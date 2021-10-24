@@ -1,15 +1,26 @@
+<script>
+import Header from "../components/header.svelte";
+import MapikitLogo from "../components/mapikit-logo.svelte";
 
-<title>Mapikit</title>
+</script>
+
+<title>Mapikit - Coming soon</title>
 <body>
-  <h1>Welcome to Mapikit!</h1>
-  <p>Here is where you Lorem your Ipsum</p>
+  <Header />
+  <MapikitLogo />
+
+  <h1> Coming Soon... </h1>
+
 </body>
 
-
-
-<style lang="css">
+<style lang="scss">
   body {
     text-align: center;
     font-family: Dosis;
+  }
+
+  h1 {
+    font-size: 120px;
+    color: rgba(255, 255, 255, 0.055);
   }
 </style>
