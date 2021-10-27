@@ -18,20 +18,17 @@
 
   .center-container {
     width: 100%;
-    height:  500px;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
+    height:  300px;
 
     h1 {
-      font-size: 58px;
+      font-size: 48px;
       margin-bottom: 6px;
       font-family: 'Livvic', sans-serif;
       font-weight: normal;
     }
     
     p {
+      font-size: 18px;
       margin: 0;
 
       span {
@@ -41,7 +38,7 @@
   }
 
   img {
-    height: 160px;
+    height: 140px;
   }
 
   .slogan {
@@ -49,7 +46,49 @@
   }
 
   .logo {
-    margin-bottom: 28px;
+    margin-bottom: 6px;
   }
-  
-</style>
+
+  @media only screen and (min-width: 768px) {
+    .center-container {
+      height:  450px;
+
+      h1 {
+        font-size: 58px;
+        margin-bottom: 6px;
+      }
+
+      p {
+        font-size: 22px;
+      }
+    }
+
+    img {
+      height: 180px;
+    }
+
+    .logo {
+      margin-bottom: 28px;
+    }
+  }
+
+  @media only screen and (min-width: 1390px) {
+    .center-container {
+      height:  550px;
+
+      h1 {
+        font-size: 58px;
+        margin-bottom: 6px;
+      }
+    }
+
+    img {
+      height: 210px;
+    }
+
+    .logo {
+      margin-bottom: 28px;
+    }
+  }
+
+  </style>

@@ -20,7 +20,14 @@ import MapikitLogo from "../components/mapikit-logo.svelte";
   }
 
   h1 {
-    font-size: 120px;
+    padding: 0 16px;
+    font-size: 4em;
     color: rgba(255, 255, 255, 0.055);
+  }
+
+  @media only screen and (min-width: 768px) {
+    h1 {
+      font-size: 5.5em;
+    }
   }
 </style>
