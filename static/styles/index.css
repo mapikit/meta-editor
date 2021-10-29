@@ -1,0 +1,10 @@
+html {
+  color: white;
+  background-color: #101023ff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}

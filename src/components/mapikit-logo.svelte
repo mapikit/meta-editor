@@ -1,6 +1,6 @@
 <div class="center-container flex">
   <div class="logo">
-    <img src="/icon_mapikit.svg" alt="Mapikit Logo"/>
+    <img src="icon_mapikit.svg" alt="Mapikit Logo"/>
   </div>
   <div class="slogan">
     <h1> mapikit </h1>

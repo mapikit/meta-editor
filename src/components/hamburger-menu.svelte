@@ -8,7 +8,7 @@ const toggleVisibility = () => { visible = !visible; };
 </script>
 
 <div class="hamburger-container">
-  <img class="icon" src="/hamburger-menu.svg" alt="hamburger menu icon" on:click={toggleVisibility}/>
+  <img class="icon" src="hamburger-menu.svg" alt="hamburger menu icon" on:click={toggleVisibility}/>
   {#if visible}
     <div class="menu-elements" in:fly="{{ y: -50, duration: 200 }}" out:fly="{{ y: -50, duration: 200 }}">
       <HeaderLinks />
