@@ -9,39 +9,22 @@
 
   export let moduleConfig : ModuleCard;
 
-  if(moduleConfig.key === undefined) moduleConfig.key = Math.random()*1000;
-  if(moduleConfig.dependencies === undefined) moduleConfig.dependencies = [];
-  if(moduleConfig.position === undefined) moduleConfig.position = { x: 70, y: 70 };
-  if(moduleConfig.info === undefined) moduleConfig.info = functionsInfo.get(getFullName(moduleConfig));
+  moduleConfig.key = moduleConfig.key ?? Math.random()*1000;
+  moduleConfig.dependencies = moduleConfig.dependencies ?? [];
+  moduleConfig.position = moduleConfig.position ?? { x: 70, y: 70 };
+  moduleConfig.info = moduleConfig.info ?? functionsInfo.get(getFullName(moduleConfig));
   
   let moving = false;
 
-  function drag (node : Node) {
-    // TODO Overall rewokr of this mess
-    node.addEventListener("mousedown", () => {
-      moving = true;
-      node["style"]["z-index"] = 1;
-    })
+  function startMovement (event : MouseEvent) { moving = event.button === 0 }
+  function stopMovement () { moving = false }
 
-    node.addEventListener("mousemove", (event) => {
-      if(moving) {
-        moduleConfig.position.x += event["movementX"]
-        moduleConfig.position.y += event["movementY"]
-        bopStore.update(bop => bop);
-      }
-    })
-
-    node.addEventListener("mouseup", () => {
-      node["style"]["z-index"] = 0;
-      setTimeout(() => bopStore.update(bop => bop), 120)
-      moving = false;
-    })
-
-    node.addEventListener("mouseout", () => {
-      setTimeout(() => bopStore.update(bop => bop), 120)
-      node["style"]["z-index"] = 0;
-      moving = false;
-    })
+  function moveCard (event : MouseEvent) {
+    if(moving) {
+      moduleConfig.position.x += event.movementX
+      moduleConfig.position.y += event.movementY
+      bopStore.update(bop => bop);
+    }
   }
 
   function deleteThis () {
@@ -70,7 +53,6 @@
     border-radius: 10px;
     position: absolute;
     padding: 7px 0 7px 0;
-    text-align: center;
     border: solid rgba(0, 0, 0, 0.884) 1px;
   }
   .modName {
@@ -84,7 +66,7 @@
 </style>
 
 <div 
-  use:drag 
+  on:mousedown={startMovement}
   class="module" 
   style="left: {moduleConfig.position.x}px; top: {moduleConfig.position.y}px"
 >
@@ -97,5 +79,7 @@
     <OutputSection name={output} parentInfo={moduleConfig}/>
   {/each}
 </div>
+
+<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
 
 

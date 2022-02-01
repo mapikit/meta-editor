@@ -27,8 +27,7 @@
     context.strokeStyle = "#ffffff";
     context.lineWidth = 2
 
-    bopStore.subscribe((bop) => {
-      currentBop = bop;
+    bopStore.subscribe(() => {
       updateTraces(context, canvas.height, canvas.width);
     })
   })
@@ -53,6 +52,23 @@
     })
   }
 
+  let moving = false;
+
+  function startMovement (event : MouseEvent) { moving = event.button === 1 }
+  function stopMovement () { moving = false }
+
+  function moveCard (event : MouseEvent) {
+    if(moving) {
+      bopStore.update(bop => {
+        bop.configuration.forEach(module => {
+          module.position.x += event.movementX
+          module.position.y += event.movementY
+        });
+        return bop;
+      })
+    }
+  }
+
   function copyBOpToClipboard() {
     console.log(currentBop);
     // TODO filter out ui properties
@@ -60,18 +76,20 @@
   }
 </script>
 
-<canvas class="canvas" bind:this={canvas}/>
+<canvas class="canvas" bind:this={canvas} on:mousedown={startMovement}/>
   {#each currentBop.configuration as config}
     <Module moduleConfig={config}/>
   {/each}
   
-  <select class="selection" name="select" bind:this={moduleSelection} on:input={() => addModuleToBop()}>
-    <option value={null}>-Select a Module-</option>
-    {#each Array.from(functionsInfo.keys()) as name}
-      <option value={name}>{name}</option>
-    {/each}
-  </select>
-  <input class="buttonCpy" type="button" value="Copy Bop" on:click={() => copyBOpToClipboard()}>
+<select class="selection" name="select" bind:this={moduleSelection} on:input={() => addModuleToBop()}>
+  <option value={null}>-Select a Module-</option>
+  {#each Array.from(functionsInfo.keys()) as name}
+    <option value={name}>{name}</option>
+  {/each}
+</select>
+<input class="buttonCpy" type="button" value="Copy Bop" on:click={() => copyBOpToClipboard()}>
+<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement} />
+
 
 
 <style>
