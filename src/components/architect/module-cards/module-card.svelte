@@ -31,11 +31,27 @@
     bopStore.update(bop => {
       const index = bop.configuration.findIndex(module => module.key === moduleConfig.key);
       const dependencies = bop.configuration[index].dependencies;
+      // Delete inbound connections
       for(const dependency of dependencies) {
         const identifier = 
           `${dependency.originPath.split(".").slice(1).join(".")}@${dependency.origin}-`+
           `${dependency.targetPath}@${moduleConfig.key}`
         delete moduleConnections[identifier];
+      }
+      // Delete outbound connections
+      for(const module of bop.configuration) {
+        console.log(module)
+        for(const dependency in module.dependencies) {
+
+          if(module.dependencies[dependency].origin === moduleConfig.key) {
+            const identifier = 
+              `${module.dependencies[dependency].originPath.split(".").slice(1).join(".")}@${module.dependencies[dependency].origin}-`+
+              `${module.dependencies[dependency].targetPath}@${module.key}`
+            
+            module.dependencies.splice(Number(dependency), 1);
+            delete moduleConnections[identifier];
+          }
+        }
       }
 
       bop.configuration.splice(index, 1);
