@@ -1,21 +1,58 @@
-<script>
+<script lang="ts">
 import PebblesContainer from "../components/pebbles-container.svelte";
 import Header from "../components/header.svelte";
 import MapikitLogo from "../components/mapikit-logo.svelte";
+import Module from "../components/architect/module-cards/module-card.svelte";
+import type { ConfigurationType } from "meta-system";
+import type { BusinessOperations } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import EditionCanvas from "../components/architect/edition-canvas.svelte";
+import type { UICompliantBop } from "../common/types/ui-bop";
+import { bopStore } from "../stores/bop-store";
+
+  const bopsConfig : BusinessOperations = {
+    name: "My BOp",
+    customObjects: [],
+    constants: [],
+    variables: [],
+    configuration: [
+      {
+        key: undefined,
+        moduleName: "if",
+        moduleType: "internal",
+        dependencies: [],
+      },
+      {
+        key: undefined,
+        moduleName: "add",
+        moduleType: "internal",
+        dependencies: [],
+      }
+    ],
+    input: {},
+    output: {},
+  }
+
+  bopStore.set(bopsConfig as unknown as UICompliantBop);
 
 </script>
 
 <title>Mapikit - Coming soon</title>
 <body>
-  <Header />
+  <EditionCanvas/>
+  <!-- <Header />
   <MapikitLogo />
   <br>
   <PebblesContainer />
   <br>
-  <h1> Coming Soon... </h1>
+  <h1> Coming Soon... </h1> -->
 </body>
 
 <style lang="scss">
+  .button {
+    position: absolute;
+    left: 100px;
+    top: 50px;
+  }
   body {
     text-align: center;
     font-family: Dosis;
