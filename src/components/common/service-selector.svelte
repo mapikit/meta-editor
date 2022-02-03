@@ -1,7 +1,12 @@
 <script lang="ts">
+  import ServiceIcon from "./service-icon.svelte";
+import Tooltip from "./tooltip.svelte";
+
+  export let collapsed : boolean = false;
+
   const services = [
-    { name: "Mapibox", link: "something", icon: "mapibox-icon.svg" },
-    { name: "Mapicloud", link: "something-else", icon: "mapicloud-icon.svg" }
+    { name: "Mapibox", link: "something", icon: "mapibox-icon.svg", tooltip: "Mapibox - Create and edit systems" },
+    { name: "Mapicloud", link: "something-else", icon: "mapicloud-icon.svg", tooltip: "Mapicloud - Run you systems in a ready-to-go cloud platform" }
   ];
 
   let selected = "";
@@ -11,24 +16,22 @@
   }
 </script>
 
-<div class="service-select">
+<div class="{collapsed ? "service-select collapsed" : "service-select"}"
+  on:mouseleave="{() => collapsed = true}"
+  on:mouseenter="{() => collapsed = false}"
+>
   {#each services as service}
-    <div class="service-holder">
-      <div
-        class="{selected === service.name ? "service selected" : "service"}"
-        on:click="{() => select(service.name)}"
-      >
-        <img alt={service.name} src={"/dashboard-assets/icons/"+service.icon}/>
-      </div>
-      {#if selected === service.name}
-        <div class="selected-mark"/>
-      {/if}
-    </div>
+    <ServiceIcon
+      selectFunction={select}
+      selected={selected}
+      service={service}
+    />
   {/each}
 </div>
 
 <style lang="scss">
   .service-select {
+    margin-top: 48px;
     height: calc(100vh - 48px);
     width: 84px;
     background-color: #5d2be6;
@@ -36,52 +39,14 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: center;
-    padding: 16px 0 0 16px;
-  }
+    padding: 16px 0 0 14px;
+    position: fixed;
+    transition: all 250ms;
 
-  .service {
-    cursor: pointer;
-    height: 56px;
-    width: 56px;
-    background-color: #6d3afc;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background 200ms;
-
-    img {
-      width: 32px;
-      height: 32px;
+    &.collapsed {
+      margin-left: -72px;
+      transition: all 250ms .5s;
     }
   }
 
-  .selected-mark {
-    background-color: #3cf691;
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    position: absolute;
-    right: -5px;
-    top: 23px;
-    rotate: 45deg;
-  }
-
-  .service:hover {
-    background-color: #a382ff;
-  }
-
-  .service.selected {
-    border: 3px solid white;
-  }
-
-  .service-holder {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-  }
-
-  .service-holder:not(:first-child) {
-    margin-top: 16px;
-  }
 </style>
