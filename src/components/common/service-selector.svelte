@@ -1,6 +1,6 @@
 <script lang="ts">
   import ServiceIcon from "./service-icon.svelte";
-  import { closeServiceSelector, layoutTabs, openServiceSelector } from "../../stores/layout-tabs-store";
+  import { layoutTabs } from "../../stores/layout-tabs-store";
 
   let collapsed = false;
   layoutTabs.subscribe((value) => { collapsed = !value.serviceSelectorOpen; })
@@ -19,8 +19,8 @@
 </script>
 
 <div class="{collapsed && selected !== "" ? "service-select collapsed" : "service-select"}"
-  on:mouseleave="{closeServiceSelector}"
-  on:mouseenter="{openServiceSelector}"
+  on:mouseleave="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: false && selected !== ""}))}"
+  on:mouseenter="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: true && selected !== ""}))}"
 >
   {#each services as service}
     <ServiceIcon
