@@ -1,12 +1,13 @@
 <script lang="ts">
   import ServiceIcon from "./service-icon.svelte";
-import Tooltip from "./tooltip.svelte";
+  import { closeServiceSelector, layoutTabs, openServiceSelector } from "../../stores/layout-tabs-store";
 
-  export let collapsed : boolean = false;
+  let collapsed = false;
+  layoutTabs.subscribe((value) => { collapsed = !value.serviceSelectorOpen; })
 
   const services = [
     { name: "Mapibox", link: "something", icon: "mapibox-icon.svg", tooltip: "Mapibox - Create and edit systems" },
-    { name: "Mapicloud", link: "something-else", icon: "mapicloud-icon.svg", tooltip: "Mapicloud - Run you systems in a ready-to-go cloud platform" }
+    { name: "Mapicloud", link: "something-else", icon: "mapicloud-icon.svg", tooltip: "Mapicloud - Run your systems in a ready-to-go cloud platform" }
   ];
 
   let selected = "";
@@ -14,11 +15,12 @@ import Tooltip from "./tooltip.svelte";
   const select = (serviceName : string) : void => {
     selected = serviceName;
   }
+
 </script>
 
-<div class="{collapsed ? "service-select collapsed" : "service-select"}"
-  on:mouseleave="{() => collapsed = true}"
-  on:mouseenter="{() => collapsed = false}"
+<div class="{collapsed && selected !== "" ? "service-select collapsed" : "service-select"}"
+  on:mouseleave="{closeServiceSelector}"
+  on:mouseenter="{openServiceSelector}"
 >
   {#each services as service}
     <ServiceIcon
@@ -40,8 +42,8 @@ import Tooltip from "./tooltip.svelte";
     justify-content: flex-start;
     align-items: center;
     padding: 16px 0 0 14px;
-    position: fixed;
     transition: all 250ms;
+    position: fixed;
 
     &.collapsed {
       margin-left: -72px;
