@@ -2,10 +2,13 @@
 // Logo on the left
 // After the logo, Breadcrumbs 
 // Right sandwitch menu
+
+import { goto } from '$app/navigation';
+import { selectedService } from '../../stores/layout-tabs-store';
 </script>
 
 <div class="header">
-  <div class="logo">
+  <div class="logo" on:click="{() => { goto('/home'); selectedService.set("") }}" >
     <img src="logo-and-name.svg" alt="mapikit-logo"/>
   </div>
 </div>
@@ -21,6 +24,7 @@
       height: 36px;
       margin-top: 11px;
       margin-left: 12px;
+      cursor: pointer;
     }
   }
 </style>

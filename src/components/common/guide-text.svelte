@@ -3,16 +3,14 @@
   import { fly } from "svelte/transition";
 
   let currentText = "";
-  let updateCount = 0;
   guideText.subscribe((value) => {
     currentText = value
-    updateCount += 1;
   })
 </script>
 
 <div class="guide-text-container">
-  {#key updateCount}
-    <h1 class="guide-text" in:fly="{{ x: -50, duration: 460, delay: 160 }}" out:fly="{{ x: -50, duration: 150 }}" id="{updateCount.toString()}">
+  {#key currentText}
+    <h1 class="guide-text" in:fly="{{ x: -50, duration: 460, delay: 160 }}" out:fly="{{ x: -50, duration: 150 }}">
       {currentText}
     </h1>
   {/key}

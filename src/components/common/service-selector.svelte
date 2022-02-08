@@ -1,19 +1,24 @@
 <script lang="ts">
   import ServiceIcon from "./service-icon.svelte";
-  import { layoutTabs } from "../../stores/layout-tabs-store";
+  import { layoutTabs, selectedService } from "../../stores/layout-tabs-store";
+  import { goto } from '$app/navigation';
 
   let collapsed = false;
   layoutTabs.subscribe((value) => { collapsed = !value.serviceSelectorOpen; })
 
   const services = [
-    { name: "Mapibox", link: "something", icon: "mapibox-icon.svg", tooltip: "Mapibox - Create and edit systems" },
-    { name: "Mapicloud", link: "something-else", icon: "mapicloud-icon.svg", tooltip: "Mapicloud - Run your systems in a ready-to-go cloud platform" }
+    { name: "Mapibox", link: "/mapibox", icon: "mapibox-icon.svg", tooltip: "Mapibox - Create and edit systems" },
+    { name: "Mapicloud", link: "/something-else", icon: "mapicloud-icon.svg", tooltip: "Mapicloud - Run your systems in a ready-to-go cloud platform" }
   ];
 
   let selected = "";
+  selectedService.subscribe((value) => {
+    selected = value
+  })
 
-  const select = (serviceName : string) : void => {
-    selected = serviceName;
+  const select = (serviceName : string, link : string) : void => {
+    selectedService.set(serviceName);
+    goto(link, { replaceState: true })
   }
 
 </script>
@@ -24,7 +29,7 @@
 >
   {#each services as service}
     <ServiceIcon
-      selectFunction={select}
+      selectFunction={() => select(service.name, service.link)}
       selected={selected}
       service={service}
     />
@@ -44,6 +49,7 @@
     padding: 16px 0 0 14px;
     transition: all 250ms;
     position: fixed;
+    z-index: 5;
 
     &.collapsed {
       margin-left: -72px;
