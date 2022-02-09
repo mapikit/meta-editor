@@ -3,7 +3,7 @@ import { typeColors } from "../../../common/styles/type-colors";
 
   import type { ModuleCard } from "../../../common/types/module-card";
   import { selectedNob } from "../../../stores/connection-stores";
-  import { solveConnection } from "../solve-connection";
+  import { solveConnection } from "../helpers/solve-connection";
 
 
   export let name : string;
@@ -38,7 +38,7 @@ import { typeColors } from "../../../common/styles/type-colors";
   }
   .text {
     cursor: default;
-    margin: 2px 15px 0 0px;
+    margin: 2px 0px 0 0px;
     padding: 0 7px 3px 3px;
     border-radius: 0 5px 5px 0;
     background-color: rgb(94, 93, 93);

@@ -1,6 +1,7 @@
-import { bopStore } from "../../stores/bop-store";
-import type { NobSelection } from "../../stores/connection-stores";
-import { moduleConnections } from "../../stores/connection-stores";
+import { getConnectionIdentifier } from "./get-connection-identifier";
+import { bopStore } from "../../../stores/bop-store";
+import type { NobSelection } from "../../../stores/connection-stores";
+import { moduleConnections } from "../../../stores/connection-stores";
 
 
 // TODO breakdown this function and overall rework
@@ -15,23 +16,20 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
     window.alert("Inputs may only be connected to outputs and vice versa")
   } else {
     clickedNob.nob.style.outline = "solid white 2px;";
-    // Note, you can use the $<storeName> to access the store as a value
-    // This might be useful for improving code readability in some cases
     bopStore.update((currentBOp) => {
       const currentIsOutput = currentNob.type === "output"
       
       const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob]
 
       const targetModule = currentBOp.configuration.find(module => module.key == target.parentCard.key);
-      targetModule.dependencies.push({ 
+      const dependency = { 
         origin: origin.parentCard.key, 
         originPath: `result.${origin.property}`,
         targetPath: target.property,
-      });
+      }
+      targetModule.dependencies.push(dependency);
 
-      const identifier = 
-          `${origin.property}@${origin.parentCard.key}-`+
-          `${target.property}@${target.parentCard.key}`
+      const identifier = getConnectionIdentifier(dependency, target.parentCard.key)
       
       if(moduleConnections[identifier] !== undefined) {
         delete moduleConnections[identifier];

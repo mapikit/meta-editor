@@ -1,6 +1,6 @@
 <script lang="ts">
   import { selectedNob } from "../../../stores/connection-stores";
-  import { solveConnection } from "../solve-connection";
+  import { solveConnection } from "../helpers/solve-connection";
   import type { ModuleCard } from "../../../common/types/module-card";
 import { typeColors } from "../../../common/styles/type-colors";
 

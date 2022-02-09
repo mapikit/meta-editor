@@ -16,13 +16,13 @@ import { bopStore } from "../stores/bop-store";
     variables: [],
     configuration: [
       {
-        key: undefined,
+        key: 1,
         moduleName: "if",
         moduleType: "internal",
         dependencies: [],
       },
       {
-        key: undefined,
+        key: 2,
         moduleName: "add",
         moduleType: "internal",
         dependencies: [],

@@ -17,4 +17,22 @@ export type ModuleConnection = {
 }
 
 // TODO use an actual store for this (should impact the updateTraces function)
+// IMPORTANT! Suggestion: in bop followThisStructure:
+// {
+//   ...BOPInfo
+//   configuration: [
+//     {
+//       ...MODULEINFO
+//       dependencies: [
+//         origin: <key>, 
+//         originPath: <string>, 
+//         targetPath: <string>,
+//         originNob: <HTMLSpanElement>,
+//         thisNob: <HTMLSpanElement>,
+//       ]
+//     }
+//   ]
+// }
+// This should allow for simply deleting a dependency to remove the connections
+// Also allows for the BOp Update to impact on connection updates
 export const moduleConnections : Record<string, [HTMLSpanElement, HTMLSpanElement]> = {};
