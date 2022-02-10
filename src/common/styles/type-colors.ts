@@ -1,12 +1,12 @@
 
 export const typeColors : Record<string, string> = {
-  string: "#e4ebda",
+  string: "#62fff2",
   function: "#ced100",
-  number: "#78ba14",
-  boolean: "#0962b5",
+  number: "#b9f85a",
+  boolean: "#1e92fa",
   date: "#008ad4",
-  object: "#6b09b5",
-  cloudedObject: "#6b09b5",
-  any: "#b5092e",
-  array: "#d47f00"
+  object: "#a462fe",
+  cloudedObject: "#a462fe",
+  any: "#f74f5f",
+  array: "#ff8553"
 }

@@ -8,31 +8,54 @@ import type { BusinessOperations } from "meta-system/dist/src/configuration/busi
 import EditionCanvas from "../components/architect/edition-canvas.svelte";
 import type { UICompliantBop } from "../common/types/ui-bop";
 import { bopStore } from "../stores/bop-store";
-
-  const bopsConfig : BusinessOperations = {
-    name: "My BOp",
-    customObjects: [],
-    constants: [],
-    variables: [],
-    configuration: [
+import { systemStore } from "../stores/system-store";
+  const systemConfig : ConfigurationType = {
+    name: "TestSystem",
+    schemas: [
       {
-        key: 1,
-        moduleName: "if",
-        moduleType: "internal",
-        dependencies: [],
+        dbProtocol: "fake",
+        format: {},
+        identifier: "fakeSchema",
+        name: "Users"
       },
       {
-        key: 2,
-        moduleName: "add",
-        moduleType: "internal",
-        dependencies: [],
+        dbProtocol: "fake",
+        format: {},
+        identifier: "fakeSchema2",
+        name: "Ora"
+      }
+      
+    ],
+    businessOperations: [
+      {
+        name: "My BOp",
+        customObjects: [],
+        constants: [],
+        variables: [],
+        configuration: [
+          {
+            key: 1,
+            moduleName: "if",
+            moduleType: "internal",
+            dependencies: [],
+          },
+          {
+            key: 2,
+            moduleName: "add",
+            moduleType: "internal",
+            dependencies: [],
+          }
+        ],
+        input: {},
+        output: {},
       }
     ],
-    input: {},
-    output: {},
+    version: "1.0.0",
+    envs: [],
+    protocols: []
   }
-
-  bopStore.set(bopsConfig as unknown as UICompliantBop);
+  systemStore.set(systemConfig);
+  bopStore.set(systemConfig.businessOperations[0] as unknown as UICompliantBop);
 
 </script>
 

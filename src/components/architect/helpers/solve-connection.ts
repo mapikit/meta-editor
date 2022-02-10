@@ -1,7 +1,6 @@
-import { getConnectionIdentifier } from "./get-connection-identifier";
 import { bopStore } from "../../../stores/bop-store";
 import type { NobSelection } from "../../../stores/connection-stores";
-import { moduleConnections } from "../../../stores/connection-stores";
+import type { UICompliantDependency } from "../../../common/types/module-card";
 
 
 // TODO breakdown this function and overall rework
@@ -12,33 +11,47 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
     clickedNob.nob.style.outline = "solid #ffffff 2px";
     return clickedNob;
   }
-  if(currentNob.type === clickedNob.type) {
+  if(currentNob.nobType === clickedNob.nobType) {
     window.alert("Inputs may only be connected to outputs and vice versa")
   } else {
     clickedNob.nob.style.outline = "solid white 2px;";
     bopStore.update((currentBOp) => {
-      const currentIsOutput = currentNob.type === "output"
+      const currentIsOutput = currentNob.nobType === "output"
       
       const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob]
 
       const targetModule = currentBOp.configuration.find(module => module.key == target.parentCard.key);
-      const dependency = { 
+
+      const newDependency : UICompliantDependency = { 
         origin: origin.parentCard.key, 
         originPath: `result.${origin.property}`,
         targetPath: target.property,
+        originNob: origin.nob,
+        targetNob: target.nob,
+        matchingType: (origin.propertyType === target.propertyType) || target.propertyType === "any",
       }
-      targetModule.dependencies.push(dependency);
 
-      const identifier = getConnectionIdentifier(dependency, target.parentCard.key)
+
+      const alreadyPresent = targetModule.dependencies.findIndex(dependency => {
+        return dependency.origin == newDependency.origin &&
+          dependency.originPath === newDependency.originPath &&
+          dependency.targetPath === newDependency.targetPath
+      })
+
       
-      if(moduleConnections[identifier] !== undefined) {
-        delete moduleConnections[identifier];
-      } else {
-        const inputConnectionIndicator = identifier.split("-")[1]
-        if(Object.keys(moduleConnections).find(key => key.includes(inputConnectionIndicator))) {
-          window.alert("Inputs can't have multiple connections\n(Delete by re-connecting)")
-        } else moduleConnections[identifier] = [origin.nob, target.nob];
-      }
+      if(alreadyPresent !== -1) {
+        targetModule.dependencies.splice(alreadyPresent, 1);
+      } else targetModule.dependencies.push(newDependency);
+
+      
+      // if(moduleConnections[identifier] !== undefined) {
+      //   delete moduleConnections[identifier];
+      // } else {
+      //   const inputConnectionIndicator = identifier.split("-")[1]
+      //   if(Object.keys(moduleConnections).find(key => key.includes(inputConnectionIndicator))) {
+      //     window.alert("Inputs can't have multiple connections\n(Delete by re-connecting)")
+      //   } else moduleConnections[identifier] = [origin.nob, target.nob];
+      // }
 
       return currentBOp;
     })

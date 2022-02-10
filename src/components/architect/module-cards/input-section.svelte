@@ -17,7 +17,8 @@ import { typeColors } from "../../../common/styles/type-colors";
         parentCard: parentInfo,
         nob,
         property: name,
-        type: "input"
+        nobType: "input",
+        propertyType: parentInfo.info.input[name].type
       }
     )})
   }

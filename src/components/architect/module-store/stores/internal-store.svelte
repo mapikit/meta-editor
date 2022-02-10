@@ -1,8 +1,8 @@
 <script lang="ts">
 import type { FunctionDefinition } from "@meta-system/meta-function-helper";
-  import List from "../../list/list.svelte";
-  import { functionsInfo } from '../helpers/functions-info';
-  import StoreSection from "./store-section.svelte";
+  import List from "../../../list/list.svelte";
+  import { functionsInfo } from '../../helpers/functions-info';
+  import StoreSection from "../store-section.svelte";
   
   export let search : string = "";
 
@@ -99,5 +99,6 @@ import type { FunctionDefinition } from "@meta-system/meta-function-helper";
 <style lang="scss">
   .list {
     height: 100%;
+    width: 100%;
   }
 </style>

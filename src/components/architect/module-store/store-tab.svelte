@@ -11,11 +11,13 @@
 
 <style lang="scss">
   .tab {
+    position: relative;
     user-select: none;
     margin: 2px;
     display: block;
     text-align: center;
     border-radius: 5px 5px 5px 5px;
+    padding: 18px;
     transition-duration: 200ms;
   }
 
@@ -25,7 +27,7 @@
   }
 
   .icon {
-    position: relative;
+    position: absolute;
     color: red;
     font-size: 20;
   }

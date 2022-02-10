@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import InternalStore from "./module-store/internal-store.svelte";
+  import InternalStore from "./module-store/stores/internal-store.svelte";
   import StoreTab from "./module-store/store-tab.svelte";
+  import SchemaStore from "./module-store/stores/schema-store.svelte";
+
   const tabsInfo : Array<[any, any, string]> = [
     [InternalStore, "1", "Internal Modules"],
     [undefined, "2", "External Modules"],
-    [undefined, "3", "Schema Modules"],
+    [SchemaStore, "3", "Schema Modules"],
     [undefined, "4", "Protocols Modules"],
     [undefined, "5", "BOps Modules"],
     [undefined, "6", "Constants"],
@@ -33,12 +35,12 @@
 
 <div class="store">
   <div class="storeName">{selectedName}</div>
+  <div class="tabs">
+    {#each tabsInfo as tab, index}
+      <div on:click={() => handleClick(tab, index)}><StoreTab bind:ref={tabsRef[tabsRef.length]}>{tab[1]}</StoreTab></div>
+    {/each}
+  </div>
   <div class="storeBody">
-    <div class="tabs">
-      {#each tabsInfo as tab, index}
-        <div on:click={() => handleClick(tab, index)}><StoreTab bind:ref={tabsRef[tabsRef.length]}>{tab[1]}</StoreTab></div>
-      {/each}
-    </div>
     <div class="search">
       <span class="searchBar">L<input class="searchBox" type="text" bind:value={searchValue}><div on:click={() => searchValue = ""}>X</div></span>
     </div>
@@ -50,38 +52,50 @@
   .store {
     z-index: 2;
     position: absolute;
+    display: grid;
+    grid-template-columns: min-content auto;
+    grid-template-rows: min-content 100%;
     right: 10px;
     top: 10px;
-    width: 18%;
+    width: 20%;
     height: calc(100% - 40px);
-    background-color: #7035fb;
     border-radius: 7px;
   }
 
-  .storeBody {
-    z-index: 1;
-    display: grid;
-    grid-template-rows: 11% 87%;
-    grid-template-columns: 13% auto;
-    height: 100%;
-    background-color: #10101a;
-    border-radius: 8px;
-    padding-right: 3px;
+  .storeName {
+    grid-row: 1;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    border-radius: 7px 7px 0 0;
+    background-color: #7035fb;
+    font-size: 110%;
+    top: 0;
+    color: white;
   }
 
   .tabs {
-    grid-column-start: 1;
-    grid-row-start: 1;
-    grid-row-end: 3;
-    display: grid;
-    grid-template-rows: repeat(7, calc(100%/7));
-    grid-template-columns: 100%;
+    grid-row: 2;
+    grid-column: 1;
     align-items: center;
-    border-radius: 7px;
+    height: min-content;
+    border-radius: 0 0 0 7px;
+    background-color: #10101a;
+  }
+
+  .storeBody {
+    grid-row: 2;
+    grid-column: 2;
+    display: grid;
+    grid-template-rows: min-content auto;
+    grid-template-columns: 1fr;
+    height: 100%;
+    background-color: #202031;
+    border-radius: 0 0 7px 7px;
+    padding-right: 3px;
   }
 
   .search {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 1;
     display: flex;
     align-items: center;
@@ -111,19 +125,15 @@
     background-color: inherit;
   }
 
-  .storeName {
-    border-radius: 7px 7px 0 0;
-    background-color: #7035fb;
-    font-size: 110%;
-    top: 0;
-    color: white;
-  }
+  
 
   .selectedStore {
     border-radius: 7px;
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 2;
     height: 100%;
-    background-color: #202031;
+    width: calc(100% - 3px);
+    overflow-y: hidden;
+    margin-left: 3px;
   }
 </style>

@@ -5,6 +5,7 @@ import { bopStore } from "../../../stores/bop-store";
 import ModuleCardSkeleton from "../module-cards/module-card-skeleton.svelte";
 import StoreInput from "./store-input.svelte";
 import StoreOutput from "./store-output.svelte";
+import { environment } from "../../../stores/environment";
 
 
   export let definition : FunctionDefinition;
@@ -38,7 +39,7 @@ import StoreOutput from "./store-output.svelte";
           moduleName: definition.functionName,
           moduleType: "internal", // TODO actually figure this out
           info: definition,
-          position: { x: left, y: top },
+          position: { x: left/$environment.scale, y: top/$environment.scale },
           modulePackage: undefined, // TODO Figure this out as well
         })
         return bop;
@@ -84,7 +85,7 @@ import StoreOutput from "./store-output.svelte";
 
 <style lang="scss">
   .items {
-    width: 85%;
+    width: 90%;
     display: inline-block;
     float: none;
     position: relative;

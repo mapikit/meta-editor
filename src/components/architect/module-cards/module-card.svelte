@@ -4,12 +4,11 @@
   import { bopStore } from "../../../stores/bop-store";
   import type { ModuleCard } from "../../../common/types/module-card";
   import { functionsInfo } from "../helpers/functions-info";
-  import { getFullName } from "../../../common/helpers/get-full-name";
-  import { moduleConnections } from "../../../stores/connection-stores";
-  import { getConnectionIdentifier } from "../helpers/get-connection-identifier";
   import StaticCardBody from "./module-card-skeleton.svelte";
   import { getAvailableKey } from "../helpers/get-available-key";
-  import { scale, fly } from "svelte/transition";
+  import { scale as zoomIn, fly } from "svelte/transition";
+  import { environment } from "../../../stores/environment";
+import { onMount } from "svelte";
 
   export let moduleConfig : ModuleCard;
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopStore.configuration);
@@ -22,19 +21,21 @@
 
   function startMovement (event : MouseEvent) {
     ref.style.zIndex = "1";
+    ref.style.opacity = "0.5";
     moving = event.button === 0 }
   function stopMovement (event : MouseEvent) { 
     if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
       deleteThis();
     }
+    ref.style.opacity = "1"
     ref.style.zIndex = "0"
     moving = false 
   }
 
   function moveCard (event : MouseEvent) {
     if(moving) {
-      moduleConfig.position.x += event.movementX
-      moduleConfig.position.y += event.movementY
+      moduleConfig.position.x += event.movementX/$environment.scale
+      moduleConfig.position.y += event.movementY/$environment.scale
       bopStore.update(bop => bop);
     }
   }
@@ -46,26 +47,16 @@
 
   function deleteThis () {
     bopStore.update(bop => {
-    const index = bop.configuration.findIndex(module => module.key === moduleConfig.key);
-    const dependencies = bop.configuration[index].dependencies;
-    // Delete inbound connections
-    for(const dependency of dependencies) {
-      const identifier = getConnectionIdentifier(dependency, moduleConfig.key);
-      delete moduleConnections[identifier];
-    }
-    // Delete outbound connections
-    for(const module of bop.configuration) {
-      for(const dependency in module.dependencies) {
-        if(module.dependencies[dependency].origin === moduleConfig.key) {
-          const identifier = getConnectionIdentifier(module.dependencies[dependency], module.key);
-          
-          module.dependencies.splice(Number(dependency), 1);
-          delete moduleConnections[identifier];
+      // Remove Dependants
+      bop.configuration.forEach(module => {
+        for(let i = module.dependencies.length-1; i >= 0; i--) {
+          if(module.dependencies[i].origin === moduleConfig.key) 
+            module.dependencies.splice(i, 1);
         }
-      }
-    }
+      });
 
-    bop.configuration.splice(index, 1);
+      const index = bop.configuration.findIndex(module => module.key === moduleConfig.key);
+      bop.configuration.splice(index, 1);
     return bop;
   })
   }
@@ -73,6 +64,9 @@
 
 <style lang="scss">
   .module {
+    transition: none;
+    transition: opacity 260ms ease-in-out;
+    transform-origin: center;
     user-select: none;
     min-width: 120px;
     user-select: none;
@@ -107,12 +101,12 @@
 </style>
 
 <div 
-  in:scale={{opacity:1, start: 0.55}}
+  in:zoomIn={{opacity:1, start: 0.55}}
   out:fly={{x: 100}}
   bind:this={ref}
   on:mousedown={startMovement}
   class="module" 
-  style="left: {moduleConfig.position.x}px; top: {moduleConfig.position.y}px"
+  style="left: {moduleConfig.position.x*$environment.scale}px; top: {moduleConfig.position.y*$environment.scale}px; scale: {$environment.scale};"
 >
   <StaticCardBody definition={moduleConfig.info}>
     <div slot="content" class="IODiv">
