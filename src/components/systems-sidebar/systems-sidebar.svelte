@@ -1,6 +1,5 @@
 <script lang="ts">
-import { guideText } from "../../stores/layout-tabs-store";
-
+  import { guideText } from "../../stores/layout-tabs-store";
   import SidebarSystem from "./sidebar-system.svelte";
   import type { SystemData } from "./types";
 
@@ -50,8 +49,10 @@ import { guideText } from "../../stores/layout-tabs-store";
 
 .sidebar {
   width: 460px;
+  height: calc(100vh - 48px);
   background-color: #1a1a2a;
   padding: 18px 38px;
+  overflow-y: scroll;
 }
 
 </style>
