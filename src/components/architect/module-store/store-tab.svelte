@@ -29,6 +29,9 @@
   .icon {
     position: absolute;
     color: red;
+    left: -37%;
+    top: -32%;
     font-size: 20;
+    scale: 0.7;
   }
 </style>

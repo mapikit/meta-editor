@@ -8,7 +8,6 @@
   import { getAvailableKey } from "../helpers/get-available-key";
   import { scale as zoomIn, fly } from "svelte/transition";
   import { environment } from "../../../stores/environment";
-import { onMount } from "svelte";
 
   export let moduleConfig : ModuleCard;
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopStore.configuration);
@@ -25,7 +24,7 @@ import { onMount } from "svelte";
     moving = event.button === 0 }
   function stopMovement (event : MouseEvent) { 
     if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
-      deleteThis();
+      return deleteThis();
     }
     ref.style.opacity = "1"
     ref.style.zIndex = "0"
@@ -102,7 +101,7 @@ import { onMount } from "svelte";
 
 <div 
   in:zoomIn={{opacity:1, start: 0.55}}
-  out:fly={{x: 100}}
+  out:fly={{x: 120/$environment.scale}}
   bind:this={ref}
   on:mousedown={startMovement}
   class="module" 

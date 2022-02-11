@@ -5,13 +5,13 @@
   import SchemaStore from "./module-store/stores/schema-store.svelte";
 
   const tabsInfo : Array<[any, any, string]> = [
-    [InternalStore, "1", "Internal Modules"],
-    [undefined, "2", "External Modules"],
-    [SchemaStore, "3", "Schema Modules"],
-    [undefined, "4", "Protocols Modules"],
-    [undefined, "5", "BOps Modules"],
-    [undefined, "6", "Constants"],
-    [undefined, "7", "Variables"],
+    [InternalStore, "internal_modules_v1.png", "Internal Modules"],
+    [undefined, "external_modules_v1.png", "External Modules"],
+    [SchemaStore, "schemaFunctions_v1.png", "Schema Modules"],
+    [undefined, "Protocols_v1.png", "Protocols Modules"],
+    [undefined, "businessOperations_v1.png", "BOps Modules"],
+    [undefined, "constants_v1.png", "Constants"],
+    [undefined, "variables_v1.png", "Variables"],
   ]
 
   const tabsRef : Array<HTMLDivElement> = [];
@@ -37,7 +37,9 @@
   <div class="storeName">{selectedName}</div>
   <div class="tabs">
     {#each tabsInfo as tab, index}
-      <div on:click={() => handleClick(tab, index)}><StoreTab bind:ref={tabsRef[tabsRef.length]}>{tab[1]}</StoreTab></div>
+      <div on:click={() => handleClick(tab, index)}>
+        <StoreTab bind:ref={tabsRef[tabsRef.length]}>
+          <img src="../../../static/achitectect-module-store/{tab[1]}" alt=""/></StoreTab></div>
     {/each}
   </div>
   <div class="storeBody">
