@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import DropdownIcon from "./dropdown-icon.svelte";
-  import StoreModule from "./store-module.svelte";
+  import StoreModule from "./module-components/store-module.svelte";
 
   export let summary : string;
   export let modulesInSection : Array<FunctionDefinition>

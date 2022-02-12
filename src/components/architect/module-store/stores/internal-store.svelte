@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { FunctionDefinition } from "@meta-system/meta-function-helper";
+  import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import List from "../../../list/list.svelte";
   import { functionsInfo } from '../../helpers/functions-info';
   import StoreSection from "../store-section.svelte";

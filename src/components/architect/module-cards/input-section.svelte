@@ -52,7 +52,7 @@ import { typeColors } from "../../../common/styles/type-colors";
 </style>
 
 <div class="total" ><span 
-    class="nob" 
+    class="nob" id="InputNob"
     style="color: {typeColors[parentInfo.info.input[name].type]}" 
     on:click={getNob}
     bind:this={nob}

@@ -3,6 +3,7 @@
   import InternalStore from "./module-store/stores/internal-store.svelte";
   import StoreTab from "./module-store/store-tab.svelte";
   import SchemaStore from "./module-store/stores/schema-store.svelte";
+  import ConstantStore from "./module-store/stores/constant-store.svelte";
 
   const tabsInfo : Array<[any, any, string]> = [
     [InternalStore, "internal_modules_v1.png", "Internal Modules"],
@@ -10,7 +11,7 @@
     [SchemaStore, "schemaFunctions_v1.png", "Schema Modules"],
     [undefined, "Protocols_v1.png", "Protocols Modules"],
     [undefined, "businessOperations_v1.png", "BOps Modules"],
-    [undefined, "constants_v1.png", "Constants"],
+    [ConstantStore, "constants_v1.png", "Constants"],
     [undefined, "variables_v1.png", "Variables"],
   ]
 

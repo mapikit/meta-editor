@@ -1,11 +1,11 @@
 <script lang="ts">
-import type { FunctionDefinition } from "@meta-system/meta-function-helper";
-import { getAvailableKey } from "../helpers/get-available-key";
-import { bopStore } from "../../../stores/bop-store";
-import ModuleCardSkeleton from "../module-cards/module-card-skeleton.svelte";
-import StoreInput from "./store-input.svelte";
-import StoreOutput from "./store-output.svelte";
-import { environment } from "../../../stores/environment";
+  import type { FunctionDefinition } from "@meta-system/meta-function-helper";
+  import { getAvailableKey } from "../../helpers/get-available-key";
+  import { bopStore } from "../../../../stores/bop-store";
+  import ModuleCardSkeleton from "../../module-cards/module-card-skeleton.svelte";
+  import StoreInput from "./store-input.svelte";
+  import StoreOutput from "./store-output.svelte";
+  import { environment } from "../../../../stores/environment";
 
 
   export let definition : FunctionDefinition;

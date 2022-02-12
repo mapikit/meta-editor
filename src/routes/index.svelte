@@ -30,7 +30,10 @@ import { systemStore } from "../stores/system-store";
       {
         name: "My BOp",
         customObjects: [],
-        constants: [],
+        constants: [
+          { name: "zeroValue", type: "number", value: 0 },
+          { name: "nome", type: "string", value: "Fabu" }
+        ],
         variables: [],
         configuration: [
           {
