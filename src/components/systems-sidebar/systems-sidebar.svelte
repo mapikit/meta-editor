@@ -52,7 +52,7 @@
   height: calc(100vh - 48px);
   background-color: #1a1a2a;
   padding: 18px 38px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 </style>

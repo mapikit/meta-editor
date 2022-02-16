@@ -17,12 +17,17 @@
 </div>
 
 <style lang="scss">
+  @keyframes intro {
+    0% { color: #2c2c3d }
+    15% { color: #5e5e6d }
+    100% { color: #2c2c3d }
+  }
+
   .guide-text-container {
     position: fixed;
     font-family: "Dosis";
     font-size: 16px;
     font-weight: 900;
-    color: #2c2c3d;
     user-select: none;
     -moz-user-select: none;
 
@@ -30,7 +35,10 @@
     top: 120px;
 
     h1 {
+      color: #2c2c3d;
       max-width: 550px;
+      animation: intro 1.5s ease-in-out forwards;
+      // animation-delay: 160ms;
       text-align: right;
     }
   }

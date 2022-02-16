@@ -2,6 +2,8 @@
   import type { SystemData } from "./types";
   import { fade } from "svelte/transition";
   import { selectedSystem } from "./systems-stores";
+import AttributeAppendix from "./attribute-appendix.svelte";
+import { guideText } from "../../stores/layout-tabs-store";
 
   export let system : SystemData;
   let collapsed = true;
@@ -13,8 +15,10 @@
   const updateCollapsedStatus = () => {
     if (collapsed === true) {
       selectedSystem.set(system.name);
+      guideText.set("Select one of the three icons to start configuring your system. Hover to see more info about each one of them.");
     } else {
       selectedSystem.set("");
+      guideText.set("Select or create a system to work with");
     }
   };
 </script>
@@ -36,6 +40,7 @@
       {system.description}
     </div>
     {#if !collapsed}
+      <AttributeAppendix visible={!collapsed}/>
       <div class="stats-group" transition:fade="{{ duration: 250 }}">
         <div class="stat-line">
           <p class="key"> Version: </p> <p class="value"> {system.version} </p>
@@ -54,9 +59,6 @@
         <div class="stat-line">
           <p class="key"> Protocols: </p> <p class="protocol-count"> {system.protocolsCount} </p>
         </div>
-      </div>
-      <div class="appendix">
-        
       </div>
     {/if}
   </div>

@@ -11,7 +11,7 @@
 
       selectedService.set(services.find((service) => {
         return pageData.url.pathname.includes(service.link)
-      }).name);
+      })?.name ?? "");
     } else {
       layoutTabs.set({ serviceSelectorOpen: true });
       selectedService.set("");
