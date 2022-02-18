@@ -32,6 +32,6 @@
     left: -37%;
     top: -32%;
     font-size: 20;
-    scale: 0.7;
+    transform: scale(0.7);
   }
 </style>

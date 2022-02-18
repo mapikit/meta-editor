@@ -12,7 +12,10 @@
   export let moduleConfig : ModuleCard;
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopStore.configuration);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
-  moduleConfig.position = moduleConfig.position ?? { x: 70, y: 70 };
+  moduleConfig.position = moduleConfig.position ?? { x: 220*$environment.distributionColumn++, y: 70 };
+  //Maybe create a "smartPosition" function that considers the "distance" (module steps) from output
+  // And [modular] dependency numbers to position modules in a grid-like organization when
+  // the modules position is not present (BOP was imported)
   moduleConfig.info = moduleConfig.info ?? functionsInfo[moduleConfig.moduleType].get(moduleConfig.moduleName);
   export let trashPosition : DOMRect;
   let moving = false;
@@ -21,8 +24,10 @@
   function startMovement (event : MouseEvent) {
     ref.style.zIndex = "1";
     ref.style.opacity = "0.5";
-    moving = event.button === 0 }
-  function stopMovement (event : MouseEvent) { 
+    moving = event.button === 0 
+  }
+  
+  function stopMovement (event : MouseEvent) {
     if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
       return deleteThis();
     }
@@ -105,7 +110,7 @@
   bind:this={ref}
   on:mousedown={startMovement}
   class="module" 
-  style="left: {moduleConfig.position.x*$environment.scale}px; top: {moduleConfig.position.y*$environment.scale}px; scale: {$environment.scale};"
+  style="left: {moduleConfig.position.x*$environment.scale}px; top: {moduleConfig.position.y*$environment.scale}px; transform: scale({$environment.scale});"
 >
   <StaticCardBody definition={moduleConfig.info}>
     <div slot="content" class="IODiv">

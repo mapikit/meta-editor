@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import { getClosest } from "../../../../common/helpers/get-closest";
   import { typeColors } from "../../../../common/styles/type-colors";
 
   let moving = false;
@@ -15,26 +16,33 @@
     newCard = achitectRef.appendChild(ref.cloneNode(true)) as HTMLDivElement;
     availableInputs = achitectRef.querySelectorAll("#InputNob");
     newCard.style.position = "absolute";
-    newCard.style.width = `${ref.getBoundingClientRect().width}px`
     newCard.style.zIndex = "4"
     const currentPos = ref.getBoundingClientRect();
+    newCard.style.width = `${currentPos.width}px`
     top = currentPos.y;
     left = currentPos.x;
-    newCard.style.left = `${currentPos.x}px`;
-    newCard.style.top = `${currentPos.y}px`;
+    newCard.style.left = `${left}px`;
+    newCard.style.top = `${top}px`;
+
     ref.style.visibility = "hidden"
   }
 
-  function stopMovement () { 
+  function stopMovement () {
     moving = false;
     if(newCard !== undefined) {
-      // bopStore.update(bop => {
-      //   return bop;
-      // })
       availableInputs.forEach(nob => nob.style.boxShadow = "none")
-      newCard.remove()
-      newCard = undefined;
+      const closestInRange : [number, HTMLSpanElement] = getClosest(availableInputs, newCard.getBoundingClientRect());
+      newCard.remove();
       ref.style.visibility = "visible"
+
+      if(closestInRange[1] !== undefined) {
+        const event = new CustomEvent("appendTag", { 
+          detail: { constant } 
+        })
+        closestInRange[1].dispatchEvent(event)
+      }
+      newCard = undefined;
+
     }
     left = top = 0;
   }
@@ -45,19 +53,7 @@
       top += event.movementY;
       newCard.style.left = `${left}px`;
       newCard.style.top = `${top}px`;
-      let closestInRange : [number, HTMLSpanElement] = [-1, undefined];
-      availableInputs.forEach(nob => {
-        const inputPos = nob.getBoundingClientRect();
-        const thisRect = ref.getBoundingClientRect();
-        const distance = Math.sqrt(
-          Math.pow((left + thisRect.width)-inputPos.x, 2) + 
-          Math.pow((top + thisRect.height/2)-inputPos.y, 2)
-        )
-        if(distance < 80 && (distance < closestInRange[0] || closestInRange[0] === -1)){
-          closestInRange = [distance, nob];
-        }
-      })
-        
+      let closestInRange : [number, HTMLSpanElement] = getClosest(availableInputs, newCard.getBoundingClientRect());
 
       availableInputs.forEach(nob => {
         if(nob !== closestInRange[1]) nob.style.boxShadow = "none";
@@ -70,22 +66,34 @@
 
 <div class="constant" bind:this={ref} on:mousedown={startMovement}>
   <span class="name">{constant.name}: </span><span 
-    class="indicator" style="color: {typeColors[constant.type]};"> {constant.value} ●</span>
+    class="indicator" style="color: {typeColors[constant.type]};"> <abbr title={constant.value.toString()} class="text">{constant.value}</abbr> ●</span>
 </div>
 <svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
 
 <style lang="scss">
   .constant {
+    position: relative;
     user-select: none;
     background-color: #191928;
     border-radius: 20px 0 0 20px;
-    width: 90%;
-    padding: 5px 0 5px 0;
-    margin: 3px 5% 0 5%;
+    padding: 1px 19px 3px 10px;
+    text-align:  left;
+    width: 100%;
+    clip-path: polygon(0% 0%, calc(100% - 16px) 0%, 100% 50%, calc(100% - 16px) 100%, 0% 100%);
   }
 
-  .indicator {
-    text-align: right;
-    justify-self: right;
+  .text {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    text-overflow: ellipsis;
+    max-width: 8vw;
+    white-space: nowrap;
+    text-decoration: none;
   }
+
+  // .indicator {
+  //   text-align: right;
+  //   justify-self: right;
+  // }
 </style>

@@ -32,16 +32,14 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
       }
 
 
-      const alreadyPresent = targetModule.dependencies.findIndex(dependency => {
-        return dependency.origin == newDependency.origin &&
-          dependency.originPath === newDependency.originPath &&
-          dependency.targetPath === newDependency.targetPath
-      })
+      const alreadyPresent = targetModule.dependencies.findIndex(dep => dep.targetPath === newDependency.targetPath)
 
       
       if(alreadyPresent !== -1) {
         targetModule.dependencies.splice(alreadyPresent, 1);
-      } else targetModule.dependencies.push(newDependency);
+        target.nob.dispatchEvent(new CustomEvent("removeTag"))
+      } 
+      targetModule.dependencies.push(newDependency);
 
       
       // if(moduleConnections[identifier] !== undefined) {

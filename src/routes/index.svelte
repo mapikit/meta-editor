@@ -40,7 +40,9 @@ import { systemStore } from "../stores/system-store";
             key: 1,
             moduleName: "if",
             moduleType: "internal",
-            dependencies: [],
+            dependencies: [
+              { origin: "constants", targetPath: "ifTrue", originPath: "nome" }
+            ],
           },
           {
             key: 2,
