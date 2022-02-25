@@ -4,10 +4,11 @@
   import StoreTab from "./module-store/store-tab.svelte";
   import SchemaStore from "./module-store/stores/schema-store.svelte";
   import ConstantStore from "./module-store/stores/constant-store.svelte";
+  import ExternalStore from "./module-store/stores/external-store.svelte";
 
   const tabsInfo : Array<[any, any, string]> = [
     [InternalStore, "internal_modules_v1.png", "Internal Modules"],
-    [undefined, "external_modules_v1.png", "External Modules"],
+    [ExternalStore, "external_modules_v1.png", "External Modules"],
     [SchemaStore, "schemaFunctions_v1.png", "Schema Modules"],
     [undefined, "Protocols_v1.png", "Protocols Modules"],
     [undefined, "businessOperations_v1.png", "BOps Modules"],

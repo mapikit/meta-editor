@@ -37,7 +37,7 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
       
       if(alreadyPresent !== -1) {
         targetModule.dependencies.splice(alreadyPresent, 1);
-        target.nob.dispatchEvent(new CustomEvent("removeTag"))
+        target.nob.dispatchEvent(new Event("removeTag"))
       } 
       targetModule.dependencies.push(newDependency);
 

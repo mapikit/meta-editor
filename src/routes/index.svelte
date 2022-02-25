@@ -2,9 +2,7 @@
 import PebblesContainer from "../components/pebbles-container.svelte";
 import Header from "../components/header.svelte";
 import MapikitLogo from "../components/mapikit-logo.svelte";
-import Module from "../components/architect/module-cards/module-card.svelte";
 import type { ConfigurationType } from "meta-system";
-import type { BusinessOperations } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import EditionCanvas from "../components/architect/edition-canvas.svelte";
 import type { UICompliantBop } from "../common/types/ui-bop";
 import { bopStore } from "../stores/bop-store";
@@ -81,6 +79,7 @@ import { systemStore } from "../stores/system-store";
     left: 100px;
     top: 50px;
   }
+
   body {
     text-align: center;
     font-family: Dosis;

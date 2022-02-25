@@ -5,6 +5,8 @@ import DateInput from "./date-input.svelte";
 import NumberInput from "./number-input.svelte";
 import StringInput from "./string-input.svelte";
 import ObjectInput from "./object-input.svelte";
+import ArrayInput from "./array-input.svelte";
+
 import { typeColors } from "../../../../../common/styles/type-colors";
 
 
@@ -13,7 +15,8 @@ export const availableComponents : Record<string, typeof SvelteComponent> = {
   "number": NumberInput,
   "date": DateInput,
   "boolean": BooleanInput,
-  "object": ObjectInput
+  "object": ObjectInput,
+  "array": ArrayInput,
 }
 
 export const possibleConstTypes = Object.keys(typeColors).filter(type => 

@@ -30,6 +30,7 @@
   const mount = new Promise<void>(resolve => { 
     onMount(async () => {
       context = canvas.getContext("2d");
+      $environment.debugCanvasCtx = context;
       adjustCanvas();
 
       bopStore.subscribe(bop => {

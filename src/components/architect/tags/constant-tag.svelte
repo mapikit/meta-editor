@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import { onMount } from "svelte";
   import { typeColors } from "../../../common/styles/type-colors";
+  import { expand } from "../../../common/transitions/expand";
+  import { spin } from "../../../common/transitions/spin";
+
   import DropdownIcon from "../module-store/dropdown-icon.svelte";
 
   export let parentNob : HTMLSpanElement;
@@ -9,8 +13,8 @@
   function removeTag () { parentNob.dispatchEvent(new Event("removeTag")) }
 </script>
 
-<div class="constantTag">
-  <div class="removeIcon" on:click={removeTag}><DropdownIcon/></div>
+<div class="constantTag" transition:expand >
+  <div class="removeIcon" on:click={removeTag} in:spin={{initial: 45}}><DropdownIcon/></div>
   <span class="name">{config.name}&nbsp;</span><span 
     class="indicator" style="color: {typeColors[config.type]};"> ●</span>
 </div>
@@ -31,9 +35,12 @@
   }
 
   .removeIcon {
-    width: 10px;
-    display: block;
+    width: 12px;
+    height: 12px;
+    place-content: center;
+    display: flex;
     margin-right: 7px;
+    margin-top: 6px;
     stroke: white;
     transform-origin: center;
     transform: rotate(45deg);

@@ -13,25 +13,26 @@
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0-next.21",
     "@sveltejs/kit": "next",
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
-    "eslint": "^7.32.0",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-svelte3": "^3.2.1",
-    "prettier": "^2.4.1",
-    "prettier-plugin-svelte": "^2.4.0",
-    "svelte": "^3.42.6",
-    "svelte-check": "^2.2.6",
-    "svelte-preprocess": "^4.9.4",
+    "eslint-plugin-svelte3": "^3.4.0",
+    "prettier": "^2.5.1",
+    "prettier-plugin-svelte": "^2.6.0",
+    "svelte": "^3.46.4",
+    "svelte-check": "^2.4.5",
+    "svelte-preprocess": "^4.10.3",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.3"
+    "typescript": "^4.5.5"
   },
   "type": "module",
   "dependencies": {
     "@meta-system/meta-function-helper": "^0.3.3",
     "@meta-system/object-definition": "^1.0.7",
+    "axios": "^0.26.0",
     "json-beautify": "^1.1.1",
     "meta-system": "^0.3.0-RC1",
-    "sass": "^1.43.3"
+    "sass": "^1.49.8"
   }
 }

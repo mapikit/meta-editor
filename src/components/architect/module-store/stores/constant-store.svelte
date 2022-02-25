@@ -25,9 +25,6 @@
 <style lang="scss">
   .constantStore {
     position: relative;
-    display: grid;
-    grid-template-rows: 93% 7%;
-    grid-template-columns: 100%;
     height: 100%;
     overflow-y: scroll;
     scrollbar-width: none;
@@ -36,14 +33,11 @@
 
   .list {
     display: flex;
+    max-width: 100%;
     flex-direction: column;
     align-items: center;
-    grid-row: 1;
   }
 
-  .listItem {
-    margin-top: 3px;
-  }
   .addCard {
     position: absolute;
     height: 300px;
@@ -52,12 +46,15 @@
     width: calc(100%  - 4px);
     bottom: 0;
     margin-bottom: 3px;
-    background-color: white;
+    z-index: 1;
   }
 
   .addButton {
+    position: absolute;
     width: 90%;
-    height: 88%;
+    height: 8%;
+    bottom: 8px;
+    left: 5%;
     display: flex;
     justify-self: center;
     border-radius: 6px;

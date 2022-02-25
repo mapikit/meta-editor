@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { BopsConstant, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import { onMount } from "svelte";
+import { update_await_block_branch } from "svelte/internal";
 
   import { typeColors } from "../../../common/styles/type-colors";
 
@@ -60,9 +61,9 @@ import { onMount } from "svelte";
     if(typeof thisConfig.origin !== "string" || !["constant", "constants"].includes(thisConfig.origin))
       return undefined;
     const constant = $bopStore.constants.find(cons => cons.name === thisConfig.originPath.split(".")[0]);
-    return constant
+    return constant;
   }
-  constantConfig = getConstant(parentInfo.dependencies)
+  constantConfig = getConstant(parentInfo.dependencies);
 </script>
 
 <style lang="scss">
@@ -99,7 +100,7 @@ import { onMount } from "svelte";
     on:click={getNob}
     bind:this={nob}
   >●</span><span class="text">{name}</span>
-  {#if constantConfig !== undefined}
-      <ConstantTag config={constantConfig} parentNob={nob}/>
+  {#if constantConfig !== undefined }
+    <ConstantTag config={constantConfig} parentNob={nob}/>
   {/if}
 </div>
