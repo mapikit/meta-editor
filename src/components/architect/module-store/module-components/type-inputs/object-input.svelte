@@ -1,5 +1,6 @@
 <script lang="ts">
   import { writable } from "svelte/store";
+  import TypeSelect from "../../../../select/type-select.svelte";
 
   import { availableComponents } from "./inputs-map";
   import PlaceholderProp from "./placeholder-prop.svelte";
@@ -19,7 +20,8 @@
 
 <div class="obj">
   {#each Object.keys($object) as key}
-    <div>{key}: <svelte:component this={availableComponents[$object[key].type]} bind:value={$object[key].value}/></div><br>
+    <div>{key}:<svelte:component this={availableComponents[$object[key].type]} bind:value={$object[key].value}/>
+      <TypeSelect simplyfied={true} bind:value={$object[key].type} on:change={() => $object[key].value = undefined}/></div><br>
   {/each}
   <svelte:component this={placeholder} parentReference={object}/>
   <div class="addButton" on:click={addProperty}></div>

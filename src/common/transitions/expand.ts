@@ -13,6 +13,7 @@ export function expand (node : HTMLElement, { duration = 200, initial = 0} : Exp
       const easing = sineInOut(t)
       return `
         width: ${initial + (100-initial)*easing}%;
+        overflow: hidden;
       `
     }
   }
