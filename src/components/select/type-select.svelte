@@ -44,7 +44,6 @@
 
 <style lang="scss">
   .select {
-    z-index: 5;
     display: inline-grid;
     justify-content: center;
     grid-template-rows: min-content min-content;
@@ -63,6 +62,7 @@
   }
 
   .options {
+    z-index: 1;
     padding: 5px;
     cursor: default;
     display: inline-block;
