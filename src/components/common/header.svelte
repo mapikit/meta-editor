@@ -9,7 +9,7 @@ import { selectedService } from '../../stores/layout-tabs-store';
 
 <div class="header">
   <div class="logo" on:click="{() => { goto('/home'); selectedService.set("") }}" >
-    <img src="logo-and-name.svg" alt="mapikit-logo"/>
+    <img src="/logo-and-name.svg" alt="mapikit-logo"/>
   </div>
 </div>
 
