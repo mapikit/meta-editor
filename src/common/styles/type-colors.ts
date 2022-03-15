@@ -1,6 +1,7 @@
 
 export const typeColors : Record<string, string> = {
   string: "#62fff2",
+  enum: "#f5ce42",
   function: "#ced100",
   number: "#b9f85a",
   boolean: "#1e92fa",

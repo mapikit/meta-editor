@@ -1,39 +1,88 @@
 <script lang="ts">
   import { typeColors } from "../../common/styles/type-colors";
   let collapsed = true;
+  let subTypeCollapsed = true;
   export let currentType = "string";
+  export let currentSubtype = undefined;
   import { createEventDispatcher } from "svelte";
-  import { fade } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
+import RightArrow from "../common/icons/right-arrow.svelte";
 
   const availableOptions = Object.keys(typeColors);
+  const availableSubTypeOptions = availableOptions.filter((value) => {
+    return value !== "array" && value !== "any";
+  })
   const dispatch = createEventDispatcher();
 
   const changeType = (type) => {
-    dispatch("typeChange", type);
+    if (type === "array") {
+      dispatch("typeChange", type);
+      currentType = type;
+      subTypeCollapsed = false;
+
+      return
+    }
+
     currentType = type;
+    dispatch("typeChange", type);
+
+    if (type === "object") {
+      changeSubType({});      
+      return;
+    }
+
+    currentSubtype = undefined;
     collapsed = true;
+  }
+
+  const changeSubType = (subtype) => {
+    dispatch("subTypeChange", subtype);
+    currentSubtype = subtype;
+    collapsed = true;
+    subTypeCollapsed = true;
   }
 
 </script>
 
-<div class="selector" on:blur="{() => { collapsed = true }}">
-  <div class="current-type" on:click="{() => { collapsed = !collapsed }}">
+<div class="selector" on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
+  <div class="current-type" on:click="{() => { collapsed = !collapsed; subTypeCollapsed = true; }}">
     <div class="type-circle" style="background-color: {typeColors[currentType]};"/>
+    {#if currentSubtype !== undefined && typeof currentSubtype !== "object"}
+      <div class="subtype type-circle" style="background-color: {typeColors[currentSubtype]};"/>
+    {/if}
     <div class="{collapsed ? "chevron-collapse" : "chevron-collapse down"}">
       <img src="/icon-chevron-up.svg" alt="chevron"/>
     </div>
   </div>
-  {#if !collapsed}
-  <div class="options-holder" transition:fade="{{ duration: 90}}">
-    <div class="options">
-      {#each availableOptions as option }
-        <div class="option" on:click="{() => {changeType(option)}}">
-          <div class="type-circle" style="background-color: {typeColors[option]};"/>
-          <p> {option} </p>
-        </div>
-      {/each}
+  {#if !collapsed && subTypeCollapsed}
+    <div class="options-holder" transition:fade="{{ duration: 90}}">
+      <div class="options">
+        {#each availableOptions as option }
+          <div class="option" on:click="{() => {changeType(option)}}">
+            <div class="type-circle" style="background-color: {typeColors[option]};"/>
+            {#if option !== "array"}
+              <p> {option} </p>
+            {:else}
+              <p> {option}
+                <RightArrow iconColor="white"/>
+              </p>
+            {/if}
+          </div>
+        {/each}
+      </div>
     </div>
-  </div>
+  {/if}
+  {#if !subTypeCollapsed}
+    <div class="options-holder subtype" transition:fly="{{ duration: 120, delay: 90, x: 20 }}">
+      <div class="options">
+        {#each availableSubTypeOptions as option }
+          <div class="option" on:click="{() => {changeSubType(option)}}">
+            <div class="type-circle" style="background-color: {typeColors[option]};"/>
+            <p> {option} </p>
+          </div>
+        {/each}
+      </div>
+    </div>
   {/if}
 </div>
 
@@ -103,6 +152,13 @@
     background-color: chocolate;
     border-radius: 50%;
     transition: 150ms;
+
+    &.subtype {
+      margin-left: -6px;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #171723;
+    }
   }
 
   .chevron-collapse {

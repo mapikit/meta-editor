@@ -14,7 +14,8 @@ import DefinitionField from "./definition-field.svelte";
     keyName: string;
     value: unknown;
     type: TypeDefinition["type"];
-    required : boolean }[] = [
+    required : boolean;
+    subtype?: unknown }[] = [
       {
         keyName: `Initial Test Prop`,
         value: "sum data lol",
@@ -48,7 +49,7 @@ import DefinitionField from "./definition-field.svelte";
     definitionData = definitionData;
   }
 
-  const updateProp = (data : CustomEvent<{key : string; value ?: unknown; type ?: string; required ?: boolean}>) => {
+  const updateProp = (data : CustomEvent<{key : string; value ?: unknown; type ?: string; required ?: boolean; subtype ?: unknown}>) => {
     const property = definitionData.find((value) => value.keyName === data.detail.key)
     
     console.log(data.detail)
@@ -59,6 +60,10 @@ import DefinitionField from "./definition-field.svelte";
 
     if (data.detail.type) {
       property.type = data.detail.type;
+    }
+
+    if (data.detail.subtype) {
+      property.subtype = data.detail.subtype;
     }
 
     if (data.detail.required) {

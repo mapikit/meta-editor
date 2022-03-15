@@ -3,6 +3,8 @@
   import { createEventDispatcher } from "svelte";
   import TypeSelect from "./type-select.svelte";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
+  import EditingField from "./editing-fields/editing-field.svelte";
+  import { defaultTypesValues } from "./default-types-values";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createDefinition);
@@ -11,6 +13,7 @@
   let propName : string = initialPropName;
   export let propValue : unknown = initialData;
   export let propType : TypeDefinition["type"] = "string";
+  export let propSubType : string = undefined;
   export let propRequired : TypeDefinition["required"] = false;
 
   const dispatch = createEventDispatcher();
@@ -20,6 +23,7 @@
       key: initialPropName,
       value: propValue,
       type: propType,
+      subtype: propSubType,
       required: propRequired,
     })
   }
@@ -30,6 +34,12 @@
 
   const updateType = (type) => {
     propType = type;
+    propValue = defaultTypesValues[type];
+    updateProp();
+  }
+
+  const updateSubtype = (subtype) => {
+    propSubType = subtype;
     updateProp();
   }
 </script>
@@ -40,14 +50,16 @@
       <div> {initialPropName} </div>
     {:else}
       <input class="name-input" bind:value="{propName}" on:change="{updateName}"/>
-      <TypeSelect currentType={propType} on:typeChange={(data) => { updateType(data.detail)}}/>
+      <TypeSelect
+        currentType={propType}
+        on:typeChange={(data) => { updateType(data.detail)}}
+        on:subTypeChange={(data) => { updateSubtype(data.detail)}}
+      />
     {/if}
     <!-- should edit the type and the name of the Property -->
   </div>
   {#if level.canAddData()}
-    <div class="value-input">
-      <input bind:value="{propValue}" on:change="{updateProp}"/>
-    </div>
+    <EditingField updateFunction={updateProp} bind:propValue={propValue} editingType={propType}/>
   {/if}
 </div>
 
@@ -79,12 +91,6 @@
       padding: 4px;
       width: calc(100% - 44px);
     }
-  }
-
-  .value-input {
-    padding: 4px;
-    background-color: #323248;
-    border-radius: 0 0px 6px 6px;
   }
 
   input {
