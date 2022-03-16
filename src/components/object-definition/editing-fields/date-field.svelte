@@ -3,13 +3,23 @@
 
   export let propValue = new Date();
   export let updateFunction = () => {};
-
+  
   let day = propValue.getDate();
   let month = propValue.getMonth() + 1;
+  let lastSetMonth = month;
   let year = propValue.getFullYear();
 
   const setTime = () => {
+    // Had to duplicate this because the $ thingy does not work if not on the svelte body
+    const lastValidDayOfMonth = new Date(new Date()
+      .setFullYear(year, month, 0))
+      .getDate();
+
+    // Also automatically sets the day to a valid day if it is outside the month boundaries
+    if (month !== lastSetMonth && day > lastValidDayOfMonth) { day = lastValidDayOfMonth }
+
     propValue = new Date(new Date().setFullYear(year, month - 1, day));
+    lastSetMonth = propValue.getMonth() + 1;
     updateFunction()
   }
 
