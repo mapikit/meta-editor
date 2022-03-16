@@ -42,7 +42,7 @@
 
     .date-input {
       display: grid;
-      grid-template-columns: 18px 4px 18px 4px 42px;
+      grid-template-columns: 22px 4px 22px 4px 44px;
       column-gap: 2px;
     }
 
