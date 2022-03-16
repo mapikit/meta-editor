@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { TypeDefinition } from "@meta-system/object-definition";
   import { AvailableEditingTypes } from "./available-types";
+  import BooleanField from "./boolean-field.svelte";
+  import DateField from "./date-field.svelte";
   import NumberField from "./number-field.svelte";
   import StringField from "./string-field.svelte";
 
@@ -11,6 +13,8 @@
 
   componentSelector[AvailableEditingTypes.string] = StringField;
   componentSelector[AvailableEditingTypes.number] = NumberField;
+  componentSelector[AvailableEditingTypes.boolean] = BooleanField;
+  componentSelector[AvailableEditingTypes.date] = DateField;
 
   let selectedComponent
 

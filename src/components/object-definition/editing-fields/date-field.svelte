@@ -1,0 +1,58 @@
+<script lang="ts">
+  import FlatNumberField from "./flat-number-field.svelte";
+
+  export let propValue = new Date();
+  export let updateFunction = () => {};
+
+  let day = propValue.getDate();
+  let month = propValue.getMonth() + 1;
+  let year = propValue.getFullYear();
+
+  const setTime = () => {
+    propValue = new Date(new Date().setFullYear(year, month - 1, day));
+    updateFunction()
+  }
+
+  $: lastPossibleDayOfMonth = new Date(new Date()
+    .setFullYear(propValue.getFullYear(), propValue.getMonth() + 1, 0))
+    .getDate();
+;
+</script>
+
+<div class="value-input">
+  <div class="date-input">
+    <FlatNumberField bind:value={day} updateFunction={setTime} max={lastPossibleDayOfMonth} min={1}/>
+    <p>/</p>
+    <FlatNumberField bind:value={month} updateFunction={setTime} min={1} max={12}/>
+    <p>/</p>
+    <FlatNumberField bind:value={year} updateFunction={setTime} />
+  </div>
+  <p class="format"> DD / MM / YYYY </p>
+</div>
+
+<style lang="scss">
+  .value-input {
+    padding: 4px;
+    background-color: #323248;
+    border-radius: 0 0px 6px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .date-input {
+      display: grid;
+      grid-template-columns: 18px 4px 18px 4px 42px;
+      column-gap: 2px;
+    }
+
+    .format {
+      color: #747492;
+      font-size: 14px;
+      align-self: center;
+      text-align: center;
+      width: 100%;
+    }
+    
+  }
+</style>
