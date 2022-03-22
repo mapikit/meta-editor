@@ -1,156 +1,94 @@
 <script lang="ts">
-  import type { ObjectDefinition, TypeDefinition } from "@meta-system/object-definition";
-import CancelIcon from "../common/icons/cancel-icon.svelte";
-import RightArrow from "../common/icons/right-arrow.svelte";
-import DefinitionField from "./definition-field.svelte";
+  import type { ObjectDefinition } from "@meta-system/object-definition";
+  import { convertObjDefinitionToDefinitionData, DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
+import ObjectDefinitionObjectEditor from "./object-definition-object-editor.svelte";
 
   // Default mode is Creating an Obj Definition
-  export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let isTopLevel : boolean = true;
-  export let initialDefinition : ObjectDefinition = {};
+  export let editingLevel : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
+  export let initialDefinition : ObjectDefinition = {
+    "someKey": { "type": "object", "required": true, subtype: {
+      "aSubKey": { "type": "date", }
+    }},
+    "birthDate": { "type": "date" }
+  };
 
-  let definitionData : {
-    keyName: string;
-    value: unknown;
-    type: TypeDefinition["type"];
-    required : boolean;
-    subtype?: unknown }[] = [
-      {
-        keyName: `Initial Test Prop`,
-        value: "sum data lol",
-        type: "string",
-        required: false
-      }
-    ];
-  const data = {};
-
-  const appendData = () => {
-    let newPropNumber = 1;
-
-    while (definitionData.find((value) => value.keyName === `new prop (${newPropNumber})`) !== undefined) {
-      newPropNumber ++;
+  export let initialData : object = {
+    someKey: {
+      aSubKey: new Date(899999992222),
     }
+  };
 
-    definitionData.push({
-      keyName: `new prop (${newPropNumber})`,
-      value: "",
-      type: "string",
-      required: false
-    });
+  let definitionData : DefinitionData[] = convertObjDefinitionToDefinitionData(initialDefinition, initialData);
+  
+  let currentWorkingData : unknown = definitionData;
+  let workingDefinitionPath = [];
+  let upperLevelWorkingData = null;
 
-    definitionData = definitionData;
+  const setWorkingData = (definitionKey : DefinitionData, index : number) => {
+    let keySubtype = definitionKey.subtype as ObjectDefinition;
+    workingDefinitionPath.push(index);
+
+    workingDefinitionPath = workingDefinitionPath;
+
+    upperLevelWorkingData = currentWorkingData;
+    currentWorkingData = keySubtype;
+
+    bindUpdates();
   }
 
-  const updateName = (data : CustomEvent<{ oldKey: string, newKey: string }>) => {
-    definitionData.find((value) => value.keyName === data.detail.oldKey)
-      .keyName = data.detail.newKey;
+  const goBackOneLevel = () => {
+    if (workingDefinitionPath.length <= 0) { return; }
+    workingDefinitionPath.pop();
 
-    definitionData = definitionData;
+    workingDefinitionPath = workingDefinitionPath;
+    currentWorkingData = upperLevelWorkingData;
+
+    bindUpdates();
   }
 
-  const updateProp = (data : CustomEvent<{key : string; value ?: unknown; type ?: string; required ?: boolean; subtype ?: unknown}>) => {
-    const property = definitionData.find((value) => value.keyName === data.detail.key)
-    
-    console.log(data.detail)
+  const bindUpdates = () => {
+    let selected = definitionData;
 
-    if (data.detail.value) {
-      property.value = data.detail.value;
+    if (workingDefinitionPath.length <= 0) {
+      currentWorkingData = definitionData;
+      upperLevelWorkingData = null;
+
+      return;
     }
 
-    if (data.detail.type) {
-      property.type = data.detail.type;
+    let pathButTheLastItem = workingDefinitionPath.slice(0, workingDefinitionPath.length -1);
+    let lastItem = workingDefinitionPath[workingDefinitionPath.length - 1];
+
+    for (let index of pathButTheLastItem) {
+      selected = selected[index].subtype as DefinitionData[];
     }
 
-    if (data.detail.subtype) {
-      property.subtype = data.detail.subtype;
-    }
-
-    if (data.detail.required) {
-      property.required = data.detail.required;
-    }
-
-    definitionData = definitionData;
+    selected[lastItem].subtype = currentWorkingData;
   }
-
-  const deleteProp = (propName : string) => {
-    const index = definitionData.findIndex((value) => value.keyName === propName);
-    definitionData.splice(index, 1);
-    definitionData = definitionData;
-  }
-
 </script>
 
-<div class="editor-container">
-  <div class="properties-holder">
-  {#each definitionData as defKey}
-    {#if level.canAddProperty()}
-      <div class="exclude" on:click="{() => {deleteProp(defKey.keyName)}}">
-        <CancelIcon iconColor="#ffffff"/>
-      </div>
-    {/if}
-    <DefinitionField
-      on:nameUpdate="{updateName}"
-      on:updateProp="{updateProp}"
-      initialPropName="{defKey.keyName}"
-      initialData="{defKey.value}"
-      propType="{defKey.type}"
-      propRequired="{defKey.required}"
-      level="{level}"
-    />
-    {#if defKey.type === "object" || defKey.type === "array"}
-      <div class="see-obj" > <RightArrow iconColor="white"/> </div>
-    {/if}
-  {/each}
-  </div>
-  {#if level.canAddProperty()}
-    <div class="add-prop" on:click="{appendData}">
-      add property
-    </div>
-  {/if}
+<div class="top-level-editor">
+  <div class="back" on:click="{goBackOneLevel}"> GO BACK </div>
+  <div class="back" on:click="{() => console.log(definitionData)}"> log toplevel data </div>
+  <div class="back" on:click="{() => console.log(currentWorkingData)}"> log working data </div>
+  <ObjectDefinitionObjectEditor
+    level={editingLevel}
+    bind:definitionData={currentWorkingData}
+    on:navigate-definition={(event) => { setWorkingData(event.detail.definition, event.detail.index) }}
+  />
 </div>
 
 <style lang="scss">
-  .editor-container {
+  .top-level-editor {
     font-family: 'Dosis';
     font-size: 16px;
     display: flex;
     flex-flow: column nowrap;
   }
 
-  .properties-holder {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 26px calc(100% - 52px) 26px;
-
-    &>.exclude {
-      align-self: center;
-      justify-self: center;
-      cursor: pointer;
-      width: 22px;
-      height: 22px;
-
-      display: flex;
-      justify-content: center;
-      align-content: center;
-      grid-column-start: 1;
-    }
-
-    &>.see-obj {
-      width: 22px;
-      height: 22px;
-
-      align-self: center;
-      justify-self: center;
-      display: flex;
-      justify-content: center;
-      align-content: center;
-      grid-column-start: 3;
-    }
-  }
-
-  .add-prop {
-    margin: 16px 32px 8px 32px;
+  .back {
+    margin: 8px 32px 18px 32px;
     width: auto;
     text-align: center;
     cursor: pointer;
@@ -158,4 +96,5 @@ import DefinitionField from "./definition-field.svelte";
     padding: 4px 6px;
     background-color: #13131f;
   }
+
 </style>

@@ -27,7 +27,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     dispatch("typeChange", type);
 
     if (type === "object") {
-      changeSubType({});      
+      changeSubType([]);      
       return;
     }
 

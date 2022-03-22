@@ -4,13 +4,13 @@
   import TypeSelect from "./type-select.svelte";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
   import EditingField from "./editing-fields/editing-field.svelte";
-  import { defaultTypesValues } from "./default-types-values";
+  import { defaultSubTypesValues, defaultTypesValues } from "./default-types-values";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createDefinition);
-  export let initialPropName : string = "prop (n)";
   export let initialData : unknown = "";
-  let propName : string = initialPropName;
+  export let propName : string = "";
+  export let initialPropName : string = propName;
   export let propValue : unknown = initialData;
   export let propType : TypeDefinition["type"] = "string";
   export let propSubType : string = undefined;
@@ -18,14 +18,24 @@
 
   const dispatch = createEventDispatcher();
 
-  const updateProp = () => {
-    dispatch("updateProp", {
+  const syncProp = () => {
+    dispatch("syncProp", {
       key: initialPropName,
       value: propValue,
       type: propType,
       subtype: propSubType,
       required: propRequired,
     })
+
+    console.log({
+      key: initialPropName,
+      value: propValue,
+      type: propType,
+      subtype: propSubType,
+      required: propRequired,
+    })
+
+    initialPropName = propName;
   }
 
   const updateName = (event) => {
@@ -35,12 +45,14 @@
   const updateType = (type) => {
     propType = type;
     propValue = defaultTypesValues[type];
-    updateProp();
+    propSubType = defaultSubTypesValues[type];
+
+    syncProp();
   }
 
   const updateSubtype = (subtype) => {
     propSubType = subtype;
-    updateProp();
+    syncProp();
   }
 </script>
 
@@ -59,7 +71,7 @@
     <!-- should edit the type and the name of the Property -->
   </div>
   {#if level.canAddData()}
-    <EditingField updateFunction={updateProp} bind:propValue={propValue} editingType={propType}/>
+    <EditingField updateFunction={syncProp} bind:propValue={propValue} editingType={propType}/>
   {/if}
 </div>
 

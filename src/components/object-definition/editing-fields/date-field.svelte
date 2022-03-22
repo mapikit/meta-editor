@@ -3,7 +3,7 @@
 
   export let propValue = new Date();
   export let updateFunction = () => {};
-  
+
   let day = propValue.getDate();
   let month = propValue.getMonth() + 1;
   let lastSetMonth = month;
