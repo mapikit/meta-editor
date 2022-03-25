@@ -1,27 +1,58 @@
-import type { Coordinate } from "../../common/types/geometry";
+import type { CoordinateInfo } from "../../common/types/geometry";
 import type { UICompliantBop } from "../../common/types/ui-bop";
+import type { EnvType } from "../../stores/environment";
 
 export type CuttingInfo = {
-  mouse : Coordinate;
+  mouse : CoordinateInfo;
 }
 
-export function updateTraces (canvasContext : CanvasRenderingContext2D, bop : UICompliantBop, cuttingInfo ?: CuttingInfo) : Array<[number, unknown]> {
+export function updateTraces (canvasContext : CanvasRenderingContext2D, bop : UICompliantBop, env : EnvType, cuttingInfo ?: CuttingInfo) : Array<[number, unknown]> {
   const linesToCut : Array<[number, unknown]> = [];
   canvasContext.shadowColor = "red";
 
+  const canvasOffset = canvasContext.canvas.getBoundingClientRect()
+
 
   canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
+
+  canvasContext.strokeStyle = "#303030"
+  canvasContext.beginPath()
+  canvasContext.moveTo(env.origin.x, 0);
+  canvasContext.lineTo(env.origin.x, canvasContext.canvas.height);
+  canvasContext.moveTo(0, env.origin.y);
+  canvasContext.lineTo(canvasContext.canvas.width, env.origin.y);
+  canvasContext.stroke()
+
+  canvasContext.strokeStyle = "#dddddd"
+  canvasContext.lineWidth = 0.6;
+  canvasContext.setLineDash([2, 5, 10, 5])
+  canvasContext.beginPath()
+  canvasContext.moveTo(canvasContext.canvas.width/2, 0);
+  canvasContext.lineTo(canvasContext.canvas.width/2, canvasContext.canvas.height);
+  canvasContext.moveTo(0, canvasContext.canvas.height/2);
+  canvasContext.lineTo(canvasContext.canvas.width, canvasContext.canvas.height/2);
+  canvasContext.stroke()
+
+  canvasContext.setLineDash([])
+  canvasContext.lineWidth = 2;
+
   for(const module of bop.configuration) {
     for(const dependency of module.dependencies) {
       if(dependency.originNob === undefined) continue;
       const startRect = dependency.originNob.getBoundingClientRect();
       const endRect = dependency.targetNob.getBoundingClientRect();
-      const outputPos : [number, number] = [startRect.x+startRect.width/2, startRect.y + startRect.height/2];
-      const inputPos : [number, number] = [endRect.x+endRect.width/2, endRect.y + endRect.height/2];
+      const outputPos : CoordinateInfo = {
+        x: startRect.x + startRect.width/2 - canvasOffset.x, 
+        y:startRect.y + startRect.height/2 - canvasOffset.y
+      }; 
+      const inputPos : CoordinateInfo = {
+        x: endRect.x + endRect.width/2 - canvasOffset.x, 
+        y: endRect.y + endRect.height/2 - canvasOffset.y
+      }
       if(cuttingInfo) {
-        const nominator1 = (outputPos[0]-inputPos[0])*(inputPos[1]-cuttingInfo.mouse.y);
-        const nominator2 = (inputPos[0]-cuttingInfo.mouse.x)*(outputPos[1] - inputPos[1]);
-        const denominator = Math.sqrt((outputPos[0]-inputPos[0])**2 + (outputPos[1]-inputPos[1])**2);
+        const nominator1 = (outputPos.x-inputPos.x)*(inputPos.y-cuttingInfo.mouse.y+canvasOffset.y)
+        const nominator2 = (inputPos.x-cuttingInfo.mouse.x+canvasOffset.x)*(outputPos.y - inputPos.y)
+        const denominator = Math.sqrt((outputPos.x-inputPos.x)**2 + (outputPos.y-inputPos.y)**2)
         const dist = Math.abs(nominator1 - nominator2)/denominator;
         if(dist < 15) {
           linesToCut.push([module.key, dependency]);
@@ -31,14 +62,14 @@ export function updateTraces (canvasContext : CanvasRenderingContext2D, bop : UI
 
       canvasContext.strokeStyle = dependency.matchingType ? "#ffffff" : "#fde072";
 
-      canvasContext.beginPath();
-      canvasContext.moveTo(...outputPos);
+      canvasContext.beginPath()
+      canvasContext.moveTo(outputPos.x, outputPos.y)
       canvasContext.bezierCurveTo(
-        outputPos[0]+60, outputPos[1],
-        inputPos[0]-60, inputPos[1],
-        ...inputPos);
-
-      canvasContext.stroke();
+        outputPos.x+60, outputPos.y,
+        inputPos.x-60, inputPos.y,
+        inputPos.x, inputPos.y
+      )
+      canvasContext.stroke()
     }
   }
   return linesToCut;

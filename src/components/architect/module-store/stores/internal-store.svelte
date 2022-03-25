@@ -4,7 +4,8 @@
   import { functionsInfo } from "../../helpers/functions-info";
   import StoreSection from "../store-section.svelte";
   
-  export let search  = "";
+  export let search : string = "";
+  export let storeLocked = false;
 
   interface ModuleSeparation {
     name : string;
@@ -87,10 +88,12 @@
 
 <div class="list">
   <List contents={Object.keys(separatedModules)} let:item>
-    <StoreSection 
+    <StoreSection
+      sectionModulesType="internal"
       summary={item} 
       modulesInSection={separatedModules[item]}
       bind:search
+      bind:storeLocked
     />
   </List>
 </div>

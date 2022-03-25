@@ -6,9 +6,14 @@
   import StoreInput from "./store-input.svelte";
   import StoreOutput from "./store-output.svelte";
   import { environment } from "../../../../stores/environment";
+  import type { ModuleType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import { Coordinate } from "../../../../common/types/geometry";
 
 
   export let definition : FunctionDefinition;
+  export let moduleType : ModuleType;
+  export let storeLocked = false;
+
   let moving = false;
   let ref : HTMLDivElement;
   let newCard : HTMLDivElement;
@@ -16,35 +21,45 @@
   let top = 0;
 
   function startMovement (event : MouseEvent) {
+    storeLocked = true;
     moving = event.button === 0;
     let currentParent = document.getElementById("architect");
     newCard = currentParent.appendChild(ref.cloneNode(true)) as HTMLDivElement;
     newCard.style.position = "absolute";
     newCard.style.width = `${ref.getBoundingClientRect().width}px`;
     const currentPos = ref.getBoundingClientRect();
-    top = currentPos.y;
-    left = currentPos.x;
-    newCard.style.left = `${currentPos.x}px`;
-    newCard.style.top = `${currentPos.y}px`;
-    ref.style.visibility = "hidden";
+    const parentOffset = currentParent.getBoundingClientRect()
+    top = currentPos.y-parentOffset.y;
+    left = currentPos.x-parentOffset.x;
+    newCard.style.left = `${left}px`;
+    newCard.style.top = `${top}px`;
+    ref.style.visibility = "hidden"
+
   }
 
-  function stopMovement () {
+  function stopMovement (event : MouseEvent) {
     moving = false;
+    storeLocked = false;
+    const storeRect = ref.closest("#store").getBoundingClientRect();
     if(newCard !== undefined) {
-      bopStore.update(bop => {
-        bop.configuration.push({
-          dependencies: [],
-          key: getAvailableKey(bop.configuration),
-          moduleName: definition.functionName,
-          moduleType: "internal", // TODO actually figure this out
-          info: definition,
-          position: { x: left/$environment.scale, y: top/$environment.scale },
-          modulePackage: undefined, // TODO Figure this out as well
-        });
-        return bop;
-      });
-      newCard.remove();
+      if(event.x < storeRect.x) {
+        bopStore.update(bop => {
+          bop.configuration.push({
+            dependencies: [],
+            key: getAvailableKey(bop.configuration),
+            moduleName: definition.functionName,
+            moduleType: moduleType,
+            info: definition,
+            position: new Coordinate(left, top)
+              .moveBy(-$environment.origin.x, -$environment.origin.y)
+              .scale(1/$environment.scale),
+            modulePackage: undefined, // TODO Figure this out as well
+          })
+          return bop;
+        }) 
+      }
+      
+      newCard.remove()
       newCard = undefined;
       ref.style.visibility = "visible";
     }

@@ -1,26 +1,96 @@
 <script lang="ts">
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
-  import type { ModuleCard } from "../../../common/types/module-card";
-import { typeColors } from "../../../common/styles/type-colors";
+  import { typeColors } from "../../../common/styles/type-colors";
+  import type { TypeDefinition } from "@meta-system/object-definition";
+  import { bopStore } from "../../../stores/bop-store";
+import { createEventDispatcher, onDestroy, onMount } from "svelte";
+
+  const dispatch = createEventDispatcher();
+  onMount(() => dispatch("mountUnmount"))
+  onDestroy(() => dispatch("mountUnmount"))
 
   export let name : string;
+  export let info : TypeDefinition<{}>;
+  export let parentKey : number;
+  export let path = "";
 
-  let nob : HTMLSpanElement;
 
-  export let parentInfo : ModuleCard;
+  
+  let expanded = false;
+
+  export let nob : HTMLSpanElement = undefined;
+  let childNobs : Record<string, HTMLSpanElement> = {};
+
+  const isObject = ["object", "cloudedObject"].includes(info.type)
+
+
+  const handleClick = isObject ? toggleExpansion : getNob;
 
   function getNob () : void {
     selectedNob.update((current) => {
       return solveConnection(current, {
-        parentCard: parentInfo,
-        nob,
-        property: name,
-        nobType: "output",
-        propertyType: parentInfo.info.output[name].type,
-      });});
+      parentKey,
+      nob,
+      property: `${path}.${name}`,
+      nobType: "output",
+      propertyType: info.type
+    })})
+  }
+
+  function toggleExpansion () { expanded = !expanded }
+
+  function expandObject() : void {
+    if(expanded) {
+      const currentDepth = path.split(".").length + 1;
+      bopStore.update(bop => {
+        bop.configuration.forEach(module => {
+          module.dependencies.forEach(dep => {
+            if(dep.origin === parentKey) {
+              const depthProperties = dep.originPath.split(".")
+              depthProperties.splice(0, currentDepth)
+              const child = depthProperties[0]
+              if(info["subtype"][child] !== undefined) {
+                dep.originNob = childNobs[child];
+              }
+            }
+          })
+        });
+      return bop;
+      })
+    } else {
+      bopStore.update(bop => {
+        bop.configuration.forEach(module => {
+          module.dependencies.forEach(dep => {
+            if(dep.origin === parentKey) dep.originNob = nob;
+          })
+        });
+        return bop;
+      })
+      
+    }
   }
 </script>
+<div class="box">
+<div class="total"><span class="text">{name}</span><span 
+  class="nob"
+  style="color: {typeColors[info.type]};"
+  on:click={handleClick}
+  bind:this={nob}>{ isObject ? ( expanded ? "▼" : "⯈") : "●" }</span>
+  {#if expanded}
+    {#each Object.keys(info["subtype"]) as output}
+      <svelte:self
+        on:mountUnmount={expandObject}
+        path={name}
+        name={output}
+        info={info["subtype"][output]}
+        parentKey={parentKey}
+        bind:nob={childNobs[output]}
+      />
+    {/each}
+  {/if}
+</div>
+</div>
 
 <style lang="scss">
   .nob {
@@ -30,10 +100,14 @@ import { typeColors } from "../../../common/styles/type-colors";
     border-radius: 0 5px 5px 0;
     transition-duration: 125ms;
   }
+
   .nob:hover {
     background-color: lightgray;
     transition-duration: 125ms;
   }
+
+
+
   .text {
     user-select: none;
     cursor: default;
@@ -51,10 +125,3 @@ import { typeColors } from "../../../common/styles/type-colors";
   }
 </style>
 
-<div class="total"><span class="text">{name}</span><span 
-    class="nob"
-    style="color: {typeColors[parentInfo.info.output[name].type]}" 
-    on:click={getNob}
-    bind:this={nob}
-  >●</span>
-</div>

@@ -1,6 +1,6 @@
 import type { FunctionDefinition } from "@meta-system/meta-function-helper";
 import type { BopsConfigurationEntry, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import type { Coordinate } from "./geometry";
+import type { Coordinate, Dimensions } from "./geometry";
 
 export type UICompliantDependency = Dependency & {
   originNob : HTMLSpanElement;
@@ -10,19 +10,7 @@ export type UICompliantDependency = Dependency & {
 
 export interface ModuleCard extends BopsConfigurationEntry {
   position ?: Coordinate;
+  dimensions ?: Dimensions;
   info ?: FunctionDefinition;
   dependencies : Array<UICompliantDependency>
 }
-
-const bar = {
-  a: "aaaaa",
-};
-
-const foo = {
-  b: "bbbb",
-};
-
-foo.b = bar.a;
-bar.a = "asd";
-
-console.log(foo.b); //asd

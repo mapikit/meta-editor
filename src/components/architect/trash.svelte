@@ -1,6 +1,6 @@
 <script lang="ts">
 import { onMount } from "svelte";
-
+  export let hidden = false;
 
 let ref : HTMLDivElement;
 export let trashRect : DOMRect;
@@ -9,13 +9,13 @@ onMount(() => {
 });
 </script>
 
-<div class="trash" bind:this={ref}>
+<div class="trash" bind:this={ref} style="right: {hidden ? "10px" : "18.5%"};">
   TRASH
 </div>
 
 <style lang="scss">
   .trash {
-    scale: 1;
+    transition: right 250ms ease-in-out;
     user-select: none;
     position: absolute;
     bottom: 10px;

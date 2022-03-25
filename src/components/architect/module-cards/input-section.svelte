@@ -19,7 +19,7 @@ import { update_await_block_branch } from "svelte/internal";
   function getNob () : void {
     selectedNob.update((current) => {
       return solveConnection(current, {
-        parentCard: parentInfo,
+        parentKey: parentInfo.key,
         nob,
         property: name,
         nobType: "input",

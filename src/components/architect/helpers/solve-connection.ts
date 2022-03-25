@@ -7,6 +7,8 @@ import type { UICompliantDependency } from "../../../common/types/module-card";
 // In the future this will likely be biggest function of the architect as it
 // should be able to verify types and loops
 export function solveConnection (currentNob : NobSelection, clickedNob : NobSelection) : NobSelection {
+  // console.log(currentNob, clickedNob)
+
   if(currentNob === undefined) {
     clickedNob.nob.style.outline = "solid #ffffff 2px";
     return clickedNob;
@@ -16,14 +18,13 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
   } else {
     clickedNob.nob.style.outline = "solid white 2px;";
     bopStore.update((currentBOp) => {
-      const currentIsOutput = currentNob.nobType === "output";
+      const currentIsOutput = currentNob.nobType === "output"
+      const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob]
 
-      const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob];
+      const targetModule = currentBOp.configuration.find(module => module.key == target.parentKey);
 
-      const targetModule = currentBOp.configuration.find(module => module.key == target.parentCard.key);
-
-      const newDependency : UICompliantDependency = {
-        origin: origin.parentCard.key,
+      const newDependency : UICompliantDependency = { 
+        origin: origin.parentKey, 
         originPath: `result.${origin.property}`,
         targetPath: target.property,
         originNob: origin.nob,

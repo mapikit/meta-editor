@@ -1,12 +1,11 @@
-import { writable } from "svelte/store";
-import type { ModuleCard } from "../common/types/module-card";
+import { writable } from "svelte/store"
 
 export type NobSelection = {
   nobType : "input" | "output";
   propertyType : string;
   property : string;
-  nob : HTMLSpanElement;
-  parentCard : ModuleCard;
+  nob: HTMLSpanElement;
+  parentKey : number;
 }
 
 export const selectedNob = writable<NobSelection>();

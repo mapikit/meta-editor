@@ -14,9 +14,7 @@ import HeaderLinks from "../../../../header-links.svelte";
     array.update(arr => {
       arr.push({ type, value: undefined });
       return arr;
-    });
-    console.log(type, $array);
-    console.log(type, value);
+    })
   }
   let value = [];
   array.subscribe(arr =>  value = arr.map(item => item.value));

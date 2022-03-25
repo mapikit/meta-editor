@@ -8,14 +8,17 @@
   import { getAvailableKey } from "../helpers/get-available-key";
   import { scale as zoomIn, fly } from "svelte/transition";
   import { environment } from "../../../stores/environment";
+  import { Coordinate } from "../../../common/types/geometry";
 
   export let moduleConfig : ModuleCard;
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopStore.configuration);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
-  moduleConfig.position = moduleConfig.position ?? { x: 220*$environment.distributionColumn++, y: 70 };
+  moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
+  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
   //Maybe create a "smartPosition" function that considers the "distance" (module steps) from output
   // And [modular] dependency numbers to position modules in a grid-like organization when
   // the modules position is not present (BOP was imported)
+  // Also, this sort of distribuition should line in the upper level
   moduleConfig.info = moduleConfig.info ?? functionsInfo[moduleConfig.moduleType].get(moduleConfig.moduleName);
   export let trashPosition : DOMRect;
   let moving = false;
@@ -38,8 +41,7 @@
 
   function moveCard (event : MouseEvent) {
     if(moving) {
-      moduleConfig.position.x += event.movementX/$environment.scale;
-      moduleConfig.position.y += event.movementY/$environment.scale;
+      moduleConfig.position.moveBy(event.movementX/$environment.scale, event.movementY/$environment.scale);
       bopStore.update(bop => bop);
     }
   }
@@ -70,7 +72,6 @@
   .module {
     transition: none;
     transition: opacity 260ms ease-in-out;
-    transform-origin: center;
     user-select: none;
     min-width: 120px;
     user-select: none;
@@ -108,9 +109,15 @@
   in:zoomIn={{ opacity:1, start: 0.55 }}
   out:fly={{ x: 120/$environment.scale }}
   bind:this={ref}
+  bind:clientWidth={moduleConfig.dimensions.width}
+  bind:clientHeight={moduleConfig.dimensions.height}
   on:mousedown={startMovement}
   class="module" 
-  style="left: {moduleConfig.position.x*$environment.scale}px; top: {moduleConfig.position.y*$environment.scale}px; transform: scale({$environment.scale});"
+  style="
+    left: {(moduleConfig.position.x + $environment.origin.x)*$environment.scale}px; 
+    top: {(moduleConfig.position.y + $environment.origin.y)*$environment.scale}px; 
+    transform: scale({$environment.scale});
+    transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
 >
   <StaticCardBody definition={moduleConfig.info}>
     <div slot="content" class="IODiv">
@@ -121,7 +128,7 @@
       </div>
       <div class="outputs">
         {#each Object.keys(moduleConfig.info.output) as key}
-          <OutputSection  name={key} parentInfo={moduleConfig}/>
+          <OutputSection  name={key} parentKey={moduleConfig.key} info={moduleConfig.info.output[key]}/>
         {/each}
       </div>
     </div>
