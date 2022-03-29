@@ -26,7 +26,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     currentType = type;
     dispatch("typeChange", type);
 
-    if (type === "object") {
+    if (type === "object" || type === "enum") {
       changeSubType([]);      
       return;
     }

@@ -5,4 +5,5 @@ export enum AvailableEditingTypes {
   date = "date",
   any = "any",
   array = "array",
+  enum = "enum"
 }

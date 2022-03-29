@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ObjectDefinition } from "@meta-system/object-definition";
+import EnumDefinitionEditor from "./enum-definition-editor.svelte";
   import { convertObjDefinitionToDefinitionData, DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
 import ObjectDefinitionObjectEditor from "./object-definition-object-editor.svelte";
@@ -7,22 +8,21 @@ import ObjectDefinitionObjectEditor from "./object-definition-object-editor.svel
   // Default mode is Creating an Obj Definition
   export let editingLevel : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
   export let initialDefinition : ObjectDefinition = {
-    "someKey": { "type": "object", "required": true, subtype: {
-      "aSubKey": { "type": "date", }
-    }},
-    "birthDate": { "type": "date" }
+    "anEnum": { "type": "enum", "required": true, subtype: [
+      "prop1", "another prop", "YEE HAW"
+    ]}
   };
 
   export let initialData : object = {
-    someKey: {
-      aSubKey: new Date(899999992222),
-    }
+    anEnum: "prop1"
   };
 
   let definitionData : DefinitionData[] = convertObjDefinitionToDefinitionData(initialDefinition, initialData);
   
-  let currentWorkingData : unknown = definitionData;
-  let workingDefinitionPath = [];
+  let currentWorkingData : any = definitionData;
+  let dataType = "object";
+  // let upperLevelDataType = "object";
+  let workingDefinitionPath : number[] = [];
   let upperLevelWorkingData = null;
 
   const setWorkingData = (definitionKey : DefinitionData, index : number) => {
@@ -31,16 +31,40 @@ import ObjectDefinitionObjectEditor from "./object-definition-object-editor.svel
 
     workingDefinitionPath = workingDefinitionPath;
 
+    setDataType();
     upperLevelWorkingData = currentWorkingData;
+
+    if (dataType === "array") {
+      // I am too lazy to think of a correct
+      // type def just for this use-case.
+      currentWorkingData = definitionKey.value;
+      return;
+    }
     currentWorkingData = keySubtype;
 
     bindUpdates();
+  }
+
+  const setDataType = () => {
+    let preselectedDataType : any = "object";
+
+    workingDefinitionPath.forEach((dataIndex, index) => {
+      if (index === workingDefinitionPath.length - 1) {
+        preselectedDataType = definitionData[dataIndex].type;
+        return;
+      }
+
+      preselectedDataType = definitionData[dataIndex].subtype;
+    })
+
+    dataType = preselectedDataType;
   }
 
   const goBackOneLevel = () => {
     if (workingDefinitionPath.length <= 0) { return; }
     workingDefinitionPath.pop();
 
+    setDataType()
     workingDefinitionPath = workingDefinitionPath;
     currentWorkingData = upperLevelWorkingData;
 
@@ -66,17 +90,39 @@ import ObjectDefinitionObjectEditor from "./object-definition-object-editor.svel
 
     selected[lastItem].subtype = currentWorkingData;
   }
+
+  // selects the first option of an enum whenever the options are changed.
+  const correctEnumDataChange = () => {
+    let workingDefinitionData;
+
+    for (let index of workingDefinitionPath) {
+      workingDefinitionData = definitionData[index];
+    }
+
+    workingDefinitionData.value = workingDefinitionData.subtype[0] ?? "";
+  }
 </script>
 
 <div class="top-level-editor">
   <div class="back" on:click="{goBackOneLevel}"> GO BACK </div>
   <div class="back" on:click="{() => console.log(definitionData)}"> log toplevel data </div>
   <div class="back" on:click="{() => console.log(currentWorkingData)}"> log working data </div>
-  <ObjectDefinitionObjectEditor
-    level={editingLevel}
-    bind:definitionData={currentWorkingData}
-    on:navigate-definition={(event) => { setWorkingData(event.detail.definition, event.detail.index) }}
-  />
+  {#if dataType === "object"}
+    <ObjectDefinitionObjectEditor
+      level={editingLevel}
+      bind:definitionData={currentWorkingData}
+      on:navigate-definition={(event) => { setWorkingData(event.detail.definition, event.detail.index) }}
+    />
+  {:else if dataType === "enum"}
+    <EnumDefinitionEditor
+      level={editingLevel}
+      bind:definitionData={currentWorkingData}
+      on:navigate-definition={(event) => { setWorkingData(event.detail.definition, event.detail.index) }}
+      on:sync-value={() => {correctEnumDataChange()}}
+    />
+  {:else if dataType === "array"}
+    <div> Dunno to edit arrays :( </div>
+  {/if}
 </div>
 
 <style lang="scss">

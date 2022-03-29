@@ -31,7 +31,6 @@
   }
 
   const updateName = (data : CustomEvent<{ oldKey: string, newKey: string }>) => {
-    console.log("trying to update:::: ", data.detail);
     definitionData.find((value) => value.keyName === data.detail.oldKey)
       .keyName = data.detail.newKey;
 
@@ -61,6 +60,9 @@
 </script>
 
 <div class="editor-container">
+  {#if definitionData.length < 1}
+    <p class="no-props"> No properties in this object </p>
+  {/if}
   {#each definitionData as defKey, index}
   <div class="properties-holder">
     {#if level.canAddProperty()}
@@ -77,8 +79,9 @@
       propType="{defKey.type}"
       propRequired="{defKey.required}"
       level="{level}"
+      propSubType="{defKey.subtype}"
     />
-    {#if defKey.type === "object" || defKey.type === "array"}
+    {#if defKey.type === "object" || defKey.type === "array" || defKey.type === "enum"}
       <div class="see-obj" on:click={() => navigateDefinition(defKey, index)}> <RightArrow iconColor="white"/> </div>
     {/if}
   </div>
@@ -96,6 +99,11 @@
     font-size: 16px;
     display: flex;
     flex-flow: column nowrap;
+  }
+
+  .no-props {
+    text-align: center;
+    color: #545474;
   }
 
   .properties-holder {

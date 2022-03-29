@@ -13,21 +13,13 @@
   export let initialPropName : string = propName;
   export let propValue : unknown = initialData;
   export let propType : TypeDefinition["type"] = "string";
-  export let propSubType : string = undefined;
+  export let propSubType : unknown = undefined;
   export let propRequired : TypeDefinition["required"] = false;
 
   const dispatch = createEventDispatcher();
 
   const syncProp = () => {
     dispatch("syncProp", {
-      key: initialPropName,
-      value: propValue,
-      type: propType,
-      subtype: propSubType,
-      required: propRequired,
-    })
-
-    console.log({
       key: initialPropName,
       value: propValue,
       type: propType,
@@ -71,7 +63,7 @@
     <!-- should edit the type and the name of the Property -->
   </div>
   {#if level.canAddData()}
-    <EditingField updateFunction={syncProp} bind:propValue={propValue} editingType={propType}/>
+    <EditingField updateFunction={syncProp} bind:propValue={propValue} editingType={propType} subtype={propSubType}/>
   {/if}
 </div>
 
