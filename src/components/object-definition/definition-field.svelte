@@ -39,6 +39,10 @@
     propValue = defaultTypesValues[type];
     propSubType = defaultSubTypesValues[type];
 
+    if (type === "array") {
+      propValue = [];
+    }
+
     syncProp();
   }
 
@@ -51,11 +55,12 @@
 <div class="field-container">
   <div class="field-name-type">
     {#if !level.canAddProperty()}
-      <div> {initialPropName} </div>
+      <div class="name-display"> {initialPropName} </div>
     {:else}
       <input class="name-input" bind:value="{propName}" on:change="{updateName}"/>
       <TypeSelect
         currentType={propType}
+        currentSubtype={propSubType}
         on:typeChange={(data) => { updateType(data.detail)}}
         on:subTypeChange={(data) => { updateSubtype(data.detail)}}
       />
@@ -95,6 +100,10 @@
       padding: 4px;
       width: calc(100% - 44px);
     }
+  }
+
+  .name-display {
+    padding: 0 0 0 6px;
   }
 
   input {

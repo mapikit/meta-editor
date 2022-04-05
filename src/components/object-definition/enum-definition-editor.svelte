@@ -2,26 +2,33 @@
   import { createEventDispatcher } from "svelte";
   import CancelIcon from "../common/icons/cancel-icon.svelte";
   import StringField from "./editing-fields/string-field.svelte";
+import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let definitionData : string[] = [];
+  export let definitionData : DefinitionData;
+  let enumDefinitiondata;
+
+  $: {
+    enumDefinitiondata = definitionData.subtype as string[];
+  }
+
   const dispatch = createEventDispatcher();
 
   const addEnumOption = () => {
-    let newPropNumber = definitionData.length;
+    let newPropNumber = enumDefinitiondata.length;
 
-    definitionData.push(`Enum Option (${newPropNumber + 1})`);
+    enumDefinitiondata.push(`Enum Option (${newPropNumber + 1})`);
 
-    definitionData = definitionData;
+    enumDefinitiondata = enumDefinitiondata;
     dispatch("sync-value");
   }
 
   const deleteProp = (optionValue : string) => {
-    const index = definitionData.findIndex((value) => value === optionValue);
-    definitionData.splice(index, 1);
-    definitionData = definitionData;
+    const index = enumDefinitiondata.findIndex((value) => value === optionValue);
+    enumDefinitiondata.splice(index, 1);
+    enumDefinitiondata = enumDefinitiondata;
 
     dispatch("sync-value");
   }
@@ -29,10 +36,10 @@
 </script>
 
 <div class="editor-container">
-  {#if definitionData.length === 0}
+  {#if enumDefinitiondata.length === 0}
     <p class="no-options"> No options in ENUM </p>
   {/if}
-  {#each definitionData as optionName}
+  {#each enumDefinitiondata as optionName}
   <div class="properties-holder">
     {#if level.canAddProperty()}
       <div class="exclude" on:click="{() => {deleteProp(optionName)}}">

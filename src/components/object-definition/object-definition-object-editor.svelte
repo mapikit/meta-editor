@@ -9,61 +9,70 @@
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let definitionData : DefinitionData[] = [];
+  export let definitionData : DefinitionData;
+
+  let objectDefinitionData;
+
+  $: {
+    objectDefinitionData = definitionData.subtype as DefinitionData[];
+  }
+
   const dispatch = createEventDispatcher();
 
   const appendData = () => {
     let newPropNumber = 1;
 
-    while (definitionData.find((value) => value.keyName === `new prop (${newPropNumber})`) !== undefined) {
+    while (objectDefinitionData.find((value) => value.keyName === `new prop (${newPropNumber})`) !== undefined) {
       newPropNumber ++;
     }
 
-    definitionData.push({
+    objectDefinitionData.push({
       keyName: `new prop (${newPropNumber})`,
       value: "",
       type: "string",
       required: false
     });
 
-    definitionData = definitionData;
+    objectDefinitionData = objectDefinitionData;
     dispatch("sync-value");
   }
 
   const updateName = (data : CustomEvent<{ oldKey: string, newKey: string }>) => {
-    definitionData.find((value) => value.keyName === data.detail.oldKey)
+    objectDefinitionData.find((value) => value.keyName === data.detail.oldKey)
       .keyName = data.detail.newKey;
 
-    definitionData = definitionData;
+    objectDefinitionData = objectDefinitionData;
   }
 
   const syncProp = (data : CustomEvent<{key : string; value : unknown; type : string; required : boolean; subtype : unknown}>) => {
-    const property = definitionData.find((value) => value.keyName === data.detail.key)
+    const property = objectDefinitionData.find((value) => value.keyName === data.detail.key)
 
     property.value = data.detail.value;
     property.type = data.detail.type;
     property.subtype = data.detail.subtype;
     property.required = data.detail.required;
     
-    definitionData = definitionData;
+    objectDefinitionData = objectDefinitionData;
   }
 
   const deleteProp = (propName : string) => {
-    const index = definitionData.findIndex((value) => value.keyName === propName);
-    definitionData.splice(index, 1);
-    definitionData = definitionData;
+    const index = objectDefinitionData.findIndex((value) => value.keyName === propName);
+    objectDefinitionData.splice(index, 1);
+    objectDefinitionData = objectDefinitionData;
   }
 
-  const navigateDefinition = (definition : DefinitionData, index : number) => {
-    dispatch("navigate-definition", { definition, index });
+  const navigateDefinition = (type: string, indexPath : string) => {
+    let pathOnType = "subtype"
+
+    dispatch("navigate-definition", { path: `${pathOnType}.${indexPath}` });
   }
 </script>
 
 <div class="editor-container">
-  {#if definitionData.length < 1}
+  {#if objectDefinitionData.length < 1}
     <p class="no-props"> No properties in this object </p>
   {/if}
-  {#each definitionData as defKey, index}
+  {#each objectDefinitionData as defKey, index}
   <div class="properties-holder">
     {#if level.canAddProperty()}
       <div class="exclude" on:click="{() => {deleteProp(defKey.keyName)}}">
@@ -82,7 +91,7 @@
       propSubType="{defKey.subtype}"
     />
     {#if defKey.type === "object" || defKey.type === "array" || defKey.type === "enum"}
-      <div class="see-obj" on:click={() => navigateDefinition(defKey, index)}> <RightArrow iconColor="white"/> </div>
+      <div class="see-obj" on:click={() => navigateDefinition(defKey.type, index.toString())}> <RightArrow iconColor="white"/> </div>
     {/if}
   </div>
   {/each}

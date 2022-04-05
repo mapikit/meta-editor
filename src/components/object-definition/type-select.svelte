@@ -36,6 +36,20 @@ import RightArrow from "../common/icons/right-arrow.svelte";
   }
 
   const changeSubType = (subtype) => {
+    if (subtype === "object") {
+      dispatch ("subTypeChange", {
+        subtype: [],
+        keyName: "ArrayInnerObjects",
+        type: "object",
+        value: {},
+        required: true
+      })
+      currentSubtype = subtype;
+      collapsed = true;
+      subTypeCollapsed = true;
+      return;
+    }
+
     dispatch("subTypeChange", subtype);
     currentSubtype = subtype;
     collapsed = true;
@@ -49,6 +63,8 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     <div class="type-circle" style="background-color: {typeColors[currentType]};"/>
     {#if currentSubtype !== undefined && typeof currentSubtype !== "object"}
       <div class="subtype type-circle" style="background-color: {typeColors[currentSubtype]};"/>
+    {:else if typeof currentSubtype === "object" && currentType === "array"}
+      <div class="subtype type-circle" style="background-color: {typeColors["object"]};"/>
     {/if}
     <div class="{collapsed ? "chevron-collapse" : "chevron-collapse down"}">
       <img src="/icon-chevron-up.svg" alt="chevron"/>

@@ -1,9 +1,9 @@
 <script>
-import ObjectDefinitionEditor from "../../../components/object-definition/object-definition-editor.svelte";
+import ObjectDefinitionMiniApp from "../../../components/object-definition/object-definition-mini-app.svelte";
 
 </script>
 <div class="center">
- <ObjectDefinitionEditor />
+ <ObjectDefinitionMiniApp />
 </div>
 
 <style lang="scss">
