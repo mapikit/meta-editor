@@ -6,6 +6,7 @@
   import DefinitionField from "./definition-field.svelte";
   import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
+  import clone from "just-clone";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
@@ -38,8 +39,12 @@
 
   const addNewArrayItem = () => {
     if (typeof type === "object" || type === "cloudedObject") {
+      let subtype : any = [];
+      if ((type as DefinitionData).subtype) {
+        subtype = clone((type as DefinitionData).subtype as object);
+      }
       arrayValue.push({
-        subtype: type.subtype ?? [], // is the array type (already DefinitionData),
+        subtype, // is the array type (already DefinitionData),
         keyName: "ArrayInnerObject",
         type: "object",
         value: {},

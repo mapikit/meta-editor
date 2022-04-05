@@ -32,6 +32,7 @@
     "@meta-system/object-definition": "^1.1.2",
     "axios": "^0.26.0",
     "json-beautify": "^1.1.1",
+    "just-clone": "^5.0.1",
     "meta-system": "^0.3.0-RC1",
     "sass": "^1.49.8"
   }
