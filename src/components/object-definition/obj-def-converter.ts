@@ -57,3 +57,61 @@ export const getDataFromDefinitionData = (defData : DefinitionData[]) : object =
 
   return result;
 };
+
+export const convertDefinitionDataToObjectDefinition = (definitionData : DefinitionData)
+: { definition : ObjectDefinition; data : object } => {
+  const result : { definition : ObjectDefinition; data : object } = {
+    definition : {},
+    data: {}
+  };
+
+  if (definitionData.type === "array") {
+    result.definition[definitionData.keyName] = {
+      "type": "array",
+      "required": definitionData.required,
+      "subtype": definitionData.subtype as string,
+    }
+    result.data[definitionData.keyName] = definitionData.value;
+
+    if (typeof definitionData.subtype === "object") {
+      const converted = convertDefinitionDataToObjectDefinition(definitionData.subtype as DefinitionData);
+      result.definition[definitionData.keyName]["subtype"] = converted.definition;
+      result.data[definitionData.keyName] = converted.data;
+
+      return result;
+    }
+
+    return result;
+  }
+
+  if (definitionData.type === "object") {
+    result.definition[definitionData.keyName] = {
+      "type": "object",
+      "required": definitionData.required,
+      "subtype": {}
+    };
+
+    result.data[definitionData.keyName] = {};
+
+    (definitionData.subtype as DefinitionData[]).forEach((innerDefinitionData) => {
+      const innerConverted = convertDefinitionDataToObjectDefinition(innerDefinitionData);
+      
+      result.definition[definitionData.keyName]["subtype"][innerDefinitionData.keyName]
+        = innerConverted.definition[innerDefinitionData.keyName];
+      result.data[definitionData.keyName][innerDefinitionData.keyName]
+        = innerConverted.data[innerDefinitionData.keyName];
+    });
+
+    return result;
+  }
+
+  result.definition[definitionData.keyName] = {
+    "type": definitionData.type,
+    "required": definitionData.required,
+  }
+
+  result.data[definitionData.keyName] = definitionData.value
+
+
+  return result;
+}

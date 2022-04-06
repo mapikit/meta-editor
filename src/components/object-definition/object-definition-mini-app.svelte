@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ObjectDefinition } from "@meta-system/object-definition";
-  import { convertObjDefinitionToDefinitionData, DefinitionData } from "./obj-def-converter";
+  import { convertDefinitionDataToObjectDefinition, convertObjDefinitionToDefinitionData, DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
   import ObjectDefinitionEditor from "./object-definition-editor.svelte";
 
@@ -76,7 +76,7 @@
 
 <div class="editor">
   <div class="back" on:click="{goBackOneLevel}"> GO BACK </div>
-  <div class="back" on:click="{() => { console.log(rootDefinitionData) }}"> log top level </div>
+  <div class="back" on:click="{() => { console.log(convertDefinitionDataToObjectDefinition(rootDefinitionData)) }}"> log objDef </div>
   <div class="back" on:click="{() => { workingDefinitionPath = []; levelOverrideMap.clear(); setWorkingDataAndLevel() }}"> Reset Navigation </div>
   <ObjectDefinitionEditor
     editingLevel={currentLevel}
