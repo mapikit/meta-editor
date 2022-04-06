@@ -68,6 +68,9 @@
       List of {type}
     {/if}
   </div>
+  {#if arrayValue.length === 0}
+    <div class="no-options"> No items in the List </div>
+  {:else}
   <div class="list-container">
     {#each arrayValue as arrayItem, index }
       <div class="properties-holder">
@@ -90,8 +93,11 @@
         {/if}
       </div>
     {/each}
-    <div class="add-prop" on:click={() => {addNewArrayItem()} }> Add new item </div>
   </div>
+  {/if}
+  {#if level.canAddData()}
+    <div class="add-prop" on:click={() => {addNewArrayItem()} }> Add new item </div>
+  {/if}
 </div>
 
 <style lang="scss">
@@ -150,6 +156,10 @@
     }
   }
 
+  .no-options {
+    text-align: center;
+    color: #545474;
+  }
 
   .add-prop {
     margin: 16px 16px 8px 16px;

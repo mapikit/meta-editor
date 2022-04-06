@@ -66,6 +66,14 @@
 
     dispatch("navigate-definition", { path: `${pathOnType}.${indexPath}` });
   }
+
+  const shouldDisplayArrow = (defKey : DefinitionData) : boolean => {
+    if (defKey.type === "object" || defKey.type === "array" || defKey.type === "enum") {
+      if (defKey.type === "array" && (typeof defKey.subtype === "object")) { return true }
+      if (!level.canAddData() && defKey.type === "array") { return false; }
+      return true;
+    }
+  }
 </script>
 
 <div class="editor-container">
@@ -90,7 +98,7 @@
       level="{level}"
       propSubType="{defKey.subtype}"
     />
-    {#if defKey.type === "object" || defKey.type === "array" || defKey.type === "enum"}
+    {#if shouldDisplayArrow(defKey)}
       <div class="see-obj" on:click={() => navigateDefinition(defKey.type, index.toString())}> <RightArrow iconColor="white"/> </div>
     {/if}
   </div>

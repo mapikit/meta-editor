@@ -10,7 +10,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
 
   const availableOptions = Object.keys(typeColors);
   const availableSubTypeOptions = availableOptions.filter((value) => {
-    return value !== "array" && value !== "any";
+    return value !== "array" && value !== "any" && value !== "enum"
   })
   const dispatch = createEventDispatcher();
 
