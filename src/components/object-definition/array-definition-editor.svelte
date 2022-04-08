@@ -12,7 +12,7 @@
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
   export let definitionData : DefinitionData;
   const dispatch = createEventDispatcher();
-  let arrayValue;
+  let arrayValue = [];
   let type : DefinitionData | string;
 
   $: {
@@ -45,7 +45,7 @@
       }
       arrayValue.push({
         subtype, // is the array type (already DefinitionData),
-        keyName: "ArrayInnerObject",
+        keyName: `Object in Array`,
         type: "object",
         value: {},
         required: true

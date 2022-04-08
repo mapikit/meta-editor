@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { ObjectDefinition } from "@meta-system/object-definition";
   import { createEventDispatcher } from "svelte";
   import CancelIcon from "../common/icons/cancel-icon.svelte";
   import RightArrow from "../common/icons/right-arrow.svelte";

@@ -39,7 +39,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     if (subtype === "object") {
       dispatch ("subTypeChange", {
         subtype: [],
-        keyName: "ArrayInnerObjects",
+        keyName: "Objects of Array",
         type: "object",
         value: {},
         required: true

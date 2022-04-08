@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import type { ObjectDefinition } from "@meta-system/object-definition";
   import { convertDefinitionDataToObjectDefinition, convertObjDefinitionToDefinitionData, DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
@@ -6,13 +7,11 @@
 
   // Default mode is Creating an Obj Definition
   export let editingLevel : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let initialDefinition : ObjectDefinition = {
-    "aProp": { "type": "object", "required": true, subtype: { "inner": { "type": "string" } } }
-  };
+  export let initialDefinition : ObjectDefinition;
 
-  export let initialData : object = {
-    aProp: { inner: "hiya" }
-  };
+  const dispatch = createEventDispatcher();
+
+  export let initialData : object;
 
   let definitionData : DefinitionData[] = convertObjDefinitionToDefinitionData(initialDefinition, initialData);
   const rootDefinitionData : DefinitionData = {
@@ -29,8 +28,19 @@
   let workingDefinitionPath : Array<string> = [];
   let levelOverrideMap = new Map<number, EditorLevels>();
   let currentLevel = editingLevel;
+  let levelsNames : string[] = [];
 
   const setWorkingDataAndLevel = () => {
+    let lastValidLevel = editingLevel.level;
+    for (let i = 1; i <= workingDefinitionPath.length; i ++) {
+      lastValidLevel = levelOverrideMap.get(i) ?? lastValidLevel;
+    }
+
+    currentLevel = new EditorLevel(lastValidLevel);
+    selectedData = selectDataDefinition();
+  }
+
+  const selectDataDefinition = () => {
     const dicedDefinitionPath = [];
     workingDefinitionPath.forEach((path : string) => {
       const parts = path.split(".");
@@ -42,13 +52,7 @@
       intermediarySelectedData = intermediarySelectedData[path];
     }
 
-    let lastValidLevel = editingLevel.level;
-    for (let i = 1; i <= workingDefinitionPath.length; i ++) {
-      lastValidLevel = levelOverrideMap.get(i) ?? lastValidLevel;
-    }
-
-    currentLevel = new EditorLevel(lastValidLevel);
-    selectedData = intermediarySelectedData;
+    return intermediarySelectedData;
   }
 
 
@@ -60,24 +64,49 @@
       levelOverrideMap.set(workingDefinitionPath.length, levelOverride);
     }
 
-    console.log(path, levelOverride)
+    const intermediarySelectedData = selectDataDefinition();
+    levelsNames.push(intermediarySelectedData.keyName);
+
+    dispatch("navigation-event", { namePaths: levelsNames });
+
     setWorkingDataAndLevel();
   }
 
-  const goBackOneLevel = () => {
+  export const goBackOneLevel = () => {
     levelOverrideMap.delete(workingDefinitionPath.length);
 
     workingDefinitionPath.pop();
     workingDefinitionPath = workingDefinitionPath;
 
+    dispatch("navigation-event", { namePaths: levelsNames });
+
     setWorkingDataAndLevel();
   }
+
+  export const navigateBackToLevel = (levelIndex : number) => {
+    for (let i = workingDefinitionPath.length - 1; i >= levelIndex; i--) {
+      levelOverrideMap.delete(workingDefinitionPath.length);
+      levelsNames.pop();
+    }
+
+    workingDefinitionPath = workingDefinitionPath.slice(0, levelIndex);
+
+    dispatch("navigation-event", { namePaths: levelsNames });
+
+    setWorkingDataAndLevel();
+  }
+
+  export const getDefinitionAndData = () => {
+    return convertDefinitionDataToObjectDefinition(rootDefinitionData)
+  }
+
+  export const getPathsNames = () => {
+    return levelsNames;
+  }
+
 </script>
 
 <div class="editor">
-  <div class="back" on:click="{goBackOneLevel}"> GO BACK </div>
-  <div class="back" on:click="{() => { console.log(convertDefinitionDataToObjectDefinition(rootDefinitionData)) }}"> log objDef </div>
-  <div class="back" on:click="{() => { workingDefinitionPath = []; levelOverrideMap.clear(); setWorkingDataAndLevel() }}"> Reset Navigation </div>
   <ObjectDefinitionEditor
     editingLevel={currentLevel}
     bind:workingData={selectedData}
@@ -92,15 +121,5 @@
     font-size: 16px;
     display: flex;
     flex-flow: column nowrap;
-  }
-
-  .back {
-    margin: 8px 32px 18px 32px;
-    width: auto;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 6px;
-    padding: 4px 6px;
-    background-color: #313161;
   }
 </style>

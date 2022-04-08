@@ -20,7 +20,7 @@ const isObjectDefinitionCheck = (value : object) : boolean => {
 
 // Also can populate the values of the definitionData if `objValue` is specified
 export const convertObjDefinitionToDefinitionData =
-(objDef : ObjectDefinition, objValue ? : object) : DefinitionData[] => {
+(objDef : ObjectDefinition, objValue : object = {}) : DefinitionData[] => {
   const keys = Object.keys(objDef);
   const result : DefinitionData[] = [];
 
@@ -33,10 +33,42 @@ export const convertObjDefinitionToDefinitionData =
       subtype: objDef[key]["subtype"]
     };
 
+    if (objDef[key]["type"] === "array") {
+      const arrayTypeConverted = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {})
+      partialResult["subtype"] = {
+        subtype: arrayTypeConverted,
+        keyName: "Objects of Array",
+        type: "object",
+        value: {},
+        required: true,
+      };
+
+      partialResult.value = [];
+      const valuesToBeAdded = objValue[key] ?? [];
+      valuesToBeAdded.forEach((item, index) => {
+        console.log("adding item to array values:", item);
+        const itemValueDefinition = {
+          subtype: [], // is the array type (already DefinitionData),
+          keyName: `Object in Array`,
+          type: "object",
+          value: {},
+          required: true
+        };
+
+        const arrayValueConverted = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key][index]);
+        itemValueDefinition.subtype.push(...arrayValueConverted);
+        partialResult.value.push(itemValueDefinition);
+      });
+
+      result.push(partialResult);
+      return;
+    }
+
     const isDeepObject = isObjectDefinitionCheck(objDef[key]["subtype"]);
 
     if (isDeepObject) {
-      partialResult["subtype"] = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key]);
+      console.log("deep obj conversion triggered: ", key, objValue)
+      partialResult["subtype"] = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {});
       partialResult.value = {};
       result.push(partialResult);
       return;
@@ -74,9 +106,26 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
     result.data[definitionData.keyName] = definitionData.value;
 
     if (typeof definitionData.subtype === "object") {
-      const converted = convertDefinitionDataToObjectDefinition(definitionData.subtype as DefinitionData);
-      result.definition[definitionData.keyName]["subtype"] = converted.definition;
-      result.data[definitionData.keyName] = converted.data;
+      const arrayDefinitionResult = {};
+      (definitionData.subtype["subtype"] as DefinitionData[]).forEach((arrayProp) => {
+        const convertedProp = convertDefinitionDataToObjectDefinition(arrayProp);
+        Object.assign(arrayDefinitionResult, convertedProp.definition);
+      });
+
+      result.data[definitionData.keyName] = [];
+
+      (definitionData["value"] as DefinitionData[]).forEach((arrayItem) => {
+        const innerItemValues = arrayItem["subtype"] as DefinitionData[];
+        const arrayItemValueResult = {};
+        innerItemValues.forEach((innerItem) => {
+          const convertedItem = convertDefinitionDataToObjectDefinition(innerItem);
+          Object.assign(arrayItemValueResult, convertedItem.data);
+        })
+
+        result.data[definitionData.keyName].push(arrayItemValueResult);
+      });
+
+      result.definition[definitionData.keyName]["subtype"] = arrayDefinitionResult;
 
       return result;
     }
