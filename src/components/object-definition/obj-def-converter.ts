@@ -46,7 +46,6 @@ export const convertObjDefinitionToDefinitionData =
       partialResult.value = [];
       const valuesToBeAdded = objValue[key] ?? [];
       valuesToBeAdded.forEach((item, index) => {
-        console.log("adding item to array values:", item);
         const itemValueDefinition = {
           subtype: [], // is the array type (already DefinitionData),
           keyName: `Object in Array`,
@@ -67,7 +66,6 @@ export const convertObjDefinitionToDefinitionData =
     const isDeepObject = isObjectDefinitionCheck(objDef[key]["subtype"]);
 
     if (isDeepObject) {
-      console.log("deep obj conversion triggered: ", key, objValue)
       partialResult["subtype"] = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {});
       partialResult.value = {};
       result.push(partialResult);
