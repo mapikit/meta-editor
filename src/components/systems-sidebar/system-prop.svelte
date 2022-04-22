@@ -4,6 +4,7 @@ import { createEventDispatcher } from 'svelte';
 import BopsIcon from "../common/icons/bops-icon.svelte";
 import ProtocolsIcon from "../common/icons/protocols-icon.svelte";
 import { fly } from "svelte/transition";
+import { goto } from '$app/navigation';
 
 const dispatch = createEventDispatcher();
 
@@ -11,9 +12,9 @@ export let buttonName = "";
 let hovered = false;
 
 const availableButtons = {
-  "schema": { icon: SchemaIcon, primaryColor: "#5d8efe", message: "Schemas defines the data on your system", tooltip: "Schemas" },
-  "protocols": { icon: ProtocolsIcon, primaryColor: "#ff5c8e", message: "Protocols opens your system to the outside world.", tooltip: "Protocols" },
-  "bops": { icon: BopsIcon, primaryColor: "#fde084", message: "Business operations are the processes required for your system to work.", tooltip: "Business Operations" }
+  "schema": { icon: SchemaIcon, primaryColor: "#5d8efe", message: "Schemas defines the data on your system", tooltip: "Schemas", path: "/mapibox/system/schemas/" },
+  "protocols": { icon: ProtocolsIcon, primaryColor: "#ff5c8e", message: "Protocols opens your system to the outside world.", tooltip: "Protocols", path: "/mapibox/system/protocols/"  },
+  "bops": { icon: BopsIcon, primaryColor: "#fde084", message: "Business operations are the processes required for your system to work.", tooltip: "Business Operations", path: "/mapibox/system/bops/"  }
 };
 
 const hoverIn = () => {
@@ -38,6 +39,7 @@ const hoverOut = () => {
 <div class="{`propicon ${hovered ? "hover" : ""}`}"
   on:mouseenter="{hoverIn}"
   on:mouseleave="{hoverOut}"
+  on:click="{() => { goto(availableButtons[buttonName]?.path) }}"
 >
   <svelte:component
     this={availableButtons[buttonName]?.icon}
