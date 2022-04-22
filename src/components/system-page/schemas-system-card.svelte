@@ -1,8 +1,15 @@
 <script lang="ts">
+import LockIcon from "../common/icons/lock-icon.svelte";
+import PencilIcon from "../common/icons/pencil-icon.svelte";
+import StarIcon from "../common/icons/star-icon.svelte";
+import ToolsConfigIcon from "../common/icons/tools-config-icon.svelte";
+
   export let title = "Título Teste";
   export let creationDate = new Date();
   export let updateDate = new Date();
   export let description = "Sample Description";
+  export let favorited = false;
+  export let locked = false;
 
   const showDate = (date : Date) : string => {
     const day = date.getDate();
@@ -13,7 +20,19 @@
   }
 
   let isOpen = false;
-  let isEditing = false; // Later we will need a function to save in DB
+  let isEditing = false;
+  // Later we will need a function to save in DB
+
+  const updateFavorited = (event: MouseEvent) => {
+    event.stopPropagation();
+    favorited = !favorited;
+    // Later we will also need a function to update the favorited status of the property too
+  }
+
+  const updateLocked = (event: MouseEvent) => {
+    event.stopPropagation();
+    locked = !locked;
+  }
 </script>
 
 <div class="main-card">
@@ -22,23 +41,26 @@
       <img src="/icon-chevron-up.svg" alt="chevron"/>
     </div>
     <div class="propname">
-      <div class="favorite-icon">
-        **
+      <div class="favorite-icon" on:click={updateFavorited}>
+        <StarIcon active={favorited} iconColor={"#575777"} scale={1.5}/>
       </div>
       <h2> {title} </h2>
       <div class="pencil-icon" on:click={(e) => { isEditing = !isEditing; e.stopPropagation() }}>
-        /..
+        <PencilIcon iconColor={"#575777"} scale={1.4}/>
+      </div>
+      <div class="lock-icon" on:click={updateLocked}>
+        <LockIcon locked={locked} iconColor={locked ? "#f39d26" : "#575777"} scale={1.2}/>
       </div>
     </div>
-    <!-- star - name - pencil -->
-    <!-- lock >> -->
   </div>
   {#if isOpen}
-    <div class={isEditing ? "editable-description" : "solid-description"}
+    <div class="description-container">
+      <div class={isEditing ? "editable-description" : "solid-description"}
       contenteditable="{isEditing}"
       on:click="{(e) => { if (isEditing) e.stopPropagation() }}"
-    >
-      {description}
+      >
+        {description}
+      </div>
     </div>
     <div class="body">
       <div class="stats-group">
@@ -50,7 +72,11 @@
         </div>
       </div>
 
-      editButton
+      <div class="edit-button">
+        <div class="edit-icon">
+          <ToolsConfigIcon iconColor="#3b3b53" scale={1.3}/>
+        </div>
+      </div>
     </div>
   {/if}
 </div>
@@ -63,17 +89,24 @@
     align-items: center;
 
     .favorite-icon {
+      padding-top: 3px;
       margin-right: 12px;
     }
 
     .pencil-icon {
+      padding-top: 6px;
       margin-left: 12px;
     }
+
+    .lock-icon {
+      position: absolute;
+      right: 16px;
+      padding-top: 4px;
+    };
   }
 
   .main-card {
     position: relative;
-    padding: 8px;
     margin-top: 12px;
     border-radius: 12px;
     width: 380px;
@@ -92,6 +125,7 @@
     }
 
     .header {
+      padding: 8px;
       width: 100%;
       cursor: pointer;
       display:  flex;
@@ -101,10 +135,16 @@
     }
 
     .body {
-      width: 150px;
+      width: 180px;
+      padding: 0px 8px 8px 8px;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
     }
 
     .stats-group {
+      width: 100%;
       margin-top: 16px;
     }
 
@@ -127,11 +167,11 @@
     width: 100%;
     margin-top: 8px;
     border-radius: 12px;
-    background-color: #222233;
-    padding: 8px;
+    background-color: #13131f;
+    padding: 12px;
     color: #e6e6fe;
     outline: none;
-    transition: 500ms;
+    transition: 180ms;
   }
 
   .solid-description {
@@ -145,6 +185,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 12px;
+    transition: 180ms;
+  }
+
+  .description-container {
+    width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .chevron-collapse {
@@ -170,6 +217,22 @@
 
     &.down {
       transform: rotate(180deg);
+    }
+  }
+
+  .edit-button {
+    --height: 38px;
+    margin-top: 12px;
+    background-color: #13131f;
+    border-radius: calc(var(--height) / 2);
+    height: var(--height);
+    width: 120px;
+    text-align: center;
+    justify-self: center;
+
+    .edit-icon {
+      // margin-top: 50%;
+      transform: translateY(40%);
     }
   }
 </style>

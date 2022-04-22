@@ -4,6 +4,7 @@ import ProtocolsIcon from "../common/icons/protocols-icon.svelte";
 import SchemaIcon from "../common/icons/schema-icon.svelte";
 import { fade } from "svelte/transition";
 import SchemasSystemCard from "./schemas-system-card.svelte";
+import PlusSignBoxIcon from "../common/icons/plus-sign-box-icon.svelte";
 
   export let listType = "schema";
   export let listData = [
@@ -22,6 +23,7 @@ import SchemasSystemCard from "./schemas-system-card.svelte";
   const listInfo = typeInfos[listType];
 
   let isOpen = false;
+  let createHovered = false;
 </script>
 
 <div class="prop-container">
@@ -49,8 +51,13 @@ import SchemasSystemCard from "./schemas-system-card.svelte";
       {/each}
     </div>
     <div class="button-spacer" style={`background-color: ${listInfo.color}`}/>
-    <div class="add-new" style={`--hover-color: ${listInfo.color}`}>
-      [+] Create New {listInfo.label}
+    <div class="add-new" style={`--hover-color: ${listInfo.color}`}
+      on:mouseenter={() => { createHovered = true }}
+      on:mouseleave={() => { createHovered = false }}
+    >
+      <span class="add-icon">
+        <PlusSignBoxIcon scale={1} iconColor={createHovered ? listInfo.color : "white" }/>
+      </span> Create New {listInfo.label}
     </div>
   {/if}
 </div>
@@ -71,6 +78,8 @@ import SchemasSystemCard from "./schemas-system-card.svelte";
     font-weight: 500;
     font-size: 18px;
     transition: 200ms all;
+
+    display: flex;
 
     &:hover {
       color: var(--hover-color);
@@ -149,5 +158,10 @@ import SchemasSystemCard from "./schemas-system-card.svelte";
     &.down {
       transform: rotate(180deg);
     }
+  }
+
+  .add-icon {
+    // padding-top: 1px;
+    margin-right: 6px;
   }
 </style>
