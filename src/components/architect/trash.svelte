@@ -2,14 +2,14 @@
 import { onMount } from "svelte";
 
 
-  let ref : HTMLDivElement;
-  export let trashRect : DOMRect;
-  onMount(() => {
-    trashRect = ref.getBoundingClientRect();
-  })
+let ref : HTMLDivElement;
+export let trashRect : DOMRect;
+onMount(() => {
+  trashRect = ref.getBoundingClientRect();
+});
 </script>
 
-<div class="trash" bind:this={ref}>
+<div class="trash" bind:this={ref,}>
   TRASH
 </div>
 

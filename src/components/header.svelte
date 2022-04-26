@@ -3,15 +3,15 @@ import { onMount } from "svelte";
 import HamburgerMenu from "./hamburger-menu.svelte";
 import HeaderLinks from "./header-links.svelte";
 
-let screenSize : number = 0;
+let screenSize  = 0;
 
 const setScreen = (num : number) => {
   screenSize = num;
-}
+};
 
 onMount(() => {
   setScreen(window.screen.width);
-})
+});
 
 $: isSmallScreen = screenSize < 480;
 

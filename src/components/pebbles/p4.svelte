@@ -3,6 +3,6 @@
 </svg>
 
 <script lang="ts">
-  export let color: string;
-  export let scale: number;
+  export let color : string;
+  export let scale : number;
 </script>

@@ -17,10 +17,10 @@ export const availableComponents : Record<string, typeof SvelteComponent> = {
   "boolean": BooleanInput,
   "object": ObjectInput,
   "array": ArrayInput,
-}
+};
 
-export const possibleConstTypes = Object.keys(typeColors).filter(type => 
+export const possibleConstTypes = Object.keys(typeColors).filter(type =>
   type !== "cloudedObject" &&
   type !== "any" &&
-  type !== "function"
+  type !== "function",
 );

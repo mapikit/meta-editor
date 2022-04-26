@@ -17,14 +17,14 @@
       .getDate();
 
     // Also automatically sets the day to a valid day if it is outside the month boundaries
-    if (month !== lastSetMonth && day > lastValidDayOfMonth) { day = lastValidDayOfMonth }
-    if (year !== lastSetYear && day > lastValidDayOfMonth) { day = lastValidDayOfMonth }
+    if (month !== lastSetMonth && day > lastValidDayOfMonth) { day = lastValidDayOfMonth; }
+    if (year !== lastSetYear && day > lastValidDayOfMonth) { day = lastValidDayOfMonth; }
 
     propValue = new Date(new Date().setFullYear(year, month - 1, day));
     lastSetMonth = propValue.getMonth() + 1;
     lastSetYear = propValue.getFullYear();
-    updateFunction()
-  }
+    updateFunction();
+  };
 
   $: lastPossibleDayOfMonth = new Date(new Date()
     .setFullYear(propValue.getFullYear(), propValue.getMonth() + 1, 0))

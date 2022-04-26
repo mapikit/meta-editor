@@ -4,8 +4,8 @@
 
   let currentText = "";
   guideText.subscribe((value) => {
-    currentText = value
-  })
+    currentText = value;
+  });
 </script>
 
 <div class="guide-text-container">

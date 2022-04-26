@@ -1,9 +1,9 @@
 <script lang="ts">
   export let iconColor : string;
-  export let width : number = 5.3337;
-  export let height : number = 5.3337;
-  export let scale : number = 1;
-  export let hoverTransition : number = 200;
+  export let width  = 5.3337;
+  export let height  = 5.3337;
+  export let scale  = 1;
+  export let hoverTransition  = 200;
 
   let finalHeight;
   let finalWidth;

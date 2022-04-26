@@ -1,64 +1,61 @@
 <script lang="ts">
-import PebblesContainer from "../components/pebbles-container.svelte";
-import Header from "../components/header.svelte";
-import MapikitLogo from "../components/mapikit-logo.svelte";
 import type { ConfigurationType } from "meta-system";
 import EditionCanvas from "../components/architect/edition-canvas.svelte";
 import type { UICompliantBop } from "../common/types/ui-bop";
 import { bopStore } from "../stores/bop-store";
 import { systemStore } from "../stores/system-store";
-  const systemConfig : ConfigurationType = {
-    name: "TestSystem",
-    schemas: [
-      {
-        dbProtocol: "fake",
-        format: {},
-        identifier: "fakeSchema",
-        name: "Users"
-      },
-      {
-        dbProtocol: "fake",
-        format: {},
-        identifier: "fakeSchema2",
-        name: "Ora"
-      }
-      
-    ],
-    businessOperations: [
-      {
-        name: "My BOp",
-        customObjects: [],
-        constants: [
-          { name: "zeroValue", type: "number", value: 0 },
-          { name: "nome", type: "string", value: "Fabu" }
-        ],
-        variables: [],
-        configuration: [
-          {
-            key: 1,
-            moduleName: "if",
-            moduleType: "internal",
-            dependencies: [
-              { origin: "constants", targetPath: "ifTrue", originPath: "nome" }
-            ],
-          },
-          {
-            key: 2,
-            moduleName: "add",
-            moduleType: "internal",
-            dependencies: [],
-          }
-        ],
-        input: {},
-        output: {},
-      }
-    ],
-    version: "1.0.0",
-    envs: [],
-    protocols: []
-  }
-  systemStore.set(systemConfig);
-  bopStore.set(systemConfig.businessOperations[0] as unknown as UICompliantBop);
+const systemConfig : ConfigurationType = {
+  name: "TestSystem",
+  schemas: [
+    {
+      dbProtocol: "fake",
+      format: {},
+      identifier: "fakeSchema",
+      name: "Users",
+    },
+    {
+      dbProtocol: "fake",
+      format: {},
+      identifier: "fakeSchema2",
+      name: "Ora",
+    },
+
+  ],
+  businessOperations: [
+    {
+      name: "My BOp",
+      customObjects: [],
+      constants: [
+        { name: "zeroValue", type: "number", value: 0 },
+        { name: "nome", type: "string", value: "Fabu" },
+      ],
+      variables: [],
+      configuration: [
+        {
+          key: 1,
+          moduleName: "if",
+          moduleType: "internal",
+          dependencies: [
+            { origin: "constants", targetPath: "ifTrue", originPath: "nome" },
+          ],
+        },
+        {
+          key: 2,
+          moduleName: "add",
+          moduleType: "internal",
+          dependencies: [],
+        },
+      ],
+      input: {},
+      output: {},
+    },
+  ],
+  version: "1.0.0",
+  envs: [],
+  protocols: [],
+};
+systemStore.set(systemConfig);
+bopStore.set(systemConfig.businessOperations[0] as unknown as UICompliantBop);
 
 </script>
 

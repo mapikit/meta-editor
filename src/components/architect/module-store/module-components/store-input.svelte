@@ -1,8 +1,8 @@
 <script lang="ts">
     import { typeColors } from "../../../../common/styles/type-colors";
-  
+
     export let type : string;
-  </script>
+</script>
   
   <style lang="scss">
     .nob {

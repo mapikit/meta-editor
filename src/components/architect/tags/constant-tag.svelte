@@ -10,11 +10,11 @@ import { onMount } from "svelte";
   export let parentNob : HTMLSpanElement;
   export let config : BopsConstant;
 
-  function removeTag () { parentNob.dispatchEvent(new Event("removeTag")) }
+  function removeTag () { parentNob.dispatchEvent(new Event("removeTag")); }
 </script>
 
 <div class="constantTag" transition:expand >
-  <div class="removeIcon" on:click={removeTag} in:spin={{initial: 45}}><DropdownIcon/></div>
+  <div class="removeIcon" on:click={removeTag} in:spin={{ initial: 45 }}><DropdownIcon/></div>
   <span class="name">{config.name}&nbsp;</span><span 
     class="indicator" style="color: {typeColors[config.type]};"> ●</span>
 </div>

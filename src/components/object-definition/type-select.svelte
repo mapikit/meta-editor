@@ -10,8 +10,8 @@ import RightArrow from "../common/icons/right-arrow.svelte";
 
   const availableOptions = Object.keys(typeColors);
   const availableSubTypeOptions = availableOptions.filter((value) => {
-    return value !== "array" && value !== "any" && value !== "enum"
-  })
+    return value !== "array" && value !== "any" && value !== "enum";
+  });
   const dispatch = createEventDispatcher();
 
   const changeType = (type) => {
@@ -20,20 +20,20 @@ import RightArrow from "../common/icons/right-arrow.svelte";
       currentType = type;
       subTypeCollapsed = false;
 
-      return
+      return;
     }
 
     currentType = type;
     dispatch("typeChange", type);
 
     if (type === "object" || type === "enum") {
-      changeSubType([]);      
+      changeSubType([]);
       return;
     }
 
     currentSubtype = undefined;
     collapsed = true;
-  }
+  };
 
   const changeSubType = (subtype) => {
     if (subtype === "object") {
@@ -42,8 +42,8 @@ import RightArrow from "../common/icons/right-arrow.svelte";
         keyName: "Objects of Array",
         type: "object",
         value: {},
-        required: true
-      })
+        required: true,
+      });
       currentSubtype = subtype;
       collapsed = true;
       subTypeCollapsed = true;
@@ -54,7 +54,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     currentSubtype = subtype;
     collapsed = true;
     subTypeCollapsed = true;
-  }
+  };
 
 </script>
 
@@ -71,10 +71,10 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     </div>
   </div>
   {#if !collapsed && subTypeCollapsed}
-    <div class="options-holder" transition:fade="{{ duration: 90}}">
+    <div class="options-holder" transition:fade="{{ duration: 90 }}">
       <div class="options">
         {#each availableOptions as option }
-          <div class="option" on:click="{() => {changeType(option)}}">
+          <div class="option" on:click="{() => {changeType(option);}}">
             <div class="type-circle" style="background-color: {typeColors[option]};"/>
             {#if option !== "array"}
               <p> {option} </p>
@@ -92,7 +92,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     <div class="options-holder subtype" transition:fly="{{ duration: 120, delay: 90, x: 20 }}">
       <div class="options">
         {#each availableSubTypeOptions as option }
-          <div class="option" on:click="{() => {changeSubType(option)}}">
+          <div class="option" on:click="{() => {changeSubType(option);}}">
             <div class="type-circle" style="background-color: {typeColors[option]};"/>
             <p> {option} </p>
           </div>

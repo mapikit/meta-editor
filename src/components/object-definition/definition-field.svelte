@@ -9,7 +9,7 @@
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createDefinition);
   export let initialData : unknown = "";
-  export let propName : string = "";
+  export let propName  = "";
   export let initialPropName : string = propName;
   export let propValue : unknown = initialData;
   export let propType : TypeDefinition["type"] = "string";
@@ -25,14 +25,14 @@
       type: propType,
       subtype: propSubType,
       required: propRequired,
-    })
+    });
 
     initialPropName = propName;
-  }
+  };
 
   const updateName = (event) => {
     dispatch("nameUpdate", { oldKey: initialPropName, newKey: event.target.value as string });
-  }
+  };
 
   const updateType = (type) => {
     propType = type;
@@ -44,12 +44,12 @@
     }
 
     syncProp();
-  }
+  };
 
   const updateSubtype = (subtype) => {
     propSubType = subtype;
     syncProp();
-  }
+  };
 </script>
 
 <div class="field-container">
@@ -61,8 +61,8 @@
       <TypeSelect
         currentType={propType}
         currentSubtype={propSubType}
-        on:typeChange={(data) => { updateType(data.detail)}}
-        on:subTypeChange={(data) => { updateSubtype(data.detail)}}
+        on:typeChange={(data) => { updateType(data.detail);}}
+        on:subTypeChange={(data) => { updateSubtype(data.detail);}}
       />
     {/if}
     <!-- should edit the type and the name of the Property -->

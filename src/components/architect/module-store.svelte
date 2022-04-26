@@ -14,15 +14,15 @@
     [undefined, "businessOperations_v1.png", "BOps Modules"],
     [ConstantStore, "constants_v1.png", "Constants"],
     [undefined, "variables_v1.png", "Variables"],
-  ]
+  ];
 
   const tabsRef : Array<HTMLDivElement> = [];
   onMount(() => {
-    tabsRef[0].style.backgroundColor = "#7035fb"
-  })
+    tabsRef[0].style.backgroundColor = "#7035fb";
+  });
 
-  async function handleClick(tab : [any, any, string],index : number) {
-    tabsRef.forEach(tab => { tab.style.backgroundColor = ""; })
+  async function handleClick (tab : [any, any, string],index : number) {
+    tabsRef.forEach(tab => { tab.style.backgroundColor = ""; });
     tabsRef[index].style.backgroundColor = "#7035fb";
     selectedStore = tab[0];
     selectedName = tab[2];
@@ -30,7 +30,7 @@
 
   let selectedStore = tabsInfo[0][0];
   let selectedName = tabsInfo[0][2];
-  let searchValue : string = "";
+  let searchValue  = "";
 </script>
 
 

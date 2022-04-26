@@ -4,7 +4,7 @@ const systems = [
   { systemName: "teste 1" },
   { systemName: "CallFromTheDammned" },
   { systemName: "Shipment Request" },
-]
+];
 </script>
 
 <div class="sidebar">

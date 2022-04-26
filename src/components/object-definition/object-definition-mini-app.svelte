@@ -19,8 +19,8 @@
     keyName: "root",
     type: "object",
     value: initialData,
-    required: true
-  }
+    required: true,
+  };
 
   let selectedData : DefinitionData = rootDefinitionData;
 
@@ -38,14 +38,14 @@
 
     currentLevel = new EditorLevel(lastValidLevel);
     selectedData = selectDataDefinition();
-  }
+  };
 
   const selectDataDefinition = () => {
     const dicedDefinitionPath = [];
     workingDefinitionPath.forEach((path : string) => {
       const parts = path.split(".");
       dicedDefinitionPath.push(...parts);
-    })
+    });
 
     let intermediarySelectedData = rootDefinitionData;
     for (let path of dicedDefinitionPath) {
@@ -53,7 +53,7 @@
     }
 
     return intermediarySelectedData;
-  }
+  };
 
 
   const navigateTo = (path : string, levelOverride ?: EditorLevels) => {
@@ -70,7 +70,7 @@
     dispatch("navigation-event", { namePaths: levelsNames });
 
     setWorkingDataAndLevel();
-  }
+  };
 
   export const goBackOneLevel = () => {
     levelOverrideMap.delete(workingDefinitionPath.length);
@@ -81,7 +81,7 @@
     dispatch("navigation-event", { namePaths: levelsNames });
 
     setWorkingDataAndLevel();
-  }
+  };
 
   export const navigateBackToLevel = (levelIndex : number) => {
     for (let i = workingDefinitionPath.length - 1; i >= levelIndex; i--) {
@@ -94,15 +94,15 @@
     dispatch("navigation-event", { namePaths: levelsNames });
 
     setWorkingDataAndLevel();
-  }
+  };
 
   export const getDefinitionAndData = () => {
-    return convertDefinitionDataToObjectDefinition(rootDefinitionData)
-  }
+    return convertDefinitionDataToObjectDefinition(rootDefinitionData);
+  };
 
   export const getPathsNames = () => {
     return levelsNames;
-  }
+  };
 
 </script>
 
@@ -110,7 +110,7 @@
   <ObjectDefinitionEditor
     editingLevel={currentLevel}
     bind:workingData={selectedData}
-    on:navigate-definition={(event) => { navigateTo(event.detail.path, event.detail.levelOverride) }}
+    on:navigate-definition={(event) => { navigateTo(event.detail.path, event.detail.levelOverride); }}
   />
 </div>
 

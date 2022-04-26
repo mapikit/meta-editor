@@ -16,16 +16,16 @@ import { update_await_block_branch } from "svelte/internal";
   export let parentInfo : ModuleCard;
   let nob : HTMLSpanElement;
 
-  function getNob() : void {
+  function getNob () : void {
     selectedNob.update((current) => {
       return solveConnection(current, {
         parentCard: parentInfo,
         nob,
         property: name,
         nobType: "input",
-        propertyType: parentInfo.info.input[name].type
-      }
-    )})
+        propertyType: parentInfo.info.input[name].type,
+      },
+      );});
   }
   onMount(() => {
     nob.addEventListener<any & { detail : { constant : BopsConstant }}>("appendTag", (event) => {
@@ -36,30 +36,30 @@ import { update_await_block_branch } from "svelte/internal";
         originPath: event.detail.constant.name,
         targetPath: name,
         matchingType: event.detail.constant.type === parentInfo.info.input[name].type,
-      }
-      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name)
+      };
+      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name);
       if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
-      parentInfo.dependencies.push(newDependency)
-      constantConfig = event.detail.constant;  
+      parentInfo.dependencies.push(newDependency);
+      constantConfig = event.detail.constant;
       bopStore.update(bop => bop);
-    }, false)
+    }, false);
 
     nob.addEventListener("removeTag", () => {
-      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name)
+      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name);
       if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
       constantConfig = undefined;
       bopStore.update(bop => bop);
-    }, false)
-  })
+    }, false);
+  });
   
 
   
   let constantConfig : BopsConstant;
   function getConstant (dependencies : Dependency[]) {
-    const thisConfig = dependencies.find(dep => dep.targetPath.startsWith(name))
+    const thisConfig = dependencies.find(dep => dep.targetPath.startsWith(name));
     if(thisConfig === undefined) return undefined;
     if(typeof thisConfig.origin !== "string" || !["constant", "constants"].includes(thisConfig.origin))
-      return undefined;
+    {return undefined;}
     const constant = $bopStore.constants.find(cons => cons.name === thisConfig.originPath.split(".")[0]);
     return constant;
   }

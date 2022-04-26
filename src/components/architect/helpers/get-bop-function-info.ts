@@ -18,5 +18,5 @@ export function getBopFunctionInfo (bop : BusinessOperations) : FunctionDefiniti
     functionName: bop.name,
     input: bop.input,
     output: bop.output,
-  }
+  };
 }

@@ -1,14 +1,14 @@
 export type Geometry = {
-  position: Coordinate;
-  dimensions: Dimensions;
+  position : Coordinate;
+  dimensions : Dimensions;
 }
 
 export type Coordinate = {
-  x: number;
-  y: number;
+  x : number;
+  y : number;
 }
 
 export type Dimensions = {
-  height: number;
-  width: number;
+  height : number;
+  width : number;
 }

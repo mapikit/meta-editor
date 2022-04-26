@@ -12,9 +12,9 @@
         }
 
         latestValidValue = propValue;
-      }
-    }
-  }
+      },
+    };
+  };
 </script>
 
 <div class="value-input">

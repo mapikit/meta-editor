@@ -9,8 +9,8 @@ export const defaultTypesValues = {
   "object": {},
   "cloudedObject": {},
   "any": "",
-  "array": []
-}
+  "array": [],
+};
 
 export const defaultSubTypesValues = {
   "string": undefined,
@@ -23,5 +23,5 @@ export const defaultSubTypesValues = {
   "object": [],
   "cloudedObject": [],
   "any": undefined,
-  "array": "string"
-}
+  "array": "string",
+};

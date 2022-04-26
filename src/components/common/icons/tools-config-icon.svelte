@@ -1,8 +1,8 @@
 <script lang="ts">
   export let iconColor : string;
-  export let width : number = 4.3342;
-  export let height : number = 4.0618;
-  export let scale : number = 1;
+  export let width  = 4.3342;
+  export let height  = 4.0618;
+  export let scale  = 1;
 
   let finalHeight;
   let finalWidth;

@@ -1,6 +1,6 @@
 <script lang="ts">
   export let ref : HTMLDivElement;
-  let clientWidth : number
+  let clientWidth : number;
 </script>
 
 <div bind:this={ref} class="tab" bind:clientWidth style="height: {clientWidth}px;">

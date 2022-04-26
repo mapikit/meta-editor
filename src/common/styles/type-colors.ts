@@ -9,5 +9,5 @@ export const typeColors : Record<string, string> = {
   object: "#a462fe",
   cloudedObject: "#a462fe",
   any: "#f74f5f",
-  array: "#ff8553"
-}
+  array: "#ff8553",
+};

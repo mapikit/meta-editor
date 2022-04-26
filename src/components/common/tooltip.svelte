@@ -1,14 +1,14 @@
 <script lang="ts">
-  export let tooltipContent : string = "%NOTOOLTIPTEXTPROVIDED%";
+  export let tooltipContent  = "%NOTOOLTIPTEXTPROVIDED%";
   // To externally set visibility
-  export let visible : boolean = false;
+  export let visible  = false;
 
   // To stop rendering the tooltip in a delay
-  let present = visible
+  let present = visible;
 
   const updatePresenceVisibility = (visibility : boolean) => {
     setTimeout(() => present = visibility, 400);
-  }
+  };
 
   $: {
     updatePresenceVisibility(visible);

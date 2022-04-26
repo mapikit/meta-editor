@@ -17,19 +17,19 @@
 
   function startMovement (event : MouseEvent) {
     moving = event.button === 0;
-    let currentParent = document.getElementById("architect")
+    let currentParent = document.getElementById("architect");
     newCard = currentParent.appendChild(ref.cloneNode(true)) as HTMLDivElement;
     newCard.style.position = "absolute";
-    newCard.style.width = `${ref.getBoundingClientRect().width}px`
+    newCard.style.width = `${ref.getBoundingClientRect().width}px`;
     const currentPos = ref.getBoundingClientRect();
     top = currentPos.y;
     left = currentPos.x;
     newCard.style.left = `${currentPos.x}px`;
     newCard.style.top = `${currentPos.y}px`;
-    ref.style.visibility = "hidden"
+    ref.style.visibility = "hidden";
   }
 
-  function stopMovement () { 
+  function stopMovement () {
     moving = false;
     if(newCard !== undefined) {
       bopStore.update(bop => {
@@ -41,12 +41,12 @@
           info: definition,
           position: { x: left/$environment.scale, y: top/$environment.scale },
           modulePackage: undefined, // TODO Figure this out as well
-        })
+        });
         return bop;
-      })
-      newCard.remove()
+      });
+      newCard.remove();
       newCard = undefined;
-      ref.style.visibility = "visible"
+      ref.style.visibility = "visible";
     }
     left = top = 0;
   }
@@ -55,8 +55,8 @@
     if(moving) {
       left += event.movementX;
       top += event.movementY;
-      newCard.style.left = `${left}px`
-      newCard.style.top = `${top}px`
+      newCard.style.left = `${left}px`;
+      newCard.style.top = `${top}px`;
     }
   }
   

@@ -16,7 +16,7 @@
     if(parentReference[name] !== undefined) {
       return window.alert("Property names must be unique");
     }
-    $parentReference[name] = { type: event.detail.value, value: undefined }
+    $parentReference[name] = { type: event.detail.value, value: undefined };
   }
 
 </script>

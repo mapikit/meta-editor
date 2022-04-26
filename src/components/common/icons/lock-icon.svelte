@@ -1,9 +1,9 @@
 <script lang="ts">
   export let locked : boolean;
   export let iconColor : string;
-  export let width : number = 3.142;
-  export let height : number = 5.484;
-  export let scale : number = 1;
+  export let width  = 3.142;
+  export let height  = 5.484;
+  export let scale  = 1;
 
   let finalHeight;
   let finalWidth;

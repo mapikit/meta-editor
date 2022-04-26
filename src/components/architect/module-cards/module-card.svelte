@@ -24,27 +24,27 @@
   function startMovement (event : MouseEvent) {
     ref.style.zIndex = "1";
     ref.style.opacity = "0.5";
-    moving = event.button === 0 
+    moving = event.button === 0;
   }
   
   function stopMovement (event : MouseEvent) {
     if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
       return deleteThis();
     }
-    ref.style.opacity = "1"
-    ref.style.zIndex = "0"
-    moving = false 
+    ref.style.opacity = "1";
+    ref.style.zIndex = "0";
+    moving = false;
   }
 
   function moveCard (event : MouseEvent) {
     if(moving) {
-      moduleConfig.position.x += event.movementX/$environment.scale
-      moduleConfig.position.y += event.movementY/$environment.scale
+      moduleConfig.position.x += event.movementX/$environment.scale;
+      moduleConfig.position.y += event.movementY/$environment.scale;
       bopStore.update(bop => bop);
     }
   }
 
-  function checkRectCollision(mouseX : number, mouseY : number, targetRect : DOMRect) {
+  function checkRectCollision (mouseX : number, mouseY : number, targetRect : DOMRect) {
     return (mouseX > targetRect.x && mouseX < targetRect.x + targetRect.width) &&
       (mouseY > targetRect.y && mouseY < targetRect.y + targetRect.height);
   }
@@ -54,15 +54,15 @@
       // Remove Dependants
       bop.configuration.forEach(module => {
         for(let i = module.dependencies.length-1; i >= 0; i--) {
-          if(module.dependencies[i].origin === moduleConfig.key) 
-            module.dependencies.splice(i, 1);
+          if(module.dependencies[i].origin === moduleConfig.key)
+          {module.dependencies.splice(i, 1);}
         }
       });
 
       const index = bop.configuration.findIndex(module => module.key === moduleConfig.key);
       bop.configuration.splice(index, 1);
-    return bop;
-  })
+      return bop;
+    });
   }
 </script>
 
@@ -105,8 +105,8 @@
 </style>
 
 <div 
-  in:zoomIn={{opacity:1, start: 0.55}}
-  out:fly={{x: 120/$environment.scale}}
+  in:zoomIn={{ opacity:1, start: 0.55 }}
+  out:fly={{ x: 120/$environment.scale }}
   bind:this={ref}
   on:mousedown={startMovement}
   class="module" 

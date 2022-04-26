@@ -10,9 +10,9 @@
 
   let placeholder = undefined;
 
-  object.subscribe(() => { placeholder = undefined })
+  object.subscribe(() => { placeholder = undefined; });
 
-  function addProperty(event : MouseEvent) {
+  function addProperty (event : MouseEvent) {
     placeholder = PlaceholderProp;
   }
 </script>

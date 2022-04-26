@@ -1,13 +1,12 @@
 <script lang="ts">
   export let systemName = "AlgumNome";
-  let systemId = "algum id" // To be used in the future to navigate to the system page onClick
+  let systemId = "algum id"; // To be used in the future to navigate to the system page onClick
 
   const systemMiniName = (name : string) : string => {
-    const splited = ''
     // In the future to create dinamically a "mini name" for the system
     // Must be at most 2 characters long
-    return name.slice(0,2)
-  }
+    return name.slice(0,2);
+  };
 </script>
 
 <div class="mini-system">

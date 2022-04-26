@@ -19,14 +19,14 @@
   componentSelector[AvailableEditingTypes.date] = DateField;
   componentSelector[AvailableEditingTypes.enum] = EnumField;
 
-  let selectedComponent
+  let selectedComponent;
 
   $: selectedComponent = componentSelector[editingType];
 </script>
 
 {#if selectedComponent !== undefined}
   <svelte:component this={selectedComponent} bind:propValue={propValue} updateFunction={updateFunction} bind:subtype={subtype}
-  on:click="{() => { console.log(subtype) }}"/>
+  on:click="{() => { console.log(subtype); }}"/>
 {:else}
   <p></p>
 {/if}

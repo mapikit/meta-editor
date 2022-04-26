@@ -29,50 +29,50 @@
       keyName: `new prop (${newPropNumber})`,
       value: "",
       type: "string",
-      required: false
+      required: false,
     });
 
     objectDefinitionData = objectDefinitionData;
     dispatch("sync-value");
-  }
+  };
 
-  const updateName = (data : CustomEvent<{ oldKey: string, newKey: string }>) => {
+  const updateName = (data : CustomEvent<{ oldKey : string, newKey : string }>) => {
     objectDefinitionData.find((value) => value.keyName === data.detail.oldKey)
       .keyName = data.detail.newKey;
 
     objectDefinitionData = objectDefinitionData;
-  }
+  };
 
   const syncProp = (data : CustomEvent<{key : string; value : unknown; type : string; required : boolean; subtype : unknown}>) => {
-    const property = objectDefinitionData.find((value) => value.keyName === data.detail.key)
+    const property = objectDefinitionData.find((value) => value.keyName === data.detail.key);
 
     property.value = data.detail.value;
     property.type = data.detail.type;
     property.subtype = data.detail.subtype;
     property.required = data.detail.required;
-    
+  
     objectDefinitionData = objectDefinitionData;
-  }
+  };
 
   const deleteProp = (propName : string) => {
     const index = objectDefinitionData.findIndex((value) => value.keyName === propName);
     objectDefinitionData.splice(index, 1);
     objectDefinitionData = objectDefinitionData;
-  }
+  };
 
-  const navigateDefinition = (type: string, indexPath : string) => {
-    let pathOnType = "subtype"
+  const navigateDefinition = (type : string, indexPath : string) => {
+    let pathOnType = "subtype";
 
     dispatch("navigate-definition", { path: `${pathOnType}.${indexPath}` });
-  }
+  };
 
   const shouldDisplayArrow = (defKey : DefinitionData) : boolean => {
     if (defKey.type === "object" || defKey.type === "array" || defKey.type === "enum") {
-      if (defKey.type === "array" && (typeof defKey.subtype === "object")) { return true }
+      if (defKey.type === "array" && (typeof defKey.subtype === "object")) { return true; }
       if (!level.canAddData() && defKey.type === "array") { return false; }
       return true;
     }
-  }
+  };
 </script>
 
 <div class="editor-container">
@@ -82,7 +82,7 @@
   {#each objectDefinitionData as defKey, index}
   <div class="properties-holder">
     {#if level.canAddProperty()}
-      <div class="exclude" on:click="{() => {deleteProp(defKey.keyName)}}">
+      <div class="exclude" on:click="{() => {deleteProp(defKey.keyName);}}">
         <CancelIcon iconColor="#ffffff"/>
       </div>
     {/if}

@@ -4,22 +4,22 @@
   import StoreModule from "./module-components/store-module.svelte";
 
   export let summary : string;
-  export let modulesInSection : Array<FunctionDefinition>
-  export let search : string = "";
+  export let modulesInSection : Array<FunctionDefinition>;
+  export let search  = "";
 
   let searchDelay : NodeJS.Timeout;
   let searchedModules : Array<FunctionDefinition> = modulesInSection;
-  let open : boolean = false;
+  let open  = false;
   $: searchInSection(search);
 
   async function searchInSection (searchString : string) : Promise<void> {
     if(searchDelay !== undefined) clearTimeout(searchDelay);
     searchDelay = setTimeout(() => {
       const result = modulesInSection.filter(module =>
-        module.functionName.toLowerCase().includes(searchString.toLowerCase())
-      )
+        module.functionName.toLowerCase().includes(searchString.toLowerCase()),
+      );
       searchedModules = result;
-      open = searchedModules.length > 0 && searchString !== ""
+      open = searchedModules.length > 0 && searchString !== "";
       searchDelay = undefined;
     }, 300);
   }

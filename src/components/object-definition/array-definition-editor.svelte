@@ -23,19 +23,19 @@
   const deleteProp = (index) => {
     arrayValue.splice(index, 1);
     arrayValue = arrayValue;
-  }
+  };
 
   const navigateArrayDefinition = () => {
     dispatch("navigate-definition", { path: "subtype", levelOverride: EditorLevels.createDefinition });
-  }
+  };
 
   const navigateItemDefinition = (index : number) => {
     dispatch("navigate-definition", { path: `value.${index}`, levelOverride: EditorLevels.signDefinition });
-  }
+  };
 
   const navigateCloudedItemDefinition = (index : number) => {
     dispatch("navigate-definition", { path: `value.${index}`, levelOverride: EditorLevels.createAndSignDefinition });
-  }
+  };
 
   const addNewArrayItem = () => {
     if (typeof type === "object" || type === "cloudedObject") {
@@ -45,24 +45,24 @@
       }
       arrayValue.push({
         subtype, // is the array type (already DefinitionData),
-        keyName: `Object in Array`,
+        keyName: "Object in Array",
         type: "object",
         value: {},
-        required: true
-      })
+        required: true,
+      });
       arrayValue = arrayValue;
       return;
     }
 
     arrayValue.push(defaultTypesValues[type]);
     arrayValue = arrayValue;
-  }
+  };
 </script>
 
 <div class="editor-container">
   <div class="array-type">
     {#if typeof type === "object"}
-      <p class="clickable" on:click="{() => { navigateArrayDefinition() }}"> List of Objects
+      <p class="clickable" on:click="{() => { navigateArrayDefinition(); }}"> List of Objects
         <span> <RightArrow iconColor="white"/> </span></p>
     {:else}
       List of {type}
@@ -75,7 +75,7 @@
     {#each arrayValue as arrayItem, index }
       <div class="properties-holder">
         {#if level.canAddProperty()}
-          <div class="exclude" on:click="{() => {deleteProp(index)}}">
+          <div class="exclude" on:click="{() => {deleteProp(index);}}">
             <CancelIcon iconColor="#ffffff"/>
           </div>
         {/if}
@@ -96,7 +96,7 @@
   </div>
   {/if}
   {#if level.canAddData()}
-    <div class="add-prop" on:click={() => {addNewArrayItem()} }> Add new item </div>
+    <div class="add-prop" on:click={() => {addNewArrayItem();} }> Add new item </div>
   {/if}
 </div>
 

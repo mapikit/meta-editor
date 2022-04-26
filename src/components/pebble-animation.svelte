@@ -4,12 +4,12 @@
   export let [yStart, ySpread, yValueType] : PositionInfo = [-10,-30, "%"];
   export let [minRotation, maxRotation] = [-180, 180];
   
-  const direction = () => { 
+  const direction = () => {
     const d = ["normal", "reverse"][Math.floor(Math.random()* 2)];
     return d;
-  }
+  };
 
-  const rotationCssVar = `--varrotate: ${Math.random()*maxRotation}deg`
+  const rotationCssVar = `--varrotate: ${Math.random()*maxRotation}deg`;
 </script>
 
 <div class="pebble" style="{`
@@ -18,7 +18,7 @@
   animation-direction: ${direction()};
   animation-delay: ${2*Math.random()}s;
   ${rotationCssVar}
-`}">
+`,}">
   <slot></slot>
 </div>
 

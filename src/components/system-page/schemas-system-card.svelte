@@ -4,39 +4,39 @@ import PencilIcon from "../common/icons/pencil-icon.svelte";
 import StarIcon from "../common/icons/star-icon.svelte";
 import ToolsConfigIcon from "../common/icons/tools-config-icon.svelte";
 
-  export let title = "Título Teste";
-  export let creationDate = new Date();
-  export let updateDate = new Date();
-  export let description = "Sample Description";
-  export let favorited = false;
-  export let locked = false;
+export let title = "Título Teste";
+export let creationDate = new Date();
+export let updateDate = new Date();
+export let description = "Sample Description";
+export let favorited = false;
+export let locked = false;
 
-  const showDate = (date : Date) : string => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
+const showDate = (date : Date) : string => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
 
-    return `${day}/${month}/${year}`;
-  }
+  return `${day}/${month}/${year}`;
+};
 
-  let isOpen = false;
-  let isEditing = false;
-  // Later we will need a function to save in DB
+let isOpen = false;
+let isEditing = false;
+// Later we will need a function to save in DB
 
-  const updateFavorited = (event: MouseEvent) => {
-    event.stopPropagation();
-    favorited = !favorited;
-    // Later we will also need a function to update the favorited status of the property too
-  }
+const updateFavorited = (event : MouseEvent) => {
+  event.stopPropagation();
+  favorited = !favorited;
+  // Later we will also need a function to update the favorited status of the property too
+};
 
-  const updateLocked = (event: MouseEvent) => {
-    event.stopPropagation();
-    locked = !locked;
-  }
+const updateLocked = (event : MouseEvent) => {
+  event.stopPropagation();
+  locked = !locked;
+};
 </script>
 
 <div class="main-card">
-  <div class="header" on:click={() => { isOpen = !isOpen }}>
+  <div class="header" on:click={() => { isOpen = !isOpen; }}>
     <div class="{!isOpen ? "chevron-collapse" : "chevron-collapse down"}">
       <img src="/icon-chevron-up.svg" alt="chevron"/>
     </div>
@@ -45,7 +45,7 @@ import ToolsConfigIcon from "../common/icons/tools-config-icon.svelte";
         <StarIcon active={favorited} iconColor={"#575777"} scale={1.5}/>
       </div>
       <h2> {title} </h2>
-      <div class="pencil-icon" on:click={(e) => { isEditing = !isEditing; e.stopPropagation() }}>
+      <div class="pencil-icon" on:click={(e) => { isEditing = !isEditing; e.stopPropagation(); }}>
         <PencilIcon iconColor={"#575777"} scale={1.4}/>
       </div>
       <div class="lock-icon" on:click={updateLocked}>
@@ -57,7 +57,7 @@ import ToolsConfigIcon from "../common/icons/tools-config-icon.svelte";
     <div class="description-container">
       <div class={isEditing ? "editable-description" : "solid-description"}
       contenteditable="{isEditing}"
-      on:click="{(e) => { if (isEditing) e.stopPropagation() }}"
+      on:click="{(e) => { if (isEditing) e.stopPropagation(); }}"
       >
         {description}
       </div>

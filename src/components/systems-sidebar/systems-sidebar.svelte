@@ -12,7 +12,7 @@
       envsCount: 12,
       schemasCount: 8,
       bopsCount: 25,
-      protocolsCount: 2
+      protocolsCount: 2,
     },
     {
       name: "Another Sys",
@@ -22,7 +22,7 @@
       envsCount: 2,
       schemasCount: 4,
       bopsCount: 32,
-      protocolsCount: 1
+      protocolsCount: 1,
     },
     {
       name: "Custom Create",
@@ -32,11 +32,11 @@
       envsCount: 31,
       schemasCount: 19,
       bopsCount: 325,
-      protocolsCount: 5
-    }
-  ]
+      protocolsCount: 5,
+    },
+  ];
 
-  guideText.set("Select or create a system to work with.")
+  guideText.set("Select or create a system to work with.");
 </script>
 
 <div class="sidebar">

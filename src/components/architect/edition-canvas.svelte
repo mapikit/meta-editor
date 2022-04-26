@@ -17,17 +17,17 @@
   let context : CanvasRenderingContext2D;
   let cutting = false;
 
-  function adjustCanvas() {
-    const canvasScale = canvas.clientWidth/canvas.width
+  function adjustCanvas () {
+    const canvasScale = canvas.clientWidth/canvas.width;
     canvas.width *= canvasScale;
     canvas.height *= canvasScale;
 
     context.strokeStyle = "#ffffff";
-    context.lineWidth = 2
+    context.lineWidth = 2;
   }
 
 
-  const mount = new Promise<void>(resolve => { 
+  const mount = new Promise<void>(resolve => {
     onMount(async () => {
       context = canvas.getContext("2d");
       $environment.debugCanvasCtx = context;
@@ -36,46 +36,46 @@
       bopStore.subscribe(bop => {
         currentBop = bop;
         updateTraces(context, bop);
-      })
+      });
       environment.subscribe(() => {
-        setTimeout(() => updateTraces(context, currentBop), 1); 
-      })
-    })
-    resolve()
+        setTimeout(() => updateTraces(context, currentBop), 1);
+      });
+    });
+    resolve();
   });
 
   let moving = false;
 
   function startMovement (event : MouseEvent) {
     if(cutting) {
-      const toCut = updateTraces(context, currentBop, { mouse: { x: event.x, y: event.y }});
+      const toCut = updateTraces(context, currentBop, { mouse: { x: event.x, y: event.y } });
       for(const keyDepTuple of toCut) {
         bopStore.update(bop => {
-          const module = bop.configuration.find(mod => mod.key === keyDepTuple[0])
+          const module = bop.configuration.find(mod => mod.key === keyDepTuple[0]);
           const depIndex = module.dependencies.findIndex(dep => dep === keyDepTuple[1]);
           module.dependencies.splice(depIndex, 1);
           return bop;
-        })
+        });
       }
       context.shadowBlur = 0;
     }
-    moving = event.button === 1 
+    moving = event.button === 1;
   }
-  function stopMovement () { 
-    moving = false 
+  function stopMovement () {
+    moving = false;
   }
 
   function detectShortcut (event : KeyboardEvent) {
     switch (event.key) {
       case "c":
         cutting = !cutting;
-        event.preventDefault()
+        event.preventDefault();
         break;
       case "Escape":
         cutting = false;
         break;
     }
-    bopStore.update(bop => bop)
+    bopStore.update(bop => bop);
     cutting = cutting;
   }
 
@@ -86,11 +86,11 @@
     else if(moving) {
       bopStore.update(bop => {
         bop.configuration.forEach(module => {
-          module.position.x += event.movementX/$environment.scale
-          module.position.y += event.movementY/$environment.scale
+          module.position.x += event.movementX/$environment.scale;
+          module.position.y += event.movementY/$environment.scale;
         });
         return bop;
-      })
+      });
     }
   }
 
@@ -99,11 +99,11 @@
     else if(e.deltaY < 0) $environment.scale /= 1.1;
   }
 
-  function copyBOpToClipboard() {
+  function copyBOpToClipboard () {
     console.log(currentBop);
     // console.log(moduleConnections)
     // TODO filter out ui properties
-    navigator.clipboard.writeText(beautify(currentBop, null, 1, 110))
+    navigator.clipboard.writeText(beautify(currentBop, null, 1, 110));
   }
 </script>
 
@@ -121,7 +121,7 @@
       
     </div>
   <input class="buttonCpy" type="button" value="Copy Bop" on:click={() => copyBOpToClipboard()}>
-  <input class="buttonScl" type="button" value="Reset Scale" on:click={() => { $environment.scale=1 }}>
+  <input class="buttonScl" type="button" value="Reset Scale" on:click={() => { $environment.scale=1; }}>
   <Trash bind:trashRect/>
 </div>
 <svelte:window 

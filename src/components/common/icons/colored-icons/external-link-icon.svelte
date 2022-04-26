@@ -6,8 +6,8 @@
  </svg>
 
 <script lang="ts">
-  export let color: string;
-  export let height: number;
+  export let color : string;
+  export let height : number;
 
   $: width = (1.2030 * height).toFixed(2);
 </script>

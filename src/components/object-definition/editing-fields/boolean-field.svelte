@@ -5,7 +5,7 @@
   const toggle = () => {
     propValue = !propValue;
     updateFunction();
-  }
+  };
 </script>
 
 <div class="value-input">

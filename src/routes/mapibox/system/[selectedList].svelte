@@ -3,7 +3,6 @@ import PropertyList from "../../../components/system-page/property-list.svelte";
 import CogSidebarDecoration from "../../../components/cog-sidebar-decoration.svelte";
 import MinifiedSystemsSidebar from "../../../components/systems-sidebar/minified-systems-sidebar.svelte";
 
-  
 </script>
 
 <title> System | mapikit </title>

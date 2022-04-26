@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ExternalLinkIcon from "../colored-icons/external-link-icon.svelte";
+  import ExternalLinkIcon from "./common/icons/colored-icons/external-link-icon.svelte";
 </script>
 
 <a class="link" target="blank" href="https://discord.gg/ndGsnbTW7V">

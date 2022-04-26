@@ -20,7 +20,7 @@
 <div class="value-input">
   <div
     class={hasPropValue ? "select" : "select void"}
-    on:click="{() => { collapsed = !collapsed }}"
+    on:click="{() => { collapsed = !collapsed; }}"
   >
     <p> {displayText} </p>
     <div class="{collapsed ? "chevron-collapse" : "chevron-collapse down"}">

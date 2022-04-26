@@ -10,9 +10,9 @@ import { guideText } from "../../stores/layout-tabs-store";
 
   selectedSystem.subscribe((value) => {
     collapsed = !(value === system.name); // TODO CHANGE TO BE AN UNIQUE ID
-  })
+  });
 
-  const updateCollapsedStatus = () => {
+  const updateCollapsedStatus = () : void => {
     if (collapsed === true) {
       selectedSystem.set(system.name);
       guideText.set("Select one of the three icons to start configuring your system. Hover to see more info about each one of them.");
@@ -26,7 +26,7 @@ import { guideText } from "../../stores/layout-tabs-store";
 <div class="{collapsed ? "system-container" : "system-container open"}"
   on:click="{updateCollapsedStatus}"
 >
-  <div class="{collapsed ? "chevron-collapse down" : "chevron-collapse"}"  on:click="{() => { collapsed = !collapsed }}">
+  <div class="{collapsed ? "chevron-collapse down" : "chevron-collapse"}"  on:click="{() => { collapsed = !collapsed; }}">
     <img src="/icon-chevron-up.svg" alt="chevron"/>
   </div>
   <div class="title">
@@ -35,7 +35,7 @@ import { guideText } from "../../stores/layout-tabs-store";
   <div class="body">
     <div class="{collapsed ? "solid-description" : "editable-description"}" transition:fade="{{ duration: 250, delay: 250 }}"
       contenteditable="{!collapsed}"
-      on:click="{(e) => { if (!collapsed) e.stopPropagation() }}"
+      on:click="{(e) => { if (!collapsed) e.stopPropagation(); }}"
     >
       {system.description}
     </div>

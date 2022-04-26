@@ -3,26 +3,26 @@ import { guideText } from "../../stores/layout-tabs-store";
 import SystemProp from "./system-prop.svelte";
 import { cubicInOut } from "svelte/easing";
 
-
 let hovered = "default";
 export let visible = false;
 
-const onHover = (data : CustomEvent<any>) => {
+const onHover = (data : CustomEvent<any>) : void => {
   hovered = data.detail.hovered;
   guideText.set(data.detail.message);
-}
+};
 
-const onHoverOut = () => {
+const onHoverOut = () : void => {
   hovered = "default";
-  guideText.set("Select one of the three icons to start configuring your system. Hover to see more info about each one of them.")
-}
+  guideText.set("Select one of the three icons to start configuring your system. Hover to see more info about each one of them.");
+};
 
-const slideInTransition = (node, {}) => {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type,@typescript-eslint/no-unused-vars
+const slideInTransition = (node, something) => {
   return {
     duration: 150,
-    css: t => `width: ${65 * cubicInOut(t)}px; opacity: ${cubicInOut(t)};`
-  }
-}
+    css: (t) : string => `width: ${65 * cubicInOut(t)}px; opacity: ${cubicInOut(t)};`,
+  };
+};
 
 </script>
 

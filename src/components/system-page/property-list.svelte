@@ -6,28 +6,28 @@ import { fade } from "svelte/transition";
 import SchemasSystemCard from "./schemas-system-card.svelte";
 import PlusSignBoxIcon from "../common/icons/plus-sign-box-icon.svelte";
 
-  export let listType = "schema";
-  export let listData = [
-    { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },
-    { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },
-    { title: "Empathic Car", creationDate: new Date(), updateDate: new Date(), description: "Mas esse daqui não é tão curto assim, já que precisamos de textos de diferentes tamanhos para mostrar como que a interface reage à eles." }
-  ];
+export let listType = "schema";
+export let listData = [
+  { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },
+  { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },
+  { title: "Empathic Car", creationDate: new Date(), updateDate: new Date(), description: "Mas esse daqui não é tão curto assim, já que precisamos de textos de diferentes tamanhos para mostrar como que a interface reage à eles." },
+];
 
-  const availableListTypes = ["schemas", "bops", "protocols"];
-  const typeInfos = {
-    "schemas": { color: "#5d8efe", label: "Schemas", icon: SchemaIcon, contentCard: "" },
-    "bops": { color: "#fde084", label: "Business Operations", icon: BopsIcon },
-    "protocols": { color: "#ff5c8e", label: "Protocols", icon: ProtocolsIcon }
-  }
+const availableListTypes = ["schemas", "bops", "protocols"];
+const typeInfos = {
+  "schemas": { color: "#5d8efe", label: "Schemas", icon: SchemaIcon, contentCard: "" },
+  "bops": { color: "#fde084", label: "Business Operations", icon: BopsIcon },
+  "protocols": { color: "#ff5c8e", label: "Protocols", icon: ProtocolsIcon },
+};
 
-  const listInfo = typeInfos[listType];
+const listInfo = typeInfos[listType];
 
-  let isOpen = false;
-  let createHovered = false;
+let isOpen = false;
+let createHovered = false;
 </script>
 
 <div class="prop-container">
-  <div class="title" on:click={() => { isOpen = !isOpen }}>
+  <div class="title" on:click={() => { isOpen = !isOpen; }}>
     <div class="{!isOpen ? "chevron-collapse" : "chevron-collapse down"}">
       <img src="/icon-chevron-up.svg" alt="chevron"/>
     </div>
@@ -52,8 +52,8 @@ import PlusSignBoxIcon from "../common/icons/plus-sign-box-icon.svelte";
     </div>
     <div class="button-spacer" style={`background-color: ${listInfo.color}`}/>
     <div class="add-new" style={`--hover-color: ${listInfo.color}`}
-      on:mouseenter={() => { createHovered = true }}
-      on:mouseleave={() => { createHovered = false }}
+      on:mouseenter={() => { createHovered = true; }}
+      on:mouseleave={() => { createHovered = false; }}
     >
       <span class="add-icon">
         <PlusSignBoxIcon scale={1} iconColor={createHovered ? listInfo.color : "white" }/>

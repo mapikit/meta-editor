@@ -10,15 +10,15 @@ import { typeColors } from "../../../common/styles/type-colors";
 
   export let parentInfo : ModuleCard;
 
-  function getNob() : void {
+  function getNob () : void {
     selectedNob.update((current) => {
       return solveConnection(current, {
-      parentCard: parentInfo,
-      nob,
-      property: name,
-      nobType: "output",
-      propertyType: parentInfo.info.output[name].type
-    })})
+        parentCard: parentInfo,
+        nob,
+        property: name,
+        nobType: "output",
+        propertyType: parentInfo.info.output[name].type,
+      });});
   }
 </script>
 

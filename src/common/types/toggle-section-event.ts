@@ -1,1 +1,1 @@
-export type ToggleEventType = { height: number; visible : boolean }
+export type ToggleEventType = { height : number; visible : boolean }

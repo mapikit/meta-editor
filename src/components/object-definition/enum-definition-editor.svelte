@@ -23,7 +23,7 @@ import type { DefinitionData } from "./obj-def-converter";
 
     enumDefinitiondata = enumDefinitiondata;
     dispatch("sync-value");
-  }
+  };
 
   const deleteProp = (optionValue : string) => {
     const index = enumDefinitiondata.findIndex((value) => value === optionValue);
@@ -31,7 +31,7 @@ import type { DefinitionData } from "./obj-def-converter";
     enumDefinitiondata = enumDefinitiondata;
 
     dispatch("sync-value");
-  }
+  };
 
 </script>
 
@@ -42,12 +42,12 @@ import type { DefinitionData } from "./obj-def-converter";
   {#each enumDefinitiondata as optionName}
   <div class="properties-holder">
     {#if level.canAddProperty()}
-      <div class="exclude" on:click="{() => {deleteProp(optionName)}}">
+      <div class="exclude" on:click="{() => {deleteProp(optionName);}}">
         <CancelIcon iconColor="#ffffff"/>
       </div>
     {/if}
     <div class="field-holder">
-      <StringField bind:propValue={optionName} standalone updateFunction={() => { dispatch("sync-value") }}/>
+      <StringField bind:propValue={optionName} standalone updateFunction={() => { dispatch("sync-value"); }}/>
     </div>
   </div>
   {/each}

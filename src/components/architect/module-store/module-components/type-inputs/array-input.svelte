@@ -10,16 +10,16 @@ import HeaderLinks from "../../../../header-links.svelte";
 
   let type = "none" as any;
 
-  function addItem(event : MouseEvent) {
+  function addItem (event : MouseEvent) {
     array.update(arr => {
       arr.push({ type, value: undefined });
       return arr;
-    })
-    console.log(type, $array)
-    console.log(type, value)
+    });
+    console.log(type, $array);
+    console.log(type, value);
   }
   let value = [];
-  array.subscribe(arr =>  value = arr.map(item => item.value))
+  array.subscribe(arr =>  value = arr.map(item => item.value));
   export { value };
 
 </script>

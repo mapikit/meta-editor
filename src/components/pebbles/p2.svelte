@@ -4,6 +4,6 @@
 
 
 <script lang="ts">
-  export let color: string;
+  export let color : string;
   export let scale = 1;
 </script>

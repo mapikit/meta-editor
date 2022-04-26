@@ -13,13 +13,13 @@
           return;
         }
 
-        if (max && value > max) { value = max }
-        if (max && value < min) { value = min }
+        if (max && value > max) { value = max; }
+        if (max && value < min) { value = min; }
 
         latestValidValue = value;
-      }
-    }
-  }
+      },
+    };
+  };
 </script>
 
 <input type="number" {max} {min} bind:value="{value}" on:change="{updateFunction}" use:preventLettersAndOverflow="{value}"/>

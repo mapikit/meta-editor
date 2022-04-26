@@ -1,41 +1,40 @@
 <script lang="ts">
   import ServiceIcon from "./service-icon.svelte";
   import { layoutTabs, selectedService, services } from "../../stores/layout-tabs-store";
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { navigation } from "../../lib/navigation";
   
-  // Syncs selected with current page
-  page.subscribe((pageData) => {
-    if (pageData.url.pathname !== "/home") {
-      layoutTabs.set({ serviceSelectorOpen: false });
+  // // Syncs selected with current page
+  // page.subscribe((pageData) => {
+  //   if (pageData.url.pathname !== "/home") {
+  //     layoutTabs.set({ serviceSelectorOpen: false });
 
-      selectedService.set(services.find((service) => {
-        return pageData.url.pathname.includes(service.link)
-      })?.name ?? "");
-    } else {
-      layoutTabs.set({ serviceSelectorOpen: true });
-      selectedService.set("");
-    }
-  })
+  //     selectedService.set(services.find((service) => {
+  //       return pageData.url.pathname.includes(service.link)
+  //     })?.name ?? "");
+  //   } else {
+  //     layoutTabs.set({ serviceSelectorOpen: true });
+  //     selectedService.set("");
+  //   }
+  // })
 
   let collapsed = false;
-  layoutTabs.subscribe((value) => { collapsed = !value.serviceSelectorOpen; })
+  layoutTabs.subscribe((value) => { collapsed = !value.serviceSelectorOpen; });
 
   let selected = "";
   selectedService.subscribe((value) => {
-    selected = value
-  })
+    selected = value;
+  });
 
   const select = (serviceName : string, link : string) : void => {
     selectedService.set(serviceName);
-    goto(link)
-  }
+    navigation.navigateTo(link);
+  };
 
 </script>
 
 <div class="{collapsed && selected !== "" ? "service-select collapsed" : "service-select"}"
-  on:mouseleave="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: false && selected !== ""}))}"
-  on:mouseenter="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: true && selected !== ""}))}"
+  on:mouseleave="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: false && selected !== "" }))}"
+  on:mouseenter="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: true && selected !== "" }))}"
 >
   {#each services as service}
     <ServiceIcon

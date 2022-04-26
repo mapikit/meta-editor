@@ -20,9 +20,9 @@ const bar = {
 
 const foo = {
   b: "bbbb",
-}
+};
 
-foo.b = bar.a
-bar.a = "asd"
+foo.b = bar.a;
+bar.a = "asd";
 
-console.log(foo.b) //asd
+console.log(foo.b); //asd

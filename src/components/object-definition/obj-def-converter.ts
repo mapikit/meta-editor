@@ -2,11 +2,11 @@ import { isObjectDefinition, ObjectDefinition, TypeDefinition } from "@meta-syst
 import { defaultTypesValues } from "./default-types-values";
 
 export type DefinitionData = {
-  keyName: string;
-  value: unknown;
-  type: TypeDefinition["type"];
+  keyName : string;
+  value : unknown;
+  type : TypeDefinition["type"];
   required : boolean;
-  subtype?: unknown
+  subtype ?: unknown
 }
 
 const isObjectDefinitionCheck = (value : object) : boolean => {
@@ -16,7 +16,7 @@ const isObjectDefinitionCheck = (value : object) : boolean => {
   } catch {
     return false;
   }
-}
+};
 
 // Also can populate the values of the definitionData if `objValue` is specified
 export const convertObjDefinitionToDefinitionData =
@@ -30,11 +30,11 @@ export const convertObjDefinitionToDefinitionData =
       value: objValue[key] ?? defaultTypesValues[objDef[key].type] ?? "",
       type: objDef[key].type,
       required: objDef[key].required ?? false,
-      subtype: objDef[key]["subtype"]
+      subtype: objDef[key]["subtype"],
     };
 
     if (objDef[key]["type"] === "array") {
-      const arrayTypeConverted = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {})
+      const arrayTypeConverted = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {});
       partialResult["subtype"] = {
         subtype: arrayTypeConverted,
         keyName: "Objects of Array",
@@ -48,10 +48,10 @@ export const convertObjDefinitionToDefinitionData =
       valuesToBeAdded.forEach((item, index) => {
         const itemValueDefinition = {
           subtype: [], // is the array type (already DefinitionData),
-          keyName: `Object in Array`,
+          keyName: "Object in Array",
           type: "object",
           value: {},
-          required: true
+          required: true,
         };
 
         const arrayValueConverted = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key][index]);
@@ -92,7 +92,7 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
 : { definition : ObjectDefinition; data : object } => {
   const result : { definition : ObjectDefinition; data : object } = {
     definition : {},
-    data: {}
+    data: {},
   };
 
   if (definitionData.type === "array") {
@@ -100,7 +100,7 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
       "type": "array",
       "required": definitionData.required,
       "subtype": definitionData.subtype as string,
-    }
+    };
     result.data[definitionData.keyName] = definitionData.value;
 
     if (typeof definitionData.subtype === "object") {
@@ -118,7 +118,7 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
         innerItemValues.forEach((innerItem) => {
           const convertedItem = convertDefinitionDataToObjectDefinition(innerItem);
           Object.assign(arrayItemValueResult, convertedItem.data);
-        })
+        });
 
         result.data[definitionData.keyName].push(arrayItemValueResult);
       });
@@ -135,14 +135,14 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
     result.definition[definitionData.keyName] = {
       "type": "object",
       "required": definitionData.required,
-      "subtype": {}
+      "subtype": {},
     };
 
     result.data[definitionData.keyName] = {};
 
     (definitionData.subtype as DefinitionData[]).forEach((innerDefinitionData) => {
       const innerConverted = convertDefinitionDataToObjectDefinition(innerDefinitionData);
-      
+
       result.definition[definitionData.keyName]["subtype"][innerDefinitionData.keyName]
         = innerConverted.definition[innerDefinitionData.keyName];
       result.data[definitionData.keyName][innerDefinitionData.keyName]
@@ -155,10 +155,10 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
   result.definition[definitionData.keyName] = {
     "type": definitionData.type,
     "required": definitionData.required,
-  }
+  };
 
-  result.data[definitionData.keyName] = definitionData.value
+  result.data[definitionData.keyName] = definitionData.value;
 
 
   return result;
-}
+};

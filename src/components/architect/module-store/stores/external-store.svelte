@@ -1,25 +1,25 @@
 <script async lang="ts">
   import type { FunctionDefinition, MetaFunction, MetaPackage } from "@meta-system/meta-function-helper";
   import List from "../../../list/list.svelte";
-  import { functionsInfo } from '../../helpers/functions-info';
+  import { functionsInfo } from "../../helpers/functions-info";
   import StoreSection from "../store-section.svelte";
   import axios from "axios";
   import beautify from "json-beautify";
   import { mapikitServer } from "../../../../common/network";
   import { dataset_dev } from "svelte/internal";
-  export let search : string = "";
+  export let search  = "";
   const packageModules : Record<string, FunctionDefinition[]> = {};
 
-  function getSeparateModules (infos : Array<MetaPackage | MetaFunction>) :  Record<string, FunctionDefinition[]>{
+  function getSeparateModules (infos : Array<MetaPackage | MetaFunction>) :  Record<string, FunctionDefinition[]> {
     // Ref bellow comment
     packageModules["Not In a Package"] = [];
     for(const info of infos) {
       if(info["functionsDefinitions"] !== undefined) {
-        const mPackage = info as MetaPackage
+        const mPackage = info as MetaPackage;
         packageModules[mPackage.name] = mPackage.functionsDefinitions as FunctionDefinition[];
       } else {
         //NOTE This is a terrible way to do this, conflict, change.
-        const mFunction = info as MetaFunction
+        const mFunction = info as MetaFunction;
         packageModules["Not In a Package"].push(mFunction);
       }
     }

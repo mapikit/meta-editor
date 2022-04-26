@@ -1,14 +1,15 @@
 <script lang="ts">
-// Logo on the left
-// After the logo, Breadcrumbs 
-// Right sandwitch menu
+import { navigation } from "../../lib/navigation";
 
-import { goto } from '$app/navigation';
-import { selectedService } from '../../stores/layout-tabs-store';
+// Logo on the left
+// After the logo, Breadcrumbs
+// Right sandwich menu
+
+import { selectedService } from "../../stores/layout-tabs-store";
 </script>
 
 <div class="header">
-  <div class="logo" on:click="{() => { goto('/home'); selectedService.set("") }}" >
+  <div class="logo" on:click="{() => { navigation.navigateTo('/home'); selectedService.set(""); }}" >
     <img src="/logo-and-name.svg" alt="mapikit-logo"/>
   </div>
 </div>

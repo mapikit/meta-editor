@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { typeColors } from "../../common/styles/type-colors";
-  import { possibleConstTypes } from "../architect/module-store/module-components/type-inputs/inputs-map";  
+  import { possibleConstTypes } from "../architect/module-store/module-components/type-inputs/inputs-map";
 
   let contents = possibleConstTypes;
   let selecting = false;
@@ -10,12 +10,12 @@
   export let simplyfied = false;
   export let value = undefined;
 
-  const dispatch = createEventDispatcher<{ change: { value: any, index : number }}>();
+  const dispatch = createEventDispatcher<{ change : { value : any, index : number }}>();
 
   function handleChange (index : number, nValue : any) {
     value = nValue;
     selecting = false;
-    dispatch("change", { value, index })
+    dispatch("change", { value, index });
   }
 
 </script>
