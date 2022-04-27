@@ -21,7 +21,7 @@
     <img alt={service.name} src={"/dashboard-assets/icons/"+service.icon}/>
   </div>
   {#if selected === service.name}
-    <div class="selected-mark" transition:fly="{{ x: 10, duration: 250 }}"/>
+    <div class="selected-mark" transition:fly|local="{{ x: 10, duration: 250 }}"/>
   {/if}
 </div>
 

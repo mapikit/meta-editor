@@ -4,7 +4,9 @@ import SystemsSidebar from "../../components/systems-sidebar/systems-sidebar.sve
 import { fly } from "svelte/transition";
 
 </script>
-<div in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: 150, duration: 250 }}>
+
+<div in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }}>
   <SystemsSidebar />
   <GuideText />
 </div>
+

@@ -9,7 +9,7 @@ import { selectedService } from "../../stores/layout-tabs-store";
 </script>
 
 <div class="header">
-  <div class="logo" on:click="{() => { navigation.navigateTo('/home'); selectedService.set(""); }}" >
+  <div class="logo" on:click="{() => { navigation.navigateTo('/'); selectedService.set(""); }}" >
     <img src="/logo-and-name.svg" alt="mapikit-logo"/>
   </div>
 </div>

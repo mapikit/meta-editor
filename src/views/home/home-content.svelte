@@ -1,14 +1,15 @@
 <script lang="ts">
-import { guideText } from "../stores/layout-tabs-store";
+import { guideText } from "../../stores/layout-tabs-store";
 
-import GuideText from "../components/common/guide-text.svelte";
+import GuideText from "../../components/common/guide-text.svelte";
+import { navigation } from "../../lib/navigation";
 
 const favorites = [
-  { type: "BOp", name: "Business procedure 48", description: "This is a nice description for this business case, believe me." },
-  { type: "BOp", name: "Business procedure 49", description: "This is a nice description for this business case, believe me." },
-  { type: "BOp", name: "Business procedure 50", description: "This is a nice description for this business case, believe me." },
-  { type: "BOp", name: "Business procedure 51", description: "This is a nice description for this business case, believe me." },
-  { type: "BOp", name: "Business procedure 52", description: "This is a nice description for this business case, believe me." },
+  { type: "BOp", name: "Business procedure 48", description: "This" },
+  { type: "BOp", name: "Business procedure 49", description: "This" },
+  { type: "BOp", name: "Business procedure 50", description: "This" },
+  { type: "BOp", name: "Business procedure 51", description: "This" },
+  { type: "BOp", name: "Business procedure 52", description: "This" },
 ];
 </script>
 
@@ -24,7 +25,7 @@ const favorites = [
       <div class="empty-favorites"> When you star something, it will apear here. </div>
     {:else}
       {#each favorites as favoriteItem}
-        <div class="favorite-item" on:click="{() => { guideText.update(() => favoriteItem.name); }}">
+        <div class="favorite-item" on:click="{() => { navigation.navigateTo("/mapibox"); }}">
           <div class="title"> {favoriteItem.name} </div>
           <div class="description"> {favoriteItem.description} </div>
         </div>

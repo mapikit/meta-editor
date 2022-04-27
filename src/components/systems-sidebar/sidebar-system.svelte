@@ -33,7 +33,7 @@ import { guideText } from "../../stores/layout-tabs-store";
     {system.name}
   </div>
   <div class="body">
-    <div class="{collapsed ? "solid-description" : "editable-description"}" transition:fade="{{ duration: 250, delay: 250 }}"
+    <div class="{collapsed ? "solid-description" : "editable-description"}" transition:fade|local="{{ duration: 250, delay: 250 }}"
       contenteditable="{!collapsed}"
       on:click="{(e) => { if (!collapsed) e.stopPropagation(); }}"
     >
@@ -41,7 +41,7 @@ import { guideText } from "../../stores/layout-tabs-store";
     </div>
     {#if !collapsed}
       <AttributeAppendix visible={!collapsed}/>
-      <div class="stats-group" transition:fade="{{ duration: 250 }}">
+      <div class="stats-group" transition:fade|local="{{ duration: 250 }}">
         <div class="stat-line">
           <p class="key"> Version: </p> <p class="value"> {system.version} </p>
         </div>
@@ -49,7 +49,7 @@ import { guideText } from "../../stores/layout-tabs-store";
           <p class="key"> Environment Variables: </p> <p class="value"> {system.envsCount} </p>
         </div>
       </div>
-      <div class="stats-group" transition:fade="{{ duration: 250 }}">
+      <div class="stats-group" transition:fade|local="{{ duration: 250 }}">
         <div class="stat-line">
           <p class="key"> Schemas: </p> <p class="schema-count"> {system.schemasCount} </p>
         </div>

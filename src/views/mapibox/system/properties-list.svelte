@@ -2,11 +2,19 @@
 import PropertyList from "../../../components/system-page/property-list.svelte";
 import CogSidebarDecoration from "../../../components/cog-sidebar-decoration.svelte";
 import MinifiedSystemsSidebar from "../../../components/systems-sidebar/minified-systems-sidebar.svelte";
+import { navigation } from "../../../lib/navigation";
+import { fly } from "svelte/transition";
+
+let params = navigation.getCurrentPathParams("/mapibox/system/:selectedProp");
+
+navigation.pathStore.subscribe(() => {
+  params = navigation.getCurrentPathParams("/mapibox/system/:selectedProp");
+});
 
 </script>
 
 <title> System | mapikit </title>
-<div class="content">
+<div class="content" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
   <MinifiedSystemsSidebar/>
   <CogSidebarDecoration/>
   <div class="list">

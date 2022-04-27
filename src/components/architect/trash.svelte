@@ -9,7 +9,7 @@ onMount(() => {
 });
 </script>
 
-<div class="trash" bind:this={ref,}>
+<div class="trash" bind:this={ref}>
   TRASH
 </div>
 

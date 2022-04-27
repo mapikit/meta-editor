@@ -1,15 +1,14 @@
 <script>
-import Home from "./routes/home.svelte";
-import PageBaseLayout from "./layouts/page-base-layout.svelte";
+
+import MainView from "./views/main-view.svelte";
 
 // This file contains general data about the App itself
 // and should not contain anything else.
 
 // should render router
 </script>
-<PageBaseLayout>
-  <Home />
-</PageBaseLayout>
+
+<MainView />
 
 <svelte:head>
   <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -4,7 +4,7 @@ import { createEventDispatcher } from "svelte";
 import BopsIcon from "../common/icons/bops-icon.svelte";
 import ProtocolsIcon from "../common/icons/protocols-icon.svelte";
 import { fly } from "svelte/transition";
-import { goto } from "$app/navigation";
+import { navigation } from "../../lib/navigation";
 
 const dispatch = createEventDispatcher();
 
@@ -39,7 +39,7 @@ const hoverOut = () => {
 <div class="{`propicon ${hovered ? "hover" : ""}`}"
   on:mouseenter="{hoverIn}"
   on:mouseleave="{hoverOut}"
-  on:click="{() => { goto(availableButtons[buttonName]?.path); }}"
+  on:click="{() => { navigation.navigateTo(availableButtons[buttonName]?.path); }}"
 >
   <svelte:component
     this={availableButtons[buttonName]?.icon}

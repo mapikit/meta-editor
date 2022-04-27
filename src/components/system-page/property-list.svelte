@@ -6,7 +6,7 @@ import { fade } from "svelte/transition";
 import SchemasSystemCard from "./schemas-system-card.svelte";
 import PlusSignBoxIcon from "../common/icons/plus-sign-box-icon.svelte";
 
-export let listType = "schema";
+export let listType = "schemas";
 export let listData = [
   { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },
   { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },

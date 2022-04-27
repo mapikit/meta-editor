@@ -28,7 +28,7 @@ const slideInTransition = (node, something) => {
 
 <div class="{visible ? "ugly-parent-css-hack" : "ugly-parent-css-hack"}">
   <div class="{"holder " + hovered}"
-  transition:slideInTransition="{{}}"
+  transition:slideInTransition|local="{{}}"
   >
     <SystemProp buttonName={"schema"}
       on:hoverIn={onHover}

@@ -3,19 +3,19 @@
   import { layoutTabs, selectedService, services } from "../../stores/layout-tabs-store";
   import { navigation } from "../../lib/navigation";
   
-  // // Syncs selected with current page
-  // page.subscribe((pageData) => {
-  //   if (pageData.url.pathname !== "/home") {
-  //     layoutTabs.set({ serviceSelectorOpen: false });
+  // Syncs selected with current page
+  navigation.pathStore.subscribe((path) => {
+    if (path !== "/home") {
+      layoutTabs.set({ serviceSelectorOpen: false });
 
-  //     selectedService.set(services.find((service) => {
-  //       return pageData.url.pathname.includes(service.link)
-  //     })?.name ?? "");
-  //   } else {
-  //     layoutTabs.set({ serviceSelectorOpen: true });
-  //     selectedService.set("");
-  //   }
-  // })
+      selectedService.set(services.find((service) => {
+        return path.includes(service.link);
+      })?.name ?? "");
+    } else {
+      layoutTabs.set({ serviceSelectorOpen: true });
+      selectedService.set("");
+    }
+  });
 
   let collapsed = false;
   layoutTabs.subscribe((value) => { collapsed = !value.serviceSelectorOpen; });
