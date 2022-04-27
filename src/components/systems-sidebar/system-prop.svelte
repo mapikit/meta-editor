@@ -48,7 +48,7 @@ const hoverOut = () => {
   />
   {#if hovered}
     <div class="p-holder">
-      <p transition:fly={{ x: -12, duration: 250 }}>
+      <p transition:fly|local={{ x: -12, duration: 250 }}>
         {availableButtons[buttonName].tooltip}
       </p>
     </div>
