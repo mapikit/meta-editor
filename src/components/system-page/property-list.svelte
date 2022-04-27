@@ -5,6 +5,7 @@ import SchemaIcon from "../common/icons/schema-icon.svelte";
 import { fade } from "svelte/transition";
 import SchemasSystemCard from "./schemas-system-card.svelte";
 import PlusSignBoxIcon from "../common/icons/plus-sign-box-icon.svelte";
+import { fly } from "svelte/transition";
 
 export let listType = "schemas";
 export let listData = [
@@ -46,8 +47,10 @@ let createHovered = false;
   </div>
   {#if isOpen}
     <div class="list-container" style={`border-left-color: ${listInfo.color}`}>
-      {#each listData as listItem }
-        <SchemasSystemCard />
+      {#each listData as listItem, index }
+        <div in:fly={{ x: 20, delay: index * 46 }} out:fly={{ x: 20, delay: 50*(listData.length - 1 * index) }}>
+          <SchemasSystemCard />
+        </div>
       {/each}
     </div>
     <div class="button-spacer" style={`background-color: ${listInfo.color}`}/>
