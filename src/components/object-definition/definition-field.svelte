@@ -103,7 +103,8 @@
   }
 
   .name-display {
-    padding: 0 0 0 6px;
+    padding: 4px 4px 4px 8px;
+    font-size: 16px;
   }
 
   input {

@@ -4,13 +4,13 @@ import Route from "../lib/router/route.svelte";
 import HomeContent from "./home/home-content.svelte";
 import Mapibox from "./mapibox/mapibox.svelte";
 import PageBaseLayout from "./layouts/page-base-layout.svelte";
-import PropertiesList from "./mapibox/system/properties-list.svelte";
+import System from "./mapibox/system/system.svelte";
 
 </script>
 
 <div style="width: 100%; height: 100%;">
   <PageBaseLayout>
-    <Switch>
+    <Switch basePath="/">
       <Route path="/">
         <HomeContent />
       </Route>
@@ -20,8 +20,8 @@ import PropertiesList from "./mapibox/system/properties-list.svelte";
       <Route path="/mapibox">
         <Mapibox />
       </Route>
-      <Route path="/mapibox/system/:selectedProp/">
-        <PropertiesList />
+      <Route path="/mapibox/system/" deepMatch={true} >
+        <System />
       </Route>
     </Switch>
   </PageBaseLayout>

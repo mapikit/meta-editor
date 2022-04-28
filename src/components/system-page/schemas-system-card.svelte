@@ -1,4 +1,6 @@
 <script lang="ts">
+import { navigation } from "../../lib/navigation";
+
 import LockIcon from "../common/icons/lock-icon.svelte";
 import PencilIcon from "../common/icons/pencil-icon.svelte";
 import StarIcon from "../common/icons/star-icon.svelte";
@@ -23,13 +25,13 @@ let isOpen = false;
 let isEditing = false;
 // Later we will need a function to save in DB
 
-const updateFavorited = (event : MouseEvent) => {
+const updateFavorited = (event : MouseEvent) : void => {
   event.stopPropagation();
   favorited = !favorited;
   // Later we will also need a function to update the favorited status of the property too
 };
 
-const updateLocked = (event : MouseEvent) => {
+const updateLocked = (event : MouseEvent) : void => {
   event.stopPropagation();
   locked = !locked;
 };
@@ -72,7 +74,7 @@ const updateLocked = (event : MouseEvent) => {
         </div>
       </div>
 
-      <div class="edit-button">
+      <div class="edit-button" on:click={() => { navigation.navigateAppendTo("edit"); }}>
         <div class="edit-icon">
           <ToolsConfigIcon iconColor="#3b3b53" scale={1.3}/>
         </div>
