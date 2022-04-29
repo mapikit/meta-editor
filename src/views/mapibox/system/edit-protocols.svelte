@@ -4,6 +4,10 @@ import type { ObjectDefinition } from "@meta-system/object-definition";
 import { Protocol } from "../../../entities/protocol";
 import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
 import ProtocolDefinitionSign from "../../../components/system-page/system-editor/protocol-definition-sign.svelte";
+import GuideText from "../../../components/common/guide-text.svelte";
+import { onMount } from "svelte";
+import { guideText } from "../../../stores/layout-tabs-store";
+import DataPreview from "../../../components/system-page/system-editor/data-preview.svelte";
 
 export const protocolDefinition : ObjectDefinition = {
   field1: { type: "string" },
@@ -13,14 +17,20 @@ export const protocolDefinition : ObjectDefinition = {
 };
 export let protocolData = {};
 export const protocolsList : Protocol[] = []; // Perhaps get from store when it's up?
+export const ProtocolName = "TEST PROTOCOL";
 
 // Mocked data
 protocolsList.push(new Protocol("HTTP JSON Body", "0.1.66", ProtocolKind.normal));
 protocolsList.push(new Protocol("Another Protocol", "0.1.66", ProtocolKind.normal));
 protocolsList.push(new Protocol("CRONJOB", "0.1.66", ProtocolKind.normal));
 
+onMount(() => {
+  guideText.set(`Configuring Protocol: ${ProtocolName}`);
+});
+
 </script>
-<div class="content"> 
+<div class="content">
+  <GuideText />
   <div class="protocols-list">
     {#each protocolsList as protocol}
       <div class="listed-protocol">
@@ -31,11 +41,15 @@ protocolsList.push(new Protocol("CRONJOB", "0.1.66", ProtocolKind.normal));
   </div>
   <div class="divider" />
   <div class="editor-lane">
-    <ProtocolDefinitionSign protocolDefinition={protocolDefinition} protocolData={protocolData}/>
+    <ProtocolDefinitionSign
+      protocolDefinition={protocolDefinition}
+      protocolData={protocolData}
+      on:confirmed={(data) => { protocolData = data.detail.result; }}
+    />
   </div>
 
   <div class="preview">
-
+    <DataPreview bind:data={protocolData} />
   </div>
 </div>
 
@@ -92,6 +106,10 @@ protocolsList.push(new Protocol("CRONJOB", "0.1.66", ProtocolKind.normal));
   }
 
   .preview {
+    max-height: calc(100% - 82px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex: 1;
   }
 </style>
