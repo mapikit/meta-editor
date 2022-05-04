@@ -65,7 +65,6 @@ export const convertObjDefinitionToDefinitionData =
     }
 
     const isDeepObject = isObjectDefinitionCheck(objDef[key]["subtype"]);
-    console.log(isDeepObject, objDef[key], objDef[key]["type"]);
 
     if (isDeepObject || objDef[key]["type"] === "cloudedObject") {
       partialResult["subtype"] =
@@ -148,6 +147,24 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
 
       result.definition[definitionData.keyName]["subtype"][innerDefinitionData.keyName]
         = innerConverted.definition[innerDefinitionData.keyName];
+      result.data[definitionData.keyName][innerDefinitionData.keyName]
+        = innerConverted.data[innerDefinitionData.keyName];
+    });
+
+    return result;
+  }
+
+  if (definitionData.type === "cloudedObject") {
+    result.definition[definitionData.keyName] = {
+      "type": "cloudedObject",
+      "required": definitionData.required,
+    };
+
+    result.data[definitionData.keyName] = {};
+
+    (definitionData.subtype as DefinitionData[]).forEach((innerDefinitionData) => {
+      const innerConverted = convertDefinitionDataToObjectDefinition(innerDefinitionData);
+
       result.data[definitionData.keyName][innerDefinitionData.keyName]
         = innerConverted.data[innerDefinitionData.keyName];
     });

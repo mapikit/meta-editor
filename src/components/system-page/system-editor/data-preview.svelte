@@ -2,7 +2,6 @@
   export let data = {};
 
   let dataKeys = [];
-
   $: dataKeys = Object.keys(data);
 </script>
 
@@ -11,6 +10,8 @@
     <div class="property">
       <div class="name" > {dataKey} : </div>
       <div class="value" >
+        <!-- Todo: show values differently based on their types -->
+        <!-- Todo: If type is deep (obj or array) indent and repeat -->
         {data[dataKey].toString()}
       </div>
     </div>

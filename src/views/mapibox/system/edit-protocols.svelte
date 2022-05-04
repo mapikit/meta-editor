@@ -9,11 +9,28 @@ import { onMount } from "svelte";
 import { guideText } from "../../../stores/layout-tabs-store";
 import DataPreview from "../../../components/system-page/system-editor/data-preview.svelte";
 
-export const protocolDefinition : ObjectDefinition = {
-  field1: { type: "string" },
-  body: { type: "object", subtype: { duration: { type: "string" }, destination: { type: "string" } } },
-  dueDate : { type: "date" },
-  hasInfluence: { type: "boolean" },
+export const protocolDefinition = {
+  "port": { "type": "number", "required": true },
+  "enableCors": { "type": "boolean" },
+  "corsConfig": { "type": "object", "subtype": {
+    "origin": { "type": "string", "required": true },
+    "optionsSuccessStatus": { "type": "number", "required": true },
+  } },
+  "routes": { "type": "array", "required": true, "subtype": {
+    "route": { "type": "string", "required": true },
+    "businessOperation": { "type": "string", "required": true },
+    "method": { "type": "enum", "subtype": [ "GET", "PUT", "POST", "PATCH", "DELETE" ], "required": true },
+    "inputMapConfiguration": { "type": "array", "required": true, "subtype": {
+      "origin": { "type": "enum", "required": true, "subtype": [ "route", "queryParams", "headers", "body" ] },
+      "originPath": { "type": "string", "required": true },
+      "targetPath": { "type": "string", "required": true },
+    } },
+    "resultMap": { "type": "object", "required": true, "subtype": {
+      "statusCode": { "type": "string", "required": true },
+      "headers": { "type": "string", "required": true, "subtype": "cloudedObject" },
+      "body": { "type": "cloudedObject", "required": true },
+    } },
+  } },
 };
 export let protocolData = {};
 export const protocolsList : Protocol[] = []; // Perhaps get from store when it's up?

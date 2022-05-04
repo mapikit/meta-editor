@@ -1,7 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { ObjectDefinition } from "@meta-system/object-definition";
-  import { convertDefinitionDataToObjectDefinition, convertObjDefinitionToDefinitionData, DefinitionData } from "./obj-def-converter";
+  import {
+    convertDefinitionDataToObjectDefinition,
+    convertObjDefinitionToDefinitionData,
+    DefinitionData,
+  } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
   import ObjectDefinitionEditor from "./object-definition-editor.svelte";
 
@@ -40,7 +44,7 @@
     selectedData = selectDataDefinition();
   };
 
-  const selectDataDefinition = () => {
+  const selectDataDefinition = () : DefinitionData => {
     const dicedDefinitionPath = [];
     workingDefinitionPath.forEach((path : string) => {
       const parts = path.split(".");
@@ -55,8 +59,7 @@
     return intermediarySelectedData;
   };
 
-
-  const navigateTo = (path : string, levelOverride ?: EditorLevels) => {
+  const navigateTo = (path : string, levelOverride ?: EditorLevels) : void => {
     workingDefinitionPath.push(path);
     workingDefinitionPath = workingDefinitionPath;
 
