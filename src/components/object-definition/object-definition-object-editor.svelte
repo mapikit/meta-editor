@@ -18,8 +18,13 @@
 
   const dispatch = createEventDispatcher();
 
+  // eslint-disable-next-line max-lines-per-function
   const appendData = () => {
     let newPropNumber = 1;
+
+    if (objectDefinitionData.length === 0) {
+      definitionData.subtype = objectDefinitionData;
+    }
 
     while (objectDefinitionData.find((value) => value.keyName === `new prop (${newPropNumber})`) !== undefined) {
       newPropNumber ++;
@@ -66,8 +71,14 @@
     dispatch("navigate-definition", { path: `${pathOnType}.${indexPath}` });
   };
 
+  const navigateCloudedDefinition = (type : string, indexPath : string) => {
+    let pathOnType = "subtype";
+    dispatch("navigate-definition", {
+      path: `${pathOnType}.${indexPath}` , levelOverride: EditorLevels.createAndSignDefinition });
+  };
+
   const shouldDisplayArrow = (defKey : DefinitionData) : boolean => {
-    if (defKey.type === "object" || defKey.type === "array" || defKey.type === "enum") {
+    if (defKey.type === "object" || defKey.type === "array" || defKey.type === "enum" || defKey.type === "cloudedObject") {
       if (defKey.type === "array" && (typeof defKey.subtype === "object")) { return true; }
       if (!level.canAddData() && defKey.type === "array") { return false; }
       return true;
@@ -98,7 +109,13 @@
       propSubType="{defKey.subtype}"
     />
     {#if shouldDisplayArrow(defKey)}
-      <div class="see-obj" on:click={() => navigateDefinition(defKey.type, index.toString())}> <RightArrow iconColor="white"/> </div>
+      <div class="see-obj" on:click={() => {
+        if (defKey.type === "cloudedObject") {
+          navigateCloudedDefinition(defKey.type, index.toString());
+          return;
+        }
+        navigateDefinition(defKey.type, index.toString());
+      }}> <RightArrow iconColor="white"/> </div>
     {/if}
   </div>
   {/each}

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { isObjectDefinition, ObjectDefinition, TypeDefinition } from "@meta-system/object-definition";
 import { defaultTypesValues } from "./default-types-values";
 
@@ -64,9 +65,11 @@ export const convertObjDefinitionToDefinitionData =
     }
 
     const isDeepObject = isObjectDefinitionCheck(objDef[key]["subtype"]);
+    console.log(isDeepObject, objDef[key], objDef[key]["type"]);
 
-    if (isDeepObject) {
-      partialResult["subtype"] = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {});
+    if (isDeepObject || objDef[key]["type"] === "cloudedObject") {
+      partialResult["subtype"] =
+        convertObjDefinitionToDefinitionData(objDef[key]["subtype"] ?? {}, objValue[key] ?? {});
       partialResult.value = {};
       result.push(partialResult);
       return;

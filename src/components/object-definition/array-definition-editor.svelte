@@ -37,6 +37,7 @@
     dispatch("navigate-definition", { path: `value.${index}`, levelOverride: EditorLevels.createAndSignDefinition });
   };
 
+  // eslint-disable-next-line max-lines-per-function
   const addNewArrayItem = () => {
     if (typeof type === "object" || type === "cloudedObject") {
       let subtype : any = [];
@@ -74,7 +75,7 @@
   <div class="list-container">
     {#each arrayValue as arrayItem, index }
       <div class="properties-holder">
-        {#if level.canAddProperty()}
+        {#if level.canAddData()}
           <div class="exclude" on:click="{() => {deleteProp(index);}}">
             <CancelIcon iconColor="#ffffff"/>
           </div>

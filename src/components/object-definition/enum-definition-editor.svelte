@@ -61,6 +61,7 @@ import type { DefinitionData } from "./obj-def-converter";
 <style lang="scss">
   .field-holder {
     margin-bottom: 8px;
+    grid-column-start: 2;
   }
 
   .editor-container {

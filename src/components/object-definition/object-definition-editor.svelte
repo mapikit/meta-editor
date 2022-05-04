@@ -17,7 +17,7 @@
 </script>
 
 <div class="editor">
-  {#if dataType === "object"}
+  {#if dataType === "object" || dataType === "cloudedObject"}
     <ObjectDefinitionObjectEditor
       level={editingLevel}
       bind:definitionData={workingData}

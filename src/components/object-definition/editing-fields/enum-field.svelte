@@ -105,17 +105,17 @@
     z-index: 5;
     position: absolute;
     top: calc(100% + 6px);
-    left: 50%;
+    right: 0;
   }
 
   .options {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
     border-radius: 6px;
     position: fixed;
     background-color: #323248;
     // padding: 6px 12px;
     box-shadow: 0 0 9px -2px rgba(0, 0, 0, 0.808);
-    width: calc(100% - 60px);
+    // width: calc(100% - 60px);
   }
 
   .option {
