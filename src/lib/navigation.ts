@@ -160,6 +160,7 @@ class Navigation {
   // eslint-disable-next-line max-lines-per-function
   public pathsMatches (templatePath : string, path : string, deep = false) : boolean {
     if (templatePath === path) { return true; }
+    console.log(`%cEvaluating "${templatePath}" against path "${path}"`, "color: pink");
 
     const templatePathSteps = this.normalizePath(templatePath).split("/").filter((elm) => elm !== "");
     const pathSteps = this.normalizePath(path).split("/").filter((elm) => elm !== "");
@@ -178,6 +179,7 @@ class Navigation {
 
       // console.log(step, evaluatedStep, step === evaluatedStep, index, templatePathSteps.length -1);
       result = step === evaluatedStep;
+      if (!result) { return result;}
     }
 
     // console.log(templatePathSteps, pathSteps, " <<<<<<<<<<< - Equal?", result);
