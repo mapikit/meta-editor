@@ -10,7 +10,9 @@
   import ModuleStore from "./module-store.svelte";
   import Trash from "./trash.svelte";
   import { environment } from "../../stores/environment";
-  import { Coordinate, Dimensions } from "../../common/types/geometry";
+  import { Coordinate } from "../../common/types/geometry";
+  import InputCard from "./input-card.svelte";
+import OutputCard from "./output-card.svelte";
 
   let currentBop : UICompliantBop;
   let trashRect : DOMRect;
@@ -157,7 +159,7 @@
   }
 </script>
 
-<div class="architect" id="architect" >
+<div class="architect" id="architect">
   <canvas class="canvas" bind:this={canvas}/>
     <ModuleStore bind:hidden={storeHidden}/>
     <div 
@@ -167,8 +169,12 @@
         <p>Loading...</p>
       {:then _done} 
         {#each currentBop.configuration as config (config.key)}
-          <Module moduleConfig={config} trashPosition={trashRect}/>
+          {#if config.moduleType !== "output"}
+            <Module moduleConfig={config} trashPosition={trashRect}/>
+          {/if}
         {/each}
+        <InputCard configuration={currentBop.input}/>
+        <OutputCard configuration={currentBop.output}/>
       {/await}
       
     </div>

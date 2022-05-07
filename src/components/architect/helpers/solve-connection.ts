@@ -18,14 +18,14 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
   } else {
     clickedNob.nob.style.outline = "solid white 2px;";
     bopStore.update((currentBOp) => {
-      const currentIsOutput = currentNob.nobType === "output"
+      const currentIsOutput = ["output", "module"].includes(currentNob.nobType);
       const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob]
 
       const targetModule = currentBOp.configuration.find(module => module.key == target.parentKey);
 
       const newDependency : UICompliantDependency = { 
         origin: origin.parentKey, 
-        originPath: `result.${origin.property}`,
+        originPath: origin.nobType === "module" ? "module" : `result${origin.property}`,
         targetPath: target.property,
         originNob: origin.nob,
         targetNob: target.nob,

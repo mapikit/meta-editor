@@ -1,18 +1,28 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
+  import InfoIcon from "../../../../static/info-icon.svelte";
+  import Tooltip from "../../../components/common/tooltip.svelte";
   export let definition : FunctionDefinition;
-  let cardWidth = 0;
+  export let tooltipPosition :  "top" | "bottom" | "left" | "right" = "left";
+
+  let tooltipVisible = false;
+
+  //SAVE: tooltipContent={definition["description"]}
 </script>
 
 
 
-<div class="module" bind:clientWidth={cardWidth}>
+<div class="module">
 <div class="header"> 
-<slot name="delete"></slot><span class="modName">{definition.functionName}</span><span 
-      class="tooltip" >?<span 
-        class="tooltiptext" 
-        style="left: {10+cardWidth}px">{definition["description"]}</span>
-  </span>
+<span class="modName" >{definition.functionName}</span>
+  <div class="tooltipIcon"
+    on:focus={undefined}
+    on:mouseenter={() => { tooltipVisible = true; } }
+    on:mouseleave={() => { tooltipVisible = false; } }
+  ><InfoIcon width="20px"/>
+  <Tooltip visible={tooltipVisible} tooltipContent={definition["description"]} position={tooltipPosition}/>
+</div>
+  <slot name="moduleNob" ></slot>
 </div>
 <slot name="content"></slot>
 </div>
@@ -22,38 +32,30 @@
     min-width: 120px;
     user-select: none;
     cursor: default;
-    background-color: rgb(49, 44, 44);
+    background-color: #34344b;
     border-radius: 5px;
     padding: 0 0 7px 0;
     margin-top: 5px;
   }
 
-  .tooltip {
-    background-color: rgb(48, 47, 47);
-    padding: 0 7px 0 7px;
+  .tooltipIcon {
     border-radius: 10px;
-    margin: 3px 3px 3px 0;
-    float: right;
+    display: inline-block;
+    position: relative;
+    margin: 2px;
+    top: 2px;
+    left: 8px;
   }
   
-  .tooltip .tooltiptext {
-    visibility: hidden;
-    position: absolute;
-    background-color: gray;
-    width: max-content;
-    max-width: 150%;
-    padding: 5px;
-    z-index: 3;
-  }
-
-  .tooltip:hover .tooltiptext {
-    visibility: visible;
-  }
 
   .header {
-    background-color: rgb(26, 22, 22);
+    background-color: #10101a;
     border-radius: 5px 5px 0 0 ;
     display: inline-block;
     width: 100%;
+  }
+
+  .modName {
+    vertical-align: 3px;
   }
 </style>

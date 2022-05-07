@@ -12,8 +12,10 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
 
   export let name : string;
   export let info : TypeDefinition<{}>;
-  export let parentKey : number;
+  export let parentKey : number | "input";
   export let path = "";
+
+  console.log(info)
 
 
   
@@ -22,7 +24,7 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
   export let nob : HTMLSpanElement = undefined;
   let childNobs : Record<string, HTMLSpanElement> = {};
 
-  const isObject = ["object", "cloudedObject"].includes(info.type)
+  const isObject = info.type === "object"
 
 
   const handleClick = isObject ? toggleExpansion : getNob;
@@ -96,8 +98,7 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
   .nob {
     cursor: default;
     padding: 0 5px 3px 2px;
-    background-color: rgb(94, 93, 93);
-    border-radius: 0 5px 5px 0;
+    background-color: #191928;
     transition-duration: 125ms;
   }
 
@@ -114,13 +115,12 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
     margin: 0 0 15px 0;
     padding: 0 2px 3px 7px;
     border-radius: 5px 0 0 5px;
-    background-color: rgb(94, 93, 93);
+    background-color: #191928;
   }
 
   .total {
     user-select: none;
     margin: 7px 0px 0px auto;
-    margin-right: 3px;
     width: min-content;
   }
 </style>

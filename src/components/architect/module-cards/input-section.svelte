@@ -1,7 +1,8 @@
 <script lang="ts">
+import type { TypeDefinition } from "@meta-system/object-definition";
+
   import type { BopsConstant, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { onMount } from "svelte";
-import { update_await_block_branch } from "svelte/internal";
+  import { onMount } from "svelte";
 
   import { typeColors } from "../../../common/styles/type-colors";
 
@@ -13,19 +14,23 @@ import { update_await_block_branch } from "svelte/internal";
 
 
   export let name : string;
-  export let parentInfo : ModuleCard;
+  export let parentKey : number;
+  export let info : TypeDefinition<{}>;
+
+  const parentInfo = $bopStore.configuration.find(config => config.key === parentKey);
+
   let nob : HTMLSpanElement;
 
   function getNob () : void {
     selectedNob.update((current) => {
       return solveConnection(current, {
-        parentKey: parentInfo.key,
+        parentKey: parentKey,
         nob,
         property: name,
         nobType: "input",
-        propertyType: parentInfo.info.input[name].type,
-      },
-      );});
+        propertyType: info.type
+      }
+    )})
   }
   onMount(() => {
     nob.addEventListener<any & { detail : { constant : BopsConstant }}>("appendTag", (event) => {
@@ -35,9 +40,9 @@ import { update_await_block_branch } from "svelte/internal";
         targetNob: undefined,
         originPath: event.detail.constant.name,
         targetPath: name,
-        matchingType: event.detail.constant.type === parentInfo.info.input[name].type,
-      };
-      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name);
+        matchingType: event.detail.constant.type === info.type,
+      }
+      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name)
       if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
       parentInfo.dependencies.push(newDependency);
       constantConfig = event.detail.constant;
@@ -70,9 +75,8 @@ import { update_await_block_branch } from "svelte/internal";
   .nob {
     cursor: default;
     padding: 0 5px 3px 5px;
-    margin-left: 4px;
-    background-color: rgb(94, 93, 93);
-    border-radius: 5px 0 0 5px;
+    margin-left: 0px;
+    background-color: #191928;
     transition-duration: 125ms;
   }
   .nob:hover {
@@ -84,7 +88,7 @@ import { update_await_block_branch } from "svelte/internal";
     margin: 2px 0px 0 0px;
     padding: 0 7px 3px 3px;
     border-radius: 0 5px 5px 0;
-    background-color: rgb(94, 93, 93);
+    background-color: #191928;
   }
   .total {
     position: relative;
@@ -96,7 +100,7 @@ import { update_await_block_branch } from "svelte/internal";
 
 <div class="total" ><span 
     class="nob" id="InputNob"
-    style="color: {typeColors[parentInfo.info.input[name].type]}" 
+    style="color: {typeColors[info.type]}" 
     on:click={getNob}
     bind:this={nob}
   >●</span><span class="text">{name}</span>

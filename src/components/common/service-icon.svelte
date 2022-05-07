@@ -17,7 +17,7 @@
     on:mouseenter="{() => visible = true}"
     on:mouseleave="{() => visible = false}"
   >
-    <Tooltip tooltipContent="{service.tooltip}" visible={visible}/>
+    <Tooltip tooltipContent="{service.tooltip}" visible={visible} position={"right"}/>
     <img alt={service.name} src={"/dashboard-assets/icons/"+service.icon}/>
   </div>
   {#if selected === service.name}

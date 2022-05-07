@@ -15,6 +15,8 @@ export function updateTraces (canvasContext : CanvasRenderingContext2D, bop : UI
 
   canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
 
+  canvasContext.shadowBlur = 0;
+
   canvasContext.strokeStyle = "#303030"
   canvasContext.beginPath()
   canvasContext.moveTo(env.origin.x, 0);

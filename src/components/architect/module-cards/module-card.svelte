@@ -9,6 +9,8 @@
   import { scale as zoomIn, fly } from "svelte/transition";
   import { environment } from "../../../stores/environment";
   import { Coordinate } from "../../../common/types/geometry";
+  import { selectedNob } from "../../../stores/connection-stores";
+  import { solveConnection } from "../helpers/solve-connection";
 
   export let moduleConfig : ModuleCard;
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopStore.configuration);
@@ -23,16 +25,19 @@
   export let trashPosition : DOMRect;
   let moving = false;
   let ref : HTMLDivElement;
+  let moduleNob : HTMLSpanElement;
 
   function startMovement (event : MouseEvent) {
+    if(event.button !== 0) return;
+
     ref.style.zIndex = "1";
     ref.style.opacity = "0.5";
-    moving = event.button === 0;
+    moving = true
   }
   
   function stopMovement (event : MouseEvent) {
     if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
-      return deleteThis();
+      return deleteCard();
     }
     ref.style.opacity = "1";
     ref.style.zIndex = "0";
@@ -51,7 +56,7 @@
       (mouseY > targetRect.y && mouseY < targetRect.y + targetRect.height);
   }
 
-  function deleteThis () {
+  function deleteCard () {
     bopStore.update(bop => {
       // Remove Dependants
       bop.configuration.forEach(module => {
@@ -66,7 +71,52 @@
       return bop;
     });
   }
+
+  function moduleConnect () {
+    selectedNob.update((current) => {
+      return solveConnection(current, {
+      parentKey: moduleConfig.key,
+      nob: moduleNob,
+      property: undefined,
+      nobType: "module",
+      propertyType: "function"
+    })})
+  }
 </script>
+
+<div 
+  in:zoomIn={{opacity:1, start: 0.55}}
+  out:fly={{x: 120/$environment.scale}}
+  bind:this={ref}
+  bind:clientWidth={moduleConfig.dimensions.width}
+  bind:clientHeight={moduleConfig.dimensions.height}
+  on:mousedown={startMovement}
+  class="module" 
+  style="
+    left: {(moduleConfig.position.x + $environment.origin.x)*$environment.scale}px; 
+    top: {(moduleConfig.position.y + $environment.origin.y)*$environment.scale}px; 
+    transform: scale({$environment.scale});
+    transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
+>
+  <StaticCardBody definition={moduleConfig.info} tooltipPosition="top">
+    <span slot="moduleNob" class="moduleNob" bind:this={moduleNob} on:click={moduleConnect}>M</span>
+    <div slot="content" class="IODiv">
+      <div class="inputs">
+        {#each Object.keys(moduleConfig.info.input) as key}
+          <InputSection  name={key} parentKey={moduleConfig.key} info={moduleConfig.info.input[key]}/>
+        {/each}
+      </div>
+      <div class="outputs">
+        {#each Object.keys(moduleConfig.info.output) as key}
+          <OutputSection  name={key} parentKey={moduleConfig.key} info={moduleConfig.info.output[key]}/>
+        {/each}
+      </div>
+    </div>
+  </StaticCardBody>
+</div>
+
+
+<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
 
 <style lang="scss">
   .module {
@@ -98,44 +148,22 @@
   //   top: 10%;
   //   background-color: #222222;
   // }
+
+  .moduleNob {
+    position: absolute;
+    padding-left: 7px;
+    padding-right: 5px;
+    border-radius: 0 7px 7px 0;
+    left: calc(100% - 5px);
+    background-color: rgb(68, 68, 68);
+    z-index: -1;
+  }
+  .moduleNob:hover {
+    background-color: rgb(92, 92, 92);;
+  }
   
   .outputs {
     grid-column: 2;
     padding-left: 6px;
   }
 </style>
-
-<div 
-  in:zoomIn={{ opacity:1, start: 0.55 }}
-  out:fly={{ x: 120/$environment.scale }}
-  bind:this={ref}
-  bind:clientWidth={moduleConfig.dimensions.width}
-  bind:clientHeight={moduleConfig.dimensions.height}
-  on:mousedown={startMovement}
-  class="module" 
-  style="
-    left: {(moduleConfig.position.x + $environment.origin.x)*$environment.scale}px; 
-    top: {(moduleConfig.position.y + $environment.origin.y)*$environment.scale}px; 
-    transform: scale({$environment.scale});
-    transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
->
-  <StaticCardBody definition={moduleConfig.info}>
-    <div slot="content" class="IODiv">
-      <div class="inputs">
-        {#each Object.keys(moduleConfig.info.input) as key}
-          <InputSection  name={key} parentInfo={moduleConfig}/>
-        {/each}
-      </div>
-      <div class="outputs">
-        {#each Object.keys(moduleConfig.info.output) as key}
-          <OutputSection  name={key} parentKey={moduleConfig.key} info={moduleConfig.info.output[key]}/>
-        {/each}
-      </div>
-    </div>
-  </StaticCardBody>
-</div>
-
-
-<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
-
-

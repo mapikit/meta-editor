@@ -43,7 +43,6 @@
           info.output[output].type = "object"
         }
       }
-      treatedInfo.push(info);
     })
     return treatedInfo;
   }

@@ -51,6 +51,12 @@ import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/proto
             moduleName: "add",
             moduleType: "internal",
             dependencies: [],
+          },
+          {
+            key: 3,
+            moduleName: "output",
+            moduleType: "output",
+            dependencies: [],
           }
         ],
         input: {
