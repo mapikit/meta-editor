@@ -10,8 +10,10 @@ onMount(() => {
   navigation.registerPath(path);
 });
 
+let shouldRender = navigation.isCurrentPath(path, deepMatch);
+
 </script>
 
-{#if navigation.isCurrentPath(path, deepMatch)}
+{#if shouldRender}
   <slot />
 {/if}

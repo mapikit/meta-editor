@@ -2,6 +2,7 @@ export enum EditorLevels {
   createDefinition,
   signDefinition,
   createAndSignDefinition,
+  readonly
 }
 
 export class EditorLevel {

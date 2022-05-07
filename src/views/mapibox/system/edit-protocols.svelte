@@ -1,13 +1,12 @@
 <script lang="ts">
-import type { ObjectDefinition } from "@meta-system/object-definition";
-
 import { Protocol } from "../../../entities/protocol";
 import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
-import ProtocolDefinitionSign from "../../../components/system-page/system-editor/protocol-definition-sign.svelte";
+import ProtocolDefinitionSign from "../../../components/system-page/system-editor/definition-edit-or-sign.svelte";
 import GuideText from "../../../components/common/guide-text.svelte";
 import { onMount } from "svelte";
 import { guideText } from "../../../stores/layout-tabs-store";
 import DataPreview from "../../../components/system-page/system-editor/data-preview.svelte";
+import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
 
 export const protocolDefinition = {
   "port": { "type": "number", "required": true },
@@ -60,7 +59,8 @@ onMount(() => {
   <div class="editor-lane">
     <ProtocolDefinitionSign
       protocolDefinition={protocolDefinition}
-      protocolData={protocolData}
+      bind:protocolData={protocolData}
+      level={EditorLevels.signDefinition}
       on:confirmed={(data) => { protocolData = data.detail.result; }}
     />
   </div>

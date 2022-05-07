@@ -7,6 +7,7 @@
 import Switch from "../../../lib/router/switch.svelte";
 import Route from "../../../lib/router/route.svelte";
 import EditProtocols from "./edit-protocols.svelte";
+import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
   
   let params = navigation.getCurrentPathParams("/mapibox/system/:selectedProp");
   
@@ -20,7 +21,16 @@ import EditProtocols from "./edit-protocols.svelte";
   <div class="content" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
     <MinifiedSystemsSidebar/>
     <CogSidebarDecoration/>
-    <Switch basePath="/mapibox/system/">
+    <Switch basePath="/mapibox/system/:selectedProp/" ignoreParamChanges>
+      <Route path="/mapibox/system/protocols/edit">
+        <EditProtocols />
+      </Route>
+      <Route path="/mapibox/system/schemas/edit">
+        <EditProtocols />
+      </Route>
+      <Route path="/mapibox/system/bops/edit">
+        <EditionCanvas />
+      </Route>
       <Route path="/mapibox/system/:selectedProp/">
         <div class="list">
           <div class="scroller">
@@ -30,9 +40,6 @@ import EditProtocols from "./edit-protocols.svelte";
             <PropertyList listType="protocols"/>
           </div>
         </div>
-      </Route>
-      <Route path="/mapibox/system/protocols/edit">
-        <EditProtocols />
       </Route>
     </Switch>
   </div>
@@ -51,6 +58,7 @@ import EditProtocols from "./edit-protocols.svelte";
       padding-left: 18px;
       padding-bottom: 28px;
       overflow-y: scroll;
+      overflow-x: hidden;
       flex: 1;
     }
   

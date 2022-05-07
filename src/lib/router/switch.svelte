@@ -1,22 +1,49 @@
 <script lang="ts">
 import { onMount } from "svelte";
-
 import { navigation } from "../navigation";
 
-export let basePath;
+export let basePath : string;
+export let ignoreParamChanges = false;
 
-let pathKey = new Date().getMilliseconds().toString();
+let pathKey = "";
 let shouldRender = false;
 
+// eslint-disable-next-line max-lines-per-function
+const setPathKey = (newPath : string) : void => {
+  const basePathSteps = basePath.split("/");
+  const newPathSteps = newPath.split("/");
+  const paramsIndexes = [];
+
+  let lastFoundIndex = basePathSteps.findIndex((step) => step.startsWith(":"));
+  while (lastFoundIndex >= 0) {
+    basePathSteps.splice(lastFoundIndex, 1);
+    paramsIndexes.push(lastFoundIndex);
+    lastFoundIndex = basePathSteps.findIndex((step) => step.startsWith(":"));
+  }
+
+  let checkingIndexes = newPathSteps.map((item, index) => index);
+  if (ignoreParamChanges) {
+    paramsIndexes.forEach((index) => {
+      const indexToBeRemovedIndex = checkingIndexes.findIndex((checkedIndex) => checkedIndex === index);
+      checkingIndexes.splice(indexToBeRemovedIndex, 1);
+    });
+  }
+
+  let result = checkingIndexes.reduce((finalPath, current) => {
+    return finalPath + newPathSteps[current];
+  }, "");
+
+  if (result !== pathKey) { pathKey = result; }
+};
+
 navigation.pathStore.subscribe((pathChange) => {
-  console.log(" >> Switch ", pathChange, basePath);
   if (navigation.pathsMatches(basePath, pathChange, true)) {
     navigation.setWorkingSwitchPath(basePath);
   }
 
-  if (pathChange.startsWith(basePath) && navigation.activeSwitchPath == basePath) {
+  if (navigation.activeSwitchPath == basePath) {
     shouldRender = true;
-    pathKey = pathChange.slice(basePath.length);
+    setPathKey(pathChange);
   }
 });
 
@@ -25,9 +52,9 @@ onMount(() => {
 
   const currentPath = navigation.currentPath;
 
-  if (currentPath.startsWith(basePath) && navigation.activeSwitchPath == basePath) {
+  if (navigation.activeSwitchPath == basePath) {
     shouldRender = true;
-    pathKey = currentPath.slice(basePath.length);
+    setPathKey(currentPath);
   }
 });
 </script>

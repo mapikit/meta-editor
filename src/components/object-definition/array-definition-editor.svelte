@@ -63,8 +63,12 @@
 <div class="editor-container">
   <div class="array-type">
     {#if typeof type === "object"}
+      {#if level.canAddProperty()}
       <p class="clickable" on:click="{() => { navigateArrayDefinition(); }}"> List of Objects
         <span> <RightArrow iconColor="white"/> </span></p>
+      {:else}
+      <p> List of Objects </p>
+      {/if}
     {:else}
       List of {type}
     {/if}

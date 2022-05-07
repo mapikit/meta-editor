@@ -6,6 +6,7 @@ import ObjectDefinitionMiniApp from "../../object-definition/object-definition-m
 
 export let protocolData : object = {};
 export let protocolDefinition : ObjectDefinition;
+export let level : EditorLevels;
 
 let editorReference : ObjectDefinitionMiniApp;
 let titles = [];
@@ -65,8 +66,8 @@ $: titlesLimits = (titles.length > 3 ? [titles[0], ...titles.slice(-2)] : titles
     <ObjectDefinitionMiniApp
     bind:this={editorReference}
     on:navigation-event={(data) => {titles = data.detail.namePaths.map((name, index) => ({ name, index }));}}
-    editingLevel={new EditorLevel(EditorLevels.signDefinition)}
-    initialData={protocolData}
+    editingLevel={new EditorLevel(level)}
+    bind:initialData={protocolData}
     initialDefinition={protocolDefinition}
     />
   </div>

@@ -33,11 +33,7 @@ class Navigation {
     const currentDiff = this.getPathDiffMetric(this._activeSwitchPath, this.currentPath);
     const newDiff = this.getPathDiffMetric(switchPath, this.currentPath);
 
-    console.log(this._activeSwitchPath, currentDiff, switchPath, newDiff, " ------- ");
-
-    // New switchPath is a better match than current one
     if (currentDiff >= newDiff) {
-      console.log("Setting new switchPath");
       this._activeSwitchPath = switchPath;
     }
   }
@@ -68,7 +64,6 @@ class Navigation {
     this._pathSvelteStore.subscribe((navigationPath) => {
       this._path = navigationPath;
 
-      console.log("%cNavigating pages: " + navigationPath, "color: blue");
       if (navigationPath === window.location.pathname + window.location.search) {
         return;
       }
@@ -87,6 +82,7 @@ class Navigation {
   }
 
   public navigateTo (path : string) : void {
+    // console.log(`%c Navigating to ${path}`, "color: aqua");
     this._pathSvelteStore.set(path);
   }
 
@@ -139,9 +135,9 @@ class Navigation {
     const templatePathSteps = this.normalizePath(templatePath).split("/").filter((elm) => elm !== "");
     const pathSteps = this.normalizePath(path).split("/").filter((elm) => elm !== "");
 
-    let confidence = 0;
+    let pathIsDifferentConfidenceLevel = 0;
 
-    confidence += pathSteps.length - templatePathSteps.length;
+    pathIsDifferentConfidenceLevel += Math.abs(pathSteps.length - templatePathSteps.length);
 
     for (let index = 0; index <= templatePathSteps.length -1; index ++) {
       const step = templatePathSteps[index];
@@ -151,16 +147,15 @@ class Navigation {
         continue;
       }
 
-      if (step !== evaluatedStep) { confidence += 1; }
+      if (step !== evaluatedStep) { pathIsDifferentConfidenceLevel += 1; }
     }
 
-    return confidence;
+    return pathIsDifferentConfidenceLevel;
   }
 
   // eslint-disable-next-line max-lines-per-function
   public pathsMatches (templatePath : string, path : string, deep = false) : boolean {
     if (templatePath === path) { return true; }
-    console.log(`%cEvaluating "${templatePath}" against path "${path}"`, "color: pink");
 
     const templatePathSteps = this.normalizePath(templatePath).split("/").filter((elm) => elm !== "");
     const pathSteps = this.normalizePath(path).split("/").filter((elm) => elm !== "");
@@ -177,12 +172,9 @@ class Navigation {
         continue;
       }
 
-      // console.log(step, evaluatedStep, step === evaluatedStep, index, templatePathSteps.length -1);
       result = step === evaluatedStep;
       if (!result) { return result;}
     }
-
-    // console.log(templatePathSteps, pathSteps, " <<<<<<<<<<< - Equal?", result);
 
     return result;
   }
