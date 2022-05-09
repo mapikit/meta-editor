@@ -77,6 +77,13 @@ import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/proto
         protocolKind: ProtocolKind.normal,
         identifier: "cron1",
         configuration: {}
+      },
+      {
+        protocol: "cronjob-protocol",
+        protocolVersion: "latest",
+        protocolKind: ProtocolKind.normal,
+        identifier: "cronNovo",
+        configuration: {}
       }
     ]
   }

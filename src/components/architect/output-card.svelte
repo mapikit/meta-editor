@@ -10,11 +10,9 @@ import type { ObjectDefinition } from "@meta-system/object-definition";
   import MovableCard from "./helpers/movable-card.svelte";
   import InputSection from "./module-cards/input-section.svelte";
 
-  console.log("Starting Output Build")
 
   export let configuration : ObjectDefinition;
   let module = $bopStore.configuration.find((module) => module.moduleType === "output")
-  console.log(module)
   if (module === undefined) module = {
     dependencies: [],
     moduleType: "output",

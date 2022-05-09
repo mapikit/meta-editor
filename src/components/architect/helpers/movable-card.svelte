@@ -6,6 +6,7 @@
 
 
   export let moduleConfig : ModuleCard | UIInput;
+  export let stopMovementCallback : (mouseEvent : MouseEvent) => void = () => {};
   let ref : HTMLDivElement;
   let moving = false;
 
@@ -47,7 +48,7 @@ style="
 >
   <slot name="content"/>
 </div>
-<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
+<svelte:window on:mousemove={moveCard} on:mouseup={(event) => stopMovement(event, stopMovementCallback)}/>
 
 <style lang="scss">
   .card {

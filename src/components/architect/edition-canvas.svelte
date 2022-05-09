@@ -30,6 +30,11 @@ import OutputCard from "./output-card.svelte";
     context.lineWidth = 2
 
     updateTraces(context, $bopStore, $environment)
+    const canvasScale = canvas.clientWidth/canvas.width
+    canvas.width *= canvasScale;
+    canvas.height *= canvasScale;
+
+    context.lineWidth = 2
   }
 
 
@@ -45,7 +50,6 @@ import OutputCard from "./output-card.svelte";
         updateTraces(context, bop, $environment);
       })
       environment.subscribe(() => {
-        updateTraces(context, currentBop, $environment);
         setTimeout(() => updateTraces(context, currentBop, $environment), 1);
         // Investigate and avoid this kind of repetition & timeout
         // Timeout Only: traces have "springness" (modules don't)

@@ -11,14 +11,11 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
   onDestroy(() => dispatch("mountUnmount"))
 
   export let name : string;
+
   export let info : TypeDefinition<{}>;
   export let parentKey : number | "input";
   export let path = "";
 
-  console.log(info)
-
-
-  
   let expanded = false;
 
   export let nob : HTMLSpanElement = undefined;
@@ -39,6 +36,7 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
       propertyType: info.type
     })})
   }
+
 
   function toggleExpansion () { expanded = !expanded }
 
@@ -69,10 +67,10 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
         });
         return bop;
       })
-      
     }
   }
 </script>
+
 <div class="box">
 <div class="total"><span class="text">{name}</span><span 
   class="nob"

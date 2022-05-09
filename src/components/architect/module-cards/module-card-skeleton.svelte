@@ -5,6 +5,8 @@
   export let definition : FunctionDefinition;
   export let tooltipPosition :  "top" | "bottom" | "left" | "right" = "left";
 
+
+
   let tooltipVisible = false;
 
   //SAVE: tooltipContent={definition["description"]}
@@ -14,6 +16,7 @@
 
 <div class="module">
 <div class="header"> 
+
 <span class="modName" >{definition.functionName}</span>
   <div class="tooltipIcon"
     on:focus={undefined}

@@ -11,6 +11,7 @@
   import { Coordinate } from "../../../common/types/geometry";
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
+  import MovableCard from "../helpers/movable-card.svelte";
 
   export let moduleConfig : ModuleCard;
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopStore.configuration);
@@ -21,39 +22,20 @@
   // And [modular] dependency numbers to position modules in a grid-like organization when
   // the modules position is not present (BOP was imported)
   // Also, this sort of distribuition should line in the upper level
+  moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
+  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
   moduleConfig.info = moduleConfig.info ?? functionsInfo[moduleConfig.moduleType].get(moduleConfig.moduleName);
+
   export let trashPosition : DOMRect;
-  let moving = false;
-  let ref : HTMLDivElement;
   let moduleNob : HTMLSpanElement;
 
-  function startMovement (event : MouseEvent) {
-    if(event.button !== 0) return;
-
-    ref.style.zIndex = "1";
-    ref.style.opacity = "0.5";
-    moving = true
-  }
-  
-  function stopMovement (event : MouseEvent) {
-    if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
-      return deleteCard();
-    }
-    ref.style.opacity = "1";
-    ref.style.zIndex = "0";
-    moving = false;
+  function checkRectCollision(x : number, y : number, targetRect : DOMRect) : boolean {
+    return (x > targetRect.x && x < targetRect.x + targetRect.width) &&
+      (y > targetRect.y && y < targetRect.y + targetRect.height);
   }
 
-  function moveCard (event : MouseEvent) {
-    if(moving) {
-      moduleConfig.position.moveBy(event.movementX/$environment.scale, event.movementY/$environment.scale);
-      bopStore.update(bop => bop);
-    }
-  }
-
-  function checkRectCollision (mouseX : number, mouseY : number, targetRect : DOMRect) {
-    return (mouseX > targetRect.x && mouseX < targetRect.x + targetRect.width) &&
-      (mouseY > targetRect.y && mouseY < targetRect.y + targetRect.height);
+  function checkDeletion (event : MouseEvent) : void {
+    if(checkRectCollision(event.x, event.y, trashPosition)) deleteCard()
   }
 
   function deleteCard () {
@@ -84,21 +66,9 @@
   }
 </script>
 
-<div 
-  in:zoomIn={{opacity:1, start: 0.55}}
-  out:fly={{x: 120/$environment.scale}}
-  bind:this={ref}
-  bind:clientWidth={moduleConfig.dimensions.width}
-  bind:clientHeight={moduleConfig.dimensions.height}
-  on:mousedown={startMovement}
-  class="module" 
-  style="
-    left: {(moduleConfig.position.x + $environment.origin.x)*$environment.scale}px; 
-    top: {(moduleConfig.position.y + $environment.origin.y)*$environment.scale}px; 
-    transform: scale({$environment.scale});
-    transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
->
-  <StaticCardBody definition={moduleConfig.info} tooltipPosition="top">
+
+<MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion}>
+  <StaticCardBody definition={moduleConfig.info} tooltipPosition="top" slot="content">
     <span slot="moduleNob" class="moduleNob" bind:this={moduleNob} on:click={moduleConnect}>M</span>
     <div slot="content" class="IODiv">
       <div class="inputs">
@@ -113,10 +83,12 @@
       </div>
     </div>
   </StaticCardBody>
-</div>
+</MovableCard>
 
 
-<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
+
+
+
 
 <style lang="scss">
   .module {

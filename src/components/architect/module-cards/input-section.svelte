@@ -1,12 +1,8 @@
 <script lang="ts">
-import type { TypeDefinition } from "@meta-system/object-definition";
-
+  import type { TypeDefinition } from "@meta-system/object-definition";
   import type { BopsConstant, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import { onMount } from "svelte";
-
   import { typeColors } from "../../../common/styles/type-colors";
-
-  import type { ModuleCard } from "../../../common/types/module-card";
   import { bopStore } from "../../../stores/bop-store";
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
@@ -89,6 +85,7 @@ import type { TypeDefinition } from "@meta-system/object-definition";
     padding: 0 7px 3px 3px;
     border-radius: 0 5px 5px 0;
     background-color: #191928;
+    white-space: nowrap;
   }
   .total {
     position: relative;
