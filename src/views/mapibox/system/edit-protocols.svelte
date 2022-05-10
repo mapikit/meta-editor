@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Protocol } from "../../../entities/protocol";
 import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
-import ProtocolDefinitionSign from "../../../components/system-page/system-editor/definition-edit-or-sign.svelte";
+import ProtocolDefinitionSign from "../../../components/system-page/system-editor/definition-app.svelte";
 import GuideText from "../../../components/common/guide-text.svelte";
 import { onMount } from "svelte";
 import { guideText } from "../../../stores/layout-tabs-store";

@@ -38,6 +38,12 @@ $: titlesLimits = (titles.length > 3 ? [titles[0], ...titles.slice(-2)] : titles
     }}">
       <p class="centered"> paste data </p>
     </div>
+    <div class="action-button" on:click="{async () => {
+      const data = editorReference.getDefinitionAndData()["definition"]["root"]["subtype"];
+      await navigator.clipboard.writeText(JSON.stringify(data));
+    }}">
+      <p class="centered"> copy format </p>
+    </div>
   </div>
   <div class="title" >
     {#if titles.length !== 0}

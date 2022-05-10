@@ -8,6 +8,7 @@ import Switch from "../../../lib/router/switch.svelte";
 import Route from "../../../lib/router/route.svelte";
 import EditProtocols from "./edit-protocols.svelte";
 import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
+import EditSchemas from "./edit-schemas.svelte";
   
   let params = navigation.getCurrentPathParams("/mapibox/system/:selectedProp");
   
@@ -26,7 +27,7 @@ import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
         <EditProtocols />
       </Route>
       <Route path="/mapibox/system/schemas/edit">
-        <EditProtocols />
+        <EditSchemas />
       </Route>
       <Route path="/mapibox/system/bops/edit">
         <EditionCanvas />
