@@ -3,7 +3,8 @@ import type { ConfigurationType } from "meta-system"
 import { mapikitServer } from "../../../../common/network"
 import type { MetaProtocolDefinition } from "@meta-system/meta-protocol-helper"
 
-export async function getProtocolModules (system : ConfigurationType) :  Promise<Record<string, FunctionDefinition[]>> {    
+export async function getProtocolModules (system : ConfigurationType) :  Promise<Record<string, FunctionDefinition[]>> {
+  if(system.protocols === undefined) return {};
   const systemProtocols = system.protocols.map(protocol => protocol.protocol)
   const protocolsQuery = systemProtocols.map(name => `protocolNames[]=${name}`).join("&")
   const protocolsInfo : MetaProtocolDefinition[] = (await mapikitServer.get(`getProtocols/?${protocolsQuery}`)).data.protocols

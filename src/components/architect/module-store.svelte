@@ -88,7 +88,7 @@
     {#each tabsInfo as tab, index}
       <div on:click={() => handleTabClick(tab, index)}>
         <StoreTab bind:ref={tabsRef[tabsRef.length]}>
-          <img src="../../../static/achitectect-module-store/{tab.iconURI}" alt=""/></StoreTab></div>
+          <img src="/static/achitectect-module-store/{tab.iconURI}" alt=""/></StoreTab></div>
     {/each}
   </div>
   <div class="storeBody" bind:clientWidth>

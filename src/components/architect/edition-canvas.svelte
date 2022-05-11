@@ -12,7 +12,93 @@
   import { environment } from "../../stores/environment";
   import { Coordinate } from "../../common/types/geometry";
   import InputCard from "./input-card.svelte";
-import OutputCard from "./output-card.svelte";
+  import OutputCard from "./output-card.svelte";
+  //TEMP
+import { systemStore } from "../../stores/system-store";
+import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
+import type { ConfigurationType } from "meta-system";
+  //PMET
+  const systemConfig : ConfigurationType = {
+    name: "TestSystem",
+    schemas: [
+      {
+        dbProtocol: "fake",
+        format: {},
+        identifier: "fakeSchema",
+        name: "Users"
+      },
+      {
+        dbProtocol: "fake",
+        format: {
+          isJojoRef: { type: "boolean" },
+          haveADream: { type: "boolean" }
+        },
+        identifier: "fakeSchema2",
+        name: "Ora"
+      }
+      
+    ],
+    businessOperations: [
+      {
+        name: "My BOp",
+        customObjects: [],
+        constants: [
+          { name: "zeroValue", type: "number", value: 0 },
+          { name: "nome", type: "string", value: "Fabu" }
+        ],
+        variables: [],
+        configuration: [
+          {
+            key: 1,
+            moduleName: "if",
+            moduleType: "internal",
+            dependencies: [
+              { origin: "constants", targetPath: "ifTrue", originPath: "nome" }
+            ],
+          },
+          {
+            key: 2,
+            moduleName: "add",
+            moduleType: "internal",
+            dependencies: [],
+          },
+          {
+            key: 3,
+            moduleName: "output",
+            moduleType: "output",
+            dependencies: [],
+          }
+        ],
+        input: {
+          A : { type: "number" },
+          B : { type: "number" }
+        },
+        output: {
+          O : { type: "string" }
+        },
+      }
+    ],
+    version: "1.0.0",
+    envs: [],
+    protocols: [
+      {
+        protocol: "cronjob-protocol",
+        protocolVersion: "latest",
+        protocolKind: ProtocolKind.normal,
+        identifier: "cron1",
+        configuration: {}
+      },
+      {
+        protocol: "cronjob-protocol",
+        protocolVersion: "latest",
+        protocolKind: ProtocolKind.normal,
+        identifier: "cronNovo",
+        configuration: {}
+      }
+    ]
+  }
+  systemStore.set(systemConfig);
+  bopStore.set(systemConfig.businessOperations[0] as unknown as UICompliantBop);
 
   let currentBop : UICompliantBop;
   let trashRect : DOMRect;

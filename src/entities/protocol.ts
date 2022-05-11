@@ -5,8 +5,8 @@ export class Protocol {
   public protocolConfig : object = {};
   private _definition : ObjectDefinition = {};
 
-  public set definition (defintion : ObjectDefinition) {
-    this._definition = defintion;
+  public set definition (definition : ObjectDefinition) {
+    this._definition = definition;
   }
 
   public get definition () : ObjectDefinition {
@@ -18,6 +18,8 @@ export class Protocol {
     public readonly protocolName : string,
     public readonly protocolVersion : string,
     public readonly protocolType : ProtocolKind,
+    public readonly identifier : string,
+    public validatedProtocolId : string,
   ) {}
 
   // In the future we can implement a fetch function to get their definition and other infos
