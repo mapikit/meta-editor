@@ -1,23 +1,35 @@
 <script lang="ts">
-  import type { SystemData } from "./types";
   import { fade } from "svelte/transition";
   import { selectedSystem } from "./systems-stores";
-import AttributeAppendix from "./attribute-appendix.svelte";
-import { guideText } from "../../stores/layout-tabs-store";
-
-  export let system : SystemData;
+  import AttributeAppendix from "./attribute-appendix.svelte";
+  import { guideText } from "../../stores/layout-tabs-store";
+  import type { Project } from "../../entities/project";
+  import { onDestroy } from "svelte";
+  import { navigation } from "../../lib/navigation";
+  
+  export let system : Project;
   let collapsed = true;
+  let name = system.name;
+  let description = system.description;
+  let id = system.id;
+  let summary = system.getConfigurationSummary();
+  const pathStore = navigation.pathStore;
 
-  selectedSystem.subscribe((value) => {
-    collapsed = !(value === system.name); // TODO CHANGE TO BE AN UNIQUE ID
+  const unsub = selectedSystem.subscribe((value) => {
+    collapsed = !(value === $id);
   });
+
+  onDestroy(unsub);
 
   const updateCollapsedStatus = () : void => {
     if (collapsed === true) {
-      selectedSystem.set(system.name);
-      guideText.set("Select one of the three icons to start configuring your system. Hover to see more info about each one of them.");
+      selectedSystem.set($id);
+      guideText.set("Select one of the three icons to start configuring your system. "
+        +"Hover to see more info about each one of them.");
     } else {
-      selectedSystem.set("");
+      if ($pathStore === "/mapibox") {
+        selectedSystem.set("");
+      }
       guideText.set("Select or create a system to work with");
     }
   };
@@ -30,34 +42,34 @@ import { guideText } from "../../stores/layout-tabs-store";
     <img src="/icon-chevron-up.svg" alt="chevron"/>
   </div>
   <div class="title">
-    {system.name}
+    {$name}
   </div>
   <div class="body">
     <div class="{collapsed ? "solid-description" : "editable-description"}" transition:fade|local="{{ duration: 250, delay: 250 }}"
       contenteditable="{!collapsed}"
       on:click="{(e) => { if (!collapsed) e.stopPropagation(); }}"
     >
-      {system.description}
+      {$description}
     </div>
     {#if !collapsed}
       <AttributeAppendix visible={!collapsed}/>
       <div class="stats-group" transition:fade|local="{{ duration: 250 }}">
         <div class="stat-line">
-          <p class="key"> Version: </p> <p class="value"> {system.version} </p>
+          <p class="key"> Version: </p> <p class="value"> {summary.version} </p>
         </div>
         <div class="stat-line">
-          <p class="key"> Environment Variables: </p> <p class="value"> {system.envsCount} </p>
+          <p class="key"> Environment Variables: </p> <p class="value"> {summary.envsCount} </p>
         </div>
       </div>
       <div class="stats-group" transition:fade|local="{{ duration: 250 }}">
         <div class="stat-line">
-          <p class="key"> Schemas: </p> <p class="schema-count"> {system.schemasCount} </p>
+          <p class="key"> Schemas: </p> <p class="schema-count"> {summary.schemasCount} </p>
         </div>
         <div class="stat-line">
-          <p class="key"> Business Operations: </p> <p class="bops-count"> {system.bopsCount} </p>
+          <p class="key"> Business Operations: </p> <p class="bops-count"> {summary.bopsCount} </p>
         </div>
         <div class="stat-line">
-          <p class="key"> Protocols: </p> <p class="protocol-count"> {system.protocolsCount} </p>
+          <p class="key"> Protocols: </p> <p class="protocol-count"> {summary.protocolsCount} </p>
         </div>
       </div>
     {/if}

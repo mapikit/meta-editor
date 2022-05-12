@@ -2,7 +2,6 @@ import { derived, writable } from "svelte/store";
 
 export const guideText = writable("This is just a sample text.");
 export const selectedService = writable("");
-export const selectedSystem = writable("");
 
 export const layoutTabs = writable({
   serviceSelectorOpen: false,

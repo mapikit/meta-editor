@@ -7,13 +7,11 @@ import SchemasSystemCard from "./schemas-system-card.svelte";
 import PlusSignBoxIcon from "../common/icons/plus-sign-box-icon.svelte";
 import { fly } from "svelte/transition";
 import { navigation } from "../../lib/navigation";
+import { selectedSystem } from "../systems-sidebar/systems-stores";
+import type { PropertyListEntry } from "../../common/types/property-list-entry";
 
 export let listType : keyof typeof typeInfos = "schemas";
-export let listData = [
-  { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },
-  { title: "schema 1", creationDate: new Date(), updateDate: new Date(), description: "Aqui vai uma descrição curta" },
-  { title: "Empathic Car", creationDate: new Date(), updateDate: new Date(), description: "Mas esse daqui não é tão curto assim, já que precisamos de textos de diferentes tamanhos para mostrar como que a interface reage à eles." },
-];
+export let listData : PropertyListEntry[] = [];
 
 const typeInfos = {
   "schemas": { color: "#5d8efe", label: "Schemas", icon: SchemaIcon, contentCard: "" },
@@ -27,14 +25,18 @@ let isOpen = false;
 
 navigation.pathStore.subscribe((newValue) => {
   const pathSteps = newValue.split("/");
-  isOpen = pathSteps[3] === listType;
+  isOpen = pathSteps[4] === listType;
 });
 
 let createHovered = false;
+
+const getNavPath = () : string => {
+  return `/mapibox/system/${$selectedSystem}/${listType}/`;
+};
 </script>
 
 <div class="prop-container">
-  <div class="title" on:click={() => { navigation.navigateTo(`/mapibox/system/${listType}/`); }}>
+  <div class="title" on:click={() => { navigation.navigateTo(getNavPath()); }}>
     <div class="{!isOpen ? "chevron-collapse" : "chevron-collapse down"}">
       <img src="/icon-chevron-up.svg" alt="chevron"/>
     </div>
@@ -55,7 +57,7 @@ let createHovered = false;
     <div class="list-container" style={`border-left-color: ${listInfo.color}`}>
       {#each listData as listItem, index }
         <div in:fly={{ x: 20, delay: index * 46 }} out:fly={{ x: 20, delay: 50*(listData.length - 1 * index) }}>
-          <SchemasSystemCard />
+          <SchemasSystemCard entry={listItem}/>
         </div>
       {/each}
     </div>

@@ -13,7 +13,8 @@ const onHover = (data : CustomEvent<any>) : void => {
 
 const onHoverOut = () : void => {
   hovered = "default";
-  guideText.set("Select one of the three icons to start configuring your system. Hover to see more info about each one of them.");
+  guideText.set("Select one of the three icons to start configuring your system. "
+    +"Hover to see more info about each one of them.");
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type,@typescript-eslint/no-unused-vars

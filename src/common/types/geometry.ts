@@ -17,8 +17,8 @@ export class Coordinate  implements CoordinateInfo {
 
   /**
    * Returns a cardinal vector (x, y) to the targetPoint.
-   * @param targetPoint 
-   * @returns 
+   * @param targetPoint
+   * @returns
    */
   public newPointer (targetPoint : Coordinate) : Coordinate {
     return new Coordinate(

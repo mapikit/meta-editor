@@ -3,6 +3,6 @@ import type { ModuleCard } from "./module-card";
 import type { UIInput } from "./ui-input";
 
 export interface UICompliantBop extends Omit<BusinessOperations, "configuration" | "input"> {
-  configuration: ModuleCard[]
+  configuration : ModuleCard[]
   input : UIInput
 }

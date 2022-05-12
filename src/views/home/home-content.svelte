@@ -1,5 +1,5 @@
 <script lang="ts">
-import { guideText } from "../../stores/layout-tabs-store";
+import globalUser from "../../stores/global-user-store";
 
 import GuideText from "../../components/common/guide-text.svelte";
 import { navigation } from "../../lib/navigation";
@@ -11,13 +11,15 @@ const favorites = [
   { type: "BOp", name: "Business procedure 51", description: "This" },
   { type: "BOp", name: "Business procedure 52", description: "This" },
 ];
+
+let userEmail = globalUser.email;
 </script>
 
 <div class="background">
   <GuideText />
   <div id="username">
     <img src="/logo.svg" alt="mapikit crown logo"/>
-    <p> _USERNAME_ </p>
+    <p> <span>  Welcome, </span> {$userEmail} </p>
   </div>
 
   <div id="favorite-bar">

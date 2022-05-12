@@ -40,6 +40,11 @@ class Navigation {
 
   public registerPath (path : string) : void {
     this._registeredPaths.add(this.normalizePath(path));
+    console.log(`Registered Path ${this.normalizePath(path)}`);
+  }
+
+  public unregisterPath (path : string) : void {
+    this._registeredPaths.delete(path);
   }
 
   // eslint-disable-next-line max-lines-per-function

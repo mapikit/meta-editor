@@ -1,4 +1,7 @@
 <script lang="ts">
+import type { PropertyListEntry } from "src/common/types/property-list-entry";
+import { get } from "svelte/store";
+
 import { navigation } from "../../lib/navigation";
 
 import LockIcon from "../common/icons/lock-icon.svelte";
@@ -6,12 +9,18 @@ import PencilIcon from "../common/icons/pencil-icon.svelte";
 import StarIcon from "../common/icons/star-icon.svelte";
 import ToolsConfigIcon from "../common/icons/tools-config-icon.svelte";
 
-export let title = "Título Teste";
-export let creationDate = new Date();
-export let updateDate = new Date();
-export let description = "Sample Description";
-export let favorited = false;
-export let locked = false;
+export let entry : PropertyListEntry;
+
+let title = entry.name;
+let creationDate = new Date();
+let updateDate = new Date();
+let description = entry.description;
+let favorited = entry.starred;
+let locked = entry.locked;
+const id = entry.id;
+
+let dataValues = entry.dataValues;
+
 
 const showDate = (date : Date) : string => {
   const day = date.getDate();
@@ -27,13 +36,13 @@ let isEditing = false;
 
 const updateFavorited = (event : MouseEvent) : void => {
   event.stopPropagation();
-  favorited = !favorited;
+  favorited.set(!$favorited);
   // Later we will also need a function to update the favorited status of the property too
 };
 
 const updateLocked = (event : MouseEvent) : void => {
   event.stopPropagation();
-  locked = !locked;
+  locked.set(!$locked);
 };
 </script>
 
@@ -44,14 +53,14 @@ const updateLocked = (event : MouseEvent) : void => {
     </div>
     <div class="propname">
       <div class="favorite-icon" on:click={updateFavorited}>
-        <StarIcon active={favorited} iconColor={"#575777"} scale={1.5}/>
+        <StarIcon active={$favorited} iconColor={"#575777"} scale={1.5}/>
       </div>
-      <h2> {title} </h2>
+      <h2> {$title} </h2>
       <div class="pencil-icon" on:click={(e) => { isEditing = !isEditing; e.stopPropagation(); }}>
         <PencilIcon iconColor={"#575777"} scale={1.4}/>
       </div>
       <div class="lock-icon" on:click={updateLocked}>
-        <LockIcon locked={locked} iconColor={locked ? "#f39d26" : "#575777"} scale={1.2}/>
+        <LockIcon locked={$locked} iconColor={locked ? "#f39d26" : "#575777"} scale={1.2}/>
       </div>
     </div>
   </div>
@@ -61,10 +70,17 @@ const updateLocked = (event : MouseEvent) : void => {
       contenteditable="{isEditing}"
       on:click="{(e) => { if (isEditing) e.stopPropagation(); }}"
       >
-        {description}
+        {$description}
       </div>
     </div>
     <div class="body">
+      <div class="stats-group">
+        {#each dataValues as dataValue}
+          <div class="stat-line">
+            <p class="key"> {dataValue.name}: </p> <p class="value"> {get(dataValue.value)} </p>
+          </div>
+        {/each}
+      </div>
       <div class="stats-group">
         <div class="stat-line">
           <p class="key"> Last Edited: </p> <p class="value"> {showDate(updateDate)} </p>
@@ -74,7 +90,7 @@ const updateLocked = (event : MouseEvent) : void => {
         </div>
       </div>
 
-      <div class="edit-button" on:click={() => { navigation.navigateAppendTo("edit"); }}>
+      <div class="edit-button" on:click={() => { navigation.navigateAppendTo(`/${$id}/edit`); }}>
         <div class="edit-icon">
           <ToolsConfigIcon iconColor="#3b3b53" scale={1.3}/>
         </div>
@@ -137,7 +153,7 @@ const updateLocked = (event : MouseEvent) : void => {
     }
 
     .body {
-      width: 180px;
+      width: calc(100% - 68px);
       padding: 0px 8px 8px 8px;
       display: flex;
       flex-flow: column nowrap;

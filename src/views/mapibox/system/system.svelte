@@ -4,45 +4,54 @@
   import MinifiedSystemsSidebar from "../../../components/systems-sidebar/minified-systems-sidebar.svelte";
   import { navigation } from "../../../lib/navigation";
   import { fly } from "svelte/transition";
-import Switch from "../../../lib/router/switch.svelte";
-import Route from "../../../lib/router/route.svelte";
-import EditProtocols from "./edit-protocols.svelte";
-import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
-import EditSchemas from "./edit-schemas.svelte";
-  
-  let params = navigation.getCurrentPathParams("/mapibox/system/:selectedProp");
-  
-  navigation.pathStore.subscribe(() => {
-    params = navigation.getCurrentPathParams("/mapibox/system/:selectedProp");
+  import Route from "../../../lib/router/route.svelte";
+  import EditProtocols from "./edit-protocols.svelte";
+  import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
+  import EditSchemas from "./edit-schemas.svelte";
+  import { selectedSystem } from "../../../components/systems-sidebar/systems-stores";
+  import { onMount } from "svelte";
+  import globalUser from "../../../stores/global-user-store";
+  import type { Configuration } from "../../../entities/configuration";
+  import type { Writable } from "svelte/store";
+  import type { PropertyListEntry } from "../../../common/types/property-list-entry";
+
+  let configuration : Writable<Configuration>;
+  let schemas : PropertyListEntry[];
+
+  onMount(() => {
+    const params = navigation.getCurrentPathParams();
+    selectedSystem.set(params["systemId"] ?? "WHAT IS COING ON");
+
+    configuration = globalUser.getCurrentProject()?.configuration;
+    schemas = $configuration.getSchemasPropertyListEntries();
   });
+
   
-  </script>
+</script>
   
   <title> System | mapikit </title>
   <div class="content" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
     <MinifiedSystemsSidebar/>
     <CogSidebarDecoration/>
-    <Switch basePath="/mapibox/system/:selectedProp/" ignoreParamChanges>
-      <Route path="/mapibox/system/protocols/edit">
-        <EditProtocols />
-      </Route>
-      <Route path="/mapibox/system/schemas/edit">
-        <EditSchemas />
-      </Route>
-      <Route path="/mapibox/system/bops/edit">
-        <EditionCanvas />
-      </Route>
-      <Route path="/mapibox/system/:selectedProp/">
-        <div class="list">
-          <div class="scroller">
-            <div class="top-grad" />
-            <PropertyList listType="schemas"/>
-            <PropertyList listType="bops"/>
-            <PropertyList listType="protocols"/>
-          </div>
+    <Route path="/mapibox/system/:systemId/protocols/:protocolId/edit">
+      <EditProtocols />
+    </Route>
+    <Route path="/mapibox/system/:systemId/schemas/:schemaId/edit">
+      <EditSchemas />
+    </Route>
+    <Route path="/mapibox/system/:systemId/bops/:bopId/edit">
+      <EditionCanvas />
+    </Route>
+    <Route path="/mapibox/system/:systemId/:selectedProp/">
+      <div class="list">
+        <div class="scroller">
+          <div class="top-gradient-rolloff" />
+          <PropertyList listType="schemas" listData={schemas}/>
+          <PropertyList listType="bops"/>
+          <PropertyList listType="protocols"/>
         </div>
-      </Route>
-    </Switch>
+      </div>
+    </Route>
   </div>
   
   <style lang="scss">
@@ -63,7 +72,7 @@ import EditSchemas from "./edit-schemas.svelte";
       flex: 1;
     }
   
-    .top-grad {
+    .top-gradient-rolloff {
       // background-color: #13131f;
       width: 100%;
       height: 80px;
