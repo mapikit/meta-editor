@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fade } from "svelte/transition"
+  import { fade } from "svelte/transition";
 
   export let position : "top" | "bottom" | "left" | "right" = "left";
   export let tooltipContent : string = "%NOTOOLTIPTEXTPROVIDED%";

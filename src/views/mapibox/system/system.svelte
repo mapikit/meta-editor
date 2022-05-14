@@ -14,9 +14,9 @@
   let schemasPropertyList : PropertyListEntry[];
 
   $: schemasPropertyList = $schemas.map((value) => value.getSchemaCardInfo());
-  
+
 </script>
-  
+
   <title> System | mapikit </title>
   <div class="content" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
     <MinifiedSystemsSidebar/>
@@ -41,14 +41,14 @@
       </div>
     </Route>
   </div>
-  
+
   <style lang="scss">
     .content {
       display: flex;
       flex-flow: row nowrap;
       overflow-y: hidden;
     }
-  
+
     .list {
       position: relative;
       height: calc(100vh - 48px);
@@ -59,7 +59,7 @@
       overflow-x: hidden;
       flex: 1;
     }
-  
+
     .top-gradient-rolloff {
       // background-color: #13131f;
       width: 100%;
@@ -71,4 +71,3 @@
       // box-shadow: 0px 0px 18px -6px #85858a;
     }
   </style>
-  

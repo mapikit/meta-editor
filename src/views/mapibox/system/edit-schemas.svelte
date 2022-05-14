@@ -1,127 +1,129 @@
 <script lang="ts">
-import DefinitionApp from "../../../components/system-page/system-editor/definition-app.svelte";
-import GuideText from "../../../components/common/guide-text.svelte";
-import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
-import type { Schema } from "../../../entities/schema";
-import { get } from "svelte/store";
-import { schemas } from "../../../stores/configuration-store";
+	import DefinitionApp from "../../../components/system-page/system-editor/definition-app.svelte";
+	import GuideText from "../../../components/common/guide-text.svelte";
+	import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
+	import type { Schema } from "../../../entities/schema";
+	import { get } from "svelte/store";
+	import { schemas } from "../../../stores/configuration-store";
 
-let schemaList : Schema[] = $schemas;
-let currentSchemaName;
-
+	let schemaList : Schema[] = $schemas;
+	let currentSchemaName;
 </script>
+
 <div class="content">
-  <GuideText />
-  <div class="schemas-list">
-    {#each schemaList as schema}
-      <div class="listed-protocol">
-        {get(schema.name)} [{get(schema.id)}]
-      </div>
-      <!-- later: change style if it is the current protocol on the route -->
-    {/each}
-  </div>
-  <div class="divider" />
-  <div class="editor-lane">
-    {#if schemaList.length !== 0}
-      <DefinitionApp
-        protocolDefinition={get(schemaList[0]?.format)}
-        protocolData={{}}
-        level={EditorLevels.createDefinition}
-        on:confirmed={(data) => { schemaList[0].format.set(data.detail.mode); }}
-      />
-    {/if}
-  </div>
+	<GuideText />
+	<div class="schemas-list">
+		{#each schemaList as schema}
+			<div class="listed-protocol">
+				{get(schema.name)} [{get(schema.id)}]
+			</div>
+			<!-- later: change style if it is the current protocol on the route -->
+		{/each}
+	</div>
+	<div class="divider" />
+	<div class="editor-lane">
+		{#if schemaList.length !== 0}
+			<DefinitionApp
+				protocolDefinition={get(schemaList[0]?.format)}
+				protocolData={{}}
+				level={EditorLevels.createDefinition}
+				on:confirmed={(data) => {
+					schemaList[0].format.set(data.detail.mode);
+				}}
+			/>
+		{/if}
+	</div>
 </div>
 
 <style lang="scss">
-  .content {
-    margin-top: 42px;
-    flex: 1;
-    display: flex;
-    flex-flow: row nowrap;
-    font-family: 'Dosis', monospace;
-  }
+	.content {
+		margin-top: 42px;
+		flex: 1;
+		display: flex;
+		flex-flow: row nowrap;
+		font-family: 'Dosis', monospace;
+	}
 
-  .divider {
-    width: 4px;
-    background-color: #1a1a2a;
-    height: calc(100% - 90px);
-    margin-right: 12px;
-    margin-top: 30px;
-  }
+	.divider {
+		width: 4px;
+		background-color: #1a1a2a;
+		height: calc(100% - 90px);
+		margin-right: 12px;
+		margin-top: 30px;
+	}
 
-  .solo-fields {
-    margin-bottom: 26px;
-    width: 450px;
-    padding: 12px;
-    border-radius: 12px;
-    background-color:#202031;
+	.solo-fields {
+		margin-bottom: 26px;
+		width: 450px;
+		padding: 12px;
+		border-radius: 12px;
+		background-color: #202031;
 
-    .field {
-      margin-bottom: 8px;
-      display: flex;
-      width: 100%;
-      flex-direction: row;
-      justify-content: space-between;
-      
-      label {
-        margin-right: 16px;
-      }
+		.field {
+			margin-bottom: 8px;
+			display: flex;
+			width: 100%;
+			flex-direction: row;
+			justify-content: space-between;
 
-      input {
-        border: none;
-        background-color: #323242;
-        color: white;
-        font-family: "dosis";
-        width: 300px;
-        text-align: right;
-        border-radius: 4px;
-        padding: 4px;
-      }
-    }
-  }
+			label {
+				margin-right: 16px;
+			}
 
-  .schemas-list {
-    display: flex;
-    flex-direction: column;
-    width: 286px;
-    padding-left: 22px;
-    padding-top: 22px;
+			input {
+				border: none;
+				background-color: #323242;
+				color: white;
+				font-family: 'dosis';
+				width: 300px;
+				text-align: right;
+				border-radius: 4px;
+				padding: 4px;
+			}
+		}
+	}
 
-    .listed-protocol {
-      width: calc(100% - 16px);
-      height: 35px;
-      border-radius: 12px;
-      font-size: 14px;
-      text-align: center;
-      background-color: #1a1a2a;
-      display:  flex;
-      flex-flow: row nowrap;
-      justify-content: center;
-      align-items: center;
-      transition: all 160ms;
-      margin-top: 12px;
+	.schemas-list {
+		display: flex;
+		flex-direction: column;
+		width: 286px;
+		padding-left: 22px;
+		padding-top: 22px;
 
-      &:hover {
-        background-color: #2c2c44;
-      }
-    }
-  }
+		.listed-protocol {
+			width: calc(100% - 16px);
+			height: 35px;
+			border-radius: 12px;
+			font-size: 14px;
+			text-align: center;
+			background-color: #1a1a2a;
+			display: flex;
+			flex-flow: row nowrap;
+			justify-content: center;
+			align-items: center;
+			transition: all 160ms;
+			margin-top: 12px;
 
-  .editor-lane {
-    max-height: calc(100% - 82px);
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-  }
+			&:hover {
+				background-color: #2c2c44;
+			}
+		}
+	}
 
-  .preview {
-    max-height: calc(100% - 82px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-  }
+	.editor-lane {
+		max-height: calc(100% - 82px);
+		display: flex;
+		flex-flow: column nowrap;
+		justify-content: center;
+		align-items: center;
+		flex: 1;
+	}
+
+	.preview {
+		max-height: calc(100% - 82px);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex: 1;
+	}
 </style>
