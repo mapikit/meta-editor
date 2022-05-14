@@ -1,47 +1,74 @@
+import { availableProjects } from "../stores/projects-store";
 import { get, readable, Readable, writable, Writable } from "svelte/store";
-import type { Configuration } from "./configuration";
+import { Configuration } from "./configuration";
+import { availableConfigurations } from "../stores/configuration-store";
 
 type ProjectContructorParameter = {
   id : string;
   name : string;
   description : string;
-  configuration ?: Configuration;
   isStarred : boolean;
-}
-
-export type ConfigurationSummary = {
-  version : string;
-  envsCount : number;
-  schemasCount : number;
-  bopsCount : number;
-  protocolsCount : number;
 }
 
 export class Project {
   public readonly id : Readable<string>;
   public readonly name : Writable<string> = writable("");
   public readonly description : Writable<string> = writable("");
-  public readonly configuration : Writable<Configuration> = writable();
   public readonly isStarred : Writable<boolean> = writable(false);
 
-  constructor ({ id, name, description, configuration, isStarred } : ProjectContructorParameter) {
+  constructor ({ id, name, description, isStarred } : ProjectContructorParameter) {
     this.id = readable(id);
     this.name.set(name);
     this.description.set(description);
-    this.configuration.set(configuration);
     this.isStarred.set(isStarred);
   }
 
-  public getConfigurationSummary () : ConfigurationSummary {
-    const configuration = get(this.configuration);
-    const result = {
-      version: get(configuration.version),
-      envsCount: get(configuration.envs).length,
-      schemasCount: get(configuration.schemas).length,
-      bopsCount: get(configuration.businessOperations).length,
-      protocolsCount: get(configuration.protocols).length,
-    };
+  public static getNullable () : Project {
+    return new Project({
+      id: "",
+      name: "",
+      description: "",
+      isStarred: false,
+    });
+  }
 
-    return result;
+  /** Saves to the BackEnd */
+  public async save () : Promise<void> {
+    // TODO: Implement
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  public static async addNewProject () : Promise<void> {
+    // We should add a new new system in the backEnd instantly here.
+    // Then modify the store with the new values
+
+    const newProject = new Project({
+      id: Math.floor(Math.random()*1000000).toString(),
+      name: "New System",
+      description: "system's description.",
+      isStarred: false,
+    });
+
+    availableProjects.update((current) => {
+      current.push(newProject);
+
+      return current;
+    });
+
+    availableConfigurations.update((current) => {
+      current.push(new Configuration({
+        id: "MOCK_ID",
+        projectId: get(newProject.id),
+        version: "0.0.1",
+      }));
+
+      return current;
+    });
+  }
+
+  public getConfiguration () : Configuration {
+    return get(availableConfigurations).find((configuration) => {
+      return get(configuration.projectId) === get(this.id);
+    });
   }
 }

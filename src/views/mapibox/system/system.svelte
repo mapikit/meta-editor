@@ -2,30 +2,18 @@
   import PropertyList from "../../../components/system-page/property-list.svelte";
   import CogSidebarDecoration from "../../../components/cog-sidebar-decoration.svelte";
   import MinifiedSystemsSidebar from "../../../components/systems-sidebar/minified-systems-sidebar.svelte";
-  import { navigation } from "../../../lib/navigation";
   import { fly } from "svelte/transition";
   import Route from "../../../lib/router/route.svelte";
   import EditProtocols from "./edit-protocols.svelte";
   import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
   import EditSchemas from "./edit-schemas.svelte";
-  import { selectedSystem } from "../../../components/systems-sidebar/systems-stores";
-  import { onMount } from "svelte";
-  import globalUser from "../../../stores/global-user-store";
-  import type { Configuration } from "../../../entities/configuration";
-  import type { Writable } from "svelte/store";
-  import type { PropertyListEntry } from "../../../common/types/property-list-entry";
+  import { Schema } from "../../../entities/schema";
+  import { schemas } from "../../../stores/configuration-store";
+  import type { PropertyListEntry } from "src/common/types/property-list-entry";
 
-  let configuration : Writable<Configuration>;
-  let schemas : PropertyListEntry[];
+  let schemasPropertyList : PropertyListEntry[];
 
-  onMount(() => {
-    const params = navigation.getCurrentPathParams();
-    selectedSystem.set(params["systemId"] ?? "WHAT IS COING ON");
-
-    configuration = globalUser.getCurrentProject()?.configuration;
-    schemas = $configuration.getSchemasPropertyListEntries();
-  });
-
+  $: schemasPropertyList = $schemas.map((value) => value.getSchemaCardInfo());
   
 </script>
   
@@ -37,7 +25,7 @@
       <EditProtocols />
     </Route>
     <Route path="/mapibox/system/:systemId/schemas/:schemaId/edit">
-      <EditSchemas />
+      <EditSchemas/>
     </Route>
     <Route path="/mapibox/system/:systemId/bops/:bopId/edit">
       <EditionCanvas />
@@ -46,7 +34,7 @@
       <div class="list">
         <div class="scroller">
           <div class="top-gradient-rolloff" />
-          <PropertyList listType="schemas" listData={schemas}/>
+          <PropertyList listType="schemas" listData={schemasPropertyList} createNewEntryHandler={Schema.createNewSchema}/>
           <PropertyList listType="bops"/>
           <PropertyList listType="protocols"/>
         </div>

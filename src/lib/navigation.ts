@@ -5,6 +5,7 @@ class Navigation {
   private _path = "";
   private _registeredPaths : Set<string> = new Set();
   private _activeSwitchPath = "";
+  public readonly currentPathParams : Writable<Record<string, string>> = writable({});
 
   public get pathStore () : Writable<string> {
     return this._pathSvelteStore;
@@ -74,6 +75,8 @@ class Navigation {
       }
 
       window.history.pushState({}, "", navigationPath);
+
+      this.currentPathParams.update(() => this.getCurrentPathParams());
     });
 
     window.onpopstate = () : void => {
@@ -101,7 +104,7 @@ class Navigation {
 
   /** Only works if the path was registered */
   // eslint-disable-next-line max-lines-per-function
-  public getCurrentPathParams (path ?: string) : Record<string, string> {
+  private getCurrentPathParams (path ?: string) : Record<string, string> {
     const currentPathSteps = this.normalizePath(this.currentPath).split("/");
     const matchingRegistered = path ? this.normalizePath(path) : this.getMatchingRegisteredPath(this.currentPath);
 

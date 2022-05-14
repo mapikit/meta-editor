@@ -1,32 +1,29 @@
 <script lang="ts">
   import { isObjectDefinition, ObjectDefinition } from "@meta-system/object-definition";
-import { onMount } from "svelte";
 
   import { Coordinate } from "../../common/types/geometry";
-import type { UICompliantDependency } from "../../common/types/module-card";
   import type { UIInput } from "../../common/types/ui-input";
-import { bopStore } from "../../stores/bop-store";
-import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
+  import { bopStore } from "../../stores/bop-store";
+  import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import MovableCard from "./helpers/movable-card.svelte";
-import OutputSection from "./module-cards/output-section.svelte";
-import { updateTraces } from "./update-traces";
+  import OutputSection from "./module-cards/output-section.svelte";
 
   export let configuration : UIInput | ObjectDefinition;
-  const uiConfiguration : UIInput = { definition: undefined }
+  const uiConfiguration : UIInput = { definition: undefined };
   try { 
-    isObjectDefinition(configuration) 
+    isObjectDefinition(configuration); 
     uiConfiguration.definition = configuration;
   }
-  catch (err) { Object.assign(uiConfiguration, configuration) }
+  catch (err) { Object.assign(uiConfiguration, configuration); }
   finally { if (uiConfiguration.position === undefined) uiConfiguration.position = new Coordinate(-100, 100); }
 
   let paths = [];
   let getPathsNames : () => string[];
-  let navigateBackToLevel : (index : number) => void
-  let getDefinitionAndData : () => { definition: ObjectDefinition, data : object }
+  let navigateBackToLevel : (index : number) => void;
+  let getDefinitionAndData : () => { definition: ObjectDefinition, data : object };
   let editing = false;
-  const nobMapping = {}
+  const nobMapping = {};
 
 
   function startEditing () : void {
@@ -34,36 +31,37 @@ import { updateTraces } from "./update-traces";
       bop.configuration.forEach(config => {
         config.dependencies.forEach(dependency => {
           if(["input", "inputs"].includes(String(dependency.origin))) {
-            dependency.originNob = undefined
+            dependency.originNob = undefined;
           }
-        })
-      })
+        });
+      });
       return bop;
-    })
+    });
 
     editing = true;
   }
 
+  // eslint-disable-next-line max-lines-per-function
   function finishEdition() {
     editing = false;
 
     // TODO make this a "await mount" style
     setTimeout(() => {
       bopStore.update(bop => {
-      navigateBackToLevel(0)
-      uiConfiguration.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
-      bop.input = uiConfiguration;
+        navigateBackToLevel(0);
+        uiConfiguration.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
+        bop.input = uiConfiguration;
 
-      for(const config of bop.configuration) {
-        config.dependencies.forEach((dependency, index) => {
-          const originName = dependency.originPath.split(".")[1]
-          if(Object.keys(nobMapping).includes(originName)) dependency.originNob = nobMapping[originName];
-          else config.dependencies.splice(index, 1);
-        })
-      }
-      return bop
-    })
-    }, 200)
+        for(const config of bop.configuration) {
+          config.dependencies.forEach((dependency, index) => {
+            const originName = dependency.originPath.split(".")[1];
+            if(Object.keys(nobMapping).includes(originName)) dependency.originNob = nobMapping[originName];
+            else config.dependencies.splice(index, 1);
+          });
+        }
+        return bop;
+      });
+    }, 200);
   }
 
 </script>
@@ -87,7 +85,7 @@ import { updateTraces } from "./update-traces";
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
           initialDefinition={uiConfiguration.definition} initialData={{}}
-          on:navigation-event={() => { paths = getPathsNames() }}
+          on:navigation-event={() => { paths = getPathsNames(); }}
           bind:getPathsNames
           bind:navigateBackToLevel
           bind:getDefinitionAndData

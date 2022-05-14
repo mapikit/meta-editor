@@ -1,24 +1,13 @@
 <script lang="ts">
 import DefinitionApp from "../../../components/system-page/system-editor/definition-app.svelte";
 import GuideText from "../../../components/common/guide-text.svelte";
-import { onMount } from "svelte";
-import { guideText } from "../../../stores/layout-tabs-store";
 import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
-import { Schema } from "../../../entities/schema";
-export const schemaList : Schema[] = []; // Perhaps get from store when it's up?
-export const curerntSchemaName = "Schema Test";
+import type { Schema } from "../../../entities/schema";
+import { get } from "svelte/store";
+import { schemas } from "../../../stores/configuration-store";
 
-// Mocked data
-schemaList.push(new Schema(
-  {},
-  "test schema",
-  "Db Protocol",
-  "Id",
-));
-
-onMount(() => {
-  guideText.set(`Configuring Protocol: ${curerntSchemaName}`);
-});
+let schemaList : Schema[] = $schemas;
+let currentSchemaName;
 
 </script>
 <div class="content">
@@ -26,33 +15,21 @@ onMount(() => {
   <div class="schemas-list">
     {#each schemaList as schema}
       <div class="listed-protocol">
-        {schema.name} [{schema.identifier}]
+        {get(schema.name)} [{get(schema.id)}]
       </div>
       <!-- later: change style if it is the current protocol on the route -->
     {/each}
   </div>
   <div class="divider" />
   <div class="editor-lane">
-    <div class="solo-fields">
-      <div class="field">
-        <label> Name </label>
-        <input type="text" bind:value={schemaList[0].name}/>
-      </div>
-      <div class="field">
-        <label> Identifier </label>
-        <input type="text" bind:value={schemaList[0].identifier}/>
-      </div>
-      <div class="field">
-        <label> Db Protocol </label>
-        <input type="text" bind:value={schemaList[0].dbProtocol}/>
-      </div>
-    </div>
-    <DefinitionApp
-      protocolDefinition={schemaList[0].format}
-      protocolData={{}}
-      level={EditorLevels.createDefinition}
-      on:confirmed={(data) => { schemaList[0].format = data.detail.mode; }}
-    />
+    {#if schemaList.length !== 0}
+      <DefinitionApp
+        protocolDefinition={get(schemaList[0]?.format)}
+        protocolData={{}}
+        level={EditorLevels.createDefinition}
+        on:confirmed={(data) => { schemaList[0].format.set(data.detail.mode); }}
+      />
+    {/if}
   </div>
 </div>
 

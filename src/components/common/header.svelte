@@ -6,14 +6,13 @@ import { navigation } from "../../lib/navigation";
 // Right sandwich menu
 
 import { selectedService } from "../../stores/layout-tabs-store";
-import { selectedSystem } from "../systems-sidebar/systems-stores";
+
 </script>
 
 <div class="header">
   <div class="logo" on:click="{() => { navigation.navigateTo('/'); selectedService.set(""); }}" >
     <img src="/logo-and-name.svg" alt="mapikit-logo"/>
   </div>
-  {$selectedSystem}
 </div>
 
 <style lang="scss">

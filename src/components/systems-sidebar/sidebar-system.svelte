@@ -12,7 +12,7 @@
   let name = system.name;
   let description = system.description;
   let id = system.id;
-  let summary = system.getConfigurationSummary();
+  let summary = system.getConfiguration().getConfigurationSummary();
   const pathStore = navigation.pathStore;
 
   const unsub = selectedSystem.subscribe((value) => {

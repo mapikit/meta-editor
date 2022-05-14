@@ -1,11 +1,12 @@
-import type { UIBusinessOperation } from "./business-operation";
-import type { Schema } from "./schema";
-import type { Protocol } from "./protocol";
-import type { EnvironmentVariable } from "./environment-variable";
+/* eslint-disable @typescript-eslint/no-shadow */
 import { get, readable, Readable, writable, Writable } from "svelte/store";
-import type { PropertyListEntry } from "../common/types/property-list-entry";
+import type { EnvironmentVariable } from "./environment-variable";
+import type { Protocol } from "./protocol";
+import type { Schema } from "./schema";
+import type { UIBusinessOperation } from "./business-operation";
 
 type ConfigurationParameter = {
+  projectId : string;
   id : string;
   version : string;
   envs ?: EnvironmentVariable[];
@@ -14,38 +15,67 @@ type ConfigurationParameter = {
   businessOperations ?: UIBusinessOperation[];
 }
 
+export type ConfigurationSummary = {
+  version : string;
+  envsCount : number;
+  schemasCount : number;
+  bopsCount : number;
+  protocolsCount : number;
+}
+
 export class Configuration {
-  public readonly businessOperations : Writable<UIBusinessOperation[]> = writable([]);
-  public readonly schemas : Writable<Schema[]> = writable([]);
-  public readonly protocols : Writable<Protocol[]> = writable([]);
-  public readonly envs : Writable<EnvironmentVariable[]> = writable([]);
+  public readonly projectId : Readable<string>;
   public readonly id : Readable<string>;
   public readonly version : Writable<string> = writable("0.0.0");
 
+  // These properties are not on stores because they're not meant to be
+  // changed in here, they should be changed only when this is the current
+  // configuration selected. In such case, they will be in the `configuration-store.ts` file, not here
+  private readonly businessOperations : UIBusinessOperation[] = [];
+  private readonly envs : EnvironmentVariable[] = [];
+  private readonly protocols : Protocol[] = [];
+  private readonly schemas : Schema[] = [];
+
   // eslint-disable-next-line max-lines-per-function
   public constructor ({
+    projectId,
     id,
     version,
     envs = [],
-    protocols = [],
     schemas = [],
     businessOperations = [],
+    protocols = [],
   } : ConfigurationParameter) {
+    this.projectId = readable(projectId);
     this.id = readable(id);
     this.version.set(version);
-    this.envs.set(envs);
-    this.protocols.set(protocols);
-    this.schemas.set(schemas);
-    this.businessOperations.set(businessOperations);
+
+    this.envs = envs;
+    this.schemas = schemas;
+    this.businessOperations = businessOperations;
+    this.protocols = protocols;
   }
 
-  public getSchemasPropertyListEntries () : PropertyListEntry[] {
-    const result = [];
-
-    get(this.schemas).forEach((schema) => {
-      result.push(schema.getSchemaCardInfo());
+  public static getNullable () : Configuration {
+    return new Configuration({
+      projectId: "",
+      id: "",
+      version: "",
     });
+  }
 
-    return result;
+  /** Loads configuration content into the store */
+  public async loadContents () : Promise<void> {
+    // TODO: Implement get from BackEnd
+  }
+
+  public getConfigurationSummary () : ConfigurationSummary {
+    return {
+      version: get(this.version),
+      envsCount: this.envs.length,
+      bopsCount: this.businessOperations.length,
+      schemasCount: this.schemas.length,
+      protocolsCount: this.protocols.length,
+    };
   }
 }

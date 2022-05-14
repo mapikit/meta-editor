@@ -1,13 +1,7 @@
 <script>
-  import { contentLeftMargin } from "../../stores/layout-tabs-store";
   import Header from "../../components/common/header.svelte";
   import ServiceSelector from "../../components/common/service-selector.svelte";
-  import { onDestroy } from "svelte";
 
-  let leftPadding = 8;
-  const unsubHandler = contentLeftMargin.subscribe((value) => { leftPadding = value; });
-
-  onDestroy(() => { unsubHandler(); });
 </script>
 <div class="layout">
   <Header />

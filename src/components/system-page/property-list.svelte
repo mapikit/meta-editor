@@ -3,7 +3,7 @@ import BopsIcon from "../common/icons/bops-icon.svelte";
 import ProtocolsIcon from "../common/icons/protocols-icon.svelte";
 import SchemaIcon from "../common/icons/schema-icon.svelte";
 import { fade } from "svelte/transition";
-import SchemasSystemCard from "./schemas-system-card.svelte";
+import SystemPropCard from "./system-prop-card.svelte";
 import PlusSignBoxIcon from "../common/icons/plus-sign-box-icon.svelte";
 import { fly } from "svelte/transition";
 import { navigation } from "../../lib/navigation";
@@ -12,6 +12,7 @@ import type { PropertyListEntry } from "../../common/types/property-list-entry";
 
 export let listType : keyof typeof typeInfos = "schemas";
 export let listData : PropertyListEntry[] = [];
+export let createNewEntryHandler : () => void;
 
 const typeInfos = {
   "schemas": { color: "#5d8efe", label: "Schemas", icon: SchemaIcon, contentCard: "" },
@@ -57,16 +58,17 @@ const getNavPath = () : string => {
     <div class="list-container" style={`border-left-color: ${listInfo.color}`}>
       {#each listData as listItem, index }
         <div in:fly={{ x: 20, delay: index * 46 }} out:fly={{ x: 20, delay: 50*(listData.length - 1 * index) }}>
-          <SchemasSystemCard entry={listItem}/>
+          <SystemPropCard entry={listItem}/>
         </div>
       {/each}
     </div>
     <div class="button-spacer" style={`background-color: ${listInfo.color}`}/>
     <div class="add-new" style={`--hover-color: ${listInfo.color}`}
+      on:click={createNewEntryHandler}
       on:mouseenter={() => { createHovered = true; }}
       on:mouseleave={() => { createHovered = false; }}
     >
-      <span class="add-icon">
+      <span class="add-icon" >
         <PlusSignBoxIcon scale={1} iconColor={createHovered ? listInfo.color : "white" }/>
       </span> Create New {listInfo.label}
     </div>

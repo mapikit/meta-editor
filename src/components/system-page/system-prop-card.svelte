@@ -8,6 +8,7 @@ import LockIcon from "../common/icons/lock-icon.svelte";
 import PencilIcon from "../common/icons/pencil-icon.svelte";
 import StarIcon from "../common/icons/star-icon.svelte";
 import ToolsConfigIcon from "../common/icons/tools-config-icon.svelte";
+import EditableProperty from "./editable-property.svelte";
 
 export let entry : PropertyListEntry;
 
@@ -19,8 +20,9 @@ let favorited = entry.starred;
 let locked = entry.locked;
 const id = entry.id;
 
-let dataValues = entry.dataValues;
+console.log(get(entry.description));
 
+let dataValues = entry.dataValues;
 
 const showDate = (date : Date) : string => {
   const day = date.getDate();
@@ -47,7 +49,10 @@ const updateLocked = (event : MouseEvent) : void => {
 </script>
 
 <div class="main-card">
-  <div class="header" on:click={() => { isOpen = !isOpen; }}>
+  <div class="header" on:click={() => {
+    if (isEditing) { return; }
+    isOpen = !isOpen;
+  }}>
     <div class="{!isOpen ? "chevron-collapse" : "chevron-collapse down"}">
       <img src="/icon-chevron-up.svg" alt="chevron"/>
     </div>
@@ -55,8 +60,13 @@ const updateLocked = (event : MouseEvent) : void => {
       <div class="favorite-icon" on:click={updateFavorited}>
         <StarIcon active={$favorited} iconColor={"#575777"} scale={1.5}/>
       </div>
-      <h2> {$title} </h2>
-      <div class="pencil-icon" on:click={(e) => { isEditing = !isEditing; e.stopPropagation(); }}>
+      {#if isEditing}
+        <input on:click="{(e) => e.stopPropagation()}" class="title-edit title-width" bind:value={$title} >
+      {:else}
+        <h2 class="title-width"> {$title} </h2>
+      {/if}
+      <div class="pencil-icon" on:click={(e) => {
+        isEditing = !isEditing; e.stopPropagation(); if (isEditing) { isOpen = true; } }}>
         <PencilIcon iconColor={"#575777"} scale={1.4}/>
       </div>
       <div class="lock-icon" on:click={updateLocked}>
@@ -77,7 +87,12 @@ const updateLocked = (event : MouseEvent) : void => {
       <div class="stats-group">
         {#each dataValues as dataValue}
           <div class="stat-line">
-            <p class="key"> {dataValue.name}: </p> <p class="value"> {get(dataValue.value)} </p>
+            <p class="key"> {dataValue.name}: </p>
+            {#if isEditing}
+              <EditableProperty valueStore={dataValue.value} />
+            {:else}
+              <p class="value"> {get(dataValue.value)} </p>
+            {/if}
           </div>
         {/each}
       </div>
@@ -105,6 +120,7 @@ const updateLocked = (event : MouseEvent) : void => {
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
+    flex: 1;
 
     .favorite-icon {
       padding-top: 3px;
@@ -121,6 +137,23 @@ const updateLocked = (event : MouseEvent) : void => {
       right: 16px;
       padding-top: 4px;
     };
+  }
+
+  .title-edit {
+    border-radius: 8px;
+    border: none;
+    background-color: #13131f;
+    padding: 4px;
+    color: white;
+
+    outline: none;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .title-width {
+    width: calc(100% - 186px);
   }
 
   .main-card {

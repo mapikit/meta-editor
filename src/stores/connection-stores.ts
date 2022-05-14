@@ -1,10 +1,10 @@
-import { writable } from "svelte/store"
+import { writable } from "svelte/store";
 
 export type NobSelection = {
   nobType : "input" | "output" | "module";
   propertyType : string;
   property : string;
-  nob: HTMLSpanElement;
+  nob : HTMLSpanElement;
   parentKey : number | "input";
 }
 
