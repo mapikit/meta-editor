@@ -28,7 +28,7 @@ export class Configuration {
   public readonly id : Readable<string>;
   public readonly version : Writable<string> = writable("0.0.0");
 
-  // These properties are not on stores because they're not meant to be
+  // These properties are not stores because they're not meant to be
   // changed in here, they should be changed only when this is the current
   // configuration selected. In such case, they will be in the `configuration-store.ts` file, not here
   private readonly businessOperations : UIBusinessOperation[] = [];

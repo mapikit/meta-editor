@@ -9,7 +9,8 @@
   import EditSchemas from "./edit-schemas.svelte";
   import { Schema } from "../../../entities/schema";
   import { schemas } from "../../../stores/configuration-store";
-  import type { PropertyListEntry } from "src/common/types/property-list-entry";
+  import type { PropertyListEntry } from "../../../common/types/property-list-entry";
+  import SystemBasePropertyEditor from "../../../components/system-page/system-base-property-editor.svelte";
 
   let schemasPropertyList : PropertyListEntry[];
 
@@ -34,6 +35,7 @@
       <div class="list">
         <div class="scroller">
           <div class="top-gradient-rolloff" />
+          <SystemBasePropertyEditor />
           <PropertyList listType="schemas" listData={schemasPropertyList} createNewEntryHandler={Schema.createNewSchema}/>
           <PropertyList listType="bops"/>
           <PropertyList listType="protocols"/>

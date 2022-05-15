@@ -1,14 +1,12 @@
 <script lang="ts">
-import type { PropertyListEntry } from "src/common/types/property-list-entry";
+import type { PropertyListEntry } from "../../common/types/property-list-entry";
 import { get } from "svelte/store";
-
-import { navigation } from "../../lib/navigation";
 
 import LockIcon from "../common/icons/lock-icon.svelte";
 import PencilIcon from "../common/icons/pencil-icon.svelte";
 import StarIcon from "../common/icons/star-icon.svelte";
-import ToolsConfigIcon from "../common/icons/tools-config-icon.svelte";
 import EditableProperty from "./editable-property.svelte";
+import SystemPropEditButton from "./system-prop-edit-button.svelte";
 
 export let entry : PropertyListEntry;
 
@@ -105,11 +103,7 @@ const updateLocked = (event : MouseEvent) : void => {
         </div>
       </div>
 
-      <div class="edit-button" on:click={() => { navigation.navigateAppendTo(`/${$id}/edit`); }}>
-        <div class="edit-icon">
-          <ToolsConfigIcon iconColor="#3b3b53" scale={1.3}/>
-        </div>
-      </div>
+      <SystemPropEditButton id={$id} />
     </div>
   {/if}
 </div>
@@ -169,10 +163,11 @@ const updateLocked = (event : MouseEvent) : void => {
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
-    transition: 75ms all;
+    transition: 200ms all;
+    padding-bottom: 8px;
 
     &:hover {
-      background-color: #2c2c44;
+      background-color: #222235;
     }
 
     .header {
@@ -268,22 +263,6 @@ const updateLocked = (event : MouseEvent) : void => {
 
     &.down {
       transform: rotate(180deg);
-    }
-  }
-
-  .edit-button {
-    --height: 38px;
-    margin-top: 12px;
-    background-color: #13131f;
-    border-radius: calc(var(--height) / 2);
-    height: var(--height);
-    width: 120px;
-    text-align: center;
-    justify-self: center;
-
-    .edit-icon {
-      // margin-top: 50%;
-      transform: translateY(40%);
     }
   }
 </style>
