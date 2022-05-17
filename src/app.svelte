@@ -5,7 +5,6 @@ import MainView from "./views/main-view.svelte";
 // This file contains general data about the App itself
 // and should not contain anything else.
 
-// should render router
 </script>
 
 <MainView />
