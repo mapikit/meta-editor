@@ -15,7 +15,7 @@ let titlesLimits = [];
 const dispatch = createEventDispatcher();
 
 const sendResult = () : void => {
-  const result = editorReference.getDefinitionAndData()["data"]["root"];
+  const result = editorReference.getDefinitionAndData();
 
   dispatch("confirmed", { result });
 };

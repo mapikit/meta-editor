@@ -18,8 +18,6 @@ let favorited = entry.starred;
 let locked = entry.locked;
 const id = entry.id;
 
-console.log(get(entry.description));
-
 let dataValues = entry.dataValues;
 
 const showDate = (date : Date) : string => {
@@ -86,7 +84,7 @@ const updateLocked = (event : MouseEvent) : void => {
         {#each dataValues as dataValue}
           <div class="stat-line">
             <p class="key"> {dataValue.name}: </p>
-            {#if isEditing}
+            {#if isEditing && dataValue.editable}
               <EditableProperty valueStore={dataValue.value} />
             {:else}
               <p class="value"> {get(dataValue.value)} </p>

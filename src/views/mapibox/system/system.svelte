@@ -8,12 +8,15 @@
   import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
   import EditSchemas from "./edit-schemas.svelte";
   import { Schema } from "../../../entities/schema";
-  import { schemas } from "../../../stores/configuration-store";
+  import { protocols, schemas } from "../../../stores/configuration-store";
   import type { PropertyListEntry } from "../../../common/types/property-list-entry";
   import SystemBasePropertyEditor from "../../../components/system-page/system-base-property-editor.svelte";
+  import { Protocol } from "../../../entities/protocol";
 
   let schemasPropertyList : PropertyListEntry[];
+  let protocolsPropertyList : PropertyListEntry[];
 
+  $: protocolsPropertyList = $protocols.map((value) => value.getProtocolCardInfo());
   $: schemasPropertyList = $schemas.map((value) => value.getSchemaCardInfo());
 
 </script>
@@ -38,7 +41,7 @@
           <SystemBasePropertyEditor />
           <PropertyList listType="schemas" listData={schemasPropertyList} createNewEntryHandler={Schema.createNewSchema}/>
           <PropertyList listType="bops"/>
-          <PropertyList listType="protocols"/>
+          <PropertyList listType="protocols" listData={protocolsPropertyList} createNewEntryHandler={Protocol.createNewProtocol}/>
         </div>
       </div>
     </Route>

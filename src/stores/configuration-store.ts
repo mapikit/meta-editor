@@ -1,5 +1,5 @@
 import type { Schema } from "../entities/schema";
-import { derived, get, Writable, writable } from "svelte/store";
+import { get, Writable, writable } from "svelte/store";
 import type { Configuration } from "../entities/configuration";
 import type { UIBusinessOperation } from "../entities/business-operation";
 import type { Protocol } from "../entities/protocol";
@@ -13,3 +13,15 @@ export const schemas : Writable<Schema[]> = writable([]);
 export const businessOperations : Writable<UIBusinessOperation[]> = writable([]);
 export const protocols : Writable<Protocol[]> = writable([]);
 export const environmentVariables : Writable<EnvironmentVariable[]> = writable([]);
+
+export const getSchemaById = (id : string) : Schema => {
+  const result : Schema = get(schemas).find((value) => get(value.id) === id);
+
+  return result;
+};
+
+export const getProtocolById = (id : string) : Protocol => {
+  const result : Protocol = get(protocols).find((value) => get(value.id) === id);
+
+  return result;
+};

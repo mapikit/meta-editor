@@ -51,7 +51,7 @@ export class Schema {
     // TODO: Creates a new schema in the Db
 
     const newSchema = new Schema({
-      id: "MOCK_ID",
+      id: Math.floor(Math.random() * 10000000).toString(),
       format: {},
       name: "New Schema",
       dbProtocol: "<empty>",

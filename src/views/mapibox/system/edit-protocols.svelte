@@ -1,72 +1,71 @@
 <script lang="ts">
-import { Protocol } from "../../../entities/protocol";
-import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
-import ProtocolDefinitionSign from "../../../components/system-page/system-editor/definition-app.svelte";
-import GuideText from "../../../components/common/guide-text.svelte";
-import { onMount } from "svelte";
-import { guideText } from "../../../stores/layout-tabs-store";
-import DataPreview from "../../../components/system-page/system-editor/data-preview.svelte";
-import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
+  import DefinitionApp from "../../../components/system-page/system-editor/definition-app.svelte";
+  import GuideText from "../../../components/common/guide-text.svelte";
+  import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
+  import { get, readable } from "svelte/store";
+  import { getProtocolById, protocols } from "../../../stores/configuration-store";
+  import { navigation } from "../../../lib/navigation";
+  import { onDestroy } from "svelte";
+  import { guideText } from "../../../stores/layout-tabs-store";
+  import type { Protocol } from "../../../entities/protocol";
 
-export const protocolDefinition = {
-  "port": { "type": "number", "required": true },
-  "enableCors": { "type": "boolean" },
-  "corsConfig": { "type": "object", "subtype": {
-    "origin": { "type": "string", "required": true },
-    "optionsSuccessStatus": { "type": "number", "required": true },
-  } },
-  "routes": { "type": "array", "required": true, "subtype": {
-    "route": { "type": "string", "required": true },
-    "businessOperation": { "type": "string", "required": true },
-    "method": { "type": "enum", "subtype": [ "GET", "PUT", "POST", "PATCH", "DELETE" ], "required": true },
-    "inputMapConfiguration": { "type": "array", "required": true, "subtype": {
-      "origin": { "type": "enum", "required": true, "subtype": [ "route", "queryParams", "headers", "body" ] },
-      "originPath": { "type": "string", "required": true },
-      "targetPath": { "type": "string", "required": true },
-    } },
-    "resultMap": { "type": "object", "required": true, "subtype": {
-      "statusCode": { "type": "string", "required": true },
-      "headers": { "type": "string", "required": true, "subtype": "cloudedObject" },
-      "body": { "type": "cloudedObject", "required": true },
-    } },
-  } },
-};
-export let protocolData = {};
-export const protocolsList : Protocol[] = []; // Perhaps get from store when it's up?
-export const ProtocolName = "TEST PROTOCOL";
+  let protocolList : Protocol[] = $protocols;
+  let pathParams = navigation.currentPathParams;
+  let currentProtocolId = $pathParams["protocolId"];
+  let currentProtocol = getProtocolById(currentProtocolId);
+  let protocolFormat = currentProtocol?.definition;
 
-// Mocked data
-protocolsList.push(new Protocol("HTTP JSON Body", "0.1.66", ProtocolKind.normal));
-protocolsList.push(new Protocol("Another Protocol", "0.1.66", ProtocolKind.normal));
-protocolsList.push(new Protocol("CRONJOB", "0.1.66", ProtocolKind.normal));
+  $: currentProtocolId = $pathParams["protocolId"];
+  $: currentProtocol = getProtocolById(currentProtocolId);
+  $: protocolFormat = currentProtocol?.definition;
 
-onMount(() => {
-  guideText.set(`Configuring Protocol: ${ProtocolName}`);
-});
+  const unsub = pathParams.subscribe(() => {
+    guideText.set(`Editing Protocol "${get(currentProtocol?.identifier) ?? ""}" (${currentProtocolId})`);
+  });
+
+  onDestroy(unsub);
 
 </script>
+
 <div class="content">
   <GuideText />
   <div class="protocols-list">
-    {#each protocolsList as protocol}
-      <div class="listed-protocol">
-        {protocol.protocolName} [{protocol.protocolType}]
+    {#each protocolList as protocol}
+      <div
+        class:current={currentProtocolId === get(protocol.id)}
+        class="listed-protocol"
+        on:click="{() => { navigation.navigateTo(`/mapibox/system/${$pathParams["systemId"]}/protocols/${get(protocol.id)}/edit`); }}">
+        {get(protocol.identifier)} [{get(protocol.id)}]
       </div>
       <!-- later: change style if it is the current protocol on the route -->
     {/each}
   </div>
   <div class="divider" />
   <div class="editor-lane">
-    <ProtocolDefinitionSign
-      protocolDefinition={protocolDefinition}
-      bind:protocolData={protocolData}
-      level={EditorLevels.signDefinition}
-      on:confirmed={(data) => { protocolData = data.detail.result; }}
-    />
-  </div>
-
-  <div class="preview">
-    <DataPreview bind:data={protocolData} />
+    {#key currentProtocolId}
+      {#if protocolList.length !== 0}
+        <div style="cursor: pointer;"
+          on:click="{async () => {
+            const format = JSON.parse(await navigator.clipboard.readText());
+            currentProtocol.definition = format;
+            currentProtocol.configuration.set({});
+            const newId = Math.floor(Math.random() * 10000000).toString();
+            currentProtocol.id = readable(newId);
+            navigation.navigateTo(`/mapibox/system/${$pathParams["systemId"]}/protocols/${newId}/edit`);
+          }}"
+        > Set format here </div>
+        <DefinitionApp
+        protocolDefinition={protocolFormat ?? {}}
+        protocolData={{}}
+        level={EditorLevels.signDefinition}
+        on:confirmed={(data) => {
+        currentProtocol.configuration.set(data.detail.result.data.root);
+      }}
+      />
+      {:else}
+        <p> There are no protocols created in this system. </p>
+      {/if}
+    {/key}
   </div>
 </div>
 
@@ -87,6 +86,37 @@ onMount(() => {
     margin-top: 30px;
   }
 
+  .solo-fields {
+    margin-bottom: 26px;
+    width: 450px;
+    padding: 12px;
+    border-radius: 12px;
+    background-color: #202031;
+
+    .field {
+      margin-bottom: 8px;
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+
+      label {
+        margin-right: 16px;
+      }
+
+      input {
+        border: none;
+        background-color: #323242;
+        color: white;
+        font-family: 'dosis';
+        width: 300px;
+        text-align: right;
+        border-radius: 4px;
+        padding: 4px;
+      }
+    }
+  }
+
   .protocols-list {
     display: flex;
     flex-direction: column;
@@ -101,15 +131,20 @@ onMount(() => {
       font-size: 14px;
       text-align: center;
       background-color: #1a1a2a;
-      display:  flex;
+      display: flex;
       flex-flow: row nowrap;
       justify-content: center;
       align-items: center;
-      transition: all 160ms;
+      transition: all 75ms;
       margin-top: 12px;
+      outline: #1d1d22 solid 0px;
 
       &:hover {
         background-color: #2c2c44;
+      }
+
+      &.current {
+        outline: #64647c solid 2px;
       }
     }
   }
@@ -117,6 +152,7 @@ onMount(() => {
   .editor-lane {
     max-height: calc(100% - 82px);
     display: flex;
+    flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
     flex: 1;
