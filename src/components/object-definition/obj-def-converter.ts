@@ -172,6 +172,15 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
     return result;
   }
 
+  if (definitionData.type === "enum") {
+    result.definition[definitionData.keyName] = {
+      "type": "enum",
+      "subtype": definitionData.subtype as [],
+    };
+
+    return result;
+  }
+
   result.definition[definitionData.keyName] = {
     "type": definitionData.type,
     "required": definitionData.required,
