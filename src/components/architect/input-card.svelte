@@ -1,22 +1,25 @@
 <script lang="ts">
-  import { isObjectDefinition, ObjectDefinition } from "@meta-system/object-definition";
+  import type { ObjectDefinition } from "@meta-system/object-definition";
+import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import { get, Writable } from "svelte/store";
 
   import { Coordinate } from "../../common/types/geometry";
+import type { ModuleCard } from "../../common/types/module-card";
   import type { UIInput } from "../../common/types/ui-input";
-  import { bopStore } from "../../stores/bop-store";
+  import type { UIBusinessOperation } from "../../entities/business-operation";
+  import { navigation } from "../../lib/navigation";
+  import { businessOperations } from "../../stores/configuration-store";
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import MovableCard from "./helpers/movable-card.svelte";
   import OutputSection from "./module-cards/output-section.svelte";
 
-  export let configuration : UIInput | ObjectDefinition;
-  const uiConfiguration : UIInput = { definition: undefined };
-  try { 
-    isObjectDefinition(configuration); 
-    uiConfiguration.definition = configuration;
-  }
-  catch (err) { Object.assign(uiConfiguration, configuration); }
-  finally { if (uiConfiguration.position === undefined) uiConfiguration.position = new Coordinate(-100, 100); }
+  let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === get(navigation.currentPathParams).bopId);
+
+
+  export let configuration : Writable<UIInput>;
+  export let bopModules : Writable<ModuleCard[]>;
+  // TODO receive Input store instead of ... whatever this is.
 
   let paths = [];
   let getPathsNames : () => string[];
@@ -27,16 +30,16 @@
 
 
   function startEditing () : void {
-    bopStore.update(bop => {
-      bop.configuration.forEach(config => {
+    currentBop.configuration.update(configs => {
+      configs.forEach(config => {
         config.dependencies.forEach(dependency => {
           if(["input", "inputs"].includes(String(dependency.origin))) {
             dependency.originNob = undefined;
           }
-        });
-      });
-      return bop;
-    });
+        })
+      })
+      return configs;
+    })
 
     editing = true;
   }
@@ -47,32 +50,33 @@
 
     // TODO make this a "await mount" style
     setTimeout(() => {
-      bopStore.update(bop => {
+      configuration.update(input => {
         navigateBackToLevel(0);
-        uiConfiguration.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
-        bop.input = uiConfiguration;
+        input.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
 
-        for(const config of bop.configuration) {
-          config.dependencies.forEach((dependency, index) => {
-            const originName = dependency.originPath.split(".")[1];
-            if(Object.keys(nobMapping).includes(originName)) dependency.originNob = nobMapping[originName];
-            else config.dependencies.splice(index, 1);
-          });
-        }
-        return bop;
-      });
+        // TODO Reimplement dependency re-routing (bellow)
+        // for(const config of get(bop.configuration)) {
+        //   config.dependencies.forEach((dependency, index) => {
+        //     const originName = dependency.originPath.split(".")[1];
+        //     if(Object.keys(nobMapping).includes(originName)) dependency.originNob = nobMapping[originName];
+        //     else config.dependencies.splice(index, 1);
+        //   });
+        // }
+
+        return input;
+      })
     }, 200);
   }
 
 </script>
 
-<MovableCard moduleConfig={uiConfiguration}>
+<MovableCard moduleConfig={$configuration} bopModules={bopModules}>
   <div slot="content">
     {#if !editing}
       <div class="inputModule">
         <div class="header">Input  <button on:click={startEditing}>Edit</button></div>
-        {#each Object.keys(uiConfiguration.definition) as key}
-          <OutputSection info={uiConfiguration.definition[key]} name={key} parentKey={"input"} bind:nob={nobMapping[key]}/>
+        {#each Object.keys($configuration.definition) as key}
+          <OutputSection info={$configuration.definition[key]} bopModules={bopModules} name={key} parentKey={"input"} bind:nob={nobMapping[key]}/>
         {/each}
       </div>
     {:else}
@@ -84,7 +88,7 @@
         <button on:click={() => finishEdition() }>Edit</button>
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
-          initialDefinition={uiConfiguration.definition} initialData={{}}
+          initialDefinition={$configuration.definition} initialData={{}}
           on:navigation-event={() => { paths = getPathsNames(); }}
           bind:getPathsNames
           bind:navigateBackToLevel

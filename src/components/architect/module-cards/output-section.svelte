@@ -3,8 +3,10 @@
   import { solveConnection } from "../helpers/solve-connection";
   import { typeColors } from "../../../common/styles/type-colors";
   import type { TypeDefinition } from "@meta-system/object-definition";
-  import { bopStore } from "../../../stores/bop-store";
-import { createEventDispatcher, onDestroy, onMount } from "svelte";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
+import type { Writable } from "svelte/store";
+import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { ModuleCard } from "../../../common/types/module-card";
 
   const dispatch = createEventDispatcher();
   onMount(() => dispatch("mountUnmount"))
@@ -15,6 +17,7 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
   export let info : TypeDefinition<{}>;
   export let parentKey : number | "input";
   export let path = "";
+  export let bopModules : Writable<ModuleCard[]>;
 
   let expanded = false;
 
@@ -34,7 +37,7 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
       property: `${path}.${name}`,
       nobType: "output",
       propertyType: info.type
-    })})
+    }, bopModules)})
   }
 
 
@@ -43,8 +46,8 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
   function expandObject() : void {
     if(expanded) {
       const currentDepth = path.split(".").length + 1;
-      bopStore.update(bop => {
-        bop.configuration.forEach(module => {
+      bopModules.update(modules => {
+        modules.forEach(module => {
           module.dependencies.forEach(dep => {
             if(dep.origin === parentKey) {
               const depthProperties = dep.originPath.split(".")
@@ -56,16 +59,16 @@ import { createEventDispatcher, onDestroy, onMount } from "svelte";
             }
           })
         });
-      return bop;
+      return modules;
       })
     } else {
-      bopStore.update(bop => {
-        bop.configuration.forEach(module => {
+      bopModules.update(modules => {
+        modules.forEach(module => {
           module.dependencies.forEach(dep => {
             if(dep.origin === parentKey) dep.originNob = nob;
           })
         });
-        return bop;
+        return modules;
       })
     }
   }

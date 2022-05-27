@@ -8,16 +8,18 @@
   import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
   import EditSchemas from "./edit-schemas.svelte";
   import { Schema } from "../../../entities/schema";
-  import { protocols, schemas } from "../../../stores/configuration-store";
+  import { businessOperations, protocols, schemas } from "../../../stores/configuration-store";
   import type { PropertyListEntry } from "../../../common/types/property-list-entry";
   import SystemBasePropertyEditor from "../../../components/system-page/system-base-property-editor.svelte";
+  import { UIBusinessOperation } from "../../../entities/business-operation";
   import { Protocol } from "../../../entities/protocol";
 
   let schemasPropertyList : PropertyListEntry[];
-  let protocolsPropertyList : PropertyListEntry[];
+  let bopsPropertyList : PropertyListEntry[];
 
   $: protocolsPropertyList = $protocols.map((value) => value.getProtocolCardInfo());
   $: schemasPropertyList = $schemas.map((value) => value.getSchemaCardInfo());
+  $: bopsPropertyList = $businessOperations.map(bop => bop.getCardInfo());
 
 </script>
 
@@ -40,7 +42,7 @@
           <div class="top-gradient-rolloff" />
           <SystemBasePropertyEditor />
           <PropertyList listType="schemas" listData={schemasPropertyList} createNewEntryHandler={Schema.createNewSchema}/>
-          <PropertyList listType="bops"/>
+          <PropertyList listType="bops"  listData={bopsPropertyList} createNewEntryHandler={UIBusinessOperation.createNewBOp}/>
           <PropertyList listType="protocols" listData={protocolsPropertyList} createNewEntryHandler={Protocol.createNewProtocol}/>
         </div>
       </div>

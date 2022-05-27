@@ -1,11 +1,14 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
+  import type { Writable } from "svelte/store";
+  import type { ModuleCard } from "../../../../common/types/module-card";
   import List from "../../../list/list.svelte";
   import { functionsInfo } from "../../helpers/functions-info";
   import StoreSection from "../store-section.svelte";
   
   export let search : string = "";
   export let storeLocked = false;
+  export let bopModules : Writable<ModuleCard[]>
 
   interface ModuleSeparation {
     name : string;
@@ -94,6 +97,7 @@
       modulesInSection={separatedModules[item]}
       bind:search
       bind:storeLocked
+      bind:bopModules
     />
   </List>
 </div>

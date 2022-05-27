@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
-  import { systemStore } from "../../../../stores/system-store";
   import List from "../../../list/list.svelte";
   import StoreSection from "../store-section.svelte";
   import { countInfo } from "meta-system/dist/src/schemas/application/schema-functions-info/count"
@@ -13,19 +12,20 @@
   import { updateInfo } from "meta-system/dist/src/schemas/application/schema-functions-info/update"
   import type { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-type";
   import clone from "deep-clone"
+  import { schemas } from "../../../../stores/configuration-store";
+  import type { Writable } from "svelte/store";
+  import type { ModuleCard } from "../../../../common/types/module-card";
   export let search : string;
   export let storeLocked = false;
+  export let bopModules : Writable<ModuleCard[]>
 
   const schemaFunctionsInfo : FunctionDefinition[] = [
     countInfo, deleteByIdInfo, deleteInfo, getByIdInfo, getInfo, createInfo, updateByIdInfo, updateInfo,
   ];
 
-
-  let schemas = $systemStore.schemas;
-
   const schemasFunctions : Record<string, Array<FunctionDefinition>> = {};
-  for(const schema of schemas) {
-    schemasFunctions[`${schema.name} Functions`] = treatInfo(schemaFunctionsInfo, schema);
+  for(const schema of $schemas) {
+    schemasFunctions[`${schema.name} Functions`] = treatInfo(schemaFunctionsInfo, schema as unknown as SchemaType);
   }
 
   function treatInfo(functionsInfo : FunctionDefinition[], schema : SchemaType) : FunctionDefinition[] {
@@ -56,6 +56,7 @@
       modulesInSection={schemasFunctions[item]}
       bind:search
       bind:storeLocked
+      bind:bopModules
     />
   </List>
 </div>

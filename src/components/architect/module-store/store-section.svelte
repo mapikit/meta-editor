@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import type { ModuleType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { Writable } from "svelte/store";
+import type { ModuleCard } from "../../../common/types/module-card";
   import DropdownIcon from "./dropdown-icon.svelte";
   import StoreModule from "./module-components/store-module.svelte";
 
@@ -9,6 +11,7 @@
   export let modulesInSection : Array<FunctionDefinition>
   export let search : string = "";
   export let storeLocked = false;
+  export let bopModules : Writable<ModuleCard[]>;
 
   let searchDelay : NodeJS.Timeout;
   let searchedModules : Array<FunctionDefinition> = modulesInSection;
@@ -33,7 +36,7 @@
   <summary><span class="icon"><DropdownIcon/></span>{summary + ` (${searchedModules.length})`}</summary>
     {#if open}
       {#each searchedModules as module}
-        <div class="module"><StoreModule bind:storeLocked definition={module} moduleType={sectionModulesType}/></div>
+        <div class="module"><StoreModule bind:bopModules bind:storeLocked definition={module} moduleType={sectionModulesType}/></div>
       {/each}
     {/if}
 </details>

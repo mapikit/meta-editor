@@ -2,18 +2,20 @@
   import type { TypeDefinition } from "@meta-system/object-definition";
   import type { BopsConstant, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import { onMount } from "svelte";
+  import type { Writable } from "svelte/store";
   import { typeColors } from "../../../common/styles/type-colors";
-  import { bopStore } from "../../../stores/bop-store";
+  import type { ModuleCard } from "../../../common/types/module-card";
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
-  import ConstantTag from "../tags/constant-tag.svelte";
+import ConstantTag from "../tags/constant-tag.svelte";
 
 
   export let name : string;
   export let parentKey : number;
   export let info : TypeDefinition<{}>;
+  export let bopModules : Writable<ModuleCard[]>
 
-  const parentInfo = $bopStore.configuration.find(config => config.key === parentKey);
+  const parentInfo = $bopModules.find(config => config.key === parentKey);
 
   let nob : HTMLSpanElement;
 
@@ -25,8 +27,7 @@
         property: name,
         nobType: "input",
         propertyType: info.type
-      }
-    )})
+      }, bopModules)})
   }
   onMount(() => {
     nob.addEventListener<any & { detail : { constant : BopsConstant }}>("appendTag", (event) => {
@@ -42,29 +43,30 @@
       if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
       parentInfo.dependencies.push(newDependency);
       constantConfig = event.detail.constant;
-      bopStore.update(bop => bop);
+      bopModules.update(modules => modules);
     }, false);
 
     nob.addEventListener("removeTag", () => {
       const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name);
       if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
       constantConfig = undefined;
-      bopStore.update(bop => bop);
+      bopModules.update(modules => modules);
     }, false);
   });
   
 
   
   let constantConfig : BopsConstant;
-  function getConstant (dependencies : Dependency[]) {
-    const thisConfig = dependencies.find(dep => dep.targetPath.startsWith(name));
-    if(thisConfig === undefined) return undefined;
-    if(typeof thisConfig.origin !== "string" || !["constant", "constants"].includes(thisConfig.origin))
-    {return undefined;}
-    const constant = $bopStore.constants.find(cons => cons.name === thisConfig.originPath.split(".")[0]);
-    return constant;
-  }
-  constantConfig = getConstant(parentInfo.dependencies);
+  // TODO reimplement constants
+  // function getConstant (dependencies : Dependency[]) {
+  //   const thisConfig = dependencies.find(dep => dep.targetPath.startsWith(name));
+  //   if(thisConfig === undefined) return undefined;
+  //   if(typeof thisConfig.origin !== "string" || !["constant", "constants"].includes(thisConfig.origin))
+  //   {return undefined;}
+  //   const constant = get($bopStore.constants).find(cons => cons.name === thisConfig.originPath.split(".")[0]);
+  //   return constant;
+  // }
+  // constantConfig = getConstant(parentInfo.dependencies);
 </script>
 
 <style lang="scss">

@@ -1,12 +1,12 @@
 import type { CoordinateInfo } from "../../common/types/geometry";
-import type { UICompliantBop } from "../../common/types/ui-bop";
+import type { ModuleCard } from "../../common/types/module-card";
 import type { EnvType } from "../../stores/environment";
 
 export type CuttingInfo = {
   mouse : CoordinateInfo;
 }
 
-export function updateTraces (canvasContext : CanvasRenderingContext2D, bop : UICompliantBop, env : EnvType, cuttingInfo ?: CuttingInfo) : Array<[number, unknown]> {
+export function updateTraces (canvasContext : CanvasRenderingContext2D, moduleCards : ModuleCard[], env : EnvType, cuttingInfo ?: CuttingInfo) : Array<[number, unknown]> {
   const linesToCut : Array<[number, unknown]> = [];
   canvasContext.shadowColor = "red";
 
@@ -38,7 +38,7 @@ export function updateTraces (canvasContext : CanvasRenderingContext2D, bop : UI
   canvasContext.setLineDash([])
   canvasContext.lineWidth = 2;
 
-  for(const module of bop.configuration) {
+  for(const module of moduleCards) {
     for(const dependency of module.dependencies) {
       if(dependency.originNob === undefined) continue;
       const startRect = dependency.originNob.getBoundingClientRect();

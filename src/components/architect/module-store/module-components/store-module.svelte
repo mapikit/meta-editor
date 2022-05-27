@@ -1,18 +1,20 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import { getAvailableKey } from "../../helpers/get-available-key";
-  import { bopStore } from "../../../../stores/bop-store";
   import ModuleCardSkeleton from "../../module-cards/module-card-skeleton.svelte";
   import StoreInput from "./store-input.svelte";
   import StoreOutput from "./store-output.svelte";
   import { environment } from "../../../../stores/environment";
   import type { ModuleType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import { Coordinate } from "../../../../common/types/geometry";
+  import type { Writable } from "svelte/store";
+  import type { ModuleCard } from "../../../../common/types/module-card";
 
 
   export let definition : FunctionDefinition;
   export let moduleType : ModuleType;
   export let storeLocked = false;
+  export let bopModules : Writable<ModuleCard[]>;
 
   let moving = false;
   let ref : HTMLDivElement;
@@ -33,7 +35,7 @@
     left = currentPos.x-parentOffset.x;
     newCard.style.left = `${left}px`;
     newCard.style.top = `${top}px`;
-    ref.style.visibility = "hidden"
+    ref.style.visibility = "hidden";
 
   }
 
@@ -43,10 +45,10 @@
     const storeRect = ref.closest("#store").getBoundingClientRect();
     if(newCard !== undefined) {
       if(event.x < storeRect.x) {
-        bopStore.update(bop => {
-          bop.configuration.push({
+        bopModules.update(modules => {
+          modules.push({
             dependencies: [],
-            key: getAvailableKey(bop.configuration),
+            key: getAvailableKey(modules),
             moduleName: definition.functionName,
             moduleType: moduleType,
             info: definition,
@@ -54,11 +56,10 @@
               .moveBy(-$environment.origin.x, -$environment.origin.y)
               .scale(1/$environment.scale),
             modulePackage: undefined, // TODO Figure this out as well
-          })
-          return bop;
-        }) 
+          });
+          return modules;
+        })
       }
-      
       newCard.remove()
       newCard = undefined;
       ref.style.visibility = "visible";

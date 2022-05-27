@@ -11,9 +11,13 @@
   import { getProtocolModules } from "./module-store/helpers/get-protocol-modules";
   import { systemStore } from "../../stores/system-store";
   import { getExternalModules } from "./module-store/helpers/get-external-modules";
+  import type { Writable } from "svelte/store";
+  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import type { UIBusinessOperation } from "../../entities/business-operation";
   
   
   export let hidden = true;
+  export let currentBop : UIBusinessOperation;
   let locked = false;
   let internalLock = false;
   let clientWidth = 0;
@@ -95,7 +99,16 @@
     <div class="search">
       <span class="searchBar">L<input class="searchBox" type="text" bind:value={searchValue}><div on:click={() => searchValue = ""}>X</div></span>
     </div>
-    <div class="selectedStore"><svelte:component this={selected.component} bind:storeLocked={internalLock} search={searchValue} modules={selected.contentRequestPromise}/></div>
+    <div class="selectedStore">
+      <svelte:component 
+        this={selected.component}
+        bind:storeLocked={internalLock}
+        search={searchValue}
+        modules={selected.contentRequestPromise}
+        bind:bopModules={currentBop.configuration}
+        bind:bopConstants={currentBop.constants}
+        />
+    </div>
   </div>
 </div>
 

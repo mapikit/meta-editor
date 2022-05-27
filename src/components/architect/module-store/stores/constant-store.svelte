@@ -1,17 +1,19 @@
 <script lang="ts">
+import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 
-  import { bopStore } from "../../../../stores/bop-store";
+  import type { Writable } from "svelte/store";
   import DropdownIcon from "../dropdown-icon.svelte";
   import AddConstantCard from "../module-components/add-constant-card.svelte";
   import StoreConstant from "../module-components/store-constant.svelte";
 
   let addingConst = false;
+  export let bopConstants : Writable<BopsConstant[]>
 
 </script>
 
 <div class="constantStore">
   <div class="list">
-    {#each $bopStore.constants as constant}
+    {#each $bopConstants as constant}
       <div class="listItem"><StoreConstant constant={constant}/></div>
     {/each}
   </div>

@@ -47,11 +47,14 @@
     position: relative;
     margin: 2px;
     top: 2px;
-    left: 8px;
+    left: 4px;
   }
   
 
   .header {
+    font-family: 'Dosis';
+    font-size: 20px;
+    text-align: center;
     background-color: #10101a;
     border-radius: 5px 5px 0 0 ;
     display: inline-block;
@@ -59,6 +62,6 @@
   }
 
   .modName {
-    vertical-align: 3px;
+    vertical-align: 1.5px;
   }
 </style>

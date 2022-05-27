@@ -1,9 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { typeColors } from "../../common/styles/type-colors";
-  import { possibleConstTypes } from "../architect/module-store/module-components/type-inputs/inputs-map";
 
-  let contents = possibleConstTypes;
   let selecting = false;
 
 
@@ -21,7 +19,7 @@
 </script>
 
 <div class="select">
-  <div class="selection" on:click={ () => selecting = !selecting }>
+  <!-- <div class="selection" on:click={ () => selecting = !selecting }>
     {#if value !== undefined}
       {#if !simplyfied}
         {value}
@@ -39,7 +37,7 @@
           </div>
         {/each}
       </div>
-  {/if}
+  {/if} -->
 </div>
 
 <style lang="scss">

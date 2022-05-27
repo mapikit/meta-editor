@@ -1,12 +1,17 @@
 <script lang="ts">
+import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+
+import type { Writable } from "svelte/store";
+
   import type { ModuleCard } from "../../../common/types/module-card";
   import type { UIInput } from "../../../common/types/ui-input";
-  import { bopStore } from "../../../stores/bop-store";
   import { environment } from "../../../stores/environment";
 
 
   export let moduleConfig : ModuleCard | UIInput;
   export let stopMovementCallback : (mouseEvent : MouseEvent) => void = () => {};
+  export let bopModules : Writable<BopsConfigurationEntry[]>;
+
   let ref : HTMLDivElement;
   let moving = false;
 
@@ -31,7 +36,7 @@
   function moveCard (event : MouseEvent) {
     if(moving) {
       moduleConfig.position = moduleConfig.position.moveBy(event.movementX/$environment.scale, event.movementY/$environment.scale);
-      bopStore.update(bop => bop);
+      bopModules.update(modules => modules);
     }
   }
 

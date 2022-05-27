@@ -1,12 +1,16 @@
-import { bopStore } from "../../../stores/bop-store";
 import type { NobSelection } from "../../../stores/connection-stores";
 import type { UICompliantDependency } from "../../../common/types/module-card";
+import type { Writable } from "svelte/store";
+import type {
+  BopsConfigurationEntry,
+} from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 
 
 // TODO breakdown this function and overall rework
 // In the future this will likely be biggest function of the architect as it
 // should be able to verify types and loops
-export function solveConnection (currentNob : NobSelection, clickedNob : NobSelection) : NobSelection {
+// eslint-disable-next-line max-lines-per-function
+export function solveConnection (currentNob : NobSelection, clickedNob : NobSelection, bopModules : Writable<BopsConfigurationEntry[]>) : NobSelection {
   // console.log(currentNob, clickedNob)
 
   if(currentNob === undefined) {
@@ -17,14 +21,18 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
     window.alert("Inputs may only be connected to outputs and vice versa");
   } else {
     clickedNob.nob.style.outline = "solid white 2px;";
-    bopStore.update((currentBOp) => {
+    // eslint-disable-next-line max-lines-per-function
+    bopModules.update((modules) => {
       const currentIsOutput = ["output", "module"].includes(currentNob.nobType);
-      const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob]
+      const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob];
 
-      const targetModule = currentBOp.configuration.find(module => module.key == target.parentKey);
+      console.log(modules);
+      console.log(origin, target);
 
-      const newDependency : UICompliantDependency = { 
-        origin: origin.parentKey, 
+      const targetModule = modules.find(module => module.key == target.parentKey);
+
+      const newDependency : UICompliantDependency = {
+        origin: origin.parentKey,
         originPath: origin.nobType === "module" ? "module" : `result${origin.property}`,
         targetPath: target.property,
         originNob: origin.nob,
@@ -52,7 +60,7 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
       //   } else moduleConnections[identifier] = [origin.nob, target.nob];
       // }
 
-      return currentBOp;
+      return modules;
     });
   }
   currentNob.nob.style.outline = "";

@@ -1,24 +1,24 @@
 <script lang="ts">
   import InputSection from "./input-section.svelte";
   import OutputSection from "./output-section.svelte";
-  import { bopStore } from "../../../stores/bop-store";
   import type { ModuleCard } from "../../../common/types/module-card";
   import { functionsInfo } from "../helpers/functions-info";
   import StaticCardBody from "./module-card-skeleton.svelte";
   import { getAvailableKey } from "../helpers/get-available-key";
-  import { scale as zoomIn, fly } from "svelte/transition";
   import { environment } from "../../../stores/environment";
   import { Coordinate } from "../../../common/types/geometry";
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
   import MovableCard from "../helpers/movable-card.svelte";
+  import type { Writable } from "svelte/store";
 
   export let moduleConfig : ModuleCard;
-  moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopStore.configuration);
+  export let bopModules : Writable<ModuleCard[]>
+  moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
   moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
-  //Maybe create a "smartPosition" function that considers the "distance" (module steps) from output
+  // TODO Maybe create a "smartPosition" function that considers the "distance" (module steps) from output
   // And [modular] dependency numbers to position modules in a grid-like organization when
   // the modules position is not present (BOP was imported)
   // Also, this sort of distribuition should line in the upper level
@@ -39,18 +39,19 @@
   }
 
   function deleteCard () {
-    bopStore.update(bop => {
+    bopModules.update(modules => {
       // Remove Dependants
-      bop.configuration.forEach(module => {
+      modules.forEach(module => {
         for(let i = module.dependencies.length-1; i >= 0; i--) {
           if(module.dependencies[i].origin === moduleConfig.key)
           {module.dependencies.splice(i, 1);}
         }
       });
 
-      const index = bop.configuration.findIndex(module => module.key === moduleConfig.key);
-      bop.configuration.splice(index, 1);
-      return bop;
+      const index = $bopModules.findIndex(module => module.key === moduleConfig.key);
+      modules.splice(index, 1);
+
+      return modules;
     });
   }
 
@@ -62,23 +63,23 @@
       property: undefined,
       nobType: "module",
       propertyType: "function"
-    })})
+    }, bopModules)})
   }
 </script>
 
 
-<MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion}>
+<MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
   <StaticCardBody definition={moduleConfig.info} tooltipPosition="top" slot="content">
     <span slot="moduleNob" class="moduleNob" bind:this={moduleNob} on:click={moduleConnect}>M</span>
     <div slot="content" class="IODiv">
       <div class="inputs">
         {#each Object.keys(moduleConfig.info.input) as key}
-          <InputSection  name={key} parentKey={moduleConfig.key} info={moduleConfig.info.input[key]}/>
+          <InputSection bind:bopModules name={key} parentKey={moduleConfig.key} info={moduleConfig.info.input[key]}/>
         {/each}
       </div>
       <div class="outputs">
         {#each Object.keys(moduleConfig.info.output) as key}
-          <OutputSection  name={key} parentKey={moduleConfig.key} info={moduleConfig.info.output[key]}/>
+          <OutputSection bind:bopModules name={key} parentKey={moduleConfig.key} info={moduleConfig.info.output[key]}/>
         {/each}
       </div>
     </div>

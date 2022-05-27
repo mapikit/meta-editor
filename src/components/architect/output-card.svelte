@@ -1,9 +1,10 @@
 <script lang="ts">
-import type { ObjectDefinition } from "@meta-system/object-definition";
+  import type { ObjectDefinition } from "@meta-system/object-definition";
+  import type { Writable } from "svelte/store";
 
 
   import { Coordinate } from "../../common/types/geometry";
-  import { bopStore } from "../../stores/bop-store";
+  import type { ModuleCard } from "../../common/types/module-card";
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import { getAvailableKey } from "./helpers/get-available-key";
@@ -11,15 +12,23 @@ import type { ObjectDefinition } from "@meta-system/object-definition";
   import InputSection from "./module-cards/input-section.svelte";
 
 
-  export let configuration : ObjectDefinition;
-  let module = $bopStore.configuration.find((module) => module.moduleType === "output")
-  if (module === undefined) module = {
-    dependencies: [],
-    moduleType: "output",
-    key: getAvailableKey($bopStore.configuration),
-    moduleName: "output",
-    position: new Coordinate(200, 200),
-    info: { input: configuration, output: undefined, functionName: "Output" },
+  export let configuration : Writable<ObjectDefinition>;
+  export let bopModules : Writable<ModuleCard[]>;
+
+  let module = $bopModules.find((module) => module.moduleType === "output")
+  if (module === undefined) {
+    module = {
+      dependencies: [],
+      moduleType: "output",
+      key: getAvailableKey($bopModules),
+      moduleName: "output",
+      position: new Coordinate(200, 200),
+      info: { input: $configuration, output: undefined, functionName: "Output" }
+    };
+    bopModules.update(modules => {
+      modules.push(module);
+      return modules;
+    })
   }
 
   module.dimensions = module.dimensions ?? { height: undefined, width: undefined };
@@ -33,24 +42,20 @@ import type { ObjectDefinition } from "@meta-system/object-definition";
   let editing = false;
 
   function finishEdition() {
-    bopStore.update(bop => {
-      navigateBackToLevel(0)
-      configuration = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
-      bop.output = configuration
-      return bop;
-    })
-    
+    navigateBackToLevel(0);
+    const updatedConfig = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
+    configuration.set(updatedConfig);
     editing = false;
   }
 </script>
 
-<MovableCard moduleConfig={module}>
+<MovableCard moduleConfig={module} bopModules={bopModules}>
   <div slot="content">
     {#if !editing}
       <div class="inputModule">
         <div class="header">Output  <button on:click={() => editing=!editing }>Edit</button></div>
-        {#each Object.keys(configuration) as key}
-          <InputSection info={configuration[key]} name={key} parentKey={module.key}/>
+        {#each Object.keys($configuration) as key}
+          <InputSection info={$configuration[key]} name={key} parentKey={module.key} bind:bopModules/>
         {/each}
       </div>
     {:else}
@@ -62,7 +67,7 @@ import type { ObjectDefinition } from "@meta-system/object-definition";
         <button on:click={() => finishEdition() }>Edit</button>
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
-          initialDefinition={configuration} initialData={{}}
+          initialDefinition={$configuration} initialData={{}}
           on:navigation-event={() => { paths = getPathsNames() }}
           bind:getPathsNames
           bind:navigateBackToLevel

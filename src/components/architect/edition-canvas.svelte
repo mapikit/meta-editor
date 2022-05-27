@@ -5,102 +5,28 @@
   import { onMount } from "svelte";
   import { updateTraces } from "./update-traces";
   import beautify from "json-beautify";
-  import type { UICompliantBop } from "../../common/types/ui-bop";
-  import { bopStore } from "../../stores/bop-store";
+  // import { bopStore } from "../../stores/bop-store";
   import ModuleStore from "./module-store.svelte";
   import Trash from "./trash.svelte";
   import { environment } from "../../stores/environment";
   import { Coordinate } from "../../common/types/geometry";
   import InputCard from "./input-card.svelte";
   import OutputCard from "./output-card.svelte";
-  //TEMP
-import { systemStore } from "../../stores/system-store";
-import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
-import type { ConfigurationType } from "meta-system";
-  //PMET
-  const systemConfig : ConfigurationType = {
-    name: "TestSystem",
-    schemas: [
-      {
-        dbProtocol: "fake",
-        format: {},
-        identifier: "fakeSchema",
-        name: "Users",
-      },
-      {
-        dbProtocol: "fake",
-        format: {
-          isJojoRef: { type: "boolean" },
-          haveADream: { type: "boolean" },
-        },
-        identifier: "fakeSchema2",
-        name: "Ora",
-      },
+  import type { UIBusinessOperation } from "../../entities/business-operation";
+  import { get } from "svelte/store";
+  import { navigation } from "../../lib/navigation";
+  import { businessOperations } from "../../stores/configuration-store";
+  import { getDeepStoreObject } from "./helpers/get-deep-store-obj";
+  import type { ModuleCard } from "../../common/types/module-card";
   
-    ],
-    businessOperations: [
-      {
-        name: "My BOp",
-        customObjects: [],
-        constants: [
-          { name: "zeroValue", type: "number", value: 0 },
-          { name: "nome", type: "string", value: "Fabu" },
-        ],
-        variables: [],
-        configuration: [
-          {
-            key: 1,
-            moduleName: "if",
-            moduleType: "internal",
-            dependencies: [
-              { origin: "constants", targetPath: "ifTrue", originPath: "nome" },
-            ],
-          },
-          {
-            key: 2,
-            moduleName: "add",
-            moduleType: "internal",
-            dependencies: [],
-          },
-          {
-            key: 3,
-            moduleName: "output",
-            moduleType: "output",
-            dependencies: [],
-          },
-        ],
-        input: {
-          A : { type: "number" },
-          B : { type: "number" },
-        },
-        output: {
-          O : { type: "string" },
-        },
-      },
-    ],
-    version: "1.0.0",
-    envs: [],
-    protocols: [
-      {
-        protocol: "cronjob-protocol",
-        protocolVersion: "latest",
-        protocolKind: ProtocolKind.normal,
-        identifier: "cron1",
-        configuration: {},
-      },
-      {
-        protocol: "cronjob-protocol",
-        protocolVersion: "latest",
-        protocolKind: ProtocolKind.normal,
-        identifier: "cronNovo",
-        configuration: {},
-      },
-    ],
-  };
-  systemStore.set(systemConfig);
-  bopStore.set(systemConfig.businessOperations[0] as unknown as UICompliantBop);
+  let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === get(navigation.currentPathParams).bopId);
+  let modulesInConfig : ModuleCard[];
+  currentBop.configuration.subscribe(config => {
+    console.log("ajskldasd");
+    modulesInConfig = get(currentBop.configuration)
+    return config;
+  })
 
-  let currentBop : UICompliantBop;
   let trashRect : DOMRect;
   let canvas : HTMLCanvasElement;
   let context : CanvasRenderingContext2D;
@@ -115,7 +41,7 @@ import type { ConfigurationType } from "meta-system";
     context.strokeStyle = "#ffffff";
     context.lineWidth = 2;
 
-    updateTraces(context, $bopStore, $environment);
+    updateTraces(context, get(currentBop.configuration), $environment);
     const canvasScale = canvas.clientWidth/canvas.width;
     canvas.width *= canvasScale;
     canvas.height *= canvasScale;
@@ -131,12 +57,11 @@ import type { ConfigurationType } from "meta-system";
 
       $environment.origin.moveTo(canvas.width/2, canvas.height/2);
 
-      bopStore.subscribe(bop => {
-        currentBop = bop;
+      currentBop.configuration.subscribe(bop => {
         updateTraces(context, bop, $environment);
       });
       environment.subscribe(() => {
-        setTimeout(() => updateTraces(context, currentBop, $environment), 1);
+        setTimeout(() => updateTraces(context, get(currentBop.configuration), $environment), 1);
         // Investigate and avoid this kind of repetition & timeout
         // Timeout Only: traces have "springness" (modules don't)
         // No Timeout: traces don't update correctly (obvious with scaling)
@@ -149,14 +74,14 @@ import type { ConfigurationType } from "meta-system";
 
   function startMovement (event : MouseEvent) : void {
     if(cutting) {
-      const toCut = updateTraces(context, currentBop, $environment,{ mouse: { x: event.x, y: event.y }});
+      const toCut = updateTraces(context, get(currentBop.configuration), $environment, { mouse: { x: event.x, y: event.y }});
       for(const keyDepTuple of toCut) {
-        bopStore.update(bop => {
-          const module = bop.configuration.find(mod => mod.key === keyDepTuple[0]);
+        currentBop.configuration.update(config => {
+          const module = config.find(mod => mod.key === keyDepTuple[0])
           const depIndex = module.dependencies.findIndex(dep => dep === keyDepTuple[1]);
           module.dependencies.splice(depIndex, 1);
-          return bop;
-        });
+          return config;
+        })
       }
       context.shadowBlur = 0;
     }
@@ -173,14 +98,14 @@ import type { ConfigurationType } from "meta-system";
       case "Escape":
         cutting = false;
         break;
-    }
-    bopStore.update(bop => bop);
+    };
+    // bopStore.update(bop => bop);
     cutting = cutting;
   }
 
   function handleMouseMove (event : MouseEvent) : void {
     if(cutting) {
-      updateTraces(context, currentBop, $environment, { mouse: { x: event.x, y: event.y } });
+      updateTraces(context, get(currentBop.configuration), $environment, { mouse: { x: event.x, y: event.y } });
     }
     else if(panning) {
       environment.update(env => {
@@ -190,7 +115,7 @@ import type { ConfigurationType } from "meta-system";
     }
   }
 
-  async function handleMouseWheel (e : WheelEvent) : void {
+  function handleMouseWheel (e : WheelEvent) : void {
     if(e.deltaY > 0) $environment.scale *= 1.1;
     else if(e.deltaY < 0) $environment.scale /= 1.1;
     $environment.origin.moveBy(
@@ -241,6 +166,7 @@ import type { ConfigurationType } from "meta-system";
 
   function copyBOpToClipboard () {
     console.log(currentBop);
+    console.log(getDeepStoreObject(currentBop))
     // TODO filter out ui properties
     navigator.clipboard.writeText(beautify(currentBop, null, 1, 110));
   }
@@ -248,20 +174,20 @@ import type { ConfigurationType } from "meta-system";
 
 <div class="architect" id="architect">
   <canvas class="canvas" bind:this={canvas}/>
-    <ModuleStore bind:hidden={storeHidden}/>
+    <ModuleStore bind:hidden={storeHidden} bind:currentBop/>
     <div 
       class="modulesArea" 
       on:mousedown={startMovement} on:wheel={handleMouseWheel} style="cursor: {cutting ? "crosshair" : "default"};">
       {#await mount}
         <p>Loading...</p>
-      {:then _done} 
-        {#each currentBop.configuration as config (config.key)}
+      {:then _done}
+        {#each modulesInConfig as config (config.key)}
           {#if config.moduleType !== "output"}
-            <Module moduleConfig={config} trashPosition={trashRect}/>
+            <Module bind:bopModules={currentBop.configuration} moduleConfig={config} trashPosition={trashRect}/>
           {/if}
         {/each}
-        <InputCard configuration={currentBop.input}/>
-        <OutputCard configuration={currentBop.output}/>
+        <InputCard bind:bopModules={currentBop.configuration} configuration={currentBop.input}/>
+        <OutputCard bind:bopModules={currentBop.configuration} configuration={currentBop.output}/>
       {/await}
       
     </div>
@@ -329,7 +255,9 @@ import type { ConfigurationType } from "meta-system";
   }
 
   .architect {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
   }
