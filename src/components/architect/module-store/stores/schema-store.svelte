@@ -13,7 +13,7 @@
   import type { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-type";
   import clone from "deep-clone"
   import { schemas } from "../../../../stores/configuration-store";
-  import type { Writable } from "svelte/store";
+  import { get, Writable } from "svelte/store";
   import type { ModuleCard } from "../../../../common/types/module-card";
   export let search : string;
   export let storeLocked = false;
@@ -25,7 +25,7 @@
 
   const schemasFunctions : Record<string, Array<FunctionDefinition>> = {};
   for(const schema of $schemas) {
-    schemasFunctions[`${schema.name} Functions`] = treatInfo(schemaFunctionsInfo, schema as unknown as SchemaType);
+    schemasFunctions[`${get(schema.name)} Functions`] = treatInfo(schemaFunctionsInfo, schema as unknown as SchemaType);
   }
 
   function treatInfo(functionsInfo : FunctionDefinition[], schema : SchemaType) : FunctionDefinition[] {

@@ -1,22 +1,23 @@
 import type { FunctionDefinition } from "@meta-system/meta-function-helper";
-import type { BusinessOperations } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import { get } from "svelte/store";
+import type { UIBusinessOperation } from "../../../entities/business-operation";
 
 
-export function getAllPossibleInfo (bops : BusinessOperations[], currentBop : string) : FunctionDefinition[] {
-  const infos : FunctionDefinition[] = [];
-  for(const bop of bops) {
-    if(bop.name === currentBop) continue;
-    //Check for loops and other problems involving current bop
-    infos.push(getBopFunctionInfo(bop));
-  }
-  return infos;
-}
+// export function getAllPossibleInfo (bops : BusinessOperations[], currentBop : string) : FunctionDefinition[] {
+//   const infos : FunctionDefinition[] = [];
+//   for(const bop of bops) {
+//     if(bop.name === currentBop) continue;
+//     //Check for loops and other problems involving current bop
+//     infos.push(getBopFunctionInfo(bop));
+//   }
+//   return infos;
+// }
 
 
-export function getBopFunctionInfo (bop : BusinessOperations) : FunctionDefinition {
+export function getBopFunctionInfo (bop : UIBusinessOperation) : FunctionDefinition {
   return {
-    functionName: bop.name,
-    input: bop.input,
-    output: bop.output,
+    functionName: get(bop.name),
+    input: get(bop.input).definition,
+    output: get(bop.output),
   };
 }

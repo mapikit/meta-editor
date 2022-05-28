@@ -3,9 +3,12 @@
   import List from "../../../list/list.svelte";
   import StoreSection from "../store-section.svelte";
   import beautify from "json-beautify";
+  import type { Writable } from "svelte/store";
+  import type { ModuleCard } from "../../../../common/types/module-card";
   
   export let search : string = "";
   export let modules : Promise<Record<string, FunctionDefinition[]>>;
+  export let bopModules : Writable<ModuleCard[]>
   export let storeLocked = false;
 </script>
 
@@ -20,6 +23,7 @@
         modulesInSection={result[item]}
         bind:search
         bind:storeLocked
+        bind:bopModules
       />
     </List>
   {:catch err}

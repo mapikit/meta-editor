@@ -124,7 +124,7 @@ export class UIBusinessOperation {
   //   return depthTree;
   // }
 
-  
+
 
   public addModule (module : BopsConfigurationEntry) : void {
     this.convertModuleToUI(module);

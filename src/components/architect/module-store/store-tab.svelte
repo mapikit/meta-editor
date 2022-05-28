@@ -1,5 +1,8 @@
 <script lang="ts">
+  import Tooltip from "../../common/tooltip.svelte";
+
   export let ref : HTMLDivElement;
+  export let tooltip : string;
   let clientWidth : number;
 </script>
 
@@ -7,6 +10,7 @@
   <div class="icon" >
     <slot></slot>
   </div>
+  <Tooltip  tooltipContent={tooltip}/>
 </div>
 
 <style lang="scss">

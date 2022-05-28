@@ -1,30 +1,61 @@
 <script lang="ts">
-import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { ObjectDefinition } from "@meta-system/object-definition";
 
+  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { SvelteComponent } from "svelte/internal";
   import type { Writable } from "svelte/store";
+import { EditorLevels } from "../../../object-definition/obj-def-editor-types-and-helpers";
+  import ObjectDefinitionMiniApp from "../../../object-definition/object-definition-mini-app.svelte";
+import TypeSelect from "../../../object-definition/type-select.svelte";
   import DropdownIcon from "../dropdown-icon.svelte";
   import AddConstantCard from "../module-components/add-constant-card.svelte";
   import StoreConstant from "../module-components/store-constant.svelte";
 
   let addingConst = false;
+  let newConstName : string = "";
+  let MiniApp;
   export let bopConstants : Writable<BopsConstant[]>
+
+  function confirmNewConst () : void {
+    const info = MiniApp.getDefinitionAndData();
+    console.log(info);
+    bopConstants.update(constants => {
+      const test : BopsConstant = {
+        name: newConstName,
+        type: info.definition["root"],
+        value: info.definition["root"]["subtype"] 
+      };
+      console.log(test);
+      return constants;
+    })
+    addingConst = false;
+  }
 
 </script>
 
 <div class="constantStore">
-  <div class="list">
-    {#each $bopConstants as constant}
-      <div class="listItem"><StoreConstant constant={constant}/></div>
-    {/each}
-  </div>
   {#if addingConst}
-    <div class="addCard"><AddConstantCard bind:editing={addingConst}/></div>
+    <span class="typeSelect"><TypeSelect/></span><input class="newConstName" bind:value={newConstName}  type="text"/>
+    <div class="miniAppContainer"><ObjectDefinitionMiniApp initialData={{}} initialDefinition={{}} bind:this={MiniApp}/></div>
+    <div class="confirmButton" on:click={confirmNewConst}><div class="addIcon">CONFIRM</div></div>
+  {:else}
+    <div class="list">
+      {#each $bopConstants as constant}
+        <div class="listItem"><StoreConstant constant={constant}/></div>
+      {/each}
+    </div>
+    <div class="addButton" on:click={() => { addingConst = true; }}><div class="addIcon"><DropdownIcon/></div></div>
   {/if}
-  <div class="addButton" on:click={() => { addingConst = true; }}><div class="addIcon"><DropdownIcon/></div></div>
 </div>
 
 <svelte:window on:keydown={(e) => { if(e.key === "Escape") addingConst = false; } } />
 <style lang="scss">
+  .confirmButton {
+    padding: 10px;
+    text-align: center;
+    background-color: azure;
+  }
+
   .constantStore {
     position: relative;
     height: 100%;
@@ -40,15 +71,37 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
     align-items: center;
   }
 
-  .addCard {
-    position: absolute;
-    height: 300px;
+  .newConstName {
+    display: inline-block;
+    width: 80%;
+    height: 28px;
+    margin-bottom: 4px;
+  }
+
+  .typeSelect {
+    height: 32px;
+    margin-right: 10px;
+    display: inline-flex;
+  }
+
+  .miniAppContainer {
+    background-color: antiquewhite;
+    height: calc(85% - 32px);
     margin-left: 2px;
     margin-right: 2px;
     width: calc(100%  - 4px);
-    bottom: 0;
+    top: 0;
     margin-bottom: 3px;
     z-index: 1;
+    overflow-y: scroll;
+  }
+
+  .confirmButton {
+    text-align: center;
+    bottom: 2px;
+    height: 15;
+    background-color: aqua;
+    width: 100%;
   }
 
   .addButton {

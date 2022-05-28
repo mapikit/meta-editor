@@ -2,8 +2,8 @@ import type { FunctionDefinition, MetaFunction, MetaPackage } from "@meta-system
 import { mapikitServer } from "../../../../common/network";
 
 export async function getExternalModules () : Promise<Record<string, FunctionDefinition[]>> {
-  const infos = (await mapikitServer.get("getConfigs")).data.functionsInfo
-  const packageModules : Record<string, FunctionDefinition[]> = {}
+  const infos = (await mapikitServer.get("getConfigs")).data.functionsInfo;
+  const packageModules : Record<string, FunctionDefinition[]> = {};
   packageModules["Not In a Package"] = [];
   for(const info of infos) {
     if(info["functionsDefinitions"] !== undefined) {

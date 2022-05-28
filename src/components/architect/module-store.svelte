@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, SvelteComponent } from "svelte";
+  import { onMount } from "svelte";
   import InternalStore from "./module-store/stores/internal-store.svelte";
   import StoreTab from "./module-store/store-tab.svelte";
   import SchemaStore from "./module-store/stores/schema-store.svelte";
@@ -7,38 +7,37 @@
   import ExternalStore from "./module-store/stores/external-store.svelte";
   import BopsStore from "./module-store/stores/bops-store.svelte";
   import ProtocolsFunctionsStore from "./module-store/stores/protocols-functions-store.svelte";
-  import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import { getProtocolModules } from "./module-store/helpers/get-protocol-modules";
-  import { systemStore } from "../../stores/system-store";
   import { getExternalModules } from "./module-store/helpers/get-external-modules";
-  import type { Writable } from "svelte/store";
-  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { UIBusinessOperation } from "../../entities/business-operation";
+  import { protocols } from "../../stores/configuration-store";
   
   
   export let hidden = true;
   export let currentBop : UIBusinessOperation;
+  type PossibleStores = "internal" | "external" | "schema" | "bops" | "protocols" | "constants" | "variables";
+  type TabInfo = { iconURI : string; title : string; }
+  type TabsInfo = Record<PossibleStores, TabInfo>;
+
+  let selectedStore : PossibleStores = "internal";
+
   let locked = false;
   let internalLock = false;
   let clientWidth = 0;
   let activity : NodeJS.Timeout;
 
-  interface TabInfo {
-    component : typeof SvelteComponent;
-    iconURI : string;
-    title : string;
-    contentRequestPromise ?: Promise<Record<string, FunctionDefinition[]>>
-  }
 
-  const tabsInfo : Array<TabInfo> = [
-    { component: InternalStore, iconURI: "internal_modules_v1.png", title: "Internal Modules" },
-    { component: ExternalStore, iconURI: "external_modules_v1.png", title: "External Modules", contentRequestPromise: getExternalModules() },
-    { component: SchemaStore, iconURI: "schemaFunctions_v1.png", title: "Schema Modules" },
-    { component: ProtocolsFunctionsStore, iconURI: "Protocols_v1.png", title: "Protocols Modules", contentRequestPromise: getProtocolModules($systemStore) },
-    { component: BopsStore, iconURI: "businessOperations_v1.png", title: "BOps Modules" },
-    { component: ConstantStore, iconURI: "constants_v1.png", title: "Constants" },
-    { component: undefined, iconURI: "variables_v1.png", title: "Variables" },
-  ]
+
+
+  const tabsInfo : TabsInfo = {
+    internal: { iconURI: "internal_modules_v1.png", title: "Internal Modules" },
+    external: { iconURI: "external_modules_v1.png", title: "External Modules" },
+    schema: { iconURI: "schemaFunctions_v1.png", title: "Schema Modules" },
+    protocols: { iconURI: "Protocols_v1.png", title: "Protocols Modules" },
+    bops: { iconURI: "businessOperations_v1.png", title: "BOps Modules" },
+    constants: { iconURI: "constants_v1.png", title: "Constants" },
+    variables: { iconURI: "variables_v1.png", title: "Variables" },
+  };
 
   const tabsRef : Array<HTMLDivElement> = [];
   onMount(() => {
@@ -56,10 +55,10 @@
     }
   }
 
-  function handleTabClick(tab : TabInfo, index : number) {
+  function handleTabClick(tab : string, index : number) {
+    selectedStore = tab as PossibleStores;
     tabsRef.forEach(tab => { tab.style.backgroundColor = ""; })
     tabsRef[index].style.backgroundColor = "#7035fb";
-    selected = tab
   }
 
   function handleLock () { locked = !locked; }
@@ -70,8 +69,7 @@
 
   $: onInternalLockUpdate(internalLock);
 
-  let selected : TabInfo = tabsInfo[0];
-  let searchValue : string = "";
+  let search : string = "";
   // 
 </script>
 
@@ -87,27 +85,26 @@
     class="lockIcon"
     style="background-color: {locked ? "red" : "green"};"
     on:click={handleLock}
-    >L</span><span class="title">{selected.title}</span></div>
+    >L</span><span class="title">{tabsInfo[selectedStore].title}</span></div>
   <div class="tabs">
-    {#each tabsInfo as tab, index}
+    {#each Object.keys(tabsInfo) as tab, index}
       <div on:click={() => handleTabClick(tab, index)}>
-        <StoreTab bind:ref={tabsRef[tabsRef.length]}>
-          <img src="/static/achitectect-module-store/{tab.iconURI}" alt=""/></StoreTab></div>
+        <StoreTab bind:ref={tabsRef[tabsRef.length]} tooltip={tabsInfo[tab].title}>
+          <img src="/static/achitectect-module-store/{tabsInfo[tab].iconURI}" alt=""/></StoreTab></div>
     {/each}
   </div>
   <div class="storeBody" bind:clientWidth>
     <div class="search">
-      <span class="searchBar">L<input class="searchBox" type="text" bind:value={searchValue}><div on:click={() => searchValue = ""}>X</div></span>
+      <span class="searchBar">L<input class="searchBox" type="text" bind:value={search}><div on:click={() => search = ""}>X</div></span>
     </div>
     <div class="selectedStore">
-      <svelte:component 
-        this={selected.component}
-        bind:storeLocked={internalLock}
-        search={searchValue}
-        modules={selected.contentRequestPromise}
-        bind:bopModules={currentBop.configuration}
-        bind:bopConstants={currentBop.constants}
-        />
+      {#if selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}
+      {#if selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
+      {#if selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
+      {#if selectedStore === "schema"} <SchemaStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
+      {#if selectedStore === "constants"} <ConstantStore bopConstants={currentBop.constants} /> {/if}
+      {#if selectedStore === "variables"} <div></div> {/if}
+      {#if selectedStore === "protocols"} <ProtocolsFunctionsStore bind:storeLocked={internalLock} bind:search modules={getProtocolModules($protocols)} /> {/if}
     </div>
   </div>
 </div>
@@ -154,7 +151,8 @@
     width: 20px;
     height: 20px;
     width: 100%;
-    text-justify: center;
+    margin-bottom: 2px;
+    text-align: center;
   }
 
   .tabs {

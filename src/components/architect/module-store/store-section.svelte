@@ -53,6 +53,7 @@ import type { ModuleCard } from "../../../common/types/module-card";
     list-style: none;
     transition: all 1s;
     width: 100%;
+    text-align: center;
   }
 
   .icon {

@@ -22,10 +22,11 @@
   let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === get(navigation.currentPathParams).bopId);
   let modulesInConfig : ModuleCard[];
   currentBop.configuration.subscribe(config => {
-    console.log("ajskldasd");
     modulesInConfig = get(currentBop.configuration)
     return config;
   })
+
+  console.log(getDeepStoreObject(currentBop));
 
   let trashRect : DOMRect;
   let canvas : HTMLCanvasElement;
