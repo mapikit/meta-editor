@@ -1,7 +1,7 @@
 import type { ObjectDefinition } from "@meta-system/object-definition";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
-import { readable, Readable, Writable, writable } from "svelte/store";
-import { schemas } from "../stores/configuration-store";
+import { get, readable, Readable, Writable, writable } from "svelte/store";
+import { saveConfigurations, schemas } from "../stores/configuration-store";
 
 type SchemaParameters = {
   id : string;
@@ -32,6 +32,7 @@ export class Schema {
     this.description.set(description);
 
     this.id = readable(id);
+    this.keepStorageUpdated();
   }
 
   public getSchemaCardInfo () : PropertyListEntry {
@@ -62,5 +63,28 @@ export class Schema {
 
     // adds it to the store
     schemas.update((value) => { value.push(newSchema); return value; });
+    saveConfigurations();
+  }
+
+  public serialized () : object {
+    return ({
+      format: get(this.format),
+      description: get(this.description),
+      name: get(this.name),
+      dbProtocol: get(this.dbProtocol),
+      isStarred: get(this.isStarred),
+      isLocked: get(this.isLocked),
+      id: get(this.id),
+    });
+  }
+
+  private keepStorageUpdated () : void {
+    this.format.subscribe(saveConfigurations);
+    this.description.subscribe(saveConfigurations);
+    this.name.subscribe(saveConfigurations);
+    this.dbProtocol.subscribe(saveConfigurations);
+    this.isStarred.subscribe(saveConfigurations);
+    this.isLocked.subscribe(saveConfigurations);
+    this.id.subscribe(saveConfigurations);
   }
 }

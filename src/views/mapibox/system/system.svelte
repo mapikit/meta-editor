@@ -13,6 +13,9 @@
   import SystemBasePropertyEditor from "../../../components/system-page/system-base-property-editor.svelte";
   import { UIBusinessOperation } from "../../../entities/business-operation";
   import { Protocol } from "../../../entities/protocol";
+  import { navigation } from "../../../lib/navigation";
+  import { selectedSystem } from "../../../components/systems-sidebar/systems-stores";
+  import { onMount } from "svelte";
 
   let schemasPropertyList : PropertyListEntry[];
   let bopsPropertyList : PropertyListEntry[];
@@ -21,60 +24,62 @@
   $: schemasPropertyList = $schemas.map((value) => value.getSchemaCardInfo());
   $: bopsPropertyList = $businessOperations.map(bop => bop.getCardInfo());
 
+  onMount(() => {
+    selectedSystem.set(navigation.currentPathParams["systemId"]);
+  });
+
 </script>
 
-  <title> System | mapikit </title>
-  <div class="content" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
-    <MinifiedSystemsSidebar/>
-    <CogSidebarDecoration/>
-    <Route path="/mapibox/system/:systemId/protocols/:protocolId/edit">
-      <EditProtocols />
-    </Route>
-    <Route path="/mapibox/system/:systemId/schemas/:schemaId/edit">
-      <EditSchemas/>
-    </Route>
-    <Route path="/mapibox/system/:systemId/bops/:bopId/edit">
-      <EditionCanvas />
-    </Route>
-    <Route path="/mapibox/system/:systemId/:selectedProp/">
-      <div class="list">
-        <div class="scroller">
-          <div class="top-gradient-rolloff" />
-          <SystemBasePropertyEditor />
-          <PropertyList listType="schemas" listData={schemasPropertyList} createNewEntryHandler={Schema.createNewSchema}/>
-          <PropertyList listType="bops"  listData={bopsPropertyList} createNewEntryHandler={UIBusinessOperation.createNewBOp}/>
-          <PropertyList listType="protocols" listData={protocolsPropertyList} createNewEntryHandler={Protocol.createNewProtocol}/>
-        </div>
+<title> System | mapikit </title>
+<div class="content" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
+  <MinifiedSystemsSidebar/>
+  <CogSidebarDecoration/>
+  <Route path="/mapibox/system/:systemId/protocols/:protocolId/edit">
+    <EditProtocols />
+  </Route>
+  <Route path="/mapibox/system/:systemId/schemas/:schemaId/edit">
+    <EditSchemas/>
+  </Route>
+  <Route path="/mapibox/system/:systemId/bops/:bopId/edit">
+    <EditionCanvas />
+  </Route>
+  <Route path="/mapibox/system/:systemId/:selectedProp/">
+    <div class="list">
+      <div class="scroller">
+        <div class="top-gradient-rolloff" />
+        <SystemBasePropertyEditor />
+        <PropertyList listType="schemas" listData={schemasPropertyList} createNewEntryHandler={Schema.createNewSchema}/>
+        <PropertyList listType="bops"  listData={bopsPropertyList} createNewEntryHandler={UIBusinessOperation.createNewBOp}/>
+        <PropertyList listType="protocols" listData={protocolsPropertyList} createNewEntryHandler={Protocol.createNewProtocol}/>
       </div>
-    </Route>
-  </div>
+    </div>
+  </Route>
+</div>
 
-  <style lang="scss">
-    .content {
-      display: flex;
-      flex-flow: row nowrap;
-      overflow-y: hidden;
-    }
-
-    .list {
-      position: relative;
-      height: calc(100vh - 48px);
-      padding-top: 60px;
-      padding-left: 18px;
-      padding-bottom: 28px;
-      overflow-y: scroll;
-      overflow-x: hidden;
-      flex: 1;
-    }
-
-    .top-gradient-rolloff {
-      // background-color: #13131f;
-      width: 100%;
-      height: 80px;
-      position: fixed;
-      z-index: 1;
-      top: 48px;
-      box-shadow: inset 0px 60px 28px -26px #13131f;
-      // box-shadow: 0px 0px 18px -6px #85858a;
-    }
-  </style>
+<style lang="scss">
+  .content {
+    display: flex;
+    flex-flow: row nowrap;
+    overflow-y: hidden;
+  }
+  .list {
+    position: relative;
+    height: calc(100vh - 48px);
+    padding-top: 60px;
+    padding-left: 18px;
+    padding-bottom: 28px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    flex: 1;
+  }
+  .top-gradient-rolloff {
+    // background-color: #13131f;
+    width: 100%;
+    height: 80px;
+    position: fixed;
+    z-index: 1;
+    top: 48px;
+    box-shadow: inset 0px 60px 28px -26px #13131f;
+    // box-shadow: 0px 0px 18px -6px #85858a;
+  }
+</style>

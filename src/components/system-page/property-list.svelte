@@ -31,9 +31,13 @@ navigation.pathStore.subscribe((newValue) => {
 
 let createHovered = false;
 
+$: currentSystem = $selectedSystem;
+
 const getNavPath = () : string => {
-  return `/mapibox/system/${$selectedSystem}/${listType}/`;
+  console.log("THE SELECTED SYSTEM IS ", currentSystem);
+  return `/mapibox/system/${currentSystem}/${listType}/`;
 };
+
 </script>
 
 <div class="prop-container">

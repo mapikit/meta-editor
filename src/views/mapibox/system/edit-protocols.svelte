@@ -10,11 +10,12 @@
   import type { Protocol } from "../../../entities/protocol";
 
   let protocolList : Protocol[] = $protocols;
-  let pathParams = navigation.currentPathParams;
+  let pathParams = navigation.currentPathParamsSubscribable;
   let currentProtocolId = $pathParams["protocolId"];
   let currentProtocol = getProtocolById(currentProtocolId);
   let protocolFormat = currentProtocol?.definition;
 
+  $: protocolList = $protocols;
   $: currentProtocolId = $pathParams["protocolId"];
   $: currentProtocol = getProtocolById(currentProtocolId);
   $: protocolFormat = currentProtocol?.definition;

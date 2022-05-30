@@ -1,8 +1,8 @@
 import type { ObjectDefinition } from "@meta-system/object-definition";
 import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
 import type { PropertyListEntry } from "src/common/types/property-list-entry";
-import { Readable, readable, Writable, writable } from "svelte/store";
-import { protocols } from "../stores/configuration-store";
+import { get, Readable, readable, Writable, writable } from "svelte/store";
+import { protocols, saveConfigurations } from "../stores/configuration-store";
 
 type ProtocolParameters = {
   id : string;
@@ -63,12 +63,15 @@ export class Protocol {
     this.isLocked.set(isLocked);
     this.description.set(description);
     this.configuration.set(configuration);
+
+    this.keepStorageUpdated();
   }
 
   public async getDataFromValidatedProtocol () : Promise<void> {
     // TODO populate: definition, protocolType
   }
 
+  // eslint-disable-next-line max-lines-per-function
   public static async createNewProtocol () : Promise<void> {
     // TODO: Creates a new Protocol in the Db
 
@@ -88,6 +91,7 @@ export class Protocol {
 
     // adds it to the store
     protocols.update((value) => { value.push(newProtocol); return value; });
+    saveConfigurations();
   }
 
   public getProtocolCardInfo () : PropertyListEntry {
@@ -107,5 +111,31 @@ export class Protocol {
     };
 
     return result;
+  }
+
+  public serialized () : object {
+    return ({
+      id: get(this.id),
+      identifier: get(this.identifier),
+      validatedProtocolId: get(this.validatedProtocolId),
+      protocolName: get(this.protocolName),
+      protocolVersion: get(this.protocolVersion),
+      isStarred: get(this.isStarred),
+      isLocked: get(this.isLocked),
+      description: get(this.description),
+      configuration: get(this.configuration),
+    });
+  }
+
+  private keepStorageUpdated () : void {
+    this.id.subscribe(saveConfigurations);
+    this.identifier.subscribe(saveConfigurations);
+    this.validatedProtocolId.subscribe(saveConfigurations);
+    this.protocolName.subscribe(saveConfigurations);
+    this.protocolVersion.subscribe(saveConfigurations);
+    this.isStarred.subscribe(saveConfigurations);
+    this.isLocked.subscribe(saveConfigurations);
+    this.description.subscribe(saveConfigurations);
+    this.configuration.subscribe(saveConfigurations);
   }
 }

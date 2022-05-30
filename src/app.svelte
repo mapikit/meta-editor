@@ -1,10 +1,13 @@
 <script>
-
+import { loadConfigurationsFromStore } from "./stores/configuration-store";
+import { loadProjectsFromStore } from "./stores/projects-store";
 import MainView from "./views/main-view.svelte";
 
 // This file contains general data about the App itself
 // and should not contain anything else.
 
+loadProjectsFromStore();
+loadConfigurationsFromStore();
 </script>
 
 <MainView />

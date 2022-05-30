@@ -1,11 +1,62 @@
-import type { Schema } from "../entities/schema";
+import { Schema } from "../entities/schema";
 import { get, Writable, writable } from "svelte/store";
-import type { Configuration } from "../entities/configuration";
-import type { UIBusinessOperation } from "../entities/business-operation";
-import type { Protocol } from "../entities/protocol";
-import type { EnvironmentVariable } from "../entities/environment-variable";
+import { UIBusinessOperation } from "../entities/business-operation";
+import { Protocol } from "../entities/protocol";
+import { EnvironmentVariable } from "../entities/environment-variable";
+import { localStorageService } from "../services/local-storage-service";
+import { Configuration } from "../entities/configuration";
+import { currentProject } from "./projects-store";
 
 export const availableConfigurations : Writable<Configuration[]> = writable([]);
+
+
+export const saveConfigurations = () : void => {
+  const configs = get(availableConfigurations);
+  const savingData = configs.map((config) => config.serialized());
+
+  localStorageService.save("configurations", savingData);
+};
+
+// eslint-disable-next-line max-lines-per-function
+export const loadConfigurationsFromStore = () : void => {
+  if (localStorageService.isInStorage("configurations")) {
+    const configurationsData = localStorageService.fetchKey("configurations") as object[];
+    const rawConfigs = [];
+
+    configurationsData.forEach((value) => {
+      const businessOperations = (value["businessOperations"] as any[]).map((bop) => new UIBusinessOperation(bop));
+      const envs = (value["envs"] as any[]).map((env) => new EnvironmentVariable(env));
+      const protocols = (value["protocols"] as any[]).map((protocol) => new Protocol(protocol));
+      const schemas = (value["schemas"] as any[]).map((schema) => new Schema(schema));
+
+      rawConfigs.push(new Configuration({ ...value, businessOperations, envs, protocols, schemas } as any));
+    });
+
+    availableConfigurations.update((configs) => {
+      configs.push(...rawConfigs);
+      return configs;
+    });
+  };
+
+  setCurrentConfigData(get(currentProject).getConfiguration());
+
+  availableConfigurations.subscribe(saveConfigurations);
+  startConfigurationStoreSync();
+};
+
+const setCurrentConfigData = (configuration : Configuration) : void => {
+  schemas.set(configuration.schemas);
+  businessOperations.set(configuration.businessOperations);
+  protocols.set(configuration.protocols);
+  environmentVariables.set(configuration.envs);
+};
+
+const startConfigurationStoreSync = () : void => {
+  currentProject.subscribe((project) => {
+    const currentConfig = project.getConfiguration();
+    setCurrentConfigData(currentConfig);
+  });
+};
 
 // From this and below, it should actually be the data of the currently selected configuration.
 // If no configuration is selected, this should be empty.

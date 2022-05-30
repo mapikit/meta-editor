@@ -4,6 +4,7 @@ import type { EnvironmentVariable } from "./environment-variable";
 import type { Protocol } from "./protocol";
 import type { Schema } from "./schema";
 import type { UIBusinessOperation } from "./business-operation";
+import { saveConfigurations } from "../stores/configuration-store";
 
 type ConfigurationParameter = {
   projectId : string;
@@ -31,10 +32,10 @@ export class Configuration {
   // These properties are not stores because they're not meant to be
   // changed in here, they should be changed only when this is the current
   // configuration selected. In such case, they will be in the `configuration-store.ts` file, not here
-  private readonly businessOperations : UIBusinessOperation[] = [];
-  private readonly envs : EnvironmentVariable[] = [];
-  private readonly protocols : Protocol[] = [];
-  private readonly schemas : Schema[] = [];
+  public readonly businessOperations : UIBusinessOperation[] = [];
+  public readonly envs : EnvironmentVariable[] = [];
+  public readonly protocols : Protocol[] = [];
+  public readonly schemas : Schema[] = [];
 
   // eslint-disable-next-line max-lines-per-function
   public constructor ({
@@ -77,5 +78,27 @@ export class Configuration {
       schemasCount: this.schemas.length,
       protocolsCount: this.protocols.length,
     };
+  }
+
+  public serialized () : object {
+    this.businessOperations.forEach((bop) => {
+      console.log(bop.constructor.name);
+    });
+
+    return {
+      projectId: get(this.projectId),
+      id: get(this.id),
+      version: get(this.version),
+      businessOperations: this.businessOperations.map((x) => x.serialized()),
+      envs: this.envs.map((x) => x.serialized()),
+      protocols: this.protocols.map((x) => x.serialized()),
+      schemas: this.schemas.map((x) => x.serialized()),
+    };
+  }
+
+  public keepStorageUpdated () : void {
+    this.projectId.subscribe(saveConfigurations);
+    this.id.subscribe(saveConfigurations);
+    this.version.subscribe(saveConfigurations);
   }
 }

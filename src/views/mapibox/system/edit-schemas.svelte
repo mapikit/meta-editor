@@ -10,11 +10,12 @@
   import { guideText } from "../../../stores/layout-tabs-store";
 
   let schemaList : Schema[] = $schemas;
-  let pathParams = navigation.currentPathParams;
+  let pathParams = navigation.currentPathParamsSubscribable;
   let currentSchemaId = $pathParams["schemaId"];
   let currentSchema = getSchemaById(currentSchemaId);
   let schemaFormat = currentSchema?.format;
 
+  $: schemaList = $schemas;
   $: currentSchemaId = $pathParams["schemaId"];
   $: currentSchema = getSchemaById(currentSchemaId);
   $: schemaFormat = currentSchema?.format;

@@ -6,11 +6,10 @@ import type {
   BopsCustomObject } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import type { ModuleCard } from "../common/types/module-card";
 import type { UIInput } from "../common/types/ui-input";
-import { writable, Writable, readable, Readable } from "svelte/store";
+import { writable, Writable, readable, Readable, get } from "svelte/store";
 import { Coordinate } from "../common/types/geometry";
-import { businessOperations } from "../stores/configuration-store";
+import { businessOperations, saveConfigurations } from "../stores/configuration-store";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
-
 
 type BOpConstructorArgument = {
   id : string,
@@ -29,7 +28,6 @@ type BOpConstructorArgument = {
 export class UIBusinessOperation {
   public readonly configuration : Writable<ModuleCard[]> = writable([]);
   public readonly input : Writable<UIInput> = writable({ definition: undefined, position: undefined });
-
   public readonly id : Readable<string>;
   public readonly constants : Writable<BopsConstant[]>;
   public readonly variables : Writable<BopsVariable[]>;
@@ -40,8 +38,9 @@ export class UIBusinessOperation {
   public readonly isStarred : Writable<boolean> = writable(false);
   public readonly isLocked : Writable<boolean> = writable(false);
 
+  // eslint-disable-next-line max-lines-per-function
   constructor ({
-    id, name, description, input, output, configuration, constants, customObjects, variables, isLocked, isStarred
+    id, name, description, input, output, configuration, constants, customObjects, variables, isLocked, isStarred,
   } : BOpConstructorArgument) {
     this.id = readable(id);
     this.name = writable(name);
@@ -55,6 +54,8 @@ export class UIBusinessOperation {
 
     this.validateInput(input);
     this.validateConfigurationForUI(configuration);
+
+    this.keepStorageUpdated();
   }
 
   public getCardInfo () : PropertyListEntry {
@@ -68,8 +69,9 @@ export class UIBusinessOperation {
     };
   }
 
+  // eslint-disable-next-line max-lines-per-function
   public static createNewBOp () : void {
-    const newSchema = new UIBusinessOperation({
+    const newBop = new UIBusinessOperation({
       id: "MOCK_BOP_ID",
       name: "New BOp",
       configuration: [],
@@ -84,7 +86,8 @@ export class UIBusinessOperation {
     });
 
     // adds it to the store
-    businessOperations.update((value) => { value.push(newSchema); return value; });
+    businessOperations.update((value) => { value.push(newBop); return value; });
+    saveConfigurations();
   }
 
   private validateInput (input : UIInput | ObjectDefinition) : asserts input is UIInput {
@@ -138,5 +141,35 @@ export class UIBusinessOperation {
     if(module["position"] === undefined) {
       module["position"] = new Coordinate(Math.random() * 1414, Math.random() * 577);
     }
+  }
+
+  public serialized () : object {
+    return ({
+      configuration: get(this.configuration),
+      input: get(this.input),
+      id: get(this.id),
+      constants: get(this.constants),
+      variables: get(this.variables),
+      name: get(this.name),
+      description: get(this.description),
+      output: get(this.output),
+      customObjects: get(this.customObjects),
+      isStarred: get(this.isStarred),
+      isLocked: get(this.isLocked),
+    });
+  }
+
+  private keepStorageUpdated () : void {
+    this.configuration.subscribe(saveConfigurations);
+    this.input.subscribe(saveConfigurations);
+    this.id.subscribe(saveConfigurations);
+    this.constants.subscribe(saveConfigurations);
+    this.variables.subscribe(saveConfigurations);
+    this.name.subscribe(saveConfigurations);
+    this.description.subscribe(saveConfigurations);
+    this.output.subscribe(saveConfigurations);
+    this.customObjects.subscribe(saveConfigurations);
+    this.isStarred.subscribe(saveConfigurations);
+    this.isLocked.subscribe(saveConfigurations);
   }
 }

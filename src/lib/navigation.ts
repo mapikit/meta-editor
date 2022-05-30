@@ -1,11 +1,18 @@
-import { Writable, writable } from "svelte/store";
+import { derived, Readable, Writable, writable } from "svelte/store";
 
 class Navigation {
   private _pathSvelteStore = writable("");
   private _path = "";
   private _registeredPaths : Set<string> = new Set();
   private _activeSwitchPath = "";
-  public readonly currentPathParams : Writable<Record<string, string>> = writable({});
+
+  public currentPathParamsSubscribable : Readable<Record<string, string>> = derived(this.pathStore, () => {
+    return this.currentPathParams;
+  });
+
+  public get currentPathParams () : Record<string, string> {
+    return this.getCurrentPathParams();
+  }
 
   public get pathStore () : Writable<string> {
     return this._pathSvelteStore;
@@ -42,6 +49,8 @@ class Navigation {
   public registerPath (path : string) : void {
     this._registeredPaths.add(this.normalizePath(path));
     console.log(`Registered Path ${this.normalizePath(path)}`);
+
+    this.pathStore.update((value) => value);
   }
 
   public unregisterPath (path : string) : void {
@@ -63,6 +72,7 @@ class Navigation {
     return this.pathsMatches(path, this.currentPath, deep);
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private constructor (path ?: string) {
     this._pathSvelteStore = writable(path || "");
     this._path = path || "";
@@ -75,8 +85,6 @@ class Navigation {
       }
 
       window.history.pushState({}, "", navigationPath);
-
-      this.currentPathParams.update(() => this.getCurrentPathParams());
     });
 
     window.onpopstate = () : void => {

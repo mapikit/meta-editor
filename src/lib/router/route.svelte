@@ -5,12 +5,15 @@ import { navigation } from "../navigation";
 
 export let path;
 export let deepMatch = false;
+export let onEnter : () => void = () => { /* placeholder */ };
 let shouldRender = false;
 
 navigation.registerPath(path);
 
 const unsubscriber = navigation.pathStore.subscribe(() => {
   shouldRender = navigation.isCurrentPath(path, deepMatch);
+
+  if (shouldRender) { onEnter(); }
 });
 
 onDestroy(() => {
