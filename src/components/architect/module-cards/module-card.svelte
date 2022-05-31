@@ -11,9 +11,11 @@
   import { solveConnection } from "../helpers/solve-connection";
   import MovableCard from "../helpers/movable-card.svelte";
   import type { Writable } from "svelte/store";
+import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 
   export let moduleConfig : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>
+  export let bopConstants : Writable<BopsConstant[]>;
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
@@ -74,7 +76,7 @@
     <div slot="content" class="IODiv">
       <div class="inputs">
         {#each Object.keys(moduleConfig.info.input) as key}
-          <InputSection bind:bopModules name={key} parentKey={moduleConfig.key} info={moduleConfig.info.input[key]}/>
+          <InputSection bind:bopModules bind:bopConstants name={key} parentKey={moduleConfig.key} info={moduleConfig.info.input[key]}/>
         {/each}
       </div>
       <div class="outputs">

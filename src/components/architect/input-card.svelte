@@ -2,6 +2,7 @@
   import type { ObjectDefinition } from "@meta-system/object-definition";
 import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import { get, Writable } from "svelte/store";
+  import { slide } from "svelte/transition";
 
   import { Coordinate } from "../../common/types/geometry";
 import type { ModuleCard } from "../../common/types/module-card";
@@ -73,19 +74,21 @@ import type { ModuleCard } from "../../common/types/module-card";
 <MovableCard moduleConfig={$configuration} bopModules={bopModules}>
   <div slot="content">
     {#if !editing}
-      <div class="inputModule">
-        <div class="header">Input  <button on:click={startEditing}>Edit</button></div>
+      <div class="inputModule" in:slide>
+        <div class="header">Input  <button on:click={startEditing} class="button">Edit</button></div>
         {#each Object.keys($configuration.definition) as key}
           <OutputSection info={$configuration.definition[key]} bopModules={bopModules} name={key} parentKey={"input"} bind:nob={nobMapping[key]}/>
         {/each}
       </div>
     {:else}
-      <div class="inputDefinition">
-        <span on:click={() => navigateBackToLevel(0)} class="clickablePath">Input</span>
+      <div class="inputDefinition" in:slide>
+        <div class="header">
+          <span on:click={() => navigateBackToLevel(0)} class="clickablePath">Input</span>
+          <button on:click={() => finishEdition() } class="button">Edit</button>
+        </div>
         {#each paths as path, index}
           &gt <span class="clickablePath" on:click={() => navigateBackToLevel(index+1)}>{path}</span>
         {/each}
-        <button on:click={() => finishEdition() }>Edit</button>
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
           initialDefinition={$configuration.definition} initialData={{}}
@@ -103,23 +106,31 @@ import type { ModuleCard } from "../../common/types/module-card";
 
 <style lang="scss">
   .header {
+    border-radius: 5px 5px 0 0;
+    padding: 2px 2px 0 8px;
     background-color: rgb(94, 94, 94);
+    margin-bottom: 5px;
   }
+  .button {
+    position: absolute;
+    right: 3px;
+  }
+
   .inputModule {
-    background-color: cornflowerblue;
+    border-radius: 5px;
+    background-color: #34344b;
     padding-bottom: 8px;
     min-width: 150px;
   }
 
   .inputDefinition {
     transition: width 2s ease-in-out;
-    background-color: red;
-    border-radius: 0 20px 20px 0;
+    background-color: #34344b;
+    border-radius: 5px;
   }
 
   .clickablePath {
     cursor: pointer;
-    background-color: gray;
   }
 </style>
 

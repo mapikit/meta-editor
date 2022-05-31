@@ -184,11 +184,11 @@
       {:then _done}
         {#each modulesInConfig as config (config.key)}
           {#if config.moduleType !== "output"}
-            <Module bind:bopModules={currentBop.configuration} moduleConfig={config} trashPosition={trashRect}/>
+            <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} trashPosition={trashRect}/>
           {/if}
         {/each}
-        <InputCard bind:bopModules={currentBop.configuration} configuration={currentBop.input}/>
-        <OutputCard bind:bopModules={currentBop.configuration} configuration={currentBop.output}/>
+        <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>
+        <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>
       {/await}
       
     </div>
@@ -256,10 +256,11 @@
   }
 
   .architect {
-    position: absolute;
+    position: static;
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
+    overflow-x: hidden;
   }
 </style>

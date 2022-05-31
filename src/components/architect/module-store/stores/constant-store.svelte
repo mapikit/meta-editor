@@ -1,9 +1,13 @@
 <script lang="ts">
-import type { ObjectDefinition } from "@meta-system/object-definition";
+import type { ObjectDefinition, TypeDefinition } from "@meta-system/object-definition";
+import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
 
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import type { SvelteComponent } from "svelte/internal";
+import type { bind, SvelteComponent } from "svelte/internal";
   import type { Writable } from "svelte/store";
+import ArrayDefinitionEditor from "../../../object-definition/array-definition-editor.svelte";
+import EditingField from "../../../object-definition/editing-fields/editing-field.svelte";
+import type { DefinitionData } from "../../../object-definition/obj-def-converter";
 import { EditorLevels } from "../../../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../../../object-definition/object-definition-mini-app.svelte";
 import TypeSelect from "../../../object-definition/type-select.svelte";
@@ -13,19 +17,51 @@ import TypeSelect from "../../../object-definition/type-select.svelte";
 
   let addingConst = false;
   let newConstName : string = "";
+  let selectedType : string = undefined;
+  let selectedSubtype = undefined;
+  let selectedValue : unknown = undefined;
+
+  let arrayData : DefinitionData = undefined;
+
+  $: arrayData = {
+    keyName: newConstName,
+    required: false,
+    type: selectedType,
+    subtype: selectedSubtype,
+    value: []
+  }
+
+
   let MiniApp;
   export let bopConstants : Writable<BopsConstant[]>
 
+  function startAddingConst () : void {
+    newConstName = `Constant${$bopConstants.length + 1}`;
+    addingConst = true;
+  }
+
   function confirmNewConst () : void {
-    const info = MiniApp.getDefinitionAndData();
-    console.log(info);
+    let newConst : Partial<TypeDefinition<{ name: string, value: unknown }>> = { name: newConstName };
+    switch (selectedType) {
+      case "object":
+        const definition = MiniApp.getDefinitionAndData();
+        newConst.type = "object";
+        (newConst as TypeDefinitionDeep).subtype = definition.definition["root"]["subtype"];
+        newConst.value = definition.data["root"];
+        break;
+      case "array":
+        newConst.type = "array";
+        (newConst as TypeDefinitionDeep).subtype = arrayData.subtype as string | ObjectDefinition;
+        newConst.value = arrayData.value;
+        break;
+      default:
+        newConst.type = selectedType;
+        newConst.value = selectedValue;
+        break;
+    }
+    console.log(newConst);
     bopConstants.update(constants => {
-      const test : BopsConstant = {
-        name: newConstName,
-        type: info.definition["root"],
-        value: info.definition["root"]["subtype"] 
-      };
-      console.log(test);
+      constants.push(newConst as BopsConstant)
       return constants;
     })
     addingConst = false;
@@ -35,8 +71,15 @@ import TypeSelect from "../../../object-definition/type-select.svelte";
 
 <div class="constantStore">
   {#if addingConst}
-    <span class="typeSelect"><TypeSelect/></span><input class="newConstName" bind:value={newConstName}  type="text"/>
-    <div class="miniAppContainer"><ObjectDefinitionMiniApp initialData={{}} initialDefinition={{}} bind:this={MiniApp}/></div>
+    <span class="typeSelect"><TypeSelect bind:currentType={selectedType} bind:currentSubtype={selectedSubtype}/></span>
+    <input class="newConstName" bind:value={newConstName}  type="text" placeholder="New Constant Name" />
+    {#if selectedType === "object"}
+      <div class="editionContainer"><ObjectDefinitionMiniApp initialData={{}} initialDefinition={{}} bind:this={MiniApp}/></div>
+    {:else if selectedType === "array" && selectedSubtype !== undefined}
+      <div class="editionContainer"><ArrayDefinitionEditor bind:definitionData={arrayData}/></div>
+    {:else}
+      <div class="editionContainer"><EditingField editingType={selectedType} subtype={selectedSubtype} bind:propValue={selectedValue}/></div>
+    {/if}
     <div class="confirmButton" on:click={confirmNewConst}><div class="addIcon">CONFIRM</div></div>
   {:else}
     <div class="list">
@@ -44,7 +87,7 @@ import TypeSelect from "../../../object-definition/type-select.svelte";
         <div class="listItem"><StoreConstant constant={constant}/></div>
       {/each}
     </div>
-    <div class="addButton" on:click={() => { addingConst = true; }}><div class="addIcon"><DropdownIcon/></div></div>
+    <div class="addButton" on:click={startAddingConst}><div class="addIcon"><DropdownIcon/></div></div>
   {/if}
 </div>
 
@@ -84,8 +127,8 @@ import TypeSelect from "../../../object-definition/type-select.svelte";
     display: inline-flex;
   }
 
-  .miniAppContainer {
-    background-color: antiquewhite;
+  .editionContainer {
+    background-color: rgba(100, 100, 150, 0.116);
     height: calc(85% - 32px);
     margin-left: 2px;
     margin-right: 2px;

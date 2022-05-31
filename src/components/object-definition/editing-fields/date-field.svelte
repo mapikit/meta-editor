@@ -1,9 +1,10 @@
 <script lang="ts">
   import FlatNumberField from "./flat-number-field.svelte";
 
-  export let propValue = new Date();
+  export let propValue : Date;
   export let updateFunction = () => {};
 
+  propValue = new Date();
   let day = propValue.getDate();
   let month = propValue.getMonth() + 1;
   let lastSetMonth = month;

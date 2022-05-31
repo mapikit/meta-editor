@@ -7,13 +7,14 @@
   import type { ModuleCard } from "../../../common/types/module-card";
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
-import ConstantTag from "../tags/constant-tag.svelte";
+  import ConstantTag from "../tags/constant-tag.svelte";
 
 
   export let name : string;
   export let parentKey : number;
   export let info : TypeDefinition<{}>;
-  export let bopModules : Writable<ModuleCard[]>
+  export let bopModules : Writable<ModuleCard[]>;
+  export let bopConstants : Writable<BopsConstant[]>;
 
   const parentInfo = $bopModules.find(config => config.key === parentKey);
 
@@ -57,17 +58,27 @@ import ConstantTag from "../tags/constant-tag.svelte";
 
   
   let constantConfig : BopsConstant;
-  // TODO reimplement constants
-  // function getConstant (dependencies : Dependency[]) {
-  //   const thisConfig = dependencies.find(dep => dep.targetPath.startsWith(name));
-  //   if(thisConfig === undefined) return undefined;
-  //   if(typeof thisConfig.origin !== "string" || !["constant", "constants"].includes(thisConfig.origin))
-  //   {return undefined;}
-  //   const constant = get($bopStore.constants).find(cons => cons.name === thisConfig.originPath.split(".")[0]);
-  //   return constant;
-  // }
-  // constantConfig = getConstant(parentInfo.dependencies);
+  function getConstant (dependencies : Dependency[]) {
+    const thisConfig = dependencies.find(dep => dep.targetPath.startsWith(name));
+    if(thisConfig === undefined) return undefined;
+    if(typeof thisConfig.origin !== "string" || !["constant", "constants"].includes(thisConfig.origin))
+    {return undefined;}
+    const constant = $bopConstants.find(cons => cons.name === thisConfig.originPath.split(".")[0]);
+    return constant;
+  }
+  constantConfig = getConstant(parentInfo.dependencies);
 </script>
+
+<div class="total" ><span 
+  class="nob" id="InputNob"
+  style="color: {typeColors[info.type]}" 
+  on:click={getNob}
+  bind:this={nob}
+>●</span><span class="text">{name}</span>
+{#if constantConfig !== undefined }
+  <ConstantTag config={constantConfig} parentNob={nob}/>
+{/if}
+</div>
 
 <style lang="scss">
   .nob {
@@ -96,14 +107,3 @@ import ConstantTag from "../tags/constant-tag.svelte";
     margin: 6px 0 0 0;
   }
 </style>
-
-<div class="total" ><span 
-    class="nob" id="InputNob"
-    style="color: {typeColors[info.type]}" 
-    on:click={getNob}
-    bind:this={nob}
-  >●</span><span class="text">{name}</span>
-  {#if constantConfig !== undefined }
-    <ConstantTag config={constantConfig} parentNob={nob}/>
-  {/if}
-</div>

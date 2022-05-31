@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { ObjectDefinition } from "@meta-system/object-definition";
+import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { Writable } from "svelte/store";
+  import { slide } from "svelte/transition";
 
 
   import { Coordinate } from "../../common/types/geometry";
@@ -14,6 +16,7 @@
 
   export let configuration : Writable<ObjectDefinition>;
   export let bopModules : Writable<ModuleCard[]>;
+  export let bopConstants : Writable<BopsConstant[]>;
 
   let module = $bopModules.find((module) => module.moduleType === "output")
   if (module === undefined) {
@@ -52,19 +55,20 @@
 <MovableCard moduleConfig={module} bopModules={bopModules}>
   <div slot="content">
     {#if !editing}
-      <div class="inputModule">
-        <div class="header">Output  <button on:click={() => editing=!editing }>Edit</button></div>
+      <div class="outputModule" in:slide>
+        <div class="header">Output<button class="button" on:click={() => editing=!editing }>Edit</button></div>
         {#each Object.keys($configuration) as key}
-          <InputSection info={$configuration[key]} name={key} parentKey={module.key} bind:bopModules/>
+          <InputSection info={$configuration[key]} name={key} parentKey={module.key} bind:bopModules bind:bopConstants/>
         {/each}
       </div>
     {:else}
-      <div class="inputDefinition">
-        <span on:click={() => navigateBackToLevel(0)} class="clickablePath">Input</span>
+      <div class="outputDefinition" in:slide>
+        <div class="header">
+          <span on:click={() => navigateBackToLevel(0)} class="clickablePath">Output</span><button class="button" on:click={() => finishEdition() }>Edit</button>
+        </div>
         {#each paths as path, index}
           &gt <span class="clickablePath" on:click={() => navigateBackToLevel(index+1)}>{path}</span>
         {/each}
-        <button on:click={() => finishEdition() }>Edit</button>
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
           initialDefinition={$configuration} initialData={{}}
@@ -82,23 +86,31 @@
 
 <style lang="scss">
   .header {
+    border-radius: 5px 5px 0 0;
+    padding: 2px 2px 0 8px;
     background-color: rgb(94, 94, 94);
+    margin-bottom: 5px;
   }
-  .inputModule {
-    background-color: cornflowerblue;
+  .button {
+    position: absolute;
+    right: 3px;
+  }
+
+  .outputModule {
+    border-radius: 5px;
+    background-color: #34344b;
     padding-bottom: 8px;
     min-width: 150px;
   }
 
-  .inputDefinition {
+  .outputDefinition {
     transition: width 2s ease-in-out;
-    background-color: red;
-    border-radius: 0 20px 20px 0;
+    background-color: #34344b;
+    border-radius: 5px;
   }
 
   .clickablePath {
     cursor: pointer;
-    background-color: gray;
   }
 </style>
 
