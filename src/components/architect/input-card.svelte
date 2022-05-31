@@ -20,14 +20,13 @@ import type { ModuleCard } from "../../common/types/module-card";
 
   export let configuration : Writable<UIInput>;
   export let bopModules : Writable<ModuleCard[]>;
-  // TODO receive Input store instead of ... whatever this is.
 
   let paths = [];
   let getPathsNames : () => string[];
   let navigateBackToLevel : (index : number) => void;
   let getDefinitionAndData : () => { definition: ObjectDefinition, data : object };
   let editing = false;
-  const nobMapping = {};
+  const nobMapping : Record<string, HTMLSpanElement> = {};
 
 
   function startEditing () : void {
@@ -55,14 +54,13 @@ import type { ModuleCard } from "../../common/types/module-card";
         navigateBackToLevel(0);
         input.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
 
-        // TODO Reimplement dependency re-routing (bellow)
-        // for(const config of get(bop.configuration)) {
-        //   config.dependencies.forEach((dependency, index) => {
-        //     const originName = dependency.originPath.split(".")[1];
-        //     if(Object.keys(nobMapping).includes(originName)) dependency.originNob = nobMapping[originName];
-        //     else config.dependencies.splice(index, 1);
-        //   });
-        // }
+        for(const config of get(currentBop.configuration)) {
+          config.dependencies.forEach((dependency, index) => {
+            const originName = dependency.originPath;
+            if(Object.keys(nobMapping).includes(originName)) dependency.originNob = nobMapping[originName];
+            else config.dependencies.splice(index, 1);
+          });
+        }
 
         return input;
       })
@@ -77,7 +75,7 @@ import type { ModuleCard } from "../../common/types/module-card";
       <div class="inputModule" in:slide>
         <div class="header">Input  <button on:click={startEditing} class="button">Edit</button></div>
         {#each Object.keys($configuration.definition) as key}
-          <OutputSection info={$configuration.definition[key]} bopModules={bopModules} name={key} parentKey={"input"} bind:nob={nobMapping[key]}/>
+          <OutputSection info={$configuration.definition[key]} bopModules={bopModules} name={key} parentKey={"input"}/>
         {/each}
       </div>
     {:else}

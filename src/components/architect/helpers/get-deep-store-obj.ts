@@ -1,4 +1,4 @@
-import { get, readable, Readable } from "svelte/store";
+import { get, Readable } from "svelte/store";
 
 export function getDeepStoreObject <T> (input : T | Readable<T>) : T {
   let temp : T = input as T;
@@ -19,8 +19,6 @@ export function getDeepStoreObject <T> (input : T | Readable<T>) : T {
 
 
 function isSvelteReadable (input : unknown | Readable<unknown>) : boolean {
-  console.log(input);
-  console.log("isReadable instance:", input instanceof readable);
   return typeof input === "object" &&
          "subscribe" in input &&
          typeof input["subscribe"] === "function";

@@ -12,6 +12,8 @@
   import MovableCard from "../helpers/movable-card.svelte";
   import type { Writable } from "svelte/store";
 import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import { SectionsMap, sectionsMap } from "../helpers/sections-map";
+import { getConnectionIdentifier } from "../helpers/get-connection-identifier";
 
   export let moduleConfig : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>
@@ -29,7 +31,6 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
   moduleConfig.info = moduleConfig.info ?? functionsInfo[moduleConfig.moduleType].get(moduleConfig.moduleName);
 
   export let trashPosition : DOMRect;
-  let moduleNob : HTMLSpanElement;
 
   function checkRectCollision(x : number, y : number, targetRect : DOMRect) : boolean {
     return (x > targetRect.x && x < targetRect.x + targetRect.width) &&
@@ -61,7 +62,7 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
     selectedNob.update((current) => {
       return solveConnection(current, {
       parentKey: moduleConfig.key,
-      nob: moduleNob,
+      nob: sectionsMap.outputs[SectionsMap.getIdentifier(moduleConfig.key, `module`)],
       property: undefined,
       nobType: "module",
       propertyType: "function"
@@ -72,7 +73,7 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
 
 <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
   <StaticCardBody definition={moduleConfig.info} tooltipPosition="top" slot="content">
-    <span slot="moduleNob" class="moduleNob" bind:this={moduleNob} on:click={moduleConnect}>M</span>
+    <span slot="moduleNob" class="moduleNob" bind:this={sectionsMap.outputs[SectionsMap.getIdentifier(moduleConfig.key, `module`)]} on:click={moduleConnect}>M</span>
     <div slot="content" class="IODiv">
       <div class="inputs">
         {#each Object.keys(moduleConfig.info.input) as key}
@@ -94,16 +95,6 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
 
 
 <style lang="scss">
-  .module {
-    transition: none;
-    transition: opacity 260ms ease-in-out;
-    user-select: none;
-    min-width: 120px;
-    user-select: none;
-    cursor: default;
-    position: absolute;
-  }
-
   .IODiv {
     display: grid;
     position: relative;

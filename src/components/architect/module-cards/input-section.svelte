@@ -6,6 +6,7 @@
   import { typeColors } from "../../../common/styles/type-colors";
   import type { ModuleCard } from "../../../common/types/module-card";
   import { selectedNob } from "../../../stores/connection-stores";
+import { SectionsMap, sectionsMap } from "../helpers/sections-map";
   import { solveConnection } from "../helpers/solve-connection";
   import ConstantTag from "../tags/constant-tag.svelte";
 
@@ -18,20 +19,18 @@
 
   const parentInfo = $bopModules.find(config => config.key === parentKey);
 
-  let nob : HTMLSpanElement;
-
   function getNob () : void {
     selectedNob.update((current) => {
       return solveConnection(current, {
         parentKey: parentKey,
-        nob,
+        nob: sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)],
         property: name,
         nobType: "input",
         propertyType: info.type
       }, bopModules)})
   }
   onMount(() => {
-    nob.addEventListener<any & { detail : { constant : BopsConstant }}>("appendTag", (event) => {
+    sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)].addEventListener<any & { detail : { constant : BopsConstant }}>("appendTag", (event) => {
       const newDependency = {
         origin: "constants",
         originNob: undefined,
@@ -47,7 +46,7 @@
       bopModules.update(modules => modules);
     }, false);
 
-    nob.addEventListener("removeTag", () => {
+    sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)].addEventListener("removeTag", () => {
       const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name);
       if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
       constantConfig = undefined;
@@ -73,10 +72,10 @@
   class="nob" id="InputNob"
   style="color: {typeColors[info.type]}" 
   on:click={getNob}
-  bind:this={nob}
+  bind:this={sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)]}
 >●</span><span class="text">{name}</span>
 {#if constantConfig !== undefined }
-  <ConstantTag config={constantConfig} parentNob={nob}/>
+  <ConstantTag config={constantConfig} parentNob={sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)]}/>
 {/if}
 </div>
 

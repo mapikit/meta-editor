@@ -18,6 +18,7 @@
   import { businessOperations } from "../../stores/configuration-store";
   import { getDeepStoreObject } from "./helpers/get-deep-store-obj";
   import type { ModuleCard } from "../../common/types/module-card";
+import { sectionsMap } from "./helpers/sections-map";
   
   let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === get(navigation.currentPathParams).bopId);
   let modulesInConfig : ModuleCard[];
@@ -26,15 +27,13 @@
     return config;
   })
 
-  console.log(getDeepStoreObject(currentBop));
-
   let trashRect : DOMRect;
   let canvas : HTMLCanvasElement;
   let context : CanvasRenderingContext2D;
   let cutting = false;
   let storeHidden = true;
 
-  
+   
   function adjustCanvas () : void {
     const containerDimensions = canvas.parentElement.getBoundingClientRect();
     canvas.width = containerDimensions.width;
@@ -42,7 +41,7 @@
     context.strokeStyle = "#ffffff";
     context.lineWidth = 2;
 
-    updateTraces(context, get(currentBop.configuration), $environment);
+    updateTraces(context, $environment);
     const canvasScale = canvas.clientWidth/canvas.width;
     canvas.width *= canvasScale;
     canvas.height *= canvasScale;
@@ -59,10 +58,10 @@
       $environment.origin.moveTo(canvas.width/2, canvas.height/2);
 
       currentBop.configuration.subscribe(bop => {
-        updateTraces(context, bop, $environment);
+        updateTraces(context, $environment);
       });
       environment.subscribe(() => {
-        setTimeout(() => updateTraces(context, get(currentBop.configuration), $environment), 1);
+        setTimeout(() => updateTraces(context, $environment), 1);
         // Investigate and avoid this kind of repetition & timeout
         // Timeout Only: traces have "springness" (modules don't)
         // No Timeout: traces don't update correctly (obvious with scaling)
@@ -75,15 +74,19 @@
 
   function startMovement (event : MouseEvent) : void {
     if(cutting) {
-      const toCut = updateTraces(context, get(currentBop.configuration), $environment, { mouse: { x: event.x, y: event.y }});
-      for(const keyDepTuple of toCut) {
+      const linesToCut = updateTraces(context, $environment, { mouse: { x: event.x, y: event.y }});
         currentBop.configuration.update(config => {
-          const module = config.find(mod => mod.key === keyDepTuple[0])
-          const depIndex = module.dependencies.findIndex(dep => dep === keyDepTuple[1]);
-          module.dependencies.splice(depIndex, 1);
+          for(const identifier of linesToCut) {
+            const moduleKey = Number(identifier.split(".")[0]);
+            const targetPath = identifier.split(".").slice(1).join(".");
+            const module = config.find(module => module.key === moduleKey);
+            const dependencyIndex = module.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
+            module.dependencies.splice(dependencyIndex, 1);
+            sectionsMap.removeConnection(identifier);
+          }
+
           return config;
         })
-      }
       context.shadowBlur = 0;
     }
     panning = event.button === 1;
@@ -106,7 +109,7 @@
 
   function handleMouseMove (event : MouseEvent) : void {
     if(cutting) {
-      updateTraces(context, get(currentBop.configuration), $environment, { mouse: { x: event.x, y: event.y } });
+      updateTraces(context, $environment, { mouse: { x: event.x, y: event.y } });
     }
     else if(panning) {
       environment.update(env => {
@@ -166,8 +169,9 @@
   }
 
   function copyBOpToClipboard () {
-    console.log(currentBop);
     console.log(getDeepStoreObject(currentBop))
+    console.log(sectionsMap);
+    
     // TODO filter out ui properties
     navigator.clipboard.writeText(beautify(currentBop, null, 1, 110));
   }
@@ -211,14 +215,13 @@
 
 <style>
   .canvas {
-    z-index: -1;
     position: absolute;
     top: 0;
     left: 0;
     /* background: url("../../../static/images/dotted-back.jpg") rgb(16, 15, 17); */
     background-color: gray;
-    /* width: 100%;
-    height: 100%; */
+    width: 100%;
+    height: 100%;
   }
 
   .buttonCpy {
@@ -256,7 +259,7 @@
   }
 
   .architect {
-    position: static;
+    position: absolute;
     top: 0;
     left: 0;
     height: 100%;

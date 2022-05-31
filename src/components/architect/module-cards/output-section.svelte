@@ -7,6 +7,8 @@
 import type { Writable } from "svelte/store";
 import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import type { ModuleCard } from "../../../common/types/module-card";
+import { SectionsMap, sectionsMap } from "../helpers/sections-map";
+import { element } from "svelte/internal";
 
   const dispatch = createEventDispatcher();
   onMount(() => dispatch("mountUnmount"))
@@ -21,11 +23,9 @@ import type { ModuleCard } from "../../../common/types/module-card";
 
   let expanded = false;
 
-  export let nob : HTMLSpanElement = undefined;
   let childNobs : Record<string, HTMLSpanElement> = {};
 
   const isObject = info.type === "object"
-
 
   const handleClick = isObject ? toggleExpansion : getNob;
 
@@ -33,8 +33,8 @@ import type { ModuleCard } from "../../../common/types/module-card";
     selectedNob.update((current) => {
       return solveConnection(current, {
       parentKey,
-      nob,
-      property: `${path}.${name}`,
+      nob: sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, `result.${name}`)],
+      property: path ? `${path}.${name}` : name,
       nobType: "output",
       propertyType: info.type
     }, bopModules)})
@@ -65,7 +65,7 @@ import type { ModuleCard } from "../../../common/types/module-card";
       bopModules.update(modules => {
         modules.forEach(module => {
           module.dependencies.forEach(dep => {
-            if(dep.origin === parentKey) dep.originNob = nob;
+            if(dep.origin === parentKey) dep.originNob = sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, path ? `${path}.${name}` : name)];
           })
         });
         return modules;
@@ -79,7 +79,7 @@ import type { ModuleCard } from "../../../common/types/module-card";
   class="nob"
   style="color: {typeColors[info.type]};"
   on:click={handleClick}
-  bind:this={nob}>{ isObject ? ( expanded ? "▼" : "⯈") : "●" }</span>
+  bind:this={sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, `result.${name}`)]}>{ isObject ? ( expanded ? "▼" : "⯈") : "●" }</span>
   {#if expanded}
     {#each Object.keys(info["subtype"]) as output}
       <svelte:self
@@ -117,6 +117,7 @@ import type { ModuleCard } from "../../../common/types/module-card";
     padding: 0 2px 3px 7px;
     border-radius: 5px 0 0 5px;
     background-color: #191928;
+    white-space: nowrap;
   }
 
   .total {

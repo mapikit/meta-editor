@@ -4,6 +4,7 @@ import type { Writable } from "svelte/store";
 import type {
   BopsConfigurationEntry,
 } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import { sectionsMap } from "./sections-map";
 
 
 // TODO breakdown this function and overall rework
@@ -26,20 +27,22 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
       const currentIsOutput = ["output", "module"].includes(currentNob.nobType);
       const [origin, target] = currentIsOutput ? [currentNob, clickedNob] : [clickedNob, currentNob];
 
-      console.log(modules);
-      console.log(origin, target);
-
       const targetModule = modules.find(module => module.key == target.parentKey);
+
+
+      const originPath = origin.parentKey === "input" ? origin.property
+        : origin.nobType === "module" ? "module" : `result.${origin.property}`;
 
       const newDependency : UICompliantDependency = {
         origin: origin.parentKey,
-        originPath: origin.nobType === "module" ? "module" : `result${origin.property}`,
+        originPath,
         targetPath: target.property,
         originNob: origin.nob,
         targetNob: target.nob,
         matchingType: (origin.propertyType === target.propertyType) || target.propertyType === "any",
       };
 
+      sectionsMap.addConnection(newDependency, target.parentKey);
 
       const alreadyPresent = targetModule.dependencies.findIndex(dep => dep.targetPath === newDependency.targetPath);
 

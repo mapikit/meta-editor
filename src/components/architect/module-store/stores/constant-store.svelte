@@ -59,7 +59,6 @@ import TypeSelect from "../../../object-definition/type-select.svelte";
         newConst.value = selectedValue;
         break;
     }
-    console.log(newConst);
     bopConstants.update(constants => {
       constants.push(newConst as BopsConstant)
       return constants;

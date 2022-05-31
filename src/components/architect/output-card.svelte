@@ -7,6 +7,7 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
 
   import { Coordinate } from "../../common/types/geometry";
   import type { ModuleCard } from "../../common/types/module-card";
+import { currentProject } from "../../stores/projects-store";
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import { getAvailableKey } from "./helpers/get-available-key";
@@ -49,6 +50,8 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
     const updatedConfig = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
     configuration.set(updatedConfig);
     editing = false;
+
+    setTimeout(() => bopModules.update(mods => mods), 200);
   }
 </script>
 
