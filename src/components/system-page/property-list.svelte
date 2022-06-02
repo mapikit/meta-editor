@@ -9,6 +9,7 @@ import { fly } from "svelte/transition";
 import { navigation } from "../../lib/navigation";
 import { selectedSystem } from "../systems-sidebar/systems-stores";
 import type { PropertyListEntry } from "../../common/types/property-list-entry";
+import { flip } from "svelte/animate";
 
 export let listType : keyof typeof typeInfos = "schemas";
 export let listData : PropertyListEntry[] = [];
@@ -34,7 +35,6 @@ let createHovered = false;
 $: currentSystem = $selectedSystem;
 
 const getNavPath = () : string => {
-  console.log("THE SELECTED SYSTEM IS ", currentSystem);
   return `/mapibox/system/${currentSystem}/${listType}/`;
 };
 
@@ -60,8 +60,8 @@ const getNavPath = () : string => {
   </div>
   {#if isOpen}
     <div class="list-container" style={`border-left-color: ${listInfo.color}`}>
-      {#each listData as listItem, index }
-        <div in:fly={{ x: 20, delay: index * 46 }} out:fly={{ x: 20, delay: 50*(listData.length - 1 * index) }}>
+      {#each listData as listItem, index (listItem.id)}
+        <div animate:flip={{ duration: 150 }} in:fly={{ x: 20, delay: index * 46 }} out:fly={{ x: 20, delay: 50*(listData.length - 1 * index) }}>
           <SystemPropCard entry={listItem}/>
         </div>
       {/each}

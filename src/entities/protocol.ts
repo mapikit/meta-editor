@@ -65,6 +65,20 @@ export class Protocol {
     this.configuration.set(configuration);
 
     this.keepStorageUpdated();
+
+    this.deleteProtocol = this.deleteProtocol.bind(this);
+  }
+
+  private deleteProtocol () : void {
+    protocols.update((list) => {
+      const itemIndex = list.findIndex((protocol) => get(protocol.id) === get(this.id));
+
+      list.splice(itemIndex, 1);
+
+      return list;
+    });
+
+    saveConfigurations();
   }
 
   public async getDataFromValidatedProtocol () : Promise<void> {
@@ -96,7 +110,7 @@ export class Protocol {
 
   public getProtocolCardInfo () : PropertyListEntry {
     const result : PropertyListEntry = {
-      id: this.id,
+      id: get(this.id),
       name: this.identifier,
       locked: this.isLocked,
       starred: this.isStarred,
@@ -108,6 +122,7 @@ export class Protocol {
         { name: "Version", value: this.protocolVersion, editable: false },
         { name: "Type", value: this.protocolType, editable: false },
       ],
+      deleteSelf: this.deleteProtocol,
     };
 
     return result;

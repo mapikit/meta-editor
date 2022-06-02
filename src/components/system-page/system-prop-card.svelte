@@ -7,6 +7,7 @@ import PencilIcon from "../common/icons/pencil-icon.svelte";
 import StarIcon from "../common/icons/star-icon.svelte";
 import EditableProperty from "./editable-property.svelte";
 import SystemPropEditButton from "./system-prop-edit-button.svelte";
+import SystemPropDeleteButton from "./system-prop-delete-button.svelte";
 
 export let entry : PropertyListEntry;
 
@@ -101,7 +102,8 @@ const updateLocked = (event : MouseEvent) : void => {
         </div>
       </div>
 
-      <SystemPropEditButton id={$id} />
+      <SystemPropEditButton id={id} />
+      <SystemPropDeleteButton deleteAction={entry.deleteSelf}/>
     </div>
   {/if}
 </div>

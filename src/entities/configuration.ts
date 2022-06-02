@@ -32,10 +32,10 @@ export class Configuration {
   // These properties are not stores because they're not meant to be
   // changed in here, they should be changed only when this is the current
   // configuration selected. In such case, they will be in the `configuration-store.ts` file, not here
-  public readonly businessOperations : UIBusinessOperation[] = [];
-  public readonly envs : EnvironmentVariable[] = [];
-  public readonly protocols : Protocol[] = [];
-  public readonly schemas : Schema[] = [];
+  public businessOperations : UIBusinessOperation[] = [];
+  public envs : EnvironmentVariable[] = [];
+  public protocols : Protocol[] = [];
+  public schemas : Schema[] = [];
 
   // eslint-disable-next-line max-lines-per-function
   public constructor ({
@@ -81,10 +81,6 @@ export class Configuration {
   }
 
   public serialized () : object {
-    this.businessOperations.forEach((bop) => {
-      console.log(bop.constructor.name);
-    });
-
     return {
       projectId: get(this.projectId),
       id: get(this.id),

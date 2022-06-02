@@ -33,11 +33,25 @@ export class Schema {
 
     this.id = readable(id);
     this.keepStorageUpdated();
+
+    this.deleteSchema = this.deleteSchema.bind(this);
+  }
+
+  private deleteSchema () : void {
+    schemas.update((list) => {
+      const itemIndex = list.findIndex((schema) => get(schema.id) === get(this.id));
+
+      list.splice(itemIndex, 1);
+
+      return list;
+    });
+
+    saveConfigurations();
   }
 
   public getSchemaCardInfo () : PropertyListEntry {
     return {
-      id: this.id,
+      id: get(this.id),
       name: this.name,
       locked: this.isLocked,
       starred: this.isStarred,
@@ -45,6 +59,7 @@ export class Schema {
       dataValues: [
         { name: "DB Protocol", value: this.dbProtocol, editable: true },
       ],
+      deleteSelf: this.deleteSchema,
     };
   }
 

@@ -56,16 +56,31 @@ export class UIBusinessOperation {
     this.validateConfigurationForUI(configuration);
 
     this.keepStorageUpdated();
+
+    this.deleteBop = this.deleteBop.bind(this);
+  }
+
+  private deleteBop () : void {
+    businessOperations.update((list) => {
+      const itemIndex = list.findIndex((bop) => get(bop.id) === get(this.id));
+
+      list.splice(itemIndex, 1);
+
+      return list;
+    });
+
+    saveConfigurations();
   }
 
   public getCardInfo () : PropertyListEntry {
     return {
-      id: this.id,
+      id: get(this.id),
       name: this.name,
       locked: this.isLocked,
       starred: this.isStarred,
       description: this.description,
       dataValues: [],
+      deleteSelf: this.deleteBop,
     };
   }
 
