@@ -1,11 +1,11 @@
-import type { Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type {
+  BopsConfigurationEntry,
+  Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 
 export class SectionsMap {
   public outputs : Record<string, HTMLSpanElement> =  {};
   public inputs : Record<string, HTMLSpanElement> =  {};
   public connections : Record<string, string[]> = {};
-
-  // TODO Improve the identifier to a more comprehensive and inclusive model
 
   public static getIdentifier (key : string | number, path : string) : string {
     return `${key}.${path}`;
@@ -29,6 +29,21 @@ export class SectionsMap {
         return;
       }
     }
+  }
+
+  private connectModule (module : BopsConfigurationEntry) : void {
+    for(const dependency of module.dependencies) this.addConnection(dependency, module.key);
+  }
+
+  private connectModules (modules : BopsConfigurationEntry[]) : void {
+    for(const module of modules) this.connectModule(module);
+  }
+
+  private clearConnections () : void { this.connections = {}; }
+
+  public refreshConnections (bopModules : BopsConfigurationEntry[]) : void {
+    this.clearConnections();
+    this.connectModules(bopModules);
   }
 }
 

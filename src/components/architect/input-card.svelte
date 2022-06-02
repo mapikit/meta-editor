@@ -30,17 +30,6 @@ import type { ModuleCard } from "../../common/types/module-card";
 
 
   function startEditing () : void {
-    currentBop.configuration.update(configs => {
-      configs.forEach(config => {
-        config.dependencies.forEach(dependency => {
-          if(["input", "inputs"].includes(String(dependency.origin))) {
-            dependency.originNob = undefined;
-          }
-        })
-      })
-      return configs;
-    })
-
     editing = true;
   }
 
@@ -48,23 +37,14 @@ import type { ModuleCard } from "../../common/types/module-card";
   function finishEdition() {
     editing = false;
 
+    configuration.update(input => {
+      navigateBackToLevel(0);
+      input.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
+
+      return input;
+    });
+
     // TODO make this a "await mount" style
-    setTimeout(() => {
-      configuration.update(input => {
-        navigateBackToLevel(0);
-        input.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
-
-        for(const config of get(currentBop.configuration)) {
-          config.dependencies.forEach((dependency, index) => {
-            const originName = dependency.originPath;
-            if(Object.keys(nobMapping).includes(originName)) dependency.originNob = nobMapping[originName];
-            else config.dependencies.splice(index, 1);
-          });
-        }
-
-        return input;
-      })
-    }, 200);
   }
 
 </script>

@@ -37,8 +37,6 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
         origin: origin.parentKey,
         originPath,
         targetPath: target.property,
-        originNob: origin.nob,
-        targetNob: target.nob,
         matchingType: (origin.propertyType === target.propertyType) || target.propertyType === "any",
       };
 

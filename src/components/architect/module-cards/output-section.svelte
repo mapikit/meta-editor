@@ -44,33 +44,33 @@ import { element } from "svelte/internal";
   function toggleExpansion () { expanded = !expanded }
 
   function expandObject() : void {
-    if(expanded) {
-      const currentDepth = path.split(".").length + 1;
-      bopModules.update(modules => {
-        modules.forEach(module => {
-          module.dependencies.forEach(dep => {
-            if(dep.origin === parentKey) {
-              const depthProperties = dep.originPath.split(".")
-              depthProperties.splice(0, currentDepth)
-              const child = depthProperties[0]
-              if(info["subtype"][child] !== undefined) {
-                dep.originNob = childNobs[child];
-              }
-            }
-          })
-        });
-      return modules;
-      })
-    } else {
-      bopModules.update(modules => {
-        modules.forEach(module => {
-          module.dependencies.forEach(dep => {
-            if(dep.origin === parentKey) dep.originNob = sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, path ? `${path}.${name}` : name)];
-          })
-        });
-        return modules;
-      })
-    }
+    // if(expanded) {
+    //   const currentDepth = path.split(".").length + 1;
+    //   bopModules.update(modules => {
+    //     modules.forEach(module => {
+    //       module.dependencies.forEach(dep => {
+    //         if(dep.origin === parentKey) {
+    //           const depthProperties = dep.originPath.split(".")
+    //           depthProperties.splice(0, currentDepth)
+    //           const child = depthProperties[0]
+    //           if(info["subtype"][child] !== undefined) {
+    //             dep.originNob = childNobs[child];
+    //           }
+    //         }
+    //       })
+    //     });
+    //   return modules;
+    //   })
+    // } else {
+    //   bopModules.update(modules => {
+    //     modules.forEach(module => {
+    //       module.dependencies.forEach(dep => {
+    //         if(dep.origin === parentKey) dep.originNob = sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, path ? `${path}.${name}` : name)];
+    //       })
+    //     });
+    //     return modules;
+    //   })
+    // }
   }
 </script>
 

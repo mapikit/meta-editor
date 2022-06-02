@@ -3,8 +3,6 @@ import type { BopsConfigurationEntry, Dependency } from "meta-system/dist/src/co
 import type { Coordinate, Dimensions } from "./geometry";
 
 export type UICompliantDependency = Dependency & {
-  originNob : HTMLSpanElement;
-  targetNob : HTMLSpanElement;
   matchingType : boolean;
 }
 

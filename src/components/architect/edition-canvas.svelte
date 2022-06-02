@@ -27,6 +27,8 @@ import { sectionsMap } from "./helpers/sections-map";
     return config;
   })
 
+  sectionsMap.refreshConnections(get(currentBop.configuration));
+
   let trashRect : DOMRect;
   let canvas : HTMLCanvasElement;
   let context : CanvasRenderingContext2D;
@@ -170,8 +172,7 @@ import { sectionsMap } from "./helpers/sections-map";
 
   function copyBOpToClipboard () {
     console.log(getDeepStoreObject(currentBop))
-    console.log(sectionsMap);
-    
+
     // TODO filter out ui properties
     navigator.clipboard.writeText(beautify(currentBop, null, 1, 110));
   }
@@ -219,7 +220,7 @@ import { sectionsMap } from "./helpers/sections-map";
     top: 0;
     left: 0;
     /* background: url("../../../static/images/dotted-back.jpg") rgb(16, 15, 17); */
-    background-color: gray;
+    /* background-color: gray; */
     width: 100%;
     height: 100%;
   }
@@ -227,25 +228,25 @@ import { sectionsMap } from "./helpers/sections-map";
   .buttonCpy {
     position: absolute;
     top: 10px;
-    left: 90px;
+    left: 160px;
   }
 
   .buttonScl {
     position: absolute;
     top: 10px;
-    left: 160px;
+    left: 230px;
   }
 
   .buttonFit {
     position: absolute;
     top: 10px;
-    left: 240px;
+    left: 310px;
   }
 
   .adjust {
     position: absolute;
     top: 10px;
-    left: 290px;
+    left: 360px;
   }
 
 
@@ -260,10 +261,10 @@ import { sectionsMap } from "./helpers/sections-map";
 
   .architect {
     position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
+    top: 48px;
+    left: 10px;
+    height: calc(100% - 48px);
+    width: calc(100% - 10px);
     overflow-x: hidden;
   }
 </style>
