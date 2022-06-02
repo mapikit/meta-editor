@@ -18,7 +18,6 @@
   let navigateBackToLevel : (index : number) => void;
   let getDefinitionAndData : () => { definition: ObjectDefinition, data : object };
   let editing = false;
-  const nobMapping : Record<string, HTMLSpanElement> = {};
 
 
   function startEditing () : void {

@@ -41,10 +41,10 @@ export function updateTraces (canvasContext : CanvasRenderingContext2D, env : En
   canvasContext.lineWidth = 2;
 
   for(const outputId of Object.keys(sectionsMap.connections)) {
-    if(sectionsMap.outputs[outputId] === null) continue;
+    if(sectionsMap.outputs[outputId] === null || sectionsMap.outputs[outputId] === undefined) continue;
     const startRect = sectionsMap.outputs[outputId].getBoundingClientRect();
     for(const inputId of sectionsMap.connections[outputId]) {
-      if(sectionsMap.inputs[inputId] === null) continue;
+      if(sectionsMap.inputs[inputId] === null || sectionsMap.inputs[inputId] === undefined) continue;
 
       const endRect = sectionsMap.inputs[inputId].getBoundingClientRect();
       const outputPos : CoordinateInfo = {

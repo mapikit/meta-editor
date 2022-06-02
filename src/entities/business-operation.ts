@@ -94,7 +94,9 @@ export class UIBusinessOperation {
     const resolvedInput : UIInput = { definition: undefined, position: undefined };
     try { isObjectDefinition(input); }
     catch {
-      resolvedInput.position = (input as UIInput).position ?? new Coordinate(0, 0);
+      const position = (input as UIInput).position;
+      resolvedInput.position =  position ? new Coordinate(position.x, position.y) : new Coordinate(0, 0);
+      resolvedInput.definition = (input as UIInput).definition ?? {};
       return this.input.set(resolvedInput);
     }
     resolvedInput.definition = input;
@@ -106,10 +108,10 @@ export class UIBusinessOperation {
     : asserts configuration is ModuleCard[] {
     for(const config of configuration) {
       if((config as ModuleCard).position === undefined) {
-        (config as ModuleCard).position = new Coordinate(
-          Math.random() * 1414, // See TODO below
-          Math.random() * 577,
-        );
+        (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
+      } else {
+        const position = (config as ModuleCard).position;
+        (config as ModuleCard).position = new Coordinate(position.x, position.y);
       }
 
       this.configuration.update(bopConfig => {

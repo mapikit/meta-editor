@@ -11,8 +11,8 @@ export interface CoordinateInfo {
 
 export class Coordinate  implements CoordinateInfo {
   constructor (
-    public x: number,
-    public y: number,
+    public x : number,
+    public y : number,
   ) {}
 
   /**
@@ -24,7 +24,7 @@ export class Coordinate  implements CoordinateInfo {
     return new Coordinate(
       targetPoint.x - this.x,
       targetPoint.y - this.y,
-    )
+    );
   }
 
   public scale (scale : number) : Coordinate {
@@ -46,7 +46,7 @@ export class Coordinate  implements CoordinateInfo {
   }
 
   public decompose () : [number, number] {
-    return [this.x, this.y]
+    return [this.x, this.y];
   }
 }
 
