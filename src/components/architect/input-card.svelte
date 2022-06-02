@@ -1,21 +1,13 @@
 <script lang="ts">
   import type { ObjectDefinition } from "@meta-system/object-definition";
-import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-  import { get, Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
   import { slide } from "svelte/transition";
-
-  import { Coordinate } from "../../common/types/geometry";
-import type { ModuleCard } from "../../common/types/module-card";
+  import type { ModuleCard } from "../../common/types/module-card";
   import type { UIInput } from "../../common/types/ui-input";
-  import type { UIBusinessOperation } from "../../entities/business-operation";
-  import { navigation } from "../../lib/navigation";
-  import { businessOperations } from "../../stores/configuration-store";
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import MovableCard from "./helpers/movable-card.svelte";
   import OutputSection from "./module-cards/output-section.svelte";
-
-  let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === get(navigation.currentPathParams).bopId);
 
 
   export let configuration : Writable<UIInput>;
@@ -43,8 +35,6 @@ import type { ModuleCard } from "../../common/types/module-card";
 
       return input;
     });
-
-    // TODO make this a "await mount" style
   }
 
 </script>

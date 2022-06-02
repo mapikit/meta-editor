@@ -19,8 +19,11 @@
   import { getDeepStoreObject } from "./helpers/get-deep-store-obj";
   import type { ModuleCard } from "../../common/types/module-card";
 import { sectionsMap } from "./helpers/sections-map";
-  
-  let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === get(navigation.currentPathParams).bopId);
+  const pathParams = navigation.currentPathParamsSubscribable
+  let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
+
+  $: currentBop = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
+
   let modulesInConfig : ModuleCard[];
   currentBop.configuration.subscribe(config => {
     modulesInConfig = get(currentBop.configuration)

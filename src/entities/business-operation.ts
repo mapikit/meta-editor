@@ -72,7 +72,7 @@ export class UIBusinessOperation {
   // eslint-disable-next-line max-lines-per-function
   public static createNewBOp () : void {
     const newBop = new UIBusinessOperation({
-      id: "MOCK_BOP_ID",
+      id: Math.floor(Math.random()*1000000).toString(),
       name: "New BOp",
       configuration: [],
       constants: [],
