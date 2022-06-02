@@ -13,15 +13,17 @@
   let pathParams = navigation.currentPathParamsSubscribable;
   let currentSchemaId = $pathParams["schemaId"];
   let currentSchema = getSchemaById(currentSchemaId);
-  let schemaFormat = currentSchema?.format;
+  let schemaFormat = $currentSchema?.format;
+  let schemaName = $currentSchema?.name;
 
   $: schemaList = $schemas;
-  $: currentSchemaId = $pathParams["schemaId"];
-  $: currentSchema = getSchemaById(currentSchemaId);
-  $: schemaFormat = currentSchema?.format;
 
-  const unsub = pathParams.subscribe(() => {
-    guideText.set(`Editing schema "${get(currentSchema?.name) ?? ""}" (${currentSchemaId})`);
+  const unsub = pathParams.subscribe((newValue) => {
+    currentSchemaId = newValue["schemaId"];
+    currentSchema = getSchemaById(currentSchemaId);
+    schemaFormat = $currentSchema?.format;
+    schemaName = $currentSchema?.name;
+    guideText.set(`Editing schema "${$schemaName}" (${currentSchemaId})`);
   });
 
   onDestroy(unsub);

@@ -1,5 +1,5 @@
 import { Schema } from "../entities/schema";
-import { get, Writable, writable } from "svelte/store";
+import { derived, get, Readable, Writable, writable } from "svelte/store";
 import { UIBusinessOperation } from "../entities/business-operation";
 import { Protocol } from "../entities/protocol";
 import { EnvironmentVariable } from "../entities/environment-variable";
@@ -65,14 +65,18 @@ export const businessOperations : Writable<UIBusinessOperation[]> = writable([])
 export const protocols : Writable<Protocol[]> = writable([]);
 export const environmentVariables : Writable<EnvironmentVariable[]> = writable([]);
 
-export const getSchemaById = (id : string) : Schema => {
-  const result : Schema = get(schemas).find((value) => get(value.id) === id);
+export const getSchemaById = (id : string) : Readable<Schema> => {
+  return derived(schemas, () => {
+    const result : Schema = get(schemas).find((value) => get(value.id) === id);
 
-  return result;
+    return result;
+  });
 };
 
-export const getProtocolById = (id : string) : Protocol => {
-  const result : Protocol = get(protocols).find((value) => get(value.id) === id);
+export const getProtocolById = (id : string) : Readable<Protocol> => {
+  return derived(protocols, () => {
+    const result : Protocol = get(protocols).find((value) => get(value.id) === id);
 
-  return result;
+    return result;
+  });
 };

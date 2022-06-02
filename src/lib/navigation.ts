@@ -6,9 +6,7 @@ class Navigation {
   private _registeredPaths : Set<string> = new Set();
   private _activeSwitchPath = "";
 
-  public currentPathParamsSubscribable : Readable<Record<string, string>> = derived(this.pathStore, () => {
-    return this.currentPathParams;
-  });
+  public currentPathParamsSubscribable : Readable<Record<string, string>>;
 
   public get currentPathParams () : Record<string, string> {
     return this.getCurrentPathParams();
@@ -90,6 +88,10 @@ class Navigation {
     window.onpopstate = () : void => {
       this.navigateTo(window.location.pathname + window.location.search);
     };
+
+    this.currentPathParamsSubscribable = derived(this._pathSvelteStore, () => {
+      return this.getCurrentPathParams();
+    });
   }
 
   public navigateAppendTo (path : string) : void {
@@ -98,7 +100,6 @@ class Navigation {
   }
 
   public navigateTo (path : string) : void {
-    // console.log(`%c Navigating to ${path}`, "color: aqua");
     this._pathSvelteStore.set(path);
   }
 
