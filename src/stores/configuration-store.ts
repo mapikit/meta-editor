@@ -80,3 +80,19 @@ export const getProtocolById = (id : string) : Readable<Protocol> => {
     return result;
   });
 };
+
+export const getCurrentMsysConfiguration = () : object => {
+  const project = get(currentProject);
+  const config = project.getConfiguration();
+
+  const result = {
+    "name": get(project.name),
+    "version": "1.0.0",
+    "envs": config.envs.map((env) => env.serialized()),
+    "protocols": config.protocols.map((protocol) => protocol.exported()),
+    "schemas": config.schemas.map((schema) => schema.exported()),
+    "businessOperations": config.businessOperations.map((bop) => bop.exported()),
+  };
+
+  return result;
+};

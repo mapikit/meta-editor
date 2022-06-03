@@ -176,6 +176,19 @@ export class UIBusinessOperation {
     });
   }
 
+  public exported () : object {
+    return ({
+      name: get(this.name),
+      description: get(this.description),
+      input: get(this.input).definition,
+      output: get(this.output),
+      constants: get(this.constants),
+      variables: get(this.variables),
+      configuration: get(this.configuration),
+      customObjects: get(this.customObjects),
+    });
+  }
+
   private keepStorageUpdated () : void {
     this.configuration.subscribe(saveConfigurations);
     this.input.subscribe(saveConfigurations);

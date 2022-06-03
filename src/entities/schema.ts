@@ -93,6 +93,15 @@ export class Schema {
     });
   }
 
+  public exported () : object {
+    return ({
+      format: get(this.format),
+      name: get(this.name),
+      dbProtocol: get(this.dbProtocol),
+      identifier: get(this.id),
+    });
+  }
+
   private keepStorageUpdated () : void {
     this.format.subscribe(saveConfigurations);
     this.description.subscribe(saveConfigurations);

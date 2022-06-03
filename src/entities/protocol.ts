@@ -142,6 +142,16 @@ export class Protocol {
     });
   }
 
+  public exported () : object {
+    return ({
+      protocol: get(this.protocolName),
+      protocolKind: get(this.protocolType),
+      configuration: get(this.configuration),
+      protocolVersion: get(this.protocolVersion),
+      identifier: get(this.identifier),
+    });
+  }
+
   private keepStorageUpdated () : void {
     this.id.subscribe(saveConfigurations);
     this.identifier.subscribe(saveConfigurations);
