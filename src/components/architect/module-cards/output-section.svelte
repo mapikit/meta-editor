@@ -30,7 +30,7 @@ import { element } from "svelte/internal";
     selectedNob.update((current) => {
       return solveConnection(current, {
       parentKey,
-      nob: sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, `result.${name}`)],
+      nob: sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, `result.${path ? `${path}.${name}` : name}`)],
       property: path ? `${path}.${name}` : name,
       nobType: "output",
       propertyType: info.type
