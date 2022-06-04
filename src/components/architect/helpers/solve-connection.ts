@@ -4,7 +4,7 @@ import type { Writable } from "svelte/store";
 import type {
   BopsConfigurationEntry,
 } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { sectionsMap } from "./sections-map";
+import { SectionsMap, sectionsMap } from "./sections-map";
 
 
 // TODO breakdown this function and overall rework
@@ -12,7 +12,6 @@ import { sectionsMap } from "./sections-map";
 // should be able to verify types and loops
 // eslint-disable-next-line max-lines-per-function
 export function solveConnection (currentNob : NobSelection, clickedNob : NobSelection, bopModules : Writable<BopsConfigurationEntry[]>) : NobSelection {
-  // console.log(currentNob, clickedNob)
 
   if(currentNob === undefined) {
     clickedNob.nob.style.outline = "solid #ffffff 2px";
@@ -40,7 +39,6 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
         matchingType: (origin.propertyType === target.propertyType) || target.propertyType === "any",
       };
 
-      sectionsMap.addConnection(newDependency, target.parentKey);
 
       const alreadyPresent = targetModule.dependencies.findIndex(dep => dep.targetPath === newDependency.targetPath);
 
@@ -48,18 +46,11 @@ export function solveConnection (currentNob : NobSelection, clickedNob : NobSele
       if(alreadyPresent !== -1) {
         targetModule.dependencies.splice(alreadyPresent, 1);
         target.nob.dispatchEvent(new Event("removeTag"));
+        sectionsMap.removeConnection(SectionsMap.getIdentifier(targetModule.key, newDependency.targetPath));
       }
+
       targetModule.dependencies.push(newDependency);
-
-
-      // if(moduleConnections[identifier] !== undefined) {
-      //   delete moduleConnections[identifier];
-      // } else {
-      //   const inputConnectionIndicator = identifier.split("-")[1]
-      //   if(Object.keys(moduleConnections).find(key => key.includes(inputConnectionIndicator))) {
-      //     window.alert("Inputs can't have multiple connections\n(Delete by re-connecting)")
-      //   } else moduleConnections[identifier] = [origin.nob, target.nob];
-      // }
+      sectionsMap.addConnection(newDependency, target.parentKey);
 
       return modules;
     });

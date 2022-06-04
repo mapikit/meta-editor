@@ -5,30 +5,31 @@ import type { Writable } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
   import DropdownIcon from "./dropdown-icon.svelte";
   import StoreModule from "./module-components/store-module.svelte";
+  import type { StoreModuleInfo } from "../../../common/types/store-module-info";
 
   export let sectionModulesType : ModuleType;
   export let summary : string;
-  export let modulesInSection : Array<FunctionDefinition>
+  export let modulesInSection : Array<StoreModuleInfo>;
   export let search : string = "";
   export let storeLocked = false;
   export let bopModules : Writable<ModuleCard[]>;
 
   let searchDelay : NodeJS.Timeout;
-  let searchedModules : Array<FunctionDefinition> = modulesInSection;
+  let searchedModules : Array<StoreModuleInfo> = modulesInSection;
   let open  = false;
-  $: searchInSection(search);
+  // $: searchInSection(search);
 
-  async function searchInSection (searchString : string) : Promise<void> {
-    if(searchDelay !== undefined) clearTimeout(searchDelay);
-    searchDelay = setTimeout(() => {
-      const result = modulesInSection.filter(module =>
-        module.functionName.toLowerCase().includes(searchString.toLowerCase()),
-      );
-      searchedModules = result;
-      open = searchedModules.length > 0 && searchString !== "";
-      searchDelay = undefined;
-    }, 300);
-  }
+  // async function searchInSection (searchString : string) : Promise<void> {
+  //   if(searchDelay !== undefined) clearTimeout(searchDelay);
+  //   searchDelay = setTimeout(() => {
+  //     const result = modulesInSection.filter(module =>
+  //       module.functionName.toLowerCase().includes(searchString.toLowerCase()),
+  //     );
+  //     searchedModules = result;
+  //     open = searchedModules.length > 0 && searchString !== "";
+  //     searchDelay = undefined;
+  //   }, 300);
+  // }
 </script>
 
 
@@ -36,7 +37,7 @@ import type { ModuleCard } from "../../../common/types/module-card";
   <summary><span class="icon"><DropdownIcon/></span>{summary + ` (${searchedModules.length})`}</summary>
     {#if open}
       {#each searchedModules as module}
-        <div class="module"><StoreModule bind:bopModules bind:storeLocked definition={module} moduleType={sectionModulesType}/></div>
+        <div class="module"><StoreModule bind:bopModules bind:storeLocked module={module} moduleType={sectionModulesType}/></div>
       {/each}
     {/if}
 </details>

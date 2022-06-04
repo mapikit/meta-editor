@@ -4,7 +4,7 @@
   import { typeColors } from "../../../common/styles/type-colors";
   import type { TypeDefinition } from "@meta-system/object-definition";
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
-import type { Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
 import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import type { ModuleCard } from "../../../common/types/module-card";
 import { SectionsMap, sectionsMap } from "../helpers/sections-map";
@@ -22,9 +22,6 @@ import { element } from "svelte/internal";
   export let bopModules : Writable<ModuleCard[]>;
 
   let expanded = false;
-
-  let childNobs : Record<string, HTMLSpanElement> = {};
-
   const isObject = info.type === "object"
 
   const handleClick = isObject ? toggleExpansion : getNob;
@@ -41,9 +38,14 @@ import { element } from "svelte/internal";
   }
 
 
-  function toggleExpansion () { expanded = !expanded }
+  function toggleExpansion () {
+    expanded = !expanded
+  }
 
   function expandObject() : void {
+    setTimeout(() => bopModules.update(mod => mod), 1);
+
+
     // if(expanded) {
     //   const currentDepth = path.split(".").length + 1;
     //   bopModules.update(modules => {
@@ -74,12 +76,11 @@ import { element } from "svelte/internal";
   }
 </script>
 
-<div class="box">
 <div class="total"><span class="text">{name}</span><span 
   class="nob"
   style="color: {typeColors[info.type]};"
   on:click={handleClick}
-  bind:this={sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, `result.${name}`)]}>{ isObject ? ( expanded ? "▼" : "⯈") : "●" }</span>
+  bind:this={sectionsMap.outputs[SectionsMap.getIdentifier(parentKey, `result.${path ? `${path}.${name}` : name}`)]}>{ isObject ? ( expanded ? "▼" : "⯈") : "●" }</span>
   {#if expanded}
     {#each Object.keys(info["subtype"]) as output}
       <svelte:self
@@ -88,11 +89,9 @@ import { element } from "svelte/internal";
         name={output}
         info={info["subtype"][output]}
         parentKey={parentKey}
-        bind:nob={childNobs[output]}
       />
     {/each}
   {/if}
-</div>
 </div>
 
 <style lang="scss">
@@ -107,8 +106,6 @@ import { element } from "svelte/internal";
     background-color: lightgray;
     transition-duration: 125ms;
   }
-
-
 
   .text {
     user-select: none;

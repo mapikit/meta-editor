@@ -3,7 +3,7 @@
   import type { Writable } from "svelte/store";
   import type { ModuleCard } from "../../../../common/types/module-card";
   import List from "../../../list/list.svelte";
-  import { functionsInfo } from "../../helpers/functions-info";
+import { FunctionsInfo } from "../../helpers/functions-info";
   import StoreSection from "../store-section.svelte";
   
   export let search : string = "";
@@ -68,19 +68,20 @@
 
   function getSeparatedModules () {
     const separatedModules : { [name : string] : Array<FunctionDefinition> } = {};
-    for(const module of functionsInfo.internal) {
+    const functionsInfo = FunctionsInfo.getInternalsInfo;
+    for(const module of functionsInfo) {
       let saved = false;
       for(const sectionInfo of Object.values(internalModulesSections)) {
         if(separatedModules[sectionInfo.name] === undefined) separatedModules[sectionInfo.name] = [];
-        if(sectionInfo.modules.includes(module[0])) {
-          separatedModules[sectionInfo.name].push(module[1]);
+        if(sectionInfo.modules.includes(module.functionName)) {
+          separatedModules[sectionInfo.name].push(module);
           saved = true;
           break;
         };
       }
       if(!saved) {
         if(separatedModules["Other Functions"] === undefined) separatedModules["Other Functions"] = [];
-        separatedModules["Other Functions"].push(module[1]);
+        separatedModules["Other Functions"].push(module);
       }
     }
     return separatedModules;

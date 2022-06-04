@@ -175,6 +175,7 @@ import { sectionsMap } from "./helpers/sections-map";
 
   function copyBOpToClipboard () {
     console.log(getDeepStoreObject(currentBop))
+    console.log(sectionsMap)
 
     // TODO filter out ui properties
     navigator.clipboard.writeText(beautify(currentBop, null, 1, 110));

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import { getAvailableKey } from "../../helpers/get-available-key";
   import ModuleCardSkeleton from "../../module-cards/module-card-skeleton.svelte";
   import StoreInput from "./store-input.svelte";
@@ -9,9 +8,11 @@
   import { Coordinate } from "../../../../common/types/geometry";
   import type { Writable } from "svelte/store";
   import type { ModuleCard } from "../../../../common/types/module-card";
+  import { FunctionsInfo } from "../../helpers/functions-info";
+  import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
 
 
-  export let definition : FunctionDefinition;
+  export let module : StoreModuleInfo;
   export let moduleType : ModuleType;
   export let storeLocked = false;
   export let bopModules : Writable<ModuleCard[]>;
@@ -36,7 +37,13 @@
     newCard.style.left = `${left}px`;
     newCard.style.top = `${top}px`;
     ref.style.visibility = "hidden";
+  }
 
+  function getPackage (): string {
+    switch (moduleType) {
+      case "schemaFunction": return module.schemaName;
+      default: return undefined;
+    }
   }
 
   function stopMovement (event : MouseEvent) {
@@ -46,17 +53,18 @@
     if(newCard !== undefined) {
       if(event.x < storeRect.x) {
         bopModules.update(modules => {
-          modules.push({
+          const newModule : ModuleCard = {
             dependencies: [],
             key: getAvailableKey(modules),
-            moduleName: definition.functionName,
+            moduleName: module.functionName,
+            modulePackage: getPackage(),
             moduleType: moduleType,
-            info: definition,
             position: new Coordinate(left, top)
               .moveBy(-$environment.origin.x, -$environment.origin.y)
               .scale(1/$environment.scale),
-            modulePackage: undefined, // TODO Figure this out as well
-          });
+            bopId: module["bopId"]
+          };
+          modules.push(newModule)
           return modules;
         })
       }
@@ -80,17 +88,17 @@
 
 
 <div class="items" bind:this={ref} on:mousedown={startMovement}>
-  <ModuleCardSkeleton definition={definition}>
+  <ModuleCardSkeleton definition={module}>
     <div slot="content" class="IO">
       <div class="inputs">
-        {#each Object.keys(definition.input) as key}
-          <StoreInput  type={definition.input[key].type}/>
+        {#each Object.keys(module.input) as key}
+          <StoreInput  type={module.input[key].type}/>
         {/each}
       </div>
       <div class="separator"></div>
       <div class="outputs">
-        {#each Object.keys(definition.output) as key}
-          <StoreOutput type={definition.output[key].type}/>
+        {#each Object.keys(module.output) as key}
+          <StoreOutput type={module.output[key].type}/>
         {/each}
       </div>
     </div>

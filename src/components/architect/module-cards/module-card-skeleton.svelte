@@ -4,6 +4,8 @@
   import Tooltip from "../../../components/common/tooltip.svelte";
   export let definition : FunctionDefinition;
   export let tooltipPosition :  "top" | "bottom" | "left" | "right" = "left";
+  export let parentSchema = undefined;
+
 
 
 
@@ -17,7 +19,7 @@
 <div class="module">
 <div class="header"> 
 
-<span class="modName" >{definition.functionName}</span>
+<span class="modName" >{definition.functionName}</span> {#if parentSchema} <span class="schemaName">@{parentSchema}</span> {/if}
   <div class="tooltipIcon"
     on:focus={undefined}
     on:mouseenter={() => { tooltipVisible = true; } }
@@ -41,6 +43,10 @@
     margin-top: 5px;
   }
 
+  .schemaName {
+    color: lightgray;
+  }
+
   .tooltipIcon {
     border-radius: 10px;
     display: inline-block;
@@ -59,6 +65,8 @@
     border-radius: 5px 5px 0 0 ;
     display: inline-block;
     width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .modName {

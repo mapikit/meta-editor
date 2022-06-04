@@ -2,7 +2,7 @@
   import InputSection from "./input-section.svelte";
   import OutputSection from "./output-section.svelte";
   import type { ModuleCard } from "../../../common/types/module-card";
-  import { functionsInfo } from "../helpers/functions-info";
+  import { FunctionsInfo } from "../helpers/functions-info";
   import StaticCardBody from "./module-card-skeleton.svelte";
   import { getAvailableKey } from "../helpers/get-available-key";
   import { environment } from "../../../stores/environment";
@@ -11,9 +11,8 @@
   import { solveConnection } from "../helpers/solve-connection";
   import MovableCard from "../helpers/movable-card.svelte";
   import type { Writable } from "svelte/store";
-import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { SectionsMap, sectionsMap } from "../helpers/sections-map";
-import { getConnectionIdentifier } from "../helpers/get-connection-identifier";
+  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import { SectionsMap, sectionsMap } from "../helpers/sections-map";
 
   export let moduleConfig : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>
@@ -22,14 +21,9 @@ import { getConnectionIdentifier } from "../helpers/get-connection-identifier";
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
   moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
-  // TODO Maybe create a "smartPosition" function that considers the "distance" (module steps) from output
-  // And [modular] dependency numbers to position modules in a grid-like organization when
-  // the modules position is not present (BOP was imported)
-  // Also, this sort of distribuition should line in the upper level
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
   moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
-  moduleConfig.info = moduleConfig.info ?? functionsInfo[moduleConfig.moduleType].get(moduleConfig.moduleName);
-
+  $: cardInfo = FunctionsInfo.getCardInfo(moduleConfig);
   export let trashPosition : DOMRect;
 
   function checkRectCollision(x : number, y : number, targetRect : DOMRect) : boolean {
@@ -71,23 +65,32 @@ import { getConnectionIdentifier } from "../helpers/get-connection-identifier";
 </script>
 
 
-<MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
-  <StaticCardBody definition={moduleConfig.info} tooltipPosition="top" slot="content">
-    <span slot="moduleNob" class="moduleNob" bind:this={sectionsMap.outputs[SectionsMap.getIdentifier(moduleConfig.key, `module`)]} on:click={moduleConnect}>M</span>
-    <div slot="content" class="IODiv">
-      <div class="inputs">
-        {#each Object.keys(moduleConfig.info.input) as key}
-          <InputSection bind:bopModules bind:bopConstants name={key} parentKey={moduleConfig.key} info={moduleConfig.info.input[key]}/>
-        {/each}
+{#if cardInfo !== undefined}
+  <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
+    <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
+      <span slot="moduleNob" class="moduleNob" bind:this={sectionsMap.outputs[SectionsMap.getIdentifier(moduleConfig.key, `module`)]} on:click={moduleConnect}>M</span>
+      <div slot="content" class="IODiv">
+        <div class="inputs">
+          {#each Object.keys(cardInfo.input) as key}
+            <InputSection bind:bopModules bind:bopConstants name={key} parentKey={moduleConfig.key} info={cardInfo.input[key]}/>
+          {/each}
+        </div>
+        <div class="outputs">
+          {#each Object.keys(cardInfo.output) as key}
+            <OutputSection bind:bopModules name={key} parentKey={moduleConfig.key} info={cardInfo.output[key]}/>
+          {/each}
+        </div>
       </div>
-      <div class="outputs">
-        {#each Object.keys(moduleConfig.info.output) as key}
-          <OutputSection bind:bopModules name={key} parentKey={moduleConfig.key} info={moduleConfig.info.output[key]}/>
-        {/each}
-      </div>
+    </StaticCardBody>
+  </MovableCard>
+{:else}
+  <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
+    <div class="undefinedModule" slot="content">! UNAVAILABLE MODULE !<br>
+      This card has been deleted. This is usually happens when you delete a BOp that was used internally, or an external package that was removed from
+      our database for security reasons. 
     </div>
-  </StaticCardBody>
-</MovableCard>
+  </MovableCard>
+{/if}
 
 
 
@@ -104,6 +107,14 @@ import { getConnectionIdentifier } from "../helpers/get-connection-identifier";
   .inputs {
     grid-column: 1;
     padding-right: 6px;
+  }
+
+  .undefinedModule {
+    background-color: darkred;
+    padding: 5px 5px 5px 5px;
+    max-width: 300px;
+    text-align: center;
+    z-index: 3;
   }
 
   // .divider {

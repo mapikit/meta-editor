@@ -3,7 +3,7 @@ import type { Writable } from "svelte/store";
 import type { ModuleCard } from "../../../../common/types/module-card";
 import { businessOperations } from "../../../../stores/configuration-store";
   import List from "../../../list/list.svelte";
-  import { getBopFunctionInfo } from "../../helpers/get-bop-function-info";
+  import { getAllBopsInfo } from "../../helpers/get-bop-function-info";
   import StoreModule from "../module-components/store-module.svelte";
   
   export let search : string = "";
@@ -11,14 +11,14 @@ import { businessOperations } from "../../../../stores/configuration-store";
   export let bopModules : Writable<ModuleCard[]>;
   businessOperations
 
-  const modules = $businessOperations.map(bop => getBopFunctionInfo(bop))
+  const modules = Array.from(getAllBopsInfo($businessOperations).values());
 
 
 </script>
 
 <div class="list">
   <List contents={modules} let:item>
-      <StoreModule bind:bopModules bind:storeLocked definition={item} moduleType="bop"/>
+      <StoreModule bind:bopModules bind:storeLocked module={item} moduleType="bop"/>
   </List>
 </div>
 

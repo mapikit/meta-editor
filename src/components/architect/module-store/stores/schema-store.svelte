@@ -15,36 +15,23 @@
   import { schemas } from "../../../../stores/configuration-store";
   import { get, Writable } from "svelte/store";
   import type { ModuleCard } from "../../../../common/types/module-card";
+import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
+import { FunctionsInfo } from "../../helpers/functions-info";
   export let search : string;
   export let storeLocked = false;
   export let bopModules : Writable<ModuleCard[]>
 
-  const schemaFunctionsInfo : FunctionDefinition[] = [
-    countInfo, deleteByIdInfo, deleteInfo, getByIdInfo, getInfo, createInfo, updateByIdInfo, updateInfo,
-  ];
-
-  const schemasFunctions : Record<string, Array<FunctionDefinition>> = {};
+  const schemasFunctions : Record<string, Array<StoreModuleInfo>> = {};
   for(const schema of $schemas) {
-    schemasFunctions[`${get(schema.name)} Functions`] = treatInfo(schemaFunctionsInfo, schema as unknown as SchemaType);
-  }
-
-  function treatInfo(functionsInfo : FunctionDefinition[], schema : SchemaType) : FunctionDefinition[] {
-    const treatedInfo = clone(functionsInfo);
-    treatedInfo.map(info => {
-      for(const input of Object.keys(info.input)) {
-        if(info.input[input].type === "%entity") {
-          info.input[input]["subtype"] = schema.format;
-          info.input[input].type = "object"
-        }
-      }
-      for(const output of Object.keys(info.output)) {
-        if(info.output[output].type === "%entity") {
-          info.output[output]["subtype"] = schema.format;
-          info.output[output].type = "object"
-        }
-      }
-    })
-    return treatedInfo;
+    const schemaName = get(schema.name);
+    const sectionTitle = `${schemaName} Functions`;
+    schemasFunctions[sectionTitle] = [];
+    for(const info of FunctionsInfo.getSchemasInfo(schemaName)) {
+      schemasFunctions[sectionTitle].push({
+        ...info,
+        schemaName,
+      })
+    }
   }
 
 </script>

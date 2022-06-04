@@ -27,10 +27,14 @@ import type { Writable } from "svelte/store";
     // if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
     //   return deleteCard();
     // }
-    ref.style.opacity = "1"
-    ref.style.zIndex = "0"
-    moving = false
-    if(endOfMovementCallback) endOfMovementCallback(event);
+    if(moving) {
+      ref.style.opacity = "1"
+      ref.style.zIndex = "0"
+      moving = false
+      if(endOfMovementCallback) {
+        endOfMovementCallback(event);
+      }
+    }
   }
 
   function moveCard (event : MouseEvent) {
