@@ -7,7 +7,6 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
 
   import { Coordinate } from "../../common/types/geometry";
   import type { ModuleCard } from "../../common/types/module-card";
-import { currentProject } from "../../stores/projects-store";
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import { getAvailableKey } from "./helpers/get-available-key";
@@ -27,7 +26,6 @@ import { currentProject } from "../../stores/projects-store";
       key: getAvailableKey($bopModules),
       moduleName: "output",
       position: new Coordinate(200, 200),
-      info: { input: $configuration, output: undefined, functionName: "Output" }
     };
     bopModules.update(modules => {
       modules.push(module);

@@ -44,7 +44,7 @@
   }
 
   .schemaName {
-    color: lightgray;
+    color: rgb(148, 148, 148);
   }
 
   .tooltipIcon {

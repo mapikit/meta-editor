@@ -75,8 +75,8 @@ export function updateTraces (canvasContext : CanvasRenderingContext2D, env : En
       canvasContext.beginPath();
       canvasContext.moveTo(outputPos.x, outputPos.y);
       canvasContext.bezierCurveTo(
-        outputPos.x+60, outputPos.y,
-        inputPos.x-60, inputPos.y,
+        outputPos.x+60*env.scale, outputPos.y,
+        inputPos.x-60*env.scale, inputPos.y,
         inputPos.x, inputPos.y,
       );
       canvasContext.stroke();

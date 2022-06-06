@@ -18,9 +18,9 @@ import type { ModuleCard } from "../../../common/types/module-card";
 
 
 const internalManager = msys.internalFunctionManagerSingleton;
-
 // TODO !IMPORTANT There seems to be some inconsistency in this part between dev and build,
 // possibly related to the way msys exports its components.
+
 export class FunctionsInfo {
   private static getSchemaFunctionInfo (schemaName : string, functionName : string) : FunctionDefinition {
     if(schemaName === undefined) return undefined;
