@@ -9,6 +9,7 @@ export type CuttingInfo = {
 // eslint-disable-next-line max-lines-per-function
 export function updateTraces (canvasContext : CanvasRenderingContext2D, env : EnvType, cuttingInfo ?: CuttingInfo)
   : Array<string> {
+
   const linesToCut : Array<string> = [];
   canvasContext.shadowColor = "red";
 
@@ -41,17 +42,12 @@ export function updateTraces (canvasContext : CanvasRenderingContext2D, env : En
   canvasContext.lineWidth = 2;
 
   for(const outputId of Object.keys(sectionsMap.connections)) {
-    let altOutputId = undefined;
-    if(sectionsMap.outputs[outputId] === null || sectionsMap.outputs[outputId] === undefined) {
-      const paths = outputId.split(".");
-      altOutputId = paths.slice(undefined, paths.length-1).join(".");
-      if(sectionsMap.outputs[altOutputId] === null || sectionsMap.outputs[altOutputId] === undefined) continue;
-    };
-    const startRect = sectionsMap.outputs[altOutputId ?? outputId].getBoundingClientRect();
+    if(sectionsMap.output[outputId] === null || sectionsMap.output[outputId] === undefined) continue;
+    const startRect = sectionsMap.output[outputId].getBoundingClientRect();
     for(const inputId of sectionsMap.connections[outputId]) {
-      if(sectionsMap.inputs[inputId] === null || sectionsMap.inputs[inputId] === undefined) continue;
+      if(sectionsMap.input[inputId] === null || sectionsMap.input[inputId] === undefined) continue;
 
-      const endRect = sectionsMap.inputs[inputId].getBoundingClientRect();
+      const endRect = sectionsMap.input[inputId].getBoundingClientRect();
       const outputPos : CoordinateInfo = {
         x: startRect.x + startRect.width/2 - canvasOffset.x,
         y: startRect.y + startRect.height/2 - canvasOffset.y,

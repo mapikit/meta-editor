@@ -7,10 +7,10 @@ import { onMount } from "svelte";
 
   import DropdownIcon from "../module-store/dropdown-icon.svelte";
 
-  export let parentNob : HTMLSpanElement;
   export let config : BopsConstant;
 
-  function removeTag () { parentNob.dispatchEvent(new Event("removeTag")); }
+  function removeTag () {}
+
 </script>
 
 <div class="constantTag" transition:expand >

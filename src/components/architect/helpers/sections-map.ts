@@ -3,8 +3,8 @@ import type {
   Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 
 export class SectionsMap {
-  public outputs : Record<string, HTMLSpanElement> =  {};
-  public inputs : Record<string, HTMLSpanElement> =  {};
+  public output : Record<string, HTMLSpanElement> =  {};
+  public input : Record<string, HTMLSpanElement> =  {};
   public connections : Record<string, string[]> = {};
 
   public static getIdentifier (key : string | number, path : string) : string {
@@ -39,11 +39,50 @@ export class SectionsMap {
     for(const module of modules) this.connectModule(module);
   }
 
-  private clearConnections () : void { this.connections = {}; }
+  private isNill (value : unknown) : boolean { return value === undefined || value === null; }
+
+  // eslint-disable-next-line max-lines-per-function
+  private solveDeepConnections () : void {
+    for(const output in this.connections) {
+      const outSteps = output.split(".");
+      while(this.isNill(this.output[outSteps.join(".")]) && outSteps.length > 0) {
+        outSteps.pop();
+      }
+      if(outSteps.length === 0) delete this.connections[output];
+      else {
+        const correctedOutId = outSteps.join(".");
+        if(output !== correctedOutId) {
+          this.connections[outSteps.join(".")] =
+            [...this.connections[output], ...this.connections[outSteps.join(".")] ?? []];
+          delete this.connections[output];
+        }
+
+
+        for(const input of this.connections[correctedOutId]) {
+          const inSteps = input.split(".");
+          while(this.isNill(this.input[inSteps.join(".")]) && inSteps.length > 0) inSteps.pop();
+          const inputIndex = this.connections[correctedOutId].indexOf(input);
+          if(inSteps.length === 0) this.connections[correctedOutId].splice(inputIndex, 1);
+          else this.connections[correctedOutId][inputIndex] = inSteps.join(".");
+        }
+        this.removeDuplicates(correctedOutId);
+      }
+    }
+  }
+
+  private removeDuplicates (outputId : string) : void {
+    for(const input of this.connections[outputId]) {
+      while(this.connections[outputId].filter(inputId => inputId === input).length > 1) {
+        const inputIndex = this.connections[outputId].indexOf(input);
+        this.connections[outputId].splice(inputIndex, 1);
+      }
+    }
+  }
 
   public refreshConnections (bopModules : BopsConfigurationEntry[]) : void {
-    this.clearConnections();
+    this.connections = {};
     this.connectModules(bopModules);
+    this.solveDeepConnections();
   }
 }
 

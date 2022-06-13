@@ -1,11 +1,8 @@
 <script lang="ts">
-  // There be dragons beyond this point, take all this code with a pinch of salt
-  // (Many) Changes are to be expected
   import Module from "./module-cards/module-card.svelte";
   import { onMount } from "svelte";
   import { updateTraces } from "./update-traces";
   import beautify from "json-beautify";
-  // import { bopStore } from "../../stores/bop-store";
   import ModuleStore from "./module-store.svelte";
   import Trash from "./trash.svelte";
   import { environment } from "../../stores/environment";
@@ -13,12 +10,13 @@
   import InputCard from "./input-card.svelte";
   import OutputCard from "./output-card.svelte";
   import type { UIBusinessOperation } from "../../entities/business-operation";
-  import { get } from "svelte/store";
+  import { get, Writable } from "svelte/store";
   import { navigation } from "../../lib/navigation";
   import { businessOperations } from "../../stores/configuration-store";
   import { getDeepStoreObject } from "./helpers/get-deep-store-obj";
   import type { ModuleCard } from "../../common/types/module-card";
-import { sectionsMap } from "./helpers/sections-map";
+  import { sectionsMap } from "./helpers/sections-map";
+
   const pathParams = navigation.currentPathParamsSubscribable
   let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
 
@@ -61,6 +59,7 @@ import { sectionsMap } from "./helpers/sections-map";
       adjustCanvas();
 
       $environment.origin.moveTo(canvas.width/2, canvas.height/2);
+      sectionsMap.refreshConnections(get(currentBop.configuration));
 
       currentBop.configuration.subscribe(bop => {
         updateTraces(context, $environment);

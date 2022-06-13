@@ -102,7 +102,7 @@
       {#if selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
       {#if selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
       {#if selectedStore === "schema"} <SchemaStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
-      {#if selectedStore === "constants"} <ConstantStore bopConstants={currentBop.constants} /> {/if}
+      {#if selectedStore === "constants"} <ConstantStore bopModules={currentBop.configuration} bopConstants={currentBop.constants} /> {/if}
       {#if selectedStore === "variables"} <div></div> {/if}
       {#if selectedStore === "protocols"} <ProtocolsFunctionsStore bind:storeLocked={internalLock} bind:search modules={getProtocolModules($protocols)} /> {/if}
     </div>

@@ -1,19 +1,18 @@
 <script lang="ts">
-import type { ObjectDefinition, TypeDefinition } from "@meta-system/object-definition";
-import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
-
-  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import type { bind, SvelteComponent } from "svelte/internal";
+  import type { ObjectDefinition, TypeDefinition } from "@meta-system/object-definition";
+  import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
+  import type { BopsConfigurationEntry, BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { Writable } from "svelte/store";
-import ArrayDefinitionEditor from "../../../object-definition/array-definition-editor.svelte";
-import EditingField from "../../../object-definition/editing-fields/editing-field.svelte";
-import type { DefinitionData } from "../../../object-definition/obj-def-converter";
-import { EditorLevels } from "../../../object-definition/obj-def-editor-types-and-helpers";
+  import ArrayDefinitionEditor from "../../../object-definition/array-definition-editor.svelte";
+  import EditingField from "../../../object-definition/editing-fields/editing-field.svelte";
+  import type { DefinitionData } from "../../../object-definition/obj-def-converter";
   import ObjectDefinitionMiniApp from "../../../object-definition/object-definition-mini-app.svelte";
-import TypeSelect from "../../../object-definition/type-select.svelte";
+  import TypeSelect from "../../../object-definition/type-select.svelte";
   import DropdownIcon from "../dropdown-icon.svelte";
-  import AddConstantCard from "../module-components/add-constant-card.svelte";
   import StoreConstant from "../module-components/store-constant.svelte";
+
+  export let bopModules : Writable<BopsConfigurationEntry[]>
+  export let bopConstants : Writable<BopsConstant[]>
 
   let addingConst = false;
   let newConstName : string = "";
@@ -33,7 +32,6 @@ import TypeSelect from "../../../object-definition/type-select.svelte";
 
 
   let MiniApp;
-  export let bopConstants : Writable<BopsConstant[]>
 
   function startAddingConst () : void {
     newConstName = `Constant${$bopConstants.length + 1}`;
@@ -83,7 +81,7 @@ import TypeSelect from "../../../object-definition/type-select.svelte";
   {:else}
     <div class="list">
       {#each $bopConstants as constant}
-        <div class="listItem"><StoreConstant constant={constant}/></div>
+        <div class="listItem"><StoreConstant bopModules={bopModules} constant={constant}/></div>
       {/each}
     </div>
     <div class="addButton" on:click={startAddingConst}><div class="addIcon"><DropdownIcon/></div></div>

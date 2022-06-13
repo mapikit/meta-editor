@@ -1,96 +1,45 @@
 <script lang="ts">
   import type { TypeDefinition } from "@meta-system/object-definition";
-  import type { BopsConstant, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-  import { onMount } from "svelte";
+  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { Writable } from "svelte/store";
-  import { typeColors } from "../../../common/styles/type-colors";
   import type { ModuleCard } from "../../../common/types/module-card";
-  import { selectedNob } from "../../../stores/connection-stores";
-import { SectionsMap, sectionsMap } from "../helpers/sections-map";
-  import { solveConnection } from "../helpers/solve-connection";
-  import ConstantTag from "../tags/constant-tag.svelte";
-
+  import { getStoredDefinition } from "../helpers/get-stored-subtype";
+  import ConnectionKnob from "./connection-knob.svelte";
 
   export let name : string;
   export let parentKey : number;
   export let info : TypeDefinition<{}>;
   export let bopModules : Writable<ModuleCard[]>;
   export let bopConstants : Writable<BopsConstant[]>;
+  export let path = "";
 
-  const parentInfo = $bopModules.find(config => config.key === parentKey);
+  let toggleEdition = () => {};
 
-  function getNob () : void {
-    selectedNob.update((current) => {
-      return solveConnection(current, {
-        parentKey: parentKey,
-        nob: sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)],
-        property: name,
-        nobType: "input",
-        propertyType: info.type
-      }, bopModules)})
-  }
-  onMount(() => {
-    sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)].addEventListener<any & { detail : { constant : BopsConstant }}>("appendTag", (event) => {
-      const newDependency = {
-        origin: "constants",
-        originNob: undefined,
-        targetNob: undefined,
-        originPath: event.detail.constant.name,
-        targetPath: name,
-        matchingType: event.detail.constant.type === info.type,
-      }
-      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name)
-      if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
-      parentInfo.dependencies.push(newDependency);
-      constantConfig = event.detail.constant;
-      bopModules.update(modules => modules);
-    }, false);
+  const fullPath = path ? `${path}.${name}` : name;
 
-    sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)].addEventListener("removeTag", () => {
-      const existingIndex = parentInfo.dependencies.findIndex(dep => dep.targetPath === name);
-      if(existingIndex !== -1) parentInfo.dependencies.splice(existingIndex, 1);
-      constantConfig = undefined;
-      bopModules.update(modules => modules);
-    }, false);
-  });
-  
 
-  
-  let constantConfig : BopsConstant;
-  function getConstant (dependencies : Dependency[]) {
-    const thisConfig = dependencies.find(dep => dep.targetPath.startsWith(name));
-    if(thisConfig === undefined) return undefined;
-    if(typeof thisConfig.origin !== "string" || !["constant", "constants"].includes(thisConfig.origin))
-    {return undefined;}
-    const constant = $bopConstants.find(cons => cons.name === thisConfig.originPath.split(".")[0]);
-    return constant;
-  }
-  constantConfig = getConstant(parentInfo.dependencies);
+  let currentInfo : TypeDefinition;
+  $: currentInfo = info.type === "cloudedObject" ? getStoredDefinition($bopModules, parentKey, fullPath, "input") : info;
+
+  const isClouded = info.type === "cloudedObject";
 </script>
 
-<div class="total" ><span 
-  class="nob" id="InputNob"
-  style="color: {typeColors[info.type]}" 
-  on:click={getNob}
-  bind:this={sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)]}
->●</span><span class="text">{name}</span>
-{#if constantConfig !== undefined }
-  <ConstantTag config={constantConfig} parentNob={sectionsMap.inputs[SectionsMap.getIdentifier(parentKey, name)]}/>
-{/if}
+<div class="total">
+  <ConnectionKnob
+    bopModules={bopModules}
+    bind:info={currentInfo}
+    parentKey={parentKey}
+    fullPathName={path ? `${path}.${name}` : name}
+    nobType="input"
+    bind:toggleEdition
+    bopsConstants={bopConstants}>
+    <span class="text" slot="left">
+      {name}{#if isClouded}<input type="button" value="E" style="margin-left: 5px;" on:click={toggleEdition}/>{/if}
+    </span>
+  </ConnectionKnob>
 </div>
 
 <style lang="scss">
-  .nob {
-    cursor: default;
-    padding: 0 5px 3px 5px;
-    margin-left: 0px;
-    background-color: #191928;
-    transition-duration: 125ms;
-  }
-  .nob:hover {
-    background-color: lightgray;
-    transition-duration: 125ms;
-  }
   .text {
     cursor: default;
     margin: 2px 0px 0 0px;
@@ -99,10 +48,12 @@ import { SectionsMap, sectionsMap } from "../helpers/sections-map";
     background-color: #191928;
     white-space: nowrap;
   }
+
   .total {
     position: relative;
     user-select: none;
     width: min-content;
     margin: 6px 0 0 0;
+    white-space: nowrap;
   }
 </style>

@@ -56,7 +56,7 @@
     selectedNob.update((current) => {
       return solveConnection(current, {
       parentKey: moduleConfig.key,
-      nob: sectionsMap.outputs[SectionsMap.getIdentifier(moduleConfig.key, `module`)],
+      nob: sectionsMap.output[SectionsMap.getIdentifier(moduleConfig.key, `module`)],
       property: undefined,
       nobType: "module",
       propertyType: "function"
@@ -68,16 +68,16 @@
 {#if cardInfo !== undefined}
   <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
     <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
-      <span slot="moduleNob" class="moduleNob" bind:this={sectionsMap.outputs[SectionsMap.getIdentifier(moduleConfig.key, `module`)]} on:click={moduleConnect}>M</span>
+      <span slot="moduleNob" class="moduleNob" bind:this={sectionsMap.output[SectionsMap.getIdentifier(moduleConfig.key, `module`)]} on:click={moduleConnect}>M</span>
       <div slot="content" class="IODiv">
         <div class="inputs">
           {#each Object.keys(cardInfo.input) as key}
-            <InputSection bind:bopModules bind:bopConstants name={key} parentKey={moduleConfig.key} info={cardInfo.input[key]}/>
+            <InputSection bopModules={bopModules} bind:bopConstants name={key} parentKey={moduleConfig.key} info={cardInfo.input[key]}/>
           {/each}
         </div>
         <div class="outputs">
           {#each Object.keys(cardInfo.output) as key}
-            <OutputSection bind:bopModules name={key} parentKey={moduleConfig.key} info={cardInfo.output[key]}/>
+            <OutputSection bopModules={bopModules} name={key} parentKey={moduleConfig.key} info={cardInfo.output[key]}/>
           {/each}
         </div>
       </div>

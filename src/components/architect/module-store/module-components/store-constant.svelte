@@ -1,9 +1,12 @@
 <script lang="ts">
 import beautify from "json-beautify";
-
-import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { BopsConfigurationEntry, BopsConstant, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { Writable } from "svelte/store";
 import { getClosest } from "../../../../common/helpers/get-closest";
 import { typeColors } from "../../../../common/styles/type-colors";
+
+export let bopModules : Writable<BopsConfigurationEntry[]>;
+export let constant : BopsConstant;
 
 let moving = false;
 let newCard : HTMLDivElement;
@@ -17,7 +20,7 @@ function startMovement (event : MouseEvent) {
   moving = event.button === 0;
   const achitectRef = document.getElementById("architect");
   newCard = achitectRef.appendChild(ref.cloneNode(true)) as HTMLDivElement;
-  availableInputs = achitectRef.querySelectorAll("#InputNob");
+  availableInputs = achitectRef.querySelectorAll("#input");
   newCard.style.position = "absolute";
   newCard.style.zIndex = "4";
   const currentPos = ref.getBoundingClientRect();
@@ -38,11 +41,18 @@ function stopMovement () {
     ref.style.visibility = "visible";
 
     if(closestInRange[1] !== undefined) {
-
-      const event = new CustomEvent("appendTag", {
-        detail: { constant },
-      });
-      setTimeout(() => closestInRange[1].dispatchEvent(event), 0);
+      const arrayPath : Array<string> = closestInRange[1].getAttribute("data").split(".");
+      const [parentKey, targetPath] = [Number(arrayPath[0]), arrayPath.slice(1).join(".")];
+      bopModules.update(modules => {
+        const cardToAdd = modules.find(module => module.key === parentKey);
+        const newConstDependency : Dependency = {
+          origin: "constant",
+          originPath: constant.name,
+          targetPath,
+        }
+        cardToAdd.dependencies.push(newConstDependency);
+        return modules;
+      })
     }
     newCard?.remove();
     newCard = undefined;
@@ -78,7 +88,6 @@ function moveCard (event : MouseEvent) {
     });
   }
 }
-export let constant : BopsConstant;
 
 function getExtendedString (value : unknown) {
   if(typeof value === "object") return beautify(value, null, 1);

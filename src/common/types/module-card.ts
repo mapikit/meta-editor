@@ -1,3 +1,4 @@
+import type { ObjectDefinition } from "@meta-system/object-definition";
 import type { BopsConfigurationEntry, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import type { Coordinate, Dimensions } from "./geometry";
 
@@ -11,4 +12,8 @@ export interface ModuleCard extends BopsConfigurationEntry {
   dimensions ?: Dimensions;
   bopId ?: string;
   dependencies : Array<UICompliantDependency>;
+  storedDefinition : {
+    input : ObjectDefinition;
+    output : ObjectDefinition;
+  };
 }
