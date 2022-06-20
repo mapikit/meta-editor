@@ -7,12 +7,12 @@
   import { getAvailableKey } from "../helpers/get-available-key";
   import { environment } from "../../../stores/environment";
   import { Coordinate } from "../../../common/types/geometry";
-  import { selectedNob } from "../../../stores/connection-stores";
-  import { solveConnection } from "../helpers/solve-connection";
   import MovableCard from "../helpers/movable-card.svelte";
   import type { Writable } from "svelte/store";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-  import { SectionsMap, sectionsMap } from "../helpers/sections-map";
+  import ConnectionKnob from "./connection-knob.svelte";
+  import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
+import ModularSection from "./modular-section.svelte";
 
   export let moduleConfig : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>
@@ -52,15 +52,10 @@
     });
   }
 
-  function moduleConnect () {
-    selectedNob.update((current) => {
-      return solveConnection(current, {
-      parentKey: moduleConfig.key,
-      nob: sectionsMap.output[SectionsMap.getIdentifier(moduleConfig.key, `module`)],
-      property: undefined,
-      nobType: "module",
-      propertyType: "function"
-    }, bopModules)})
+  let modularInfo : TypeDefinitionDeep;
+  $: modularInfo = {
+    type: "object",
+    subtype: cardInfo.output
   }
 </script>
 
@@ -68,7 +63,13 @@
 {#if cardInfo !== undefined}
   <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
     <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
-      <span slot="moduleNob" class="moduleNob" bind:this={sectionsMap.output[SectionsMap.getIdentifier(moduleConfig.key, `module`)]} on:click={moduleConnect}>M</span>
+      <span slot="moduleNob" class="moduleNob">
+        <ModularSection
+          bopModules={bopModules}
+          parentKey={moduleConfig.key}
+          info={modularInfo}
+        />
+      </span>
       <div slot="content" class="IODiv">
         <div class="inputs">
           {#each Object.keys(cardInfo.input) as key}
@@ -128,18 +129,14 @@
 
   .moduleNob {
     position: absolute;
-    padding-left: 7px;
-    padding-right: 5px;
-    border-radius: 0 7px 7px 0;
-    left: calc(100% - 5px);
-    background-color: rgb(68, 68, 68);
-    z-index: -1;
+    right: 0;
+    top: -3px;
+    text-align: right;
+    z-index: 1;
   }
-  .moduleNob:hover {
-    background-color: rgb(92, 92, 92);;
-  }
-  
+
   .outputs {
+    text-align: right;
     grid-column: 2;
     padding-left: 6px;
   }

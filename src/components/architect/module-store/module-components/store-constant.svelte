@@ -4,6 +4,7 @@ import type { BopsConfigurationEntry, BopsConstant, Dependency } from "meta-syst
 import type { Writable } from "svelte/store";
 import { getClosest } from "../../../../common/helpers/get-closest";
 import { typeColors } from "../../../../common/styles/type-colors";
+import { sectionsMap } from "../../helpers/sections-map";
 
 export let bopModules : Writable<BopsConfigurationEntry[]>;
 export let constant : BopsConstant;
@@ -50,6 +51,10 @@ function stopMovement () {
           originPath: constant.name,
           targetPath,
         }
+        const alreadyPresentIndex = cardToAdd.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
+        if(alreadyPresentIndex !== -1) {
+          cardToAdd.dependencies.splice(alreadyPresentIndex, 1);
+        }
         cardToAdd.dependencies.push(newConstDependency);
         return modules;
       })
@@ -57,6 +62,7 @@ function stopMovement () {
     newCard?.remove();
     newCard = undefined;
 
+    sectionsMap.refreshConnections($bopModules);
   }
   left = top = 0;
 }

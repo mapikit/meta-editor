@@ -9,7 +9,6 @@ import { businessOperations } from "../../../../stores/configuration-store";
   export let search : string = "";
   export let storeLocked = false;
   export let bopModules : Writable<ModuleCard[]>;
-  businessOperations
 
   const modules = Array.from(getAllBopsInfo($businessOperations).values());
 

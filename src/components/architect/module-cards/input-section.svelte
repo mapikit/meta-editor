@@ -32,10 +32,19 @@
     fullPathName={path ? `${path}.${name}` : name}
     nobType="input"
     bind:toggleEdition
-    bopsConstants={bopConstants}>
-    <span class="text" slot="left">
+    bopsConstants={bopConstants}
+    let:item
+    ><span class="text" slot="left">
       {name}{#if isClouded}<input type="button" value="E" style="margin-left: 5px;" on:click={toggleEdition}/>{/if}
     </span>
+    <svelte:self
+      name={item.name}
+      info={item.info}
+      parentKey={parentKey}
+      path={item.fullPathName}
+      bopModules={bopModules}
+      bopConstants={bopConstants}
+    />
   </ConnectionKnob>
 </div>
 

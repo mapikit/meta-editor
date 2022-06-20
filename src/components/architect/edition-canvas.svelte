@@ -10,7 +10,7 @@
   import InputCard from "./input-card.svelte";
   import OutputCard from "./output-card.svelte";
   import type { UIBusinessOperation } from "../../entities/business-operation";
-  import { get, Writable } from "svelte/store";
+  import { get } from "svelte/store";
   import { navigation } from "../../lib/navigation";
   import { businessOperations } from "../../stores/configuration-store";
   import { getDeepStoreObject } from "./helpers/get-deep-store-obj";
@@ -44,7 +44,7 @@
     context.strokeStyle = "#ffffff";
     context.lineWidth = 2;
 
-    updateTraces(context, $environment);
+    updateTraces();
     const canvasScale = canvas.clientWidth/canvas.width;
     canvas.width *= canvasScale;
     canvas.height *= canvasScale;
@@ -56,16 +56,17 @@
   const mount = new Promise<void>(resolve => {
     onMount(async () => {
       context = canvas.getContext("2d");
+      $environment.canvasContext = context;
       adjustCanvas();
 
       $environment.origin.moveTo(canvas.width/2, canvas.height/2);
       sectionsMap.refreshConnections(get(currentBop.configuration));
 
       currentBop.configuration.subscribe(bop => {
-        updateTraces(context, $environment);
+        updateTraces();
       });
       environment.subscribe(() => {
-        setTimeout(() => updateTraces(context, $environment), 1);
+        setTimeout(() => updateTraces(), 1);
         // Investigate and avoid this kind of repetition & timeout
         // Timeout Only: traces have "springness" (modules don't)
         // No Timeout: traces don't update correctly (obvious with scaling)
@@ -78,7 +79,7 @@
 
   function startMovement (event : MouseEvent) : void {
     if(cutting) {
-      const linesToCut = updateTraces(context, $environment, { mouse: { x: event.x, y: event.y }});
+      const linesToCut = updateTraces({ cutting: event });
         currentBop.configuration.update(config => {
           for(const identifier of linesToCut) {
             const moduleKey = Number(identifier.split(".")[0]);
@@ -98,6 +99,7 @@
 
   function detectShortcut (event : KeyboardEvent) : void {
     context.shadowBlur = 0;
+    if(document.activeElement.tagName === "INPUT") return;
     switch (event.key) {
       case "c":
         cutting = !cutting;
@@ -113,7 +115,7 @@
 
   function handleMouseMove (event : MouseEvent) : void {
     if(cutting) {
-      updateTraces(context, $environment, { mouse: { x: event.x, y: event.y } });
+      updateTraces({ cutting: event });
     }
     else if(panning) {
       environment.update(env => {

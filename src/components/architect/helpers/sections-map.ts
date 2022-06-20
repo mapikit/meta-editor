@@ -4,17 +4,18 @@ import type {
 
 export class SectionsMap {
   public output : Record<string, HTMLSpanElement> =  {};
+  public module = this.output;
   public input : Record<string, HTMLSpanElement> =  {};
   public connections : Record<string, string[]> = {};
+  public activeLinkingOrigin : HTMLSpanElement = undefined;
 
   public static getIdentifier (key : string | number, path : string) : string {
     return `${key}.${path}`;
   }
 
   public addConnection (newDependency : Dependency, targetKey : number | "input") : void {
-    const outputPath = newDependency.origin === "input" ?
-      `result.${newDependency.originPath}` :
-      newDependency.originPath;
+    const outputPath = newDependency.originPath;
+
     const outputId = SectionsMap.getIdentifier(newDependency.origin, outputPath);
     const targetId = SectionsMap.getIdentifier(targetKey, newDependency.targetPath);
     if(this.connections[outputId] === undefined) this.connections[outputId] = [];

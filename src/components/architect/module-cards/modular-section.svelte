@@ -4,10 +4,11 @@
   import type { ModuleCard } from "../../../common/types/module-card";
   import ConnectionKnob from "./connection-knob.svelte";
   import { getStoredDefinition } from "../helpers/get-stored-subtype";
+import { environment } from "../../../stores/environment";
 
-  export let name : string;
+  export let name : string = "";
   export let info : TypeDefinition<{}>;
-  export let parentKey : number | "input";
+  export let parentKey : number;
   export let path = "";
   export let bopModules : Writable<ModuleCard[]>;
 
@@ -16,24 +17,19 @@
   let currentInfo : TypeDefinition;
   $: currentInfo = info.type === "cloudedObject" ? getStoredDefinition($bopModules, Number(parentKey), fullPath, "output") : info
 
-  let toggleEdition = () => {}
-
-  const isClouded = info.type === "cloudedObject";
 
 </script>
 
 <div class="total">
   <ConnectionKnob
     bopModules={bopModules}
-    bind:info={currentInfo}
-    bind:parentKey
-    fullPathName={path ? `${path}.${name}` : name}
-    nobType="output"
-    bind:toggleEdition
+    info={currentInfo}
+    parentKey={parentKey}
+    fullPathName={fullPath}
+    nobType="module"
     let:item
-  ><span class="text" slot="right">
-      {#if isClouded}<input type="button" value="E" style="margin-right: 5px;" on:click={toggleEdition}/>{/if}{name}
-    </span>
+    subtypeStyle="position: absolute; background-color: grey; top: 0; transform: translateY(-100%); padding: 0 0 8px 6px; border-radius: 6px 0 0 6px"
+  ><span class="text" slot="right">{name}</span>
     <svelte:self
       name={item.name}
       info={item.info}
@@ -56,7 +52,6 @@
   }
 
   .total {
-    text-align: right;
     user-select: none;
     margin: 7px 0px 0px auto;
     width: max-content;

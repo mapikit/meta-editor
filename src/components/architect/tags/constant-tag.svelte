@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { onMount } from "svelte";
+  import type { BopsConfigurationEntry, BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import type { Writable } from "svelte/store";
   import { typeColors } from "../../../common/styles/type-colors";
   import { expand } from "../../../common/transitions/expand";
   import { spin } from "../../../common/transitions/spin";
@@ -8,8 +8,22 @@ import { onMount } from "svelte";
   import DropdownIcon from "../module-store/dropdown-icon.svelte";
 
   export let config : BopsConstant;
+  export let parentKey : number;
+  export let fullPathName : string;
+  export let bopModules : Writable<BopsConfigurationEntry[]>
 
-  function removeTag () {}
+  function removeTag () {
+    bopModules.update(modules => {
+      const parentCard = modules.find(module => module.key === parentKey)
+      const index = parentCard.dependencies.findIndex(dependency => {
+        return ["constant", "constants"].includes(dependency.origin as string) &&
+          dependency.targetPath === fullPathName &&
+          dependency.originPath === config.name;
+      })
+      parentCard.dependencies.splice(index, 1);
+      return modules;
+    })
+  }
 
 </script>
 

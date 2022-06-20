@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ObjectDefinition, TypeDefinition } from "@meta-system/object-definition";
+  import type { TypeDefinition } from "@meta-system/object-definition";
   import { SectionsMap, sectionsMap } from "../helpers/sections-map";
   import { EditorLevel, EditorLevels } from "../../object-definition/obj-def-editor-types-and-helpers";
   import { typeColors } from "../../../common/styles/type-colors"
@@ -9,33 +9,44 @@
   import type { ModuleCard } from "../../../common/types/module-card";
   import ObjectDefinitionMiniApp from "../../object-definition/object-definition-mini-app.svelte";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-  import { onMount } from "svelte";
+  import { onMount,  } from "svelte";
   import ConstantTag from "../tags/constant-tag.svelte";
-  import InputSection from "./input-section.svelte";
-  import OutputSection from "./output-section.svelte";
+  import { updateTraces } from "../update-traces";
 
   export let info : TypeDefinition<{}>;
   export let parentKey : number | "input";
   export let fullPathName : string;
   export let bopModules : Writable<ModuleCard[]>;
-  export let nobType : "input" | "output";
+  export let nobType : "input" | "output" | "module";
   export let bopsConstants : Writable<BopsConstant[]> = undefined;
+  export let subtypeStyle : string = "";
 
-  let getPathsNames : () => string[];
-  let navigateBackToLevel : (index : number) => void;
-  let getDefinitionAndData : () => { definition: ObjectDefinition, data : object };
+  const isModuleRoot = nobType === "module" && !fullPathName;
+  const colorType = isModuleRoot ? "function" : info.type;
+
+  const prePath = 
+    nobType === "output" ? "result" :
+    nobType === "module" ? "module" : undefined;
+
+  const propertyPath = [parentKey !== "input" ? prePath : undefined, fullPathName].filter(value => value).join(".")
+
+  let miniApp : ObjectDefinitionMiniApp;
 
   let attatchedConstant : BopsConstant = undefined;
   let editing : boolean = false;
   let expanded : boolean = false;
+  let connecting = false;
 
   onMount(() => {
+    sectionsMap.refreshConnections($bopModules);
     if(nobType === "input") {
-      const parentInfo = $bopModules.find(module => module.key === parentKey);
-      const constDependency = parentInfo.dependencies.find(dependency => 
+      bopModules.subscribe(modules => {
+        const parentInfo = modules.find(module => module.key === parentKey);
+        const constDependency = parentInfo.dependencies.find(dependency => 
         dependency.targetPath === fullPathName && 
         ["constant", "constants"].includes(dependency.origin as string));
-      if(constDependency !== undefined) attatchedConstant = $bopsConstants.find(constant => constant.name === constDependency.originPath);
+        attatchedConstant = $bopsConstants.find(constant => constant.name === constDependency?.originPath);
+      });
     }
   })
 
@@ -51,7 +62,7 @@
           aux = aux[step];
         }
         aux["type"] = "cloudedObject"
-        aux["subtype"] = getDefinitionAndData().definition["root"]["subtype"];
+        aux["subtype"] = miniApp.getDefinitionAndData().definition["root"]["subtype"];
         parentModule.storedDefinition[nobType] = Object.assign(parentModule.storedDefinition[nobType] ?? {}, newInfo);
         return modules;
       })
@@ -59,69 +70,79 @@
     editing = !editing;
   }
 
-  const knobIdentifier = SectionsMap.getIdentifier(parentKey, `${nobType === "output" ? "result." : ""}${fullPathName}`);
-
-  const isObject = info.type === "object";
+  const knobIdentifier = SectionsMap.getIdentifier(parentKey, propertyPath);
+  const isExpandable = info.type === "object" || info.type === "cloudedObject";
   const isClouded = info.type === "cloudedObject";
-  const handleClick = (isObject || isClouded) ? toggleExpansion : getKnob;
 
-  function toggleExpansion () {
-    expanded = !expanded;
-    setTimeout(() => { 
-      sectionsMap.refreshConnections($bopModules);
-      bopModules?.update(mod => mod);
-    }, 20)
-  }
-
-  function getKnob () : void {
-    selectedNob.update((current) => {
-      return solveConnection(current, {
+  const handleClick = (event : MouseEvent) => {
+    event.stopPropagation();
+    connecting = true;
+    sectionsMap.activeLinkingOrigin = sectionsMap[nobType][knobIdentifier];
+    selectedNob.set({
       parentKey,
       nob: sectionsMap[nobType][knobIdentifier],
-      property: fullPathName,
+      property: propertyPath,
       nobType,
       propertyType: info.type
-    }, bopModules)})
+    });
+  }
+
+  function handleConnectionDrag (event : MouseEvent) : void {
+    if(connecting) {
+      updateTraces({ cursor: event });
+    }
+  }
+
+  function attemptConnection () {
+    solveConnection({
+      parentKey,
+      nob: sectionsMap[nobType][knobIdentifier],
+      property: propertyPath,
+      nobType,
+      propertyType: info.type
+    }, bopModules);
+    selectedNob.set(undefined);
+  }
+
+  function toggleExpansion () {
+    if(!(isExpandable || isClouded)) return;
+    expanded = !expanded;
+    setTimeout(() => {
+      sectionsMap.refreshConnections($bopModules);
+      bopModules?.update(mod => mod);
+    }, 20);
   }
 </script>
+
 <span class="total" id={nobType} data={`${parentKey}.${fullPathName}`}>
   <slot name="right"/><span 
-  class="knob"  style="color: {typeColors[info.type]};"
-  on:click={handleClick}
-  bind:this={sectionsMap[nobType][knobIdentifier]}>{ isObject || isClouded ? ( expanded ? "▼" : "⯈") : "●" }
+  class="knob"  style="color: {typeColors[colorType]};"
+  on:mousedown={handleClick}
+  on:mouseup={attemptConnection}
+  on:click={toggleExpansion}
+  bind:this={sectionsMap[nobType][knobIdentifier]}>{ isExpandable || isClouded ? ( expanded ? "▼" : "⯈") : "●" }
   </span><slot name="left"/>
-  {#if attatchedConstant !== undefined}<ConstantTag config={attatchedConstant}/>{/if}
+  {#if attatchedConstant !== undefined}<ConstantTag config={attatchedConstant} fullPathName={fullPathName} parentKey={Number(parentKey)} bopModules={bopModules}/>{/if}
   {#if editing}
     <ObjectDefinitionMiniApp
+      bind:this={miniApp}
       editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
       initialDefinition={info["subtype"]} initialData={{}}
-      bind:getPathsNames
-      bind:navigateBackToLevel
-      bind:getDefinitionAndData
     />
   {/if}
   {#if expanded}
-  <div class="subtype">
-    {#each Object.keys(info["subtype"] ?? {}) as output}
-      <svelte:component
-        this={nobType === "input" ? InputSection : OutputSection}
-        path={fullPathName}
-        name={output}
-        info={info["subtype"][output]}
-        parentKey={parentKey}
-        bopModules={bopModules}
-        bopsConstants={bopsConstants}
-      />
-    {/each}
-  </div>
-{/if}
+    <div style={subtypeStyle}>
+      {#each Object.keys(info["subtype"] ?? {}) as key, index}
+        <slot item={{ name: key, fullPathName, info: info["subtype"] !== undefined ? info["subtype"][key] : {}, index }}> SBSLOT </slot>
+      {/each}
+    </div>
+  {/if}
 </span>
+
+<svelte:window on:mousemove={handleConnectionDrag} on:mouseup={() => { connecting = false; updateTraces() }}/>
 
 
 <style lang="scss">
-  .subtype {
-  }
-
   .knob {
     cursor: default;
     padding: 0 2px 3px 2px;
