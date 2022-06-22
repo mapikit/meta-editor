@@ -11,7 +11,7 @@ let userEmail = globalUser.email;
   <GuideText />
   <div id="username">
     <img src="/logo.svg" alt="mapikit crown logo"/>
-    <p> <span>  Welcome, </span> {$userEmail} </p>
+    <p> <span class="text-ochreYellow">  Welcome, </span> {$userEmail} </p>
   </div>
   <FavoriteBar />
 </div>
