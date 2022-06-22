@@ -17,7 +17,7 @@
   export let parentKey : number | "input";
   export let fullPathName : string;
   export let bopModules : Writable<ModuleCard[]>;
-  export let nobType : "input" | "output" | "module";
+  export let nobType : "input" | "output" | "module" | "functional";
   export let bopsConstants : Writable<BopsConstant[]> = undefined;
   export let subtypeStyle : string = "";
 

@@ -62,15 +62,13 @@
       $environment.origin.moveTo(canvas.width/2, canvas.height/2);
       sectionsMap.refreshConnections(get(currentBop.configuration));
 
-      currentBop.configuration.subscribe(bop => {
+      currentBop.configuration.subscribe(() => {
         updateTraces();
       });
-      environment.subscribe(() => {
-        setTimeout(() => updateTraces(), 1);
+      environment.subscribe(() => setTimeout(() => updateTraces(), 1));
         // Investigate and avoid this kind of repetition & timeout
         // Timeout Only: traces have "springness" (modules don't)
         // No Timeout: traces don't update correctly (obvious with scaling)
-      });
     });
     resolve();
   });
@@ -105,8 +103,13 @@
         cutting = !cutting;
         event.preventDefault();
         break;
+      case "f":
+        environment.update(environment => {environment.functionalTraces = !environment.functionalTraces; return environment});
+        event.preventDefault();
+        break;
       case "Escape":
         cutting = false;
+        environment.update(environment => {environment.functionalTraces = false; return environment});
         break;
     };
     // bopStore.update(bop => bop);

@@ -17,9 +17,8 @@
 
 
 <div class="module">
-<div class="header"> 
-
-<span class="modName" >{definition.functionName}</span> {#if parentSchema} <span class="schemaName">@{parentSchema}</span> {/if}
+<div class="header">
+  <slot name="functionalDep"/><span class="modName" >{definition.functionName}</span> {#if parentSchema} <span class="schemaName">@{parentSchema}</span> {/if}
   <div class="tooltipIcon"
     on:focus={undefined}
     on:mouseenter={() => { tooltipVisible = true; } }

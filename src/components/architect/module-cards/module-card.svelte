@@ -10,8 +10,8 @@
   import MovableCard from "../helpers/movable-card.svelte";
   import type { Writable } from "svelte/store";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-  import ConnectionKnob from "./connection-knob.svelte";
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
+  import FunctionalKnob from "./funtional-knob.svelte";
 import ModularSection from "./modular-section.svelte";
 
   export let moduleConfig : ModuleCard;
@@ -63,6 +63,12 @@ import ModularSection from "./modular-section.svelte";
 {#if cardInfo !== undefined}
   <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
     <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
+      <span slot="functionalDep" class="functionalKnob">
+        <FunctionalKnob
+          bopModules={bopModules}
+          parentKey={moduleConfig.key}
+        />
+      </span>
       <span slot="moduleNob" class="moduleNob">
         <ModularSection
           bopModules={bopModules}
@@ -99,6 +105,11 @@ import ModularSection from "./modular-section.svelte";
 
 
 <style lang="scss">
+  .functionalKnob {
+    position: absolute;
+    left: 0;
+  }
+
   .IODiv {
     display: grid;
     position: relative;

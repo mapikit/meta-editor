@@ -1,6 +1,6 @@
 import type { CoordinateInfo } from "../../common/types/geometry";
 import { sectionsMap } from "./helpers/sections-map";
-import { environment } from "../../stores/environment";
+import { environment, EnvType } from "../../stores/environment";
 import { get } from "svelte/store";
 
 
@@ -85,6 +85,10 @@ export function updateTraces (extraInfo ?: ExtraTracingInfo)
     }
   }
 
+  if(env.functionalTraces || sectionsMap.hoveredFunctionalKnob.length > 0) {
+    drawFunctionalConnections(env, canvasOffset, sectionsMap.hoveredFunctionalKnob);
+  }
+
   canvasContext.strokeStyle = "#dddddd";
   if(extraInfo?.cursor) {
     canvasContext.strokeStyle = "#4086f7";
@@ -103,3 +107,39 @@ export function updateTraces (extraInfo ?: ExtraTracingInfo)
   }
   return linesToCut;
 }
+
+// eslint-disable-next-line max-lines-per-function
+function drawFunctionalConnections (env : EnvType, canvasOffset : DOMRect, hoveredIds ?: string[]) : void {
+  env.canvasContext.strokeStyle = "#cc2222";
+  env.canvasContext.setLineDash([]);
+  for(const moduleKnobId of Object.keys(sectionsMap.functionalConnections)) {
+    if(sectionsMap.output[moduleKnobId] === undefined || sectionsMap.output[moduleKnobId] === null) continue;
+    const origin = sectionsMap.module[moduleKnobId].getBoundingClientRect();
+
+    for(const functionalId of sectionsMap.functionalConnections[moduleKnobId]) {
+      if(sectionsMap.functional[functionalId] === undefined || sectionsMap.functional[functionalId] === null) continue;
+      if(!hoveredIds.includes(functionalId) && !env.functionalTraces) continue;
+      const target = sectionsMap.functional[functionalId].getBoundingClientRect();
+
+      const outputPos : CoordinateInfo = {
+        x: origin.x + origin.width/2 - canvasOffset.x,
+        y: origin.y + origin.height/2 - canvasOffset.y,
+      };
+      const inputPos : CoordinateInfo = {
+        x: target.x + target.width/2 - canvasOffset.x,
+        y: target.y + target.height/2 - canvasOffset.y,
+      };
+
+      env.canvasContext.beginPath();
+      env.canvasContext.moveTo(outputPos.x, outputPos.y);
+      env.canvasContext.bezierCurveTo(
+        outputPos.x+60*env.scale, outputPos.y,
+        inputPos.x-60*env.scale, inputPos.y,
+        inputPos.x, inputPos.y,
+      );
+      env.canvasContext.stroke();
+    }
+  }
+
+}
+

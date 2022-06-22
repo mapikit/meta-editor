@@ -17,11 +17,14 @@ export function solveConnection (targetNob : NobSelection, bopModules : Writable
 
   if(currentNob === undefined) return;
   if(currentNob.nobType === targetNob.nobType) return;
+
+  const currentIsOutput = ["output", "module"].includes(currentNob.nobType);
+  const [origin, target] = currentIsOutput ? [currentNob, targetNob] : [targetNob, currentNob];
+
+  if(target.nobType === "functional") return addFunctionalDependency(origin, target, bopModules);
+
   // eslint-disable-next-line max-lines-per-function
   bopModules.update((modules) => {
-    const currentIsOutput = ["output", "module"].includes(currentNob.nobType);
-    const [origin, target] = currentIsOutput ? [currentNob, targetNob] : [targetNob, currentNob];
-
     const targetModule = modules.find(module => module.key == target.parentKey);
 
     const newDependency : UICompliantDependency = {
@@ -31,9 +34,7 @@ export function solveConnection (targetNob : NobSelection, bopModules : Writable
       matchingType: (origin.propertyType === target.propertyType) || target.propertyType === "any",
     };
 
-
     const alreadyPresent = targetModule.dependencies.findIndex(dep => dep.targetPath === newDependency.targetPath);
-
 
     if(alreadyPresent !== -1) {
       targetModule.dependencies.splice(alreadyPresent, 1);
@@ -49,4 +50,22 @@ export function solveConnection (targetNob : NobSelection, bopModules : Writable
 
   currentNob.nob.style.outline = "";
   return undefined;
+}
+
+
+function addFunctionalDependency (
+  origin : NobSelection, target : NobSelection, bopModules : Writable<BopsConfigurationEntry[]>) : void
+{
+  if(origin.nobType !== "module") return window.alert("Functional Dependencies only connect to modules");
+
+  bopModules.update(modules => {
+    const targetModule = get(bopModules).find(module => module.key == target.parentKey);
+    const alreadyPresent = targetModule.dependencies.findIndex(dependency => {
+      return dependency.origin === origin.parentKey && dependency.targetPath === undefined;
+    });
+    if(alreadyPresent !== -1) targetModule.dependencies.splice(alreadyPresent, 1);
+
+    targetModule.dependencies.push({ origin: origin.parentKey });
+    return modules;
+  });
 }

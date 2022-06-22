@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 
 export type NobSelection = {
-  nobType : "input" | "output" | "module";
+  nobType : "input" | "output" | "module" | "functional";
   propertyType : string;
   property : string;
   nob : HTMLSpanElement;

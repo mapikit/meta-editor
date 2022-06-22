@@ -6,6 +6,7 @@ export type EnvType = {
   distributionColumn : number; //TEMP
   canvasContext : CanvasRenderingContext2D
   origin : Coordinate;
+  functionalTraces : boolean;
 }
 
 
@@ -14,4 +15,5 @@ export const environment = writable<EnvType>({
   distributionColumn: 0.4,
   canvasContext: undefined,
   origin: new Coordinate(0,0),
+  functionalTraces: false,
 });

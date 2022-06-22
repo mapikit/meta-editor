@@ -2,24 +2,35 @@ import type {
   BopsConfigurationEntry,
   Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 
+
 export class SectionsMap {
   public output : Record<string, HTMLSpanElement> =  {};
   public module = this.output;
   public input : Record<string, HTMLSpanElement> =  {};
+  public functional : Record<string, HTMLSpanElement> = {};
+
   public connections : Record<string, string[]> = {};
+  public functionalConnections : Record<string, string[]> = {};
+
   public activeLinkingOrigin : HTMLSpanElement = undefined;
+  public hoveredFunctionalKnob : Array<string> = [];
 
   public static getIdentifier (key : string | number, path : string) : string {
-    return `${key}.${path}`;
+    return `${key}.${path ?? ""}`;
   }
 
   public addConnection (newDependency : Dependency, targetKey : number | "input") : void {
     const outputPath = newDependency.originPath;
 
-    const outputId = SectionsMap.getIdentifier(newDependency.origin, outputPath);
+    let outputId = SectionsMap.getIdentifier(newDependency.origin, outputPath);
     const targetId = SectionsMap.getIdentifier(targetKey, newDependency.targetPath);
-    if(this.connections[outputId] === undefined) this.connections[outputId] = [];
-    this.connections[outputId].push(targetId);
+    if(outputPath === undefined) outputId = outputId + "module";
+    const connections =
+      newDependency.originPath == undefined && newDependency.targetPath == undefined ?
+        this.functionalConnections : this.connections;
+
+    if(connections[outputId] === undefined) connections[outputId] = [];
+    connections[outputId].push(targetId);
   }
 
   public removeConnection (inputIdentifier : string) : void {
@@ -82,6 +93,7 @@ export class SectionsMap {
 
   public refreshConnections (bopModules : BopsConfigurationEntry[]) : void {
     this.connections = {};
+    this.functionalConnections = {};
     this.connectModules(bopModules);
     this.solveDeepConnections();
   }
