@@ -65,7 +65,7 @@ function addFunctionalDependency (
     });
     if(alreadyPresent !== -1) targetModule.dependencies.splice(alreadyPresent, 1);
 
-    targetModule.dependencies.push({ origin: origin.parentKey });
+    targetModule.dependencies.unshift({ origin: origin.parentKey });
     return modules;
   });
 }

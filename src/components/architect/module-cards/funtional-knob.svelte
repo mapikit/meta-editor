@@ -1,10 +1,11 @@
 <script lang="ts">
+  import type { BopsConfigurationEntry, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { Writable } from "svelte/store";
   import type { ModuleCard } from "../../../common/types/module-card";
-import { selectedNob } from "../../../stores/connection-stores";
+  import { selectedNob } from "../../../stores/connection-stores";
   import { sectionsMap, SectionsMap } from "../helpers/sections-map";
-import { solveConnection } from "../helpers/solve-connection";
-import { updateTraces } from "../update-traces";
+  import { solveConnection } from "../helpers/solve-connection";
+  import DraggableList from "./draggable-list.svelte";
 
   export let parentKey : number;
   export let bopModules : Writable<ModuleCard[]>;
@@ -61,8 +62,15 @@ import { updateTraces } from "../update-traces";
     sectionsMap.refreshConnections($bopModules);
   }
 
-  const parentModule = $bopModules.find(module => module.key === parentKey);
-  const functionalDeps = parentModule.dependencies.filter(dependency => dependency.originPath === undefined && dependency.targetPath === undefined) 
+  let parentModule : ModuleCard = {} as ModuleCard;
+  $: parentModule = $bopModules.find(module => module.key === parentKey);
+  let functionalDeps : Array<Dependency> = [];
+  $: functionalDeps = parentModule.dependencies.filter(dependency => dependency.originPath === undefined && dependency.targetPath === undefined)
+
+  function updateDependencyOrder () : void {
+
+  }
+  
 </script>
 
 <div class="total" 
@@ -75,14 +83,26 @@ import { updateTraces } from "../update-traces";
     F
   </span>
   <!-- !REMEMBER! Remove this false when implementing -->
-  {#if expanded && false} 
-    {#each functionalDeps as dependency}
-      {$bopModules.find(module => module.key === dependency.origin).moduleName} @{dependency.origin} <br>
-    {/each}
+  {#if expanded}
+    <div class="dependencies">
+      <DraggableList parentModule={parentModule} bopModules={bopModules}/>
+      <!-- {#each functionalDeps as dependency}
+        {$bopModules.find(module => module.key === dependency.origin).moduleName} @{dependency.origin} <br>
+      {/each} -->
+    </div>
   {/if}
 </div>
 
 <style lang="scss">
+  .dependencies {
+    position: absolute;
+    padding: 4px;
+    top: 0;
+    transform: translateY(calc(-100% - 8px));
+    text-align: left;
+    background-color: gray;
+    border-radius: 8px;
+  }
   .text {
     cursor: default;
     margin: 2px 0px 0 0px;
@@ -92,17 +112,20 @@ import { updateTraces } from "../update-traces";
   }
 
   .total {
-    color: black;
-    background-color: aqua;
-    padding: 0 12px 0 4px;
-    border-radius: 8px 20px 20px 0;
     position: relative;
     user-select: none;
     width: min-content;
     white-space: nowrap;
   }
 
-  .total:hover {
+  .knob {
+    color: black;
+    background-color: aqua;
+    padding: 0 12px 0 4px;
+    border-radius: 8px 20px 20px 0;
+  }
+
+  .knob:hover {
     background-color: red;
   }
 </style>
