@@ -80,12 +80,23 @@
       const linesToCut = updateTraces({ cutting: event });
         currentBop.configuration.update(config => {
           for(const identifier of linesToCut) {
-            const moduleKey = Number(identifier.split(".")[0]);
+            const moduleId = identifier.split(".")[0];
             const targetPath = identifier.split(".").slice(1).join(".");
-            const module = config.find(module => module.key === moduleKey);
-            const dependencyIndex = module.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
+            let module : ModuleCard;
+            let dependencyIndex : number;
+            if(!targetPath) {
+              // Functional dep id pattern `originKey_parentKey`
+              const origin = Number(moduleId.split("_")[0])
+              const parentKey = Number(moduleId.split("_")[1])
+              module = config.find(_module => _module.key === parentKey)
+              dependencyIndex = module.dependencies.findIndex(dep => dep.origin === origin && dep.targetPath === undefined);
+            } else {
+              module = config.find(_module => _module.key === Number(moduleId));
+              dependencyIndex = module.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
+            }
+
             module.dependencies.splice(dependencyIndex, 1);
-            sectionsMap.removeConnection(identifier);
+            sectionsMap.refreshConnections(get(currentBop.configuration));
           }
 
           return config;

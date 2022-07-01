@@ -25,9 +25,8 @@ export class SectionsMap {
     let outputId = SectionsMap.getIdentifier(newDependency.origin, outputPath);
     const targetId = SectionsMap.getIdentifier(targetKey, newDependency.targetPath);
     if(outputPath === undefined) outputId = outputId + "module";
-    const connections =
-      newDependency.originPath == undefined && newDependency.targetPath == undefined ?
-        this.functionalConnections : this.connections;
+    const isFunctional = newDependency.originPath == undefined && newDependency.targetPath == undefined;
+    const connections = isFunctional ? this.functionalConnections : this.connections;
 
     if(connections[outputId] === undefined) connections[outputId] = [];
     connections[outputId].push(targetId);

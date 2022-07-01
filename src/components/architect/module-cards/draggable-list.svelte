@@ -1,7 +1,7 @@
 <script lang="ts">
   import {flip} from 'svelte/animate';
   import type { Writable } from 'svelte/store';
-  import type { ModuleCard } from '../../../common/types/module-card';
+  import type { ModuleCard, UICompliantDependency } from '../../../common/types/module-card';
   
   export let parentModule : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>;
@@ -13,7 +13,8 @@
 
 
 
-  let list = parentModule.dependencies.filter(dependency => dependency.targetPath === undefined);
+  let list : UICompliantDependency[];
+  $: list = parentModule.dependencies.filter(dependency => dependency.targetPath === undefined);
   let contents : Array<string> = [];
   $: contents = list.map(dependency => {
     const moduleName = $bopModules.find(module => module.key === dependency.origin).moduleName;
@@ -22,14 +23,14 @@
 
   const moveList = (targetIndex : number) => {
     hovering = -1;
-    if (originIndex < 0 || originIndex > list.length || originIndex === targetIndex) return;
+    if (originIndex === targetIndex || originIndex < 0 || originIndex > list.length) return;
 
     bopModules.update(modules => {
       const offset = targetIndex > originIndex ? 0 : -1;
-      const start = list.slice(0, targetIndex + 1 + offset)
-      const end = list.slice(targetIndex + 1 + offset);
+      const head = list.slice(0, targetIndex + 1 + offset)
+      const tail = list.slice(targetIndex + 1 + offset);
 
-      list = [ ...start, list[originIndex], ...end ]
+      list = [ ...head, list[originIndex], ...tail ]
       list.splice(originIndex - offset, 1);
 
       parentModule.dependencies = parentModule.dependencies.filter(dependency => dependency.targetPath !== undefined);
@@ -49,7 +50,6 @@
 
 
   const draggingOver = (event : DragEvent, index : number) => {
-    console.log("over", index)
 
     event.preventDefault();
     hovering = index;
@@ -61,10 +61,6 @@
     event.stopPropagation();
     moveList(index);
   };
-
-  console.log("content");
-
- 
 
 </script>
 

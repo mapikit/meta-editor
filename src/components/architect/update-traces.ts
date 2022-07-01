@@ -12,8 +12,7 @@ export type ExtraTracingInfo = {
 
 
 // eslint-disable-next-line max-lines-per-function
-export function updateTraces (extraInfo ?: ExtraTracingInfo)
-  : Array<string> {
+export function updateTraces (extraInfo ?: ExtraTracingInfo) : Array<string> {
 
   const env = get(environment);
   const canvasContext = env.canvasContext;
@@ -39,7 +38,7 @@ export function updateTraces (extraInfo ?: ExtraTracingInfo)
 
 
   for(const outputId of Object.keys(sectionsMap.connections)) {
-    if(sectionsMap.output[outputId] === null || sectionsMap.output[outputId] === undefined) continue;
+    if(!sectionsMap.output[outputId]) continue;
     if(outputId.split(".")[1] === "module") {
       canvasContext.strokeStyle = "#dddd22";
       canvasContext.setLineDash(moduleDash);
@@ -50,7 +49,7 @@ export function updateTraces (extraInfo ?: ExtraTracingInfo)
 
     const startRect = sectionsMap.output[outputId].getBoundingClientRect();
     for(const inputId of sectionsMap.connections[outputId]) {
-      if(sectionsMap.input[inputId] === null || sectionsMap.input[inputId] === undefined) continue;
+      if(!sectionsMap.input[inputId]) continue;
 
       const endRect = sectionsMap.input[inputId].getBoundingClientRect();
       const outputPos : CoordinateInfo = {
@@ -86,7 +85,7 @@ export function updateTraces (extraInfo ?: ExtraTracingInfo)
   }
 
   if(env.functionalTraces || sectionsMap.hoveredFunctionalKnob.length > 0) {
-    drawFunctionalConnections(env, canvasOffset, sectionsMap.hoveredFunctionalKnob);
+    drawFunctionalConnections(env, canvasOffset, extraInfo?.cutting, linesToCut, sectionsMap.hoveredFunctionalKnob);
   }
 
   canvasContext.strokeStyle = "#dddddd";
@@ -105,11 +104,17 @@ export function updateTraces (extraInfo ?: ExtraTracingInfo)
     canvasContext.lineTo(targetPos.x - canvasOffset.x, targetPos.y - canvasOffset.y);
     canvasContext.stroke();
   }
+  // console.log(linesToCut);
   return linesToCut;
 }
 
-// eslint-disable-next-line max-lines-per-function
-function drawFunctionalConnections (env : EnvType, canvasOffset : DOMRect, hoveredIds ?: string[]) : void {
+// eslint-disable-next-line max-params, max-lines-per-function
+function drawFunctionalConnections (
+  env : EnvType, canvasOffset : DOMRect,
+  cuttingInfo : MouseEvent,
+  linesToCut : Array<string>,
+  hoveredIds ?: string[]) : void {
+
   env.canvasContext.strokeStyle = "#cc2222";
   env.canvasContext.setLineDash([]);
   for(const moduleKnobId of Object.keys(sectionsMap.functionalConnections)) {
@@ -129,6 +134,19 @@ function drawFunctionalConnections (env : EnvType, canvasOffset : DOMRect, hover
         x: target.x + target.width/2 - canvasOffset.x,
         y: target.y + target.height/2 - canvasOffset.y,
       };
+
+      if(cuttingInfo) {
+        const nominator1 = (outputPos.x-inputPos.x)*(inputPos.y-cuttingInfo.y+canvasOffset.y);
+        const nominator2 = (inputPos.x-cuttingInfo.x+canvasOffset.x)*(outputPos.y - inputPos.y);
+        const denominator = Math.sqrt((outputPos.x-inputPos.x)**2 + (outputPos.y-inputPos.y)**2);
+        const dist = Math.abs(nominator1 - nominator2)/denominator;
+        if(dist < 15) {
+          // moduleKnobId pattern is `key.module`
+          // functional id is `key.`
+          linesToCut.push((moduleKnobId.replace(".module","_") + functionalId));
+          env.canvasContext.shadowBlur = 5;
+        } else env.canvasContext.shadowBlur = 0;
+      }
 
       env.canvasContext.beginPath();
       env.canvasContext.moveTo(outputPos.x, outputPos.y);

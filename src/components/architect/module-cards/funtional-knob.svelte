@@ -6,31 +6,14 @@
   import { sectionsMap, SectionsMap } from "../helpers/sections-map";
   import { solveConnection } from "../helpers/solve-connection";
   import DraggableList from "./draggable-list.svelte";
+  import { slide } from "svelte/transition"
 
   export let parentKey : number;
   export let bopModules : Writable<ModuleCard[]>;
   let expanded = false;
+  let hovered 
 
   const knobIdentifier = SectionsMap.getIdentifier(parentKey, undefined);
-
-  // const handleClick = (event : MouseEvent) => {
-  //   event.stopPropagation();
-  //   connecting = true;
-  //   sectionsMap.activeLinkingOrigin = sectionsMap[nobType][knobIdentifier];
-  //   selectedNob.set({
-  //     parentKey,
-  //     nob: sectionsMap[nobType][knobIdentifier],
-  //     property: propertyPath,
-  //     nobType,
-  //     propertyType: info.type
-  //   });
-  // }
-
-  // function handleConnectionDrag (event : MouseEvent) : void {
-  //   if(connecting) {
-  //     updateTraces({ cursor: event });
-  //   }
-  // }
 
   function setAsHovered () {
     const found = sectionsMap.hoveredFunctionalKnob.find(id => id === knobIdentifier)
@@ -53,7 +36,7 @@
   function attemptConnection () {
     solveConnection({
       parentKey,
-      nob: sectionsMap["functional"][knobIdentifier],
+      nob: sectionsMap.functional[knobIdentifier],
       property: undefined,
       nobType: "functional",
       propertyType: undefined
@@ -64,13 +47,6 @@
 
   let parentModule : ModuleCard = {} as ModuleCard;
   $: parentModule = $bopModules.find(module => module.key === parentKey);
-  let functionalDeps : Array<Dependency> = [];
-  $: functionalDeps = parentModule.dependencies.filter(dependency => dependency.originPath === undefined && dependency.targetPath === undefined)
-
-  function updateDependencyOrder () : void {
-
-  }
-  
 </script>
 
 <div class="total" 
@@ -82,13 +58,9 @@
 ><span class="knob">
     F
   </span>
-  <!-- !REMEMBER! Remove this false when implementing -->
   {#if expanded}
-    <div class="dependencies">
+    <div class="dependencies" transition:slide>
       <DraggableList parentModule={parentModule} bopModules={bopModules}/>
-      <!-- {#each functionalDeps as dependency}
-        {$bopModules.find(module => module.key === dependency.origin).moduleName} @{dependency.origin} <br>
-      {/each} -->
     </div>
   {/if}
 </div>
