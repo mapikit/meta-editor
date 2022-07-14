@@ -119,6 +119,20 @@ export class UIBusinessOperation {
     this.input.set(resolvedInput);
   }
 
+  public static rebuildModuleCards (configuration : BopsConfigurationEntry[]) : ModuleCard[] {
+    const result = [] as ModuleCard[];
+    for(const config of configuration) {
+      if((config as ModuleCard).position === undefined) {
+        (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
+      } else {
+        const position = (config as ModuleCard).position;
+        (config as ModuleCard).position = new Coordinate(position.x, position.y);
+      }
+      result.push(config as ModuleCard);
+    }
+    return result;
+  }
+
   private validateConfigurationForUI (configuration : BopsConfigurationEntry[] | ModuleCard[])
     : asserts configuration is ModuleCard[] {
     for(const config of configuration) {

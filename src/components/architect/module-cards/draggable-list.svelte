@@ -76,18 +76,22 @@
     on:dragend={() => hovering = -1}
     on:mousedown|stopPropagation
     on:click|stopPropagation
-  >
-    <span>{content}</span>
-  </li>
+  ><span class="item">{index + 1}º {content}</span></li>
 {/each}
 
 
 <style>
   .contents {
-    color: black;
+    color: gainsboro;
     padding: 0 8px 0 8px;
-    list-style-type: decimal;
+    list-style-type: none;
     list-style-position: inside;
     cursor: grab;
+    margin-bottom: 4px;
+  }
+  .item {
+    background-color: #666;
+    border-radius: 6px;
+    padding: 0 4px 0 4px;
   }
 </style>

@@ -68,11 +68,10 @@
 <style lang="scss">
   .dependencies {
     position: absolute;
-    padding: 4px;
     top: 0;
     transform: translateY(calc(-100% - 8px));
     text-align: left;
-    background-color: gray;
+    background-color: #333;
     border-radius: 8px;
   }
   .text {

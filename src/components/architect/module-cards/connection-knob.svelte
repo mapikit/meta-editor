@@ -5,11 +5,11 @@
   import { typeColors } from "../../../common/styles/type-colors"
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
-  import type { Writable } from "svelte/store";
+  import type { Unsubscriber, Writable } from "svelte/store";
   import type { ModuleCard } from "../../../common/types/module-card";
   import ObjectDefinitionMiniApp from "../../object-definition/object-definition-mini-app.svelte";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-  import { onMount,  } from "svelte";
+  import { onDestroy, onMount,  } from "svelte";
   import ConstantTag from "../tags/constant-tag.svelte";
   import { updateTraces } from "../update-traces";
 
@@ -37,18 +37,24 @@
   let expanded : boolean = false;
   let connecting = false;
 
+  let unsubscribe : Unsubscriber = () => {};
+
   onMount(() => {
     sectionsMap.refreshConnections($bopModules);
-    if(nobType === "input") {
-      bopModules.subscribe(modules => {
-        const parentInfo = modules.find(module => module.key === parentKey);
-        const constDependency = parentInfo.dependencies.find(dependency => 
-        dependency.targetPath === fullPathName && 
-        ["constant", "constants"].includes(dependency.origin as string));
-        attatchedConstant = $bopsConstants.find(constant => constant.name === constDependency?.originPath);
-      });
-    }
-  })
+  });
+
+  if(nobType === "input") {
+    unsubscribe = bopModules.subscribe(modules => {
+      const parentInfo = modules.find(module => module.key === parentKey);
+      if(!parentInfo) return;
+      const constDependency = parentInfo.dependencies.find(dependency => 
+      dependency.targetPath === fullPathName && 
+      ["constant", "constants"].includes(dependency.origin as string));
+      attatchedConstant = $bopsConstants.find(constant => constant.name === constDependency?.originPath);
+    });
+  }
+
+  onDestroy(() => unsubscribe());
 
   export function toggleEdition () {
     expanded = false;

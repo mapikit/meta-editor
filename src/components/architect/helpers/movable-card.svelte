@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import { createEventDispatcher } from "svelte";
 
 import type { Writable } from "svelte/store";
 
@@ -9,11 +10,12 @@ import type { Writable } from "svelte/store";
 
 
   export let moduleConfig : ModuleCard | UIInput;
-  export let stopMovementCallback : (mouseEvent : MouseEvent) => void = () => {};
   export let bopModules : Writable<BopsConfigurationEntry[]>;
 
   let ref : HTMLDivElement;
-  let moving = false;
+  export let moving = false;
+
+  const dispatch = createEventDispatcher<{ movementStopped : MouseEvent }>();
 
   function startMovement (event : MouseEvent) {
     if(event.button !== 0) return;
@@ -23,17 +25,12 @@ import type { Writable } from "svelte/store";
     moving = true
   }
   
-  function stopMovement (event : MouseEvent, endOfMovementCallback ?: (mouseEvent : MouseEvent) => void) {
-    // if(moving && checkRectCollision(event.pageX, event.pageY, trashPosition)) {
-    //   return deleteCard();
-    // }
+  function stopMovement (event : MouseEvent) {
     if(moving) {
       ref.style.opacity = "1"
       ref.style.zIndex = "0"
       moving = false
-      if(endOfMovementCallback) {
-        endOfMovementCallback(event);
-      }
+      dispatch("movementStopped", event);
     }
   }
 
@@ -57,7 +54,7 @@ style="
 >
   <slot name="content"/>
 </div>
-<svelte:window on:mousemove={moveCard} on:mouseup={(event) => stopMovement(event, stopMovementCallback)}/>
+<svelte:window on:mousemove={moveCard} on:mouseup={(event) => stopMovement(event)}/>
 
 <style lang="scss">
   .card {

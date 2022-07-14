@@ -1,6 +1,6 @@
 <script lang="ts">
   import Module from "./module-cards/module-card.svelte";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { updateTraces } from "./update-traces";
   import beautify from "json-beautify";
   import ModuleStore from "./module-store.svelte";
@@ -9,18 +9,24 @@
   import { Coordinate } from "../../common/types/geometry";
   import InputCard from "./input-card.svelte";
   import OutputCard from "./output-card.svelte";
-  import type { UIBusinessOperation } from "../../entities/business-operation";
+  import { UIBusinessOperation } from "../../entities/business-operation";
   import { get } from "svelte/store";
   import { navigation } from "../../lib/navigation";
   import { businessOperations } from "../../stores/configuration-store";
   import { getDeepStoreObject } from "./helpers/get-deep-store-obj";
   import type { ModuleCard } from "../../common/types/module-card";
   import { sectionsMap } from "./helpers/sections-map";
+  import { History } from "../../common/helpers/generic-history";
 
   const pathParams = navigation.currentPathParamsSubscribable
-  let currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
+  const currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
 
-  $: currentBop = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
+  const configurationHistory = new History({
+    storeToWatch: currentBop.configuration, 
+    validatingFunction: UIBusinessOperation.rebuildModuleCards
+  });
+
+  onDestroy(() => configurationHistory.unsubscribe());
 
   let modulesInConfig : ModuleCard[];
   currentBop.configuration.subscribe(config => {
@@ -30,7 +36,7 @@
 
   sectionsMap.refreshConnections(get(currentBop.configuration));
 
-  let trashRect : DOMRect;
+  let trash : HTMLDivElement;
   let canvas : HTMLCanvasElement;
   let context : CanvasRenderingContext2D;
   let cutting = false;
@@ -44,33 +50,34 @@
     context.strokeStyle = "#ffffff";
     context.lineWidth = 2;
 
+    // updateTraces();
+    // const canvasScale = canvas.clientWidth/canvas.width;
+    // canvas.width *= canvasScale;
+    // canvas.height *= canvasScale;
+
     updateTraces();
-    const canvasScale = canvas.clientWidth/canvas.width;
-    canvas.width *= canvasScale;
-    canvas.height *= canvasScale;
 
     context.lineWidth = 2;
   }
 
 
-  const mount = new Promise<void>(resolve => {
-    onMount(async () => {
-      context = canvas.getContext("2d");
-      $environment.canvasContext = context;
-      adjustCanvas();
+  
+  onMount(() => {
+    context = canvas.getContext("2d");
+    $environment.canvasContext = context;
+    $environment.canvasOffset = canvas.getBoundingClientRect();
+    adjustCanvas();
 
-      $environment.origin.moveTo(canvas.width/2, canvas.height/2);
-      sectionsMap.refreshConnections(get(currentBop.configuration));
+    $environment.origin.moveTo(canvas.width/2, canvas.height/2);
+    sectionsMap.refreshConnections(get(currentBop.configuration));
 
-      currentBop.configuration.subscribe(() => {
-        updateTraces();
-      });
-      environment.subscribe(() => setTimeout(() => updateTraces(), 1));
-        // Investigate and avoid this kind of repetition & timeout
-        // Timeout Only: traces have "springness" (modules don't)
-        // No Timeout: traces don't update correctly (obvious with scaling)
+    currentBop.configuration.subscribe(() => {
+      updateTraces();
     });
-    resolve();
+    environment.subscribe(() => setTimeout(() => updateTraces(), 1));
+      // Investigate and avoid this kind of repetition & timeout
+      // Timeout Only: traces have "springness" (modules don't)
+      // No Timeout: traces don't update correctly (obvious with scaling)
   });
 
   let panning = false;
@@ -118,6 +125,20 @@
         environment.update(environment => {environment.functionalTraces = !environment.functionalTraces; return environment});
         event.preventDefault();
         break;
+      case "z":
+        if(event.ctrlKey) {
+          configurationHistory.undo();
+          setTimeout(updateTraces, 20);
+          event.preventDefault();
+        }
+        break;
+      case "r":
+        if(event.ctrlKey) {
+          configurationHistory.redo();
+          setTimeout(updateTraces, 20);
+          event.preventDefault();
+        }
+        break;
       case "Escape":
         cutting = false;
         environment.update(environment => {environment.functionalTraces = false; return environment});
@@ -128,9 +149,7 @@
   }
 
   function handleMouseMove (event : MouseEvent) : void {
-    if(cutting) {
-      updateTraces({ cutting: event });
-    }
+    if(cutting) updateTraces({ cutting: event });
     else if(panning) {
       environment.update(env => {
         env.origin.moveBy(event.movementX, event.movementY);
@@ -199,30 +218,23 @@
 
 <div class="architect" id="architect">
   <canvas class="canvas" bind:this={canvas}/>
-    <ModuleStore bind:hidden={storeHidden} bind:currentBop/>
+    <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
     <div 
       class="modulesArea" 
       on:mousedown={startMovement} on:wheel={handleMouseWheel} style="cursor: {cutting ? "crosshair" : "default"};">
-      {#await mount}
-        <p>Loading...</p>
-      {:then _done}
         {#each modulesInConfig as config (config.key)}
           {#if config.moduleType !== "output"}
-            <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} trashPosition={trashRect}/>
+            <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} bind:trash/>
           {/if}
         {/each}
         <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>
-        <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>
-      {/await}
-      
+        <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>      
     </div>
   <input class="buttonCpy" type="button" value="Copy Bop" on:click={() => copyBOpToClipboard()}>
   <input class="buttonScl" type="button" value="Reset Scale" on:click={() => { $environment.scale=1; }}>
   <input class="buttonFit" type="button" value="Fit All" on:click={() => fitModules()}>
   <input class="adjust" type="button" value="Adjust" on:click={() => adjustCanvas()}>
-
-
-  <Trash bind:trashRect bind:hidden={storeHidden}/>
+  <Trash bind:ref={trash} bind:hidden={storeHidden} bopModules={currentBop.configuration}/>
 </div>
 <svelte:window 
   on:mousemove={handleMouseMove} 

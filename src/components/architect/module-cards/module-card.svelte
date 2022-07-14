@@ -12,11 +12,14 @@
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
   import FunctionalKnob from "./funtional-knob.svelte";
-import ModularSection from "./modular-section.svelte";
+  import ModularSection from "./modular-section.svelte";
+import type { DeleteModuleEvent } from "../../../common/types/events";
 
   export let moduleConfig : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>
   export let bopConstants : Writable<BopsConstant[]>;
+  export let trash : HTMLDivElement;
+
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
@@ -24,33 +27,12 @@ import ModularSection from "./modular-section.svelte";
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
   moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
   $: cardInfo = FunctionsInfo.getCardInfo(moduleConfig);
-  export let trashPosition : DOMRect;
 
-  function checkRectCollision(x : number, y : number, targetRect : DOMRect) : boolean {
-    return (x > targetRect.x && x < targetRect.x + targetRect.width) &&
-      (y > targetRect.y && y < targetRect.y + targetRect.height);
+  function attemptDeletion (stopEvent : CustomEvent<MouseEvent>) {
+    const event = new CustomEvent<DeleteModuleEvent>("deleteModule", { detail: { key: moduleConfig.key, mouseEvent: stopEvent.detail } })
+    trash.dispatchEvent(event);
   }
 
-  function checkDeletion (event : MouseEvent) : void {
-    if(checkRectCollision(event.x, event.y, trashPosition)) deleteCard()
-  }
-
-  function deleteCard () {
-    bopModules.update(modules => {
-      // Remove Dependants
-      modules.forEach(module => {
-        for(let i = module.dependencies.length-1; i >= 0; i--) {
-          if(module.dependencies[i].origin === moduleConfig.key)
-          {module.dependencies.splice(i, 1);}
-        }
-      });
-
-      const index = $bopModules.findIndex(module => module.key === moduleConfig.key);
-      modules.splice(index, 1);
-
-      return modules;
-    });
-  }
 
   let modularInfo : TypeDefinitionDeep;
   $: modularInfo = {
@@ -61,7 +43,7 @@ import ModularSection from "./modular-section.svelte";
 
 
 {#if cardInfo !== undefined}
-  <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
+  <MovableCard moduleConfig={moduleConfig} bopModules={bopModules} on:movementStopped={attemptDeletion}>
     <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
       <span slot="functionalDep" class="functionalKnob">
         <FunctionalKnob
@@ -91,7 +73,7 @@ import ModularSection from "./modular-section.svelte";
     </StaticCardBody>
   </MovableCard>
 {:else}
-  <MovableCard moduleConfig={moduleConfig} stopMovementCallback={checkDeletion} bopModules={bopModules}>
+  <MovableCard moduleConfig={moduleConfig} bopModules={bopModules}>
     <div class="undefinedModule" slot="content">! UNAVAILABLE MODULE !<br>
       This card has been deleted. This is usually happens when you delete a BOp that was used internally, or an external package that was removed from
       our database for security reasons. 

@@ -9,6 +9,7 @@
     width: 18px;
     height: calc(100vh - 48px);
     overflow: visible;
+    z-index: 2;
 
     .tab {
       position: absolute;

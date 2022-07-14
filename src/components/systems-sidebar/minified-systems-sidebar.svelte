@@ -20,5 +20,6 @@ const systems = [
     background-color: #1a1a2a;
     padding: 18px 10px;
     overflow-y: auto;
+    z-index: 1;
   }
 </style>

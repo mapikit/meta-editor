@@ -4,6 +4,7 @@ import type { BopsConfigurationEntry, BopsConstant, Dependency } from "meta-syst
 import type { Writable } from "svelte/store";
 import { getClosest } from "../../../../common/helpers/get-closest";
 import { typeColors } from "../../../../common/styles/type-colors";
+import { environment } from "../../../../stores/environment";
 import { sectionsMap } from "../../helpers/sections-map";
 
 export let bopModules : Writable<BopsConfigurationEntry[]>;
@@ -26,8 +27,8 @@ function startMovement (event : MouseEvent) {
   newCard.style.zIndex = "4";
   const currentPos = ref.getBoundingClientRect();
   newCard.style.width = `${currentPos.width}px`;
-  top = currentPos.y;
-  left = currentPos.x;
+  top = currentPos.y - $environment.canvasOffset.y;
+  left = currentPos.x - $environment.canvasOffset.x;
   newCard.style.left = `${left}px`;
   newCard.style.top = `${top}px`;
 
@@ -69,10 +70,14 @@ function stopMovement () {
 
 function moveCard (event : MouseEvent) {
   if(moving) {
+    const scale = $environment.scale;
+
     left += event.movementX;
     top += event.movementY;
     newCard.style.left = `${left}px`;
     newCard.style.top = `${top}px`;
+    newCard.style.transform = `scale(${$environment.scale})`;
+
     let closestInRange : [number, HTMLSpanElement] = getClosest(availableInputs, newCard.getBoundingClientRect());
 
     availableInputs.forEach(nob => {
@@ -84,7 +89,7 @@ function moveCard (event : MouseEvent) {
           const a = newCard.getBoundingClientRect();
           const b = nob.getBoundingClientRect();
 
-          newCard.style.filter = `drop-shadow(${b.x-a.x-a.width+24}px ${b.y-a.y-3}px 0 #fffa)`;
+          newCard.style.filter = `drop-shadow(${(b.x-a.x-a.width)/scale + 22}px ${(b.y-a.y)/scale - 3}px 0 #fffa)`;
           // closestInRange[1].style.boxShadow = "0 0 4px 4px #0ff";
           break;
         default:
@@ -111,7 +116,7 @@ function getExtendedString (value : unknown) {
 
 <style lang="scss">
   .total {
-    transition: filter 80ms cubic-bezier(0.075, 1.045, 0.805, 0.980);
+    transition: filter 50ms cubic-bezier(0.075, 1.045, 0.805, 0.980), transform 500ms ease-in-out;
     display: block;
     width: 100%;
   }
@@ -150,8 +155,4 @@ function getExtendedString (value : unknown) {
     white-space: nowrap;
     text-decoration: none;
   }
-
-  
-
-  
 </style>
