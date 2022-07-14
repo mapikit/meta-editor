@@ -6,14 +6,33 @@ module.exports = {
   ],
   theme: {
     colors: {
-      white: "#ffffff",
-      offWhite: "#d7d7e5",
-      darkLead: "#37375b",
-      crystalBlue: "#9feffa",
-      roseRed: "#f73b5b",
-      ochreYellow: "#ffaf35",
-      brightGreen: "#3cf691",
-      deepPurple: "#501be4",
+      white: "#f4f7f7",
+      offWhite: "#9191a1",
+      roseRed: {
+        light: "#ea6e91",
+        lighter: "#f6b0c3",
+        DEFAULT: "#e6255b",
+      },
+      ochreYellow: {
+        light: "#fbc46c",
+        lighter: "#fadca8",
+        DEFAULT: "#ff9c01",
+      },
+      brightGreen: {
+        light: "#4bff93",
+        lighter: "#a5ffca",
+        DEFAULT: "#3cff88",
+      },
+      crystalBlue: {
+        light: "#93f4f6",
+        lighter: "#93f4f6",
+        DEFAULT: "#3ae6ec",
+      },
+      royalBlue: {
+        light: "#6f7ce4",
+        lighter: "#b3bffc",
+        DEFAULT: "#584df4",
+      },
       date: "#fd83ef",
       function: "#fd4ca4",
       any: "#fc3c45",
@@ -28,20 +47,14 @@ module.exports = {
       bops: "#fde084",
       protocol: "#ff5c8e",
       norbalt: {
-        100: "#676799",
-        200: "#505073",
-        300: "#34344b",
-        400: "#2c2c44"
+        100: "#3a394f",
+        200: "#222234",
+        300: "#181828",
+        350: "#101020",
+        400: "#0f0e1d",
+        500: "#080714"
       },
-      graphite: {
-        100: "#343447",
-        200: "#202031",
-        300: "#191928",
-        400: "#13131f",
-        500: "#0e0e16",
-        600: "#08080d",
-      },
-
+      transparent: "#00000000"
     }
   },
   plugins: [],
