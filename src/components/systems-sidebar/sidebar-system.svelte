@@ -1,7 +1,6 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { selectedSystem } from "./systems-stores";
-  import AttributeAppendix from "./attribute-appendix.svelte";
   import { guideText } from "../../stores/layout-tabs-store";
   import type { Project } from "../../entities/project";
   import { onDestroy } from "svelte";
@@ -33,26 +32,33 @@
       guideText.set("Select or create a system to work with");
     }
   };
+
+
 </script>
 
-<div class="{collapsed ? "system-container" : "system-container open"}"
+<div class="bg-norbalt-200 shadow mt-10 first:mt-3 rounded-md px-3 pt-3 pb-4 border-[3px] border-transparent transition-all hover:border-norbalt-100 cursor-pointer"
   on:click="{updateCollapsedStatus}"
 >
-  <div class="{collapsed ? "chevron-collapse down" : "chevron-collapse"}"  on:click="{() => { collapsed = !collapsed; }}">
+  <!-- <div class="{collapsed ? "chevron-collapse down" : "chevron-collapse"}"  on:click="{() => { collapsed = !collapsed; }}">
     <img src="/icon-chevron-up.svg" alt="chevron"/>
-  </div>
-  <div class="title">
-    {$name}
-  </div>
-  <div class="body">
-    <div class="{collapsed ? "solid-description" : "editable-description"}" transition:fade|local="{{ duration: 250, delay: 250 }}"
-      contenteditable="{!collapsed}"
-      on:click="{(e) => { if (!collapsed) e.stopPropagation(); }}"
+  </div> -->
+  <div class="pl-6 pr-3">
+    <!-- content here -->
+    <div class="flex flex-row">
+      <p class="font-sans font-medium text-lg"> {$name} </p>
+    </div>
+    <div class="text-offWhite mt-3 text-sm"
     >
       {$description}
     </div>
     {#if !collapsed}
-      <AttributeAppendix visible={!collapsed}/>
+      <div class="flex flex-row justify-between mt-3">
+        <div class="bg-norbalt-300 px-4 py-1 rounded font-medium text-offWhite transition-all hover:text-white cursor-pointer ml-auto"> Manage [ICON] </div>
+      </div>
+      <div class="flex flex-row justify-between mt-3 items-center">
+        <p class="text-offWhite text-base"> Versions </p>
+        <div class="h-[2px] w-4/6 bg-norbalt-100" ></div>
+      </div>
       <div class="stats-group" transition:fade|local="{{ duration: 250 }}">
         <div class="stat-line">
           <p class="key"> Version: </p> <p class="value"> {summary.version} </p>
