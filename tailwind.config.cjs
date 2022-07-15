@@ -7,11 +7,13 @@ module.exports = {
   theme: {
     extend: {
       boxShadow: {
-        DEFAULT: '0 6px 5px 2px rgb(0 0 0 / 0.3);'
+        DEFAULT: '0 6px 5px 2px rgb(0 0 0 / 0.3);',
+        light: '0 4px 3px 2px rgb(0 0 0 / 0.2);'
       }
     },
     fontFamily: {
       sans: ['Dosis', 'sans-serif'],
+      titles: ['Livvic', 'sans-serif']
     },
     colors: {
       white: "#f4f7f7",

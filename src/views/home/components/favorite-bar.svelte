@@ -12,56 +12,18 @@
   const navigateToFavorite = () : void => { navigation.navigateTo("/mapibox"); };
 </script>
 
-<div id="favorite-bar">
+<div class="mt-16 w-[870px]">
+  <p class="mb-6 text-xl font-bold ml-2"> Quick Access </p>
+  <div class="bg-norbalt-350 rounded p-10 grid grid-cols-3 gap-8">
   {#if favorites.length === 0}
-    <div class="empty-favorites"> When you star something, it will apear here. </div>
+    <div class="text-norbalt-100 text-center text-lg"> When you star something, it will apear here. </div>
   {:else}
     {#each favorites as favoriteItem}
-      <div class="favorite-item" on:click="{navigateToFavorite}">
-        <div class="title"> {favoriteItem.name} </div>
-        <div class="description"> {favoriteItem.description} </div>
+      <div class="bg-norbalt-300 w-auto px-6 py-3 rounded-lg border-transparent border-[3px] hover:border-norbalt-100 hover:shadow transition-all shadow-light cursor-pointer" on:click="{navigateToFavorite}">
+        <div class="text-lg font-semibold pl-4 pr-2"> {favoriteItem.name} </div>
+        <div class="text-offWhite mt-3 font-semibold pl-4 pr-2"> {favoriteItem.description} </div>
       </div>
     {/each}
   {/if}
+  </div>
 </div>
-
-<style lang="scss">
-  #favorite-bar {
-    margin-top: 82px;
-    font-family: "Dosis";
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-around;
-    max-width: 1300px;
-
-    .empty-favorites {
-      font-size: 24px;
-      color: #45455e;
-    }
-
-    .favorite-item {
-      background-color: #0e0e16;
-      padding: 8px;
-      border-radius: 12px;
-      border: 3px solid #24243b;
-      width: 360px;
-      margin-top: 18px;
-      transition: background 250ms;
-
-      .title {
-        font-size: 18px; 
-        text-align: center;
-        font-weight: bolder;
-      }
-
-      .description {
-        color: #45455e;
-        padding: 12px;
-      }
-
-      &:hover {
-        background-color: #292935;
-      }
-    }
-  }
-</style>

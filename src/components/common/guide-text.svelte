@@ -29,9 +29,9 @@
 };
 </script>
 
-<div class="guide-text-container">
+<div class="fixed font-sans text-3xl font-black select-none right-9 top-28">
   {#key currentText}
-    <h1 class="guide-text" in:customFly="{{ x: -50, duration: 460, delay: 160 }}" out:customFly="{{ x: -50, duration: 150 }}">
+    <h1 class="absolute right-0 top-0 w-[550px] text-right text-norbalt-100" in:customFly="{{ x: -50, duration: 460, delay: 160 }}" out:customFly="{{ x: -50, duration: 150 }}">
       {currentText}
     </h1>
   {/key}
@@ -39,35 +39,13 @@
 
 <style lang="scss">
   @keyframes intro {
-    0% { color: #2c2c3d }
-    15% { color: #5e5e6d }
-    100% { color: #2c2c3d }
+    0% { color: #3a394f }
+    15% { color: #9191a1 }
+    100% { color: #3a394f }
   }
 
-  .guide-text-container {
-    position: fixed;
-    font-family: "Dosis";
-    font-size: 16px;
-    font-weight: 900;
-
-    right: 36px;
-    top: 120px;
-
-    .guide-text {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 550px;
-      user-select: none;
-      -moz-user-select: none;
-    }
-
-    h1 {
-      color: #2c2c3d;
-      max-width: 550px;
-      animation: intro 1.5s ease-in-out forwards;
-      // animation-delay: 160ms;
-      text-align: right;
-    }
+  h1 {
+    animation: intro 1.5s ease-in-out forwards;
+    animation-delay: 160ms;
   }
 </style>

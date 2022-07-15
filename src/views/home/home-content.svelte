@@ -7,40 +7,11 @@ import FavoriteBar from "./components/favorite-bar.svelte";
 let userEmail = globalUser.email;
 </script>
 
-<div class="background">
+<div class="w-full h-full pl-24 flex flex-col items-center justify-center">
   <GuideText />
-  <div id="username">
-    <img src="/logo.svg" alt="mapikit crown logo"/>
-    <p> <span class="text-ochreYellow">  Welcome, </span> {$userEmail} </p>
+  <div class="flex flex-row justify-start w-3/4 min-w-fit font-titles text-4xl -mt-12">
+    <img class="h-9" src="/logo.svg" alt="mapikit crown logo"/>
+    <p class="ml-6"> Welcome, {$userEmail} . </p>
   </div>
   <FavoriteBar />
 </div>
-
-<style lang="scss">
-  .background {
-    padding-left: 90px;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-    justify-content: center;
-  }
-
-  #username {
-    display: flex;
-    flex-flow: column nowrap;
-    text-align: center;
-    align-items: center;
-
-    img {
-      width: 76px;
-    }
-    
-    p {
-      font-size: 32px;
-      font-family: "Livvic";
-      margin-top: 26px;
-    }
-  }
-</style>
