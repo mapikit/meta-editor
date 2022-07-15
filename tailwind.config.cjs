@@ -5,13 +5,21 @@ module.exports = {
     "./src/**/*.{svelte,js,ts}",
   ],
   theme: {
+    extend: {
+      boxShadow: {
+        DEFAULT: '0 6px 5px 2px rgb(0 0 0 / 0.3);'
+      }
+    },
+    fontFamily: {
+      sans: ['Dosis', 'sans-serif'],
+    },
     colors: {
       white: "#f4f7f7",
       offWhite: "#9191a1",
       roseRed: {
         light: "#ea6e91",
         lighter: "#f6b0c3",
-        DEFAULT: "#e6255b",
+        DEFAULT: "#e7325f",
       },
       ochreYellow: {
         light: "#fbc46c",
@@ -19,7 +27,7 @@ module.exports = {
         DEFAULT: "#ff9c01",
       },
       brightGreen: {
-        light: "#4bff93",
+        light: "#74ffac",
         lighter: "#a5ffca",
         DEFAULT: "#3cff88",
       },

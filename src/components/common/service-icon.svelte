@@ -12,7 +12,7 @@
   $: selectedClass = selected === service.name ? "bg-norbalt-100" : "";
 </script>
 
-<div class="w-full h-20 relative flex justify-center items-center {selectedClass}">
+<div class="w-full h-20 relative flex justify-center items-center overflow-hidden {selectedClass}">
   <div
     class="bg-norbalt-300 h-16 w-16 rounded-lg flex justify-center items-center hover:bg-norbalt-400 transition-all"
     on:click="{() => selectFunction(service.name)}"
