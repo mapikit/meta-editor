@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
   import { selectedSystem } from "./systems-stores";
   import { guideText } from "../../stores/layout-tabs-store";
   import type { Project } from "../../entities/project";
   import { onDestroy } from "svelte";
   import { navigation } from "../../lib/navigation";
+  import Selector from "../common/selector.svelte";
   
   export let system : Project;
   let collapsed = true;
@@ -59,25 +59,7 @@
         <p class="text-offWhite text-base"> Versions </p>
         <div class="h-[2px] w-4/6 bg-norbalt-100" ></div>
       </div>
-      <div class="stats-group" transition:fade|local="{{ duration: 250 }}">
-        <div class="stat-line">
-          <p class="key"> Version: </p> <p class="value"> {summary.version} </p>
-        </div>
-        <div class="stat-line">
-          <p class="key"> Environment Variables: </p> <p class="value"> {summary.envsCount} </p>
-        </div>
-      </div>
-      <div class="stats-group" transition:fade|local="{{ duration: 250 }}">
-        <div class="stat-line">
-          <p class="key"> Schemas: </p> <p class="schema-count"> {summary.schemasCount} </p>
-        </div>
-        <div class="stat-line">
-          <p class="key"> Business Operations: </p> <p class="bops-count"> {summary.bopsCount} </p>
-        </div>
-        <div class="stat-line">
-          <p class="key"> Protocols: </p> <p class="protocol-count"> {summary.protocolsCount} </p>
-        </div>
-      </div>
+      <Selector />
     {/if}
   </div>
 </div>
