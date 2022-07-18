@@ -14,6 +14,7 @@ import { SectionsMap, sectionsMap } from "./sections-map";
 export function solveConnection (targetNob : NobSelection, bopModules : Writable<BopsConfigurationEntry[]>) : void {
 
   const currentNob = get(selectedNob);
+  selectedNob.set(undefined);
 
   if(currentNob === undefined) return;
   if(currentNob.nobType === targetNob.nobType) return;

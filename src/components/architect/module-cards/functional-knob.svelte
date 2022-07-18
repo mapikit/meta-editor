@@ -11,7 +11,6 @@
   export let parentKey : number;
   export let bopModules : Writable<ModuleCard[]>;
   let expanded = false;
-  let hovered 
 
   const knobIdentifier = SectionsMap.getIdentifier(parentKey, undefined);
 

@@ -11,7 +11,7 @@
   import type { Writable } from "svelte/store";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
-  import FunctionalKnob from "./funtional-knob.svelte";
+  import FunctionalKnob from "./functional-knob.svelte";
   import ModularSection from "./modular-section.svelte";
 import type { DeleteModuleEvent } from "../../../common/types/events";
 
@@ -23,9 +23,9 @@ import type { DeleteModuleEvent } from "../../../common/types/events";
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
-  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
+  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70);
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
-  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70 );
+  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70);
   $: cardInfo = FunctionsInfo.getCardInfo(moduleConfig);
 
   function attemptDeletion (stopEvent : CustomEvent<MouseEvent>) {
@@ -37,7 +37,7 @@ import type { DeleteModuleEvent } from "../../../common/types/events";
   let modularInfo : TypeDefinitionDeep;
   $: modularInfo = {
     type: "object",
-    subtype: cardInfo.output
+    subtype: cardInfo.output,
   }
 </script>
 
@@ -104,7 +104,7 @@ import type { DeleteModuleEvent } from "../../../common/types/events";
   }
 
   .undefinedModule {
-    background-color: darkred;
+    background-color: rgb(114, 1, 1);
     padding: 5px 5px 5px 5px;
     max-width: 300px;
     text-align: center;

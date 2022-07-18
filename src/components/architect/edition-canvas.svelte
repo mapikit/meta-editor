@@ -224,7 +224,7 @@
       on:mousedown={startMovement} on:wheel={handleMouseWheel} style="cursor: {cutting ? "crosshair" : "default"};">
         {#each modulesInConfig as config (config.key)}
           {#if config.moduleType !== "output"}
-            <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} bind:trash/>
+            <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} trash={trash}/>
           {/if}
         {/each}
         <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>

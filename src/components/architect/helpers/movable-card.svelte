@@ -3,6 +3,8 @@ import type { BopsConfigurationEntry } from "meta-system/dist/src/configuration/
 import { createEventDispatcher } from "svelte";
 
 import type { Writable } from "svelte/store";
+import { AdvancedMath } from "../../../common/helpers/math";
+import { Coordinate } from "../../../common/types/geometry";
 
   import type { ModuleCard } from "../../../common/types/module-card";
   import type { UIInput } from "../../../common/types/ui-input";
@@ -14,12 +16,18 @@ import type { Writable } from "svelte/store";
 
   let ref : HTMLDivElement;
   export let moving = false;
+  let movingPos = {
+    origin : undefined,
+    delta : undefined,
+  }
 
   const dispatch = createEventDispatcher<{ movementStopped : MouseEvent }>();
 
   function startMovement (event : MouseEvent) {
     if(event.button !== 0) return;
 
+    movingPos.origin = new Coordinate(moduleConfig.position.x, moduleConfig.position.y);
+    movingPos.delta = new Coordinate(0, 0);
     ref.style.zIndex = "1";
     ref.style.opacity = "0.5";
     moving = true
@@ -36,7 +44,14 @@ import type { Writable } from "svelte/store";
 
   function moveCard (event : MouseEvent) {
     if(moving) {
-      moduleConfig.position = moduleConfig.position.moveBy(event.movementX/$environment.scale, event.movementY/$environment.scale);
+      movingPos.delta.moveBy(event.movementX/$environment.scale, event.movementY/$environment.scale);
+      let newX =  movingPos.origin.x + movingPos.delta.x;
+      let newY =  movingPos.origin.y + movingPos.delta.y;
+      if(event.shiftKey) {
+        newX = AdvancedMath.round(newX, 50);
+        newY = AdvancedMath.round(newY, 50);
+      }
+      moduleConfig.position = moduleConfig.position.moveTo(newX, newY);
       bopModules.update(modules => modules);
     }
   }
