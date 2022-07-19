@@ -59,7 +59,7 @@
         <p class="text-offWhite text-base"> Versions </p>
         <div class="h-[2px] w-4/6 bg-norbalt-100" ></div>
       </div>
-      <Selector />
+      <Selector field />
     {/if}
   </div>
 </div>
