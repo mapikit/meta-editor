@@ -5,12 +5,16 @@
   import { onDestroy } from "svelte";
   import { navigation } from "../../lib/navigation";
   import Selector from "../common/selector.svelte";
+  import { availableConfigurations } from "../../stores/configuration-store";
+  import { get } from "svelte/store";
   
   export let system : Project;
   let collapsed = true;
   let name = system.name;
   let description = system.description;
   let id = system.id;
+  let versions = $availableConfigurations.filter((elm) =>  get(elm.projectId) === $id);
+  let selectedVersion = versions[0].version;
   let summary = system.getConfiguration().getConfigurationSummary();
   const pathStore = navigation.pathStore;
 
@@ -59,7 +63,7 @@
         <p class="text-offWhite text-base"> Versions </p>
         <div class="h-[2px] w-4/6 bg-norbalt-100" ></div>
       </div>
-      <Selector field />
+      <Selector bind:field={$selectedVersion} options={versions.map((elm) => get(elm.version))} />
     {/if}
   </div>
 </div>
