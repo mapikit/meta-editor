@@ -9,6 +9,7 @@
   import { get } from "svelte/store";
   import SystemPropAmountDisplay from "./system-prop-amount-display.svelte";
   import CogSmall from "../../icons/cog-small.svelte";
+import ClipboardIcon from "../../icons/clipboard-icon.svelte";
   
   export let system : Project;
   let collapsed = true;
@@ -60,7 +61,10 @@
     </div>
     {#if !collapsed}
       <div class="flex flex-row justify-between mt-3">
-        <div class="bg-norbalt-300 px-4 py-1 rounded font-medium text-offWhite transition-all hover:text-white cursor-pointer ml-auto"> Manage [ICON] </div>
+        <div class="bg-norbalt-300 px-4 py-1 rounded font-medium text-offWhite fill-offWhite transition-all hover:text-white hover:fill-white cursor-pointer ml-auto flex flex-row items-center">
+          Manage
+          <ClipboardIcon fill={"fill-inherit ml-2"}/>
+        </div>
       </div>
       <div class="flex flex-row justify-between mt-3 items-center">
         <p class="text-offWhite text-base"> Versions </p>
@@ -77,8 +81,8 @@
           <SystemPropAmountDisplay name="Protocols" count={summary.protocolsCount} textColor={"text-crystalBlue-light"} fillColor={"fill-crystalBlue-light"}/>
           <SystemPropAmountDisplay name="Business Operations" count={summary.bopsCount} textColor={"text-ochreYellow-light"} fillColor={"fill-ochreYellow-light"}/>
         </div>
-        <div class="rounded bg-norbalt-300 h-7 px-4 flex flex-col justify-center">
-          <CogSmall stroke={"stroke-offWhite hover:stroke-white transition-all"}/>
+        <div class="rounded bg-norbalt-300 h-7 px-4 flex flex-col justify-center stroke-offWhite hover:stroke-white transition-all">
+          <CogSmall stroke={"stroke-inherit"}/>
         </div>
       </div>
     {/if}
