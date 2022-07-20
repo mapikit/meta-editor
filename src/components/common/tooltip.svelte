@@ -41,8 +41,8 @@
     switch (position) {
       case "left": return "transform: translateX(-16px) translateY(-50%);";
       case "right": return "transform: translateX(14px) translateY(-50%);";
-      case "top": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)); translateY(-14px)`;
-      case "bottom": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)) translateY(14px);`;
+      case "top": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)); translateY(-18px)`;
+      case "bottom": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)) translateY(18px);`;
     }
   };
 
@@ -69,8 +69,8 @@
     switch (position) {
       case "left": return "right: -5px; top: calc(50% - 7px); transform: rotate(45deg);";
       case "right": return "left: -5px; top: calc(50% - 7px); transform: rotate(45deg);";
-      case "top": return `bottom: -6px; left: calc(50% + 4px); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
-      case "bottom": return `top: -6px; left: calc(50% + 4px); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
+      case "top": return `bottom: -6px; left: calc(50%); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
+      case "bottom": return `top: -6px; left: calc(50%); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
     }
   }
 
@@ -81,9 +81,9 @@
 
 
 {#if showing}
-  <div class="absolute top-1/2 opacity-100 transition-all delay-200 {hiddenClass}" transition:fade={{ duration: 200 }} style="{anchorPos}">
+  <div class="absolute top-1/2 opacity-100 transition-all delay-200 {hiddenClass}" transition:fade={{ duration: 80 }} style="{anchorPos}">
     <div class="fixed z-20 p-3 rounded-lg bg-norbalt-100 w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
-        <div class="bg-norbalt-100 origin-center w-4 h-4 rounded-sm absolute" style="{arrowPos}"/>
+      <div class="bg-norbalt-100 origin-center w-4 h-4 rounded-sm absolute" style="{arrowPos}"/>
       {tooltipContent}
     </div>
   </div>
