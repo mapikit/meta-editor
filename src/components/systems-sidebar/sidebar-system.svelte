@@ -9,14 +9,14 @@
   import { get } from "svelte/store";
   import SystemPropAmountDisplay from "./system-prop-amount-display.svelte";
   import CogSmall from "../../icons/cog-small.svelte";
-import ClipboardIcon from "../../icons/clipboard-icon.svelte";
+  import ClipboardIcon from "../../icons/clipboard-icon.svelte";
   
   export let system : Project;
   let collapsed = true;
   let name = system.name;
   let description = system.description;
   let id = system.id;
-  let versions = $availableConfigurations.filter((elm) =>  get(elm.projectId) === $id);
+  let versions = $availableConfigurations.filter((elm) => get(elm.projectId) === $id);
   let selectedVersion = versions[0].version;
   let summary = system.getConfiguration().getConfigurationSummary(); // TODO get by selected config
   let currentVersion = versions[0];
@@ -41,6 +41,9 @@ import ClipboardIcon from "../../icons/clipboard-icon.svelte";
     }
   };
 
+  const goToConfiguration = () : void => {
+    navigation.navigateTo(`/mapibox/system/${$id}/configuration/${get(currentVersion.id)}`);
+  };
 
 </script>
 
@@ -81,7 +84,9 @@ import ClipboardIcon from "../../icons/clipboard-icon.svelte";
           <SystemPropAmountDisplay name="Protocols" count={summary.protocolsCount} textColor={"text-crystalBlue-light"} fillColor={"fill-crystalBlue-light"}/>
           <SystemPropAmountDisplay name="Business Operations" count={summary.bopsCount} textColor={"text-ochreYellow-light"} fillColor={"fill-ochreYellow-light"}/>
         </div>
-        <div class="rounded bg-norbalt-300 h-7 px-4 flex flex-col justify-center stroke-offWhite hover:stroke-white transition-all">
+        <div class="rounded bg-norbalt-300 h-7 px-4 flex flex-col justify-center stroke-offWhite hover:stroke-white transition-all"
+          on:click="{goToConfiguration}"
+        >
           <CogSmall stroke={"stroke-inherit"}/>
         </div>
       </div>

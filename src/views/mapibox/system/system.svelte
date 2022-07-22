@@ -7,15 +7,12 @@
   import EditProtocols from "./edit-protocols.svelte";
   import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
   import EditSchemas from "./edit-schemas.svelte";
-  import { Schema } from "../../../entities/schema";
   import { businessOperations, protocols, schemas } from "../../../stores/configuration-store";
   import type { PropertyListEntry } from "../../../common/types/property-list-entry";
-  import SystemBasePropertyEditor from "../../../components/system-page/system-base-property-editor.svelte";
-  import { UIBusinessOperation } from "../../../entities/business-operation";
-  import { Protocol } from "../../../entities/protocol";
   import { navigation } from "../../../lib/navigation";
   import { selectedSystem } from "../../../components/systems-sidebar/systems-stores";
   import { onMount } from "svelte";
+  import ConfigurationEdit from "./configuration-edit.svelte";
 
   let schemasPropertyList : PropertyListEntry[];
   let bopsPropertyList : PropertyListEntry[];
@@ -31,55 +28,18 @@
 </script>
 
 <title> System | mapikit </title>
-<div class="content" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
+<div class="flex flex-row h-full" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
   <MinifiedSystemsSidebar/>
-  <CogSidebarDecoration/>
-  <Route path="/mapibox/system/:systemId/protocols/:protocolId/edit">
+  <Route path="/mapibox/system/:systemId/configuration/:configurationId/protocols/:protocolId/edit">
     <EditProtocols />
   </Route>
-  <Route path="/mapibox/system/:systemId/schemas/:schemaId/edit">
+  <Route path="/mapibox/system/:systemId/configuration/:configurationId/schemas/:schemaId/edit">
     <EditSchemas/>
   </Route>
-  <Route path="/mapibox/system/:systemId/bops/:bopId/edit">
+  <Route path="/mapibox/system/:systemId/configuration/:configurationId/bops/:bopId/edit">
     <EditionCanvas />
   </Route>
-  <Route path="/mapibox/system/:systemId/:selectedProp/">
-    <div class="list">
-      <div class="scroller">
-        <div class="top-gradient-rolloff" />
-        <SystemBasePropertyEditor />
-        <PropertyList listType="schemas" listData={schemasPropertyList} createNewEntryHandler={Schema.createNewSchema}/>
-        <PropertyList listType="bops"  listData={bopsPropertyList} createNewEntryHandler={UIBusinessOperation.createNewBOp}/>
-        <PropertyList listType="protocols" listData={protocolsPropertyList} createNewEntryHandler={Protocol.createNewProtocol}/>
-      </div>
-    </div>
+  <Route path="/mapibox/system/:systemId/configuration/:configurationId" deepMatch={false}>
+    <ConfigurationEdit />
   </Route>
 </div>
-
-<style lang="scss">
-  .content {
-    display: flex;
-    flex-flow: row nowrap;
-    overflow-y: hidden;
-  }
-  .list {
-    position: relative;
-    height: calc(100vh - 48px);
-    padding-top: 60px;
-    padding-left: 18px;
-    padding-bottom: 28px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    flex: 1;
-  }
-  .top-gradient-rolloff {
-    // background-color: #13131f;
-    width: 100%;
-    height: 80px;
-    position: fixed;
-    z-index: 1;
-    top: 48px;
-    box-shadow: inset 0px 60px 28px -26px #13131f;
-    // box-shadow: 0px 0px 18px -6px #85858a;
-  }
-</style>
