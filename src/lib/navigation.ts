@@ -48,7 +48,7 @@ class Navigation {
     this._registeredPaths.add(this.normalizePath(path));
     console.log(`Registered Path ${this.normalizePath(path)}`);
 
-    this.pathStore.update((value) => value);
+    this._pathSvelteStore.update((value) => value);
   }
 
   public unregisterPath (path : string) : void {

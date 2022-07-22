@@ -7,21 +7,24 @@
   export let selectFunction : (name : string) => void;
 
   let visible = false;
+  let selectedClass = "";
 
+  $: selectedClass = selected === service.name ? "bg-norbalt-100" : "";
 </script>
 
-<div class="service-holder">
+<div class="w-full h-20 relative flex justify-center items-center overflow-hidden {selectedClass}">
   <div
-    class="{selected === service.name ? "service selected" : "service"}"
+    class="bg-norbalt-300 h-16 w-16 rounded-lg flex justify-center items-center hover:bg-norbalt-400 transition-all"
     on:click="{() => selectFunction(service.name)}"
     on:mouseenter="{() => visible = true}"
     on:mouseleave="{() => visible = false}"
   >
     <Tooltip tooltipContent="{service.tooltip}" visible={visible} position={"right"}/>
-    <img alt={service.name} src={"/dashboard-assets/icons/"+service.icon}/>
+    <img alt={service.name} src={"/dashboard-assets/icons/"+service.icon} class="w-10 h-10"/>
   </div>
   {#if selected === service.name}
-    <div class="selected-mark" transition:fly|local="{{ x: 10, duration: 250 }}"/>
+    <div class="bg-brightGreen w-1.5 h-1/3 absolute right-0 top-0 translate-y-[100%] rounded-l-sm" transition:fly|local="{{ x: 10, duration: 250 }}"/>
+    <div class="bg-brightGreen w-1.5 h-1/3 absolute left-0 top-0 translate-y-[100%] rounded-l-sm" transition:fly|local="{{ x: -10, duration: 250 }}"/>
   {/if}
 </div>
 
@@ -62,15 +65,5 @@
 
   .service.selected {
     border: 3px solid white;
-  }
-
-  .service-holder {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-  }
-
-  .service-holder:not(:first-child) {
-    margin-top: 16px;
   }
 </style>

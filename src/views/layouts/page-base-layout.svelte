@@ -3,25 +3,10 @@
   import ServiceSelector from "../../components/common/service-selector.svelte";
 
 </script>
-<div class="layout">
+<div class="w-full h-full overflow-hidden">
   <Header />
   <ServiceSelector />
-  <div class="general-content" >
+  <div class="w-full h-full pt-14 pl-4 bg-norbalt-300" >
     <slot></slot>
   </div>
 </div>
-
-<style lang="scss">
-  .layout {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-  }
-
-  .general-content {
-    padding-top: 48px;
-    padding-left: 12px;
-    height: 100%;
-    width: 100%;
-  }
-</style>

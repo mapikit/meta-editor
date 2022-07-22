@@ -96,3 +96,7 @@ export const getCurrentMsysConfiguration = () : object => {
 
   return result;
 };
+
+export const getConfigurationById = (id : string) : Configuration => {
+  return get(availableConfigurations).find((element) => get(element.id) === id);
+};

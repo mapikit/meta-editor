@@ -9,24 +9,13 @@ import { selectedService } from "../../stores/layout-tabs-store";
 
 </script>
 
-<div class="header">
-  <div class="logo" on:click="{() => { navigation.navigateTo('/'); selectedService.set(""); }}" >
-    <img src="/logo-and-name.svg" alt="mapikit-logo"/>
+<div class="w-full h-14 fixed bg-norbalt-400">
+  <div class="h-full flex flex-row flex-nowrap justify-center items-center" on:click="{() => { navigation.navigateTo('/'); selectedService.set(""); }}" >
+    <div class="mr-auto flex flex-row justify-center items-center">
+      <div class="w-24 flex justify-center items-center mr-auto">
+        <img src="/logo-sm.svg" alt="mapikit-logo" class="cursor-pointer -mt-1"/>
+      </div>
+      <div class="bg-norbalt-200 h-9 w-1 rounded"></div>
+    </div>
   </div>
 </div>
-
-<style lang="scss">
-  .header {
-    background-color: #0e0e16;
-    width: 100%;
-    height: 48px;
-    position: fixed;
-
-    .logo {
-      height: 36px;
-      margin-top: 11px;
-      margin-left: 12px;
-      cursor: pointer;
-    }
-  }
-</style>

@@ -14,6 +14,8 @@ type ConfigurationParameter = {
   protocols ?: Protocol[];
   schemas ?: Schema[];
   businessOperations ?: UIBusinessOperation[];
+  updatedAt : Date;
+  createdAt : Date;
 }
 
 export type ConfigurationSummary = {
@@ -28,6 +30,8 @@ export class Configuration {
   public readonly projectId : Readable<string>;
   public readonly id : Readable<string>;
   public readonly version : Writable<string> = writable("0.0.0");
+  public readonly updatedAt : Readable<Date>;
+  public readonly createdAt : Readable<Date>;
 
   // These properties are not stores because they're not meant to be
   // changed in here, they should be changed only when this is the current
@@ -46,10 +50,14 @@ export class Configuration {
     schemas = [],
     businessOperations = [],
     protocols = [],
+    updatedAt,
+    createdAt,
   } : ConfigurationParameter) {
     this.projectId = readable(projectId);
     this.id = readable(id);
     this.version.set(version);
+    this.createdAt = readable(createdAt);
+    this.updatedAt = readable(updatedAt);
 
     this.envs = envs;
     this.schemas = schemas;
@@ -62,6 +70,8 @@ export class Configuration {
       projectId: "",
       id: "",
       version: "",
+      createdAt: new Date(0),
+      updatedAt: new Date(0),
     });
   }
 

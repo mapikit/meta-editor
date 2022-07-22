@@ -11,6 +11,7 @@
 
   let xOffset = "";
   let arrowPos = "";
+  let anchorPos = "";
 
   let maxWidth = 0;
 
@@ -34,13 +35,23 @@
 
   $: xOffset = getPosition(componentRect, showing);
   $: arrowPos = getArrowPos(componentRect, showing);
+  $: anchorPos = getParentAnchorPosition(component, showing);
 
   const getPosition = (...comp) => {
     switch (position) {
-      case "left": return "transform: translateX(calc(-100% - 16px)) translateY(-50%);";
-      case "right": return "transform: translateX(calc(20% - 14px)) translateY(-50%);";
-      case "top": return `bottom: calc(100% + 8px); transform: translateX(calc(-50% - ${getMarginXDisplacement()}px));`;
-      case "bottom": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)) translateY(50%);`;
+      case "left": return "transform: translateX(-16px) translateY(-50%);";
+      case "right": return "transform: translateX(14px) translateY(-50%);";
+      case "top": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)); translateY(-18px)`;
+      case "bottom": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)) translateY(18px);`;
+    }
+  };
+
+  const getParentAnchorPosition = (...comp) => {
+    switch(position) {
+      case "left": return "left: 0";
+      case "right": return "right: 0";
+      case "top": return "top: 0";
+      case "bottom": return "bottom: 0";
     }
   };
 
@@ -56,60 +67,26 @@
   function getArrowPos (...comp) {
     // console.log(component?.getBoundingClientRect())
     switch (position) {
-      case "left": return "right: -5px; top: calc(50% - 7px); transform: rotate(45deg);";
-      case "right": return "left: -5px; top: calc(50% - 7px); transform: rotate(45deg);";
-      case "top": return `bottom: -6px; left: calc(50% + 4px); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
-      case "bottom": return `top: -6px; left: calc(50% + 4px); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
+      case "left": return "right: -5px; top: calc(50% - 9px); transform: rotate(45deg);";
+      case "right": return "left: -5px; top: calc(50% - 9px); transform: rotate(45deg);";
+      case "top": return `bottom: -6px; left: calc(50%); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
+      case "bottom": return `top: -6px; left: calc(50%); transform: translateX(${getMarginXDisplacement()}px) rotate(45deg);`;
     }
   }
 
+  let hiddenClass = "";
+  $: hiddenClass = showing ? "" : "opacity-0";
 
 </script>
 
 
 {#if showing}
-  <div class="{showing ? "tooltip-holder" : "tooltip-holder out"}" transition:fade={{ duration: 200 }}>
-    <div class="content" style="{xOffset}" bind:this={component}>
-        <div class="arrow" style="{arrowPos}"/>
+  <div class="absolute top-1/2 opacity-100 transition-all delay-200 {hiddenClass}" transition:fade={{ duration: 80 }} style="{anchorPos}">
+    <div class="fixed z-20 px-3 py-1 rounded-lg bg-norbalt-100 w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
+      <div class="bg-norbalt-100 origin-center w-4 h-4 rounded-sm absolute" style="{arrowPos}"/>
       {tooltipContent}
     </div>
   </div>
 {/if}
 
 <svelte:window bind:innerWidth={maxWidth}/>
-
-<style lang="scss">
-  .tooltip-holder {
-    position: absolute;
-    top: 50%;
-    transition: all 150ms .2s;
-    opacity: 1;
-
-    &.out {
-      opacity: 0;
-    }
-
-    .content {
-      position: fixed;
-      z-index: 5;
-      padding: 12px;
-      border-radius: 8px;
-      background-color: #2c2c44;
-      width: max-content;
-      max-width: 350px;
-      font-family: 'Dosis';
-      font-weight: 600;
-      transform-origin: center center;
-      box-shadow: 0 3px 6px rgba($color: #000000, $alpha: .8);
-    }
-
-    .arrow {
-      transform-origin: center center;
-      background-color: #2c2c44;
-      width: 14px;
-      height: 14px;
-      border-radius: 2px;
-      position: absolute;
-    }
-  }
-</style>

@@ -6,7 +6,7 @@ import PageBaseLayout from "./layouts/page-base-layout.svelte";
 import System from "./mapibox/system/system.svelte";
 </script>
 
-<div style="width: 100%; height: 100%;">
+<div style="width: 100%; height: 100%;" class="select-none">
   <PageBaseLayout>
     <Route path="/">
       <HomeContent />

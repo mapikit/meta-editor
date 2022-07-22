@@ -25,6 +25,11 @@ export class Project {
     this.keepStorageUpdated();
   }
 
+  public getConfigurations () : Configuration[] {
+    return get(availableConfigurations)
+      .filter((config) => { return get(config.projectId) === get(this.id); });
+  }
+
   public static getNullable () : Project {
     return new Project({
       id: "",

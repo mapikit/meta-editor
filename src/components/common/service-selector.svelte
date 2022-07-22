@@ -4,66 +4,47 @@
   import { navigation } from "../../lib/navigation";
   
   // Syncs selected with current page
-  navigation.pathStore.subscribe((path) => {
-    if (path !== "/home") {
+  navigation.pathStore.subscribe((path : string) => {
+    if (path === "/home" || path === "/" || path === "") {
+      layoutTabs.set({ serviceSelectorOpen: true });
+      selectedService.set("");
+    } else {
       layoutTabs.set({ serviceSelectorOpen: false });
 
       selectedService.set(services.find((service) => {
         return path.includes(service.link);
       })?.name ?? "");
-    } else {
-      layoutTabs.set({ serviceSelectorOpen: true });
-      selectedService.set("");
     }
   });
 
   let collapsed = false;
-  layoutTabs.subscribe((value) => { collapsed = !value.serviceSelectorOpen; });
-
-  let selected = "";
-  selectedService.subscribe((value) => {
-    selected = value;
-  });
 
   const select = (serviceName : string, link : string) : void => {
     selectedService.set(serviceName);
     navigation.navigateTo(link);
   };
 
+  let collapsedClass = "";
+  let isHome = $selectedService === "";
+  $: collapsedClass = collapsed ? "-translate-x-20 delay-500" : "";
+  $: isHome = $selectedService === "";
+
+  layoutTabs.subscribe((value) => {
+    collapsed = !isHome && !value.serviceSelectorOpen;
+  });
+
 </script>
 
-<div class="{collapsed && selected !== "" ? "service-select collapsed" : "service-select"}"
-  on:mouseleave="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: false && selected !== "" }))}"
-  on:mouseenter="{() => layoutTabs.update((value) => ({ serviceSelectorOpen: true && selected !== "" }))}"
+<div
+  class="w-24 bg-norbalt-200 h-full flex flex-col justify-start content-center mt-14 fixed transition-all duration-300 z-10 {collapsedClass}"
+  on:mouseleave="{() => layoutTabs.set({ serviceSelectorOpen: false })}"
+  on:mouseenter="{() => layoutTabs.set({ serviceSelectorOpen: true })}"
 >
   {#each services as service}
     <ServiceIcon
       selectFunction={() => select(service.name, service.link)}
-      selected={selected}
+      selected={$selectedService}
       service={service}
     />
   {/each}
 </div>
-
-<style lang="scss">
-  .service-select {
-    margin-top: 48px;
-    height: calc(100vh - 48px);
-    width: 84px;
-    background-color: #5d2be6;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 16px 0 0 14px;
-    transition: all 250ms;
-    position: fixed;
-    z-index: 5;
-
-    &.collapsed {
-      margin-left: -72px;
-      transition: all 250ms .5s;
-    }
-  }
-
-</style>
