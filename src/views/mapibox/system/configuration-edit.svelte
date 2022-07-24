@@ -8,6 +8,7 @@
   import { onMount } from "svelte";
   import { getConfigurationById } from "../../../stores/configuration-store";
   import VersionDisplay from "../../../components/configuration/version-display.svelte";
+  import EnvVarsEditor from "./env-vars-editor.svelte";
 
   let selectedProject = $currentProject;
   let currentVersion = "";
@@ -45,6 +46,7 @@
     />
   </div>
   <div class="w-full flex flex-row mt-8"> <!-- version overview and variables -->
-    <VersionDisplay />
+    <VersionDisplay currentVersion={selectedProject.getConfiguration()}/>
+    <EnvVarsEditor configuration={selectedProject.getConfiguration()}/>
   </div>
 </div>
