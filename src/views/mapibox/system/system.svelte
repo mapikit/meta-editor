@@ -1,6 +1,4 @@
 <script lang="ts">
-  import PropertyList from "../../../components/system-page/property-list.svelte";
-  import CogSidebarDecoration from "../../../components/cog-sidebar-decoration.svelte";
   import MinifiedSystemsSidebar from "../../../components/systems-sidebar/minified-systems-sidebar.svelte";
   import { fly } from "svelte/transition";
   import Route from "../../../lib/router/route.svelte";

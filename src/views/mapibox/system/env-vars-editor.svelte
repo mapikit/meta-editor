@@ -24,4 +24,7 @@
       <Tooltip position="top" tooltipContent="The values set here can be used in any Business Operation. These are their default values, and they can be set to a different value before downloading your configuration file." visible={infoHovered}/>
     </div>
   </div>
+  <div class="w-full mt-2">
+    
+  </div>
 </div>
