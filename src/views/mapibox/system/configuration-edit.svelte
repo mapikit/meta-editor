@@ -9,6 +9,7 @@
   import { getConfigurationById } from "../../../stores/configuration-store";
   import VersionDisplay from "../../../components/configuration/version-display.svelte";
   import EnvVarsEditor from "./env-vars-editor.svelte";
+  import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
 
   let selectedProject = $currentProject;
   let currentVersion = "";
@@ -49,4 +50,5 @@
     <VersionDisplay currentVersion={selectedProject.getConfiguration()}/>
     <EnvVarsEditor configuration={selectedProject.getConfiguration()}/>
   </div>
+  <ConfigurationSection />
 </div>
