@@ -1,7 +1,8 @@
 <script lang="ts">
-  import InformationCircleIcon from "../../../icons/information-circle-icon.svelte";
-  import type { Configuration } from "../../../entities/configuration";
-  import Tooltip from "../../../components/common/tooltip.svelte";
+  import InformationCircleIcon from "../../icons/information-circle-icon.svelte";
+  import type { Configuration } from "../../entities/configuration";
+  import Tooltip from "../../components/common/tooltip.svelte";
+  import Vars from "./vars.svelte";
 
   export let configuration : Configuration;
 
@@ -24,7 +25,7 @@
       <Tooltip position="top" tooltipContent="The values set here can be used in any Business Operation. These are their default values, and they can be set to a different value before downloading your configuration file." visible={infoHovered}/>
     </div>
   </div>
-  <div class="w-full mt-2">
-    
+  <div class="w-full mt-4 overflow-y-auto">
+    <Vars />
   </div>
 </div>
