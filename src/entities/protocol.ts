@@ -108,7 +108,7 @@ export class Protocol {
     saveConfigurations();
   }
 
-  public getProtocolCardInfo () : PropertyListEntry {
+  public getCardInfo () : PropertyListEntry {
     const result : PropertyListEntry = {
       id: get(this.id),
       name: this.identifier,

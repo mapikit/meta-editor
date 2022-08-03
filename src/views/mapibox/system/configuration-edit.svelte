@@ -35,7 +35,7 @@
   };
 </script>
 
-<div class="h-full w-full pl-7 pt-6">
+<div class="h-full w-full pl-7 py-6 overflow-y-auto">
   <div class="flex flex-row items-center"> <!-- title -->
     <CogMulticolorIcon />
     <p class="text-2xl ml-2 font-semibold"> {get(selectedProject.name)} </p>
@@ -50,5 +50,7 @@
     <VersionDisplay currentVersion={selectedProject.getConfiguration()}/>
     <EnvVarsEditor configuration={selectedProject.getConfiguration()}/>
   </div>
-  <ConfigurationSection />
+  <ConfigurationSection type="Schemas"/>
+  <ConfigurationSection type="Protocols"/>
+  <ConfigurationSection type="Business Operations"/>
 </div>

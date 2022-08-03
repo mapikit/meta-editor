@@ -5,19 +5,10 @@
   import EditProtocols from "./edit-protocols.svelte";
   import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
   import EditSchemas from "./edit-schemas.svelte";
-  import { businessOperations, protocols, schemas } from "../../../stores/configuration-store";
-  import type { PropertyListEntry } from "../../../common/types/property-list-entry";
   import { navigation } from "../../../lib/navigation";
   import { selectedSystem } from "../../../components/systems-sidebar/systems-stores";
   import { onMount } from "svelte";
   import ConfigurationEdit from "./configuration-edit.svelte";
-
-  let schemasPropertyList : PropertyListEntry[];
-  let bopsPropertyList : PropertyListEntry[];
-
-  $: protocolsPropertyList = $protocols.map((value) => value.getProtocolCardInfo());
-  $: schemasPropertyList = $schemas.map((value) => value.getSchemaCardInfo());
-  $: bopsPropertyList = $businessOperations.map(bop => bop.getCardInfo());
 
   onMount(() => {
     selectedSystem.set(navigation.currentPathParams["systemId"]);

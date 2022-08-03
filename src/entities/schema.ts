@@ -49,7 +49,7 @@ export class Schema {
     saveConfigurations();
   }
 
-  public getSchemaCardInfo () : PropertyListEntry {
+  public getCardInfo () : PropertyListEntry {
     return {
       id: get(this.id),
       name: this.name,
