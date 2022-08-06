@@ -8,6 +8,7 @@
   import { get } from "svelte/store";
   import StarIcon from "../../icons/star-icon.svelte";
   import LockIcon from "../../icons/lock-icon.svelte";
+  import { navigation } from "../../lib/navigation";
 
   type PropTypes = "Schemas" | "Business Operations" | "Protocols";
 
@@ -27,6 +28,11 @@
       ? UIBusinessOperation.createNewBOp
       : Protocol.createNewProtocol;
 
+  $: linkName = type === "Schemas"
+    ? "/schemas"
+    : type === "Business Operations"
+      ? "/bops"
+      : "/protocols";
   $: schemaList = $schemas;
   $: bopsList = $businessOperations;
   $: protocolList = $protocols;
@@ -72,7 +78,9 @@
           {/each}
         </div>
         <div class="flex flex-row mt-2 justify-between">
-          <div class="rounded bg-norbalt-300 px-3 py-1 cursor-pointer transition-all text-offWhite hover:text-white"> Edit </div>
+          <div class="rounded bg-norbalt-300 px-3 py-1 cursor-pointer transition-all text-offWhite hover:text-white"
+            on:click="{() => { navigation.navigateAppendTo(`/${linkName}/${item.id}`);}}"
+          > Edit </div>
           <div class="rounded bg-norbalt-300 h-8 px-2.5 flex flex-col justify-center {get(item.locked) ? "fill-ochreYellow" : "fill-offWhite"} hover:fill-ochreYellow-light transition-all cursor-pointer"
             on:click="{() => { item.locked.set(!get(item.locked)); }}"
           > <!-- TODO: Extract to self contained component to enable reactivity -->

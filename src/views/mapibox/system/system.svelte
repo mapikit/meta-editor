@@ -19,13 +19,13 @@
 <title> System | mapikit </title>
 <div class="flex flex-row h-full" in:fly={{ x: 150, duration: 250, delay: 250 }} out:fly={{ x: -150, duration: 250 }} >
   <MinifiedSystemsSidebar/>
-  <Route path="/mapibox/system/:systemId/configuration/:configurationId/protocols/:protocolId/edit">
+  <Route path="/mapibox/system/:systemId/configuration/:configurationId/protocols/:protocolId">
     <EditProtocols />
   </Route>
-  <Route path="/mapibox/system/:systemId/configuration/:configurationId/schemas/:schemaId/edit">
+  <Route path="/mapibox/system/:systemId/configuration/:configurationId/schemas/:schemaId">
     <EditSchemas/>
   </Route>
-  <Route path="/mapibox/system/:systemId/configuration/:configurationId/bops/:bopId/edit">
+  <Route path="/mapibox/system/:systemId/configuration/:configurationId/bops/:bopId">
     <EditionCanvas />
   </Route>
   <Route path="/mapibox/system/:systemId/configuration/:configurationId" deepMatch={false}>
