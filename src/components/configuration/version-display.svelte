@@ -8,6 +8,7 @@ import type { Configuration } from "../../entities/configuration";
 import { get } from "svelte/store";
 import SystemPropAmountDisplay from "../systems-sidebar/system-prop-amount-display.svelte";
 import LockIcon from "../../icons/lock-icon.svelte";
+import { businessOperations, protocols, schemas } from "../../stores/configuration-store";
 
 let duplicateHovered = false;
 let craterHovered = false;
@@ -16,7 +17,7 @@ let summary;
 export let currentVersion : Configuration;
 let locked = false;
 
-$: summary = currentVersion?.getConfigurationSummary();
+$: summary = ($schemas && $protocols && $businessOperations) && currentVersion?.getConfigurationSummary();
 </script>
 
 <div class="bg-norbalt-200 rounded-md p-4 shadow">

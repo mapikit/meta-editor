@@ -2,9 +2,9 @@
   import { businessOperations, protocols, schemas } from "../../stores/configuration-store";
   import ChevronIcon from "../../icons/chevron-icon.svelte";
   import SystemPropIcon from "../common/system-prop-icon.svelte";
-  import type { Schema } from "../../entities/schema";
-  import type { Protocol } from "../../entities/protocol";
-  import type { UIBusinessOperation } from "../../entities/business-operation";
+  import { Schema } from "../../entities/schema";
+  import { Protocol } from "../../entities/protocol";
+  import { UIBusinessOperation } from "../../entities/business-operation";
   import { get } from "svelte/store";
   import StarIcon from "../../icons/star-icon.svelte";
   import LockIcon from "../../icons/lock-icon.svelte";
@@ -20,6 +20,12 @@
     "Business Operations": "stroke-white fill-ochreYellow",
     "Protocols": "stroke-white fill-crystalBlue",
   };
+
+  $: creationFunction = type === "Schemas"
+    ? Schema.createNewSchema
+    : type === "Business Operations"
+      ? UIBusinessOperation.createNewBOp
+      : Protocol.createNewProtocol;
 
   $: schemaList = $schemas;
   $: bopsList = $businessOperations;
@@ -38,15 +44,17 @@
       <div class="transition-all {chevronStyle}"> <ChevronIcon /> </div>
       <p class="ml-3 flex flex-row text-xl font-semibold"> <span class="mr-2 mt-0.5"> <SystemPropIcon type={type} iconStyle={currentStyle}/> </span> {type} </p>
     </div>
-    <div class="ml-5 py-1 px-4 bg-norbalt-200 rounded text-offWhite"> Create New </div> <!-- TODO: Add call to Back End here -->
+    <div class="ml-5 py-1 px-4 bg-norbalt-200 rounded text-offWhite cursor-pointer hover:bg-norbalt-100 hover:text-white transition-all"
+      on:click="{creationFunction}"
+    > Create New </div> <!-- TODO: Add call to Back End here -->
     <div class="ml-6 flex-1 h-[calc(2px)] bg-norbalt-100"/>
   </div>
   <!-- Header -->
   <!-- List -->
   {#if !collapsed}
-  <div class="overflow-x-auto flex flex-row items-center mt-5">
+  <div class="overflow-x-auto flex flex-row items-center mt-5 w-full">
     {#each usedList as item}
-      <div class="bg-norbalt-200 w-80 p-2 px-4 rounded ml-6 first:ml-0">
+      <div class="bg-norbalt-200 w-80 min-w-[20rem] p-2 px-4 rounded ml-6 first:ml-0 last:mr-10">
         <div class="flex flex-row justify-between items-center">
           <p class="text-lg font-semibold"> {get(item.name)} </p>
           <div > <StarIcon style="stroke-norbalt-100 fill-transparent" /> </div> <!-- Todo: call BE -->
