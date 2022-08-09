@@ -6,31 +6,46 @@
   import { get } from "svelte/store";
   import { getSchemaById, schemas } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
-  import { onDestroy } from "svelte";
-  import { guideText } from "../../../stores/layout-tabs-store";
+  import { onDestroy, onMount } from "svelte";
   import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
+  import ChevronIcon from "../../../icons/chevron-icon.svelte";
+  import TextField from "../../../components/fields/text-field.svelte";
 
   let schemaList : Schema[] = $schemas;
-  let pathParams = navigation.currentPathParamsSubscribable;
-  let currentSchemaId = $pathParams["schemaId"];
-  let currentSchema = getSchemaById(currentSchemaId);
-  let schemaFormat = $currentSchema?.format;
-  let schemaName = $currentSchema?.name;
 
+  $: pathParams = navigation.currentPathParamsSubscribable;
   $: schemaList = $schemas;
+  $: currentSchemaId = $pathParams["schemaId"];
+  $: currentSchema = getSchemaById(currentSchemaId);
+  $: schemaFormat = $currentSchema?.format;
+  $: schemaName = $currentSchema?.name;
 
-  const unsub = pathParams.subscribe((newValue) => {
-    currentSchemaId = newValue["schemaId"];
-    currentSchema = getSchemaById(currentSchemaId);
-    schemaFormat = $currentSchema?.format;
-    schemaName = $currentSchema?.name;
-    guideText.set(`Editing schema "${$schemaName}" (${currentSchemaId})`);
+  // onDestroy(unsub);
+  onMount(() => {
+    const currentPathParams = navigation.currentPathParams;
+    currentSchemaId = currentPathParams["schemaId"];
   });
 
-  onDestroy(unsub);
+  console.log($currentSchema);
 
 </script>
 
 <div class="px-8 w-[calc(100%-86px)]">
   <ConfigurationSection type="Schemas" canDelete={true}/>
+  <div class="w-full mt-12" >
+    <p class="text-white font-bold text-2xl italic"> Editing '{$schemaName}' Schema </p>
+    <div class="flex flex-row w-full mt-4"> <!-- Card holder -->
+      <div class="rounded bg-norbalt-200 p-3 px-5 border-transparent border w-[550px]">
+        <div /> <!-- Confirm / Cancel -->
+        <div class="flex flex-row justify-between items-center text-lg font-semibold"> <!-- Information Section -->
+          <ChevronIcon />
+          <p class="ml-3">  Information </p>
+          <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
+        </div>
+        <TextField label="Name" bind:field={schemaName}/>
+        <TextField label="Name" bind:field={schemaName}/>
+        <TextField label="Name" bind:field={schemaName}/>
+      </div>
+    </div>
+  </div>
 </div>
