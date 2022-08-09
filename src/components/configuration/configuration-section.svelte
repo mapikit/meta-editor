@@ -13,6 +13,7 @@
   type PropTypes = "Schemas" | "Business Operations" | "Protocols";
 
   export let type : PropTypes = "Schemas";
+  export let canDelete : boolean = false;
 
   let collapsed = false;
 
@@ -22,6 +23,11 @@
     "Protocols": "stroke-white fill-crystalBlue",
   };
 
+  $: deleteFunction = type === "Schemas"
+    ? (schema) : () => void => { return () => Schema.deleteSchema(schema.id); }
+    : type === "Business Operations"
+      ? (bop) : () => void => () => UIBusinessOperation.deleteBop(bop.id)
+      : (protocol) : () => void => () => Protocol.deleteProtocol(protocol.id);
   $: creationFunction = type === "Schemas"
     ? Schema.createNewSchema
     : type === "Business Operations"
@@ -58,7 +64,7 @@
   <!-- Header -->
   <!-- List -->
   {#if !collapsed}
-  <div class="overflow-x-auto flex flex-row items-center mt-5 w-full">
+  <div class="overflow-x-auto flex flex-row items-center mt-5 w-full pb-2">
     {#each usedList as item}
       <div class="bg-norbalt-200 w-80 min-w-[20rem] p-2 px-4 rounded ml-6 first:ml-0 last:mr-10">
         <div class="flex flex-row justify-between items-center">
@@ -81,7 +87,12 @@
           <div class="rounded bg-norbalt-300 px-3 py-1 cursor-pointer transition-all text-offWhite hover:text-white"
             on:click="{() => { navigation.navigateAppendTo(`/${linkName}/${item.id}`);}}"
           > Edit </div>
-          <div class="rounded bg-norbalt-300 h-8 px-2.5 flex flex-col justify-center {get(item.locked) ? "fill-ochreYellow" : "fill-offWhite"} hover:fill-ochreYellow-light transition-all cursor-pointer"
+          {#if canDelete}
+            <div class="rounded bg-norbalt-300 px-3 py-1 ml-4 cursor-pointer transition-all text-offWhite hover:text-roseRed"
+              on:click="{deleteFunction(item)}"
+            > Delete </div>
+          {/if}
+          <div class="rounded bg-norbalt-300 ml-auto h-8 px-2.5 flex flex-col justify-center {get(item.locked) ? "fill-ochreYellow" : "fill-offWhite"} hover:fill-ochreYellow-light transition-all cursor-pointer"
             on:click="{() => { item.locked.set(!get(item.locked)); }}"
           > <!-- TODO: Extract to self contained component to enable reactivity -->
             <LockIcon style={"fill-inherit h-6 w-3"} locked={get(item.locked)}/>

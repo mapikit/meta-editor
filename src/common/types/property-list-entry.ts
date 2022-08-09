@@ -7,5 +7,4 @@ export type PropertyListEntry = {
   starred : Writable<boolean>;
   description : Writable<string>;
   dataValues : Array<{ name : string; value : Writable<unknown>, editable ?: boolean }>
-  deleteSelf : () => void;
 };

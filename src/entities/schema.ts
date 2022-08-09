@@ -33,13 +33,14 @@ export class Schema {
 
     this.id = readable(id);
     this.keepStorageUpdated();
-
-    this.deleteSchema = this.deleteSchema.bind(this);
   }
 
-  private deleteSchema () : void {
+  public static deleteSchema (id : string) : void {
+    console.log("WTF MERMÃO??");
     schemas.update((list) => {
-      const itemIndex = list.findIndex((schema) => get(schema.id) === get(this.id));
+      const itemIndex = list.findIndex((schema) => get(schema.id) === id);
+
+      console.log(itemIndex, "<<<<<<<<<<<<<<<<<<<<<");
 
       list.splice(itemIndex, 1);
 
@@ -59,7 +60,6 @@ export class Schema {
       dataValues: [
         { name: "DB Protocol", value: this.dbProtocol, editable: true },
       ],
-      deleteSelf: this.deleteSchema,
     };
   }
 

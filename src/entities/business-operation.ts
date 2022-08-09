@@ -56,13 +56,11 @@ export class UIBusinessOperation {
     this.validateConfigurationForUI(configuration);
 
     this.keepStorageUpdated();
-
-    this.deleteBop = this.deleteBop.bind(this);
   }
 
-  private deleteBop () : void {
+  public static deleteBop (id : string) : void {
     businessOperations.update((list) => {
-      const itemIndex = list.findIndex((bop) => get(bop.id) === get(this.id));
+      const itemIndex = list.findIndex((bop) => get(bop.id) === id);
 
       list.splice(itemIndex, 1);
 
@@ -80,7 +78,6 @@ export class UIBusinessOperation {
       starred: this.isStarred,
       description: this.description,
       dataValues: [],
-      deleteSelf: this.deleteBop,
     };
   }
 
