@@ -15,6 +15,10 @@ export const saveConfigurations = () : void => {
   const savingData = configs.map((config) => config.serialized());
 
   localStorageService.save("configurations", savingData);
+
+  schemas.set(get(schemas));
+  protocols.set(get(protocols));
+  businessOperations.set(get(businessOperations));
 };
 
 // eslint-disable-next-line max-lines-per-function

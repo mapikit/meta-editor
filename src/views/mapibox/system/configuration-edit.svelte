@@ -42,7 +42,7 @@
     <Selector
       styleClass="px-4 pl-8 ml-4"
       onChange={onSelectVersion}
-      options={selectedProject.getConfigurations().map((config) => get(config.version))}
+      options={selectedProject.getConfigurations().map((config) => ({ value: get(config.version), label: get(config.version) }))}
       bind:field={currentVersion}
     />
   </div>

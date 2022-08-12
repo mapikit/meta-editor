@@ -73,7 +73,7 @@
         <p class="text-offWhite text-base"> Versions </p>
         <div class="h-[2px] w-4/6 bg-norbalt-100" ></div>
       </div>
-      <Selector bind:field={$selectedVersion} options={versions.map((elm) => get(elm.version))} />
+      <Selector bind:field={$selectedVersion} options={versions.map((elm) => ({ value: get(elm.version), label: get(elm.version) }))} />
       <div class="w-full text-offWhite text-xs mt-3">
         <div> Last Edit: <span class="float-right"> {get(currentVersion.updatedAt)} </span></div>
         <div class="mt-1"> Created At: <span class="float-right"> {get(currentVersion.createdAt)} </span></div>

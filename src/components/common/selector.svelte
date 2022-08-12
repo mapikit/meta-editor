@@ -1,7 +1,7 @@
 <script lang="ts">
   import ChevronIcon from "../../icons/chevron-icon.svelte";
 
-  export let options = [ "op1", "op2", "op3" ];
+  export let options : Array<{ label : string; value : unknown }> = [];
   export let field;
   export let styleClass = "";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
@@ -31,7 +31,8 @@
   {#if focused}
     <div class='bg-norbalt-200 shadow absolute mt-2 top-full w-full rounded text-sm overflow-hidden left-0'>
       {#each options as option }
-        <div class="px-2 py-1 first:pt-2 last:pb-2 hover:bg-norbalt-100 transition-all duration-100" on:click="{() => {field = option; onChange(field); }}"> {option} </div>
+        <div class="px-2 py-1 first:pt-2 last:pb-2 hover:bg-norbalt-100 transition-all duration-100"
+          on:click="{() => {field = option.value; onChange(option); console.log(option); }}"> {option.label} </div>
       {/each}
     </div>
   {/if}

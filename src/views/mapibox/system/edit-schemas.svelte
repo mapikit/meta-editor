@@ -3,13 +3,14 @@
   import GuideText from "../../../components/common/guide-text.svelte";
   import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
   import type { Schema } from "../../../entities/schema";
-  import { get } from "svelte/store";
-  import { getSchemaById, schemas } from "../../../stores/configuration-store";
+  import { get, writable } from "svelte/store";
+  import { getSchemaById, protocols, schemas } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
   import { onDestroy, onMount } from "svelte";
   import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
   import ChevronIcon from "../../../icons/chevron-icon.svelte";
   import TextField from "../../../components/fields/text-field.svelte";
+  import Selector from "../../../components/common/selector.svelte";
 
   let schemaList : Schema[] = $schemas;
 
@@ -19,14 +20,16 @@
   $: currentSchema = getSchemaById(currentSchemaId);
   $: schemaFormat = $currentSchema?.format;
   $: schemaName = $currentSchema?.name;
+  $: description = $currentSchema?.description;
+  $: dbprotocol = $currentSchema?.dbProtocol ?? writable("");
+  $: protocolsOptions = $protocols
+    .map((protocol) => ({ value: get(protocol.identifier), label: get(protocol.protocolName) }));
 
   // onDestroy(unsub);
   onMount(() => {
     const currentPathParams = navigation.currentPathParams;
     currentSchemaId = currentPathParams["schemaId"];
   });
-
-  console.log($currentSchema);
 
 </script>
 
@@ -43,8 +46,13 @@
           <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
         </div>
         <TextField label="Name" bind:field={schemaName}/>
-        <TextField label="Name" bind:field={schemaName}/>
-        <TextField label="Name" bind:field={schemaName}/>
+        <TextField label="Description" bind:field={description} multiline/>
+        <div class="mt-2 w-full">
+          <p class="text-offWhite text-sm"> Db Protocol  </p>
+          <div class="mt-1">
+            <Selector bind:field={$dbprotocol} options={protocolsOptions}/>
+          </div>
+        </div>
       </div>
     </div>
   </div>
