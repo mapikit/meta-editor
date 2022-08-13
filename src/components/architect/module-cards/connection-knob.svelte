@@ -133,7 +133,7 @@
     <ObjectDefinitionMiniApp
       bind:this={miniApp}
       editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
-      initialDefinition={info["subtype"]} initialData={{}}
+      format={info["subtype"]} initialData={{}}
     />
   {/if}
   {#if expanded}

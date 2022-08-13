@@ -1,16 +1,15 @@
 <script lang="ts">
-  import DefinitionApp from "../../../components/system-page/system-editor/definition-app.svelte";
-  import GuideText from "../../../components/common/guide-text.svelte";
-  import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
   import type { Schema } from "../../../entities/schema";
   import { get, writable } from "svelte/store";
   import { getSchemaById, protocols, schemas } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
   import ChevronIcon from "../../../icons/chevron-icon.svelte";
   import TextField from "../../../components/fields/text-field.svelte";
   import Selector from "../../../components/common/selector.svelte";
+  import ObjectDefinitionMiniApp from "../../../components/object-definition/object-definition-mini-app.svelte";
+  import { EditorLevel, EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
 
   let schemaList : Schema[] = $schemas;
 
@@ -25,6 +24,7 @@
   $: protocolsOptions = $protocols
     .map((protocol) => ({ value: get(protocol.identifier), label: get(protocol.protocolName) }));
 
+  $: selectedProtocolLabel = protocolsOptions.find((protocol) => protocol.value === $dbprotocol)?.label;
   // onDestroy(unsub);
   onMount(() => {
     const currentPathParams = navigation.currentPathParams;
@@ -33,7 +33,7 @@
 
 </script>
 
-<div class="px-8 w-[calc(100%-86px)]">
+<div class="px-8 w-[calc(100%-86px)] overflow-y-scroll pb-36">
   <ConfigurationSection type="Schemas" canDelete={true}/>
   <div class="w-full mt-12" >
     <p class="text-white font-bold text-2xl italic"> Editing '{$schemaName}' Schema </p>
@@ -48,11 +48,23 @@
         <TextField label="Name" bind:field={schemaName}/>
         <TextField label="Description" bind:field={description} multiline/>
         <div class="mt-2 w-full">
-          <p class="text-offWhite text-sm"> Db Protocol  </p>
+          <p class="text-offWhite text-sm"> Db Protocol </p>
           <div class="mt-1">
-            <Selector bind:field={$dbprotocol} options={protocolsOptions}/>
+            <Selector bind:field={$dbprotocol} options={protocolsOptions} selectedLabel={selectedProtocolLabel}/>
           </div>
         </div>
+        <div class="flex flex-row justify-between items-center text-lg font-semibold mt-4"> <!-- Information Section -->
+          <ChevronIcon />
+          <p class="ml-3">  Format </p>
+          <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
+        </div>
+        {#if schemaFormat} <!-- this ensures the mini app is not rendered with bad values -->
+          <ObjectDefinitionMiniApp
+            editingLevel={new EditorLevel(EditorLevels.createAndSignDefinition)}
+            format={schemaFormat}
+            initialData={{}}
+          />
+        {/if}
       </div>
     </div>
   </div>

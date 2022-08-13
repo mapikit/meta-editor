@@ -1,17 +1,18 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import type { Writable } from "svelte/store";
   import CancelIcon from "../common/icons/cancel-icon.svelte";
   import StringField from "./editing-fields/string-field.svelte";
-import type { DefinitionData } from "./obj-def-converter";
+  import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let definitionData : DefinitionData;
+  export let definitionData : Writable<DefinitionData>;;
   let enumDefinitiondata;
 
   $: {
-    enumDefinitiondata = definitionData.subtype as string[];
+    enumDefinitiondata = $definitionData.subtype as string[];
   }
 
   const dispatch = createEventDispatcher();
@@ -22,6 +23,9 @@ import type { DefinitionData } from "./obj-def-converter";
     enumDefinitiondata.push(`Enum Option (${newPropNumber + 1})`);
 
     enumDefinitiondata = enumDefinitiondata;
+    definitionData.update((current) => {
+      return { ...current, subtype: enumDefinitiondata };
+    });
     dispatch("sync-value");
   };
 
@@ -29,6 +33,9 @@ import type { DefinitionData } from "./obj-def-converter";
     const index = enumDefinitiondata.findIndex((value) => value === optionValue);
     enumDefinitiondata.splice(index, 1);
     enumDefinitiondata = enumDefinitiondata;
+    definitionData.update((current) => {
+      return { ...current, subtype: enumDefinitiondata };
+    });
 
     dispatch("sync-value");
   };

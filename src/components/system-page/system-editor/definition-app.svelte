@@ -74,7 +74,7 @@ $: titlesLimits = (titles.length > 3 ? [titles[0], ...titles.slice(-2)] : titles
     on:navigation-event={(data) => {titles = data.detail.namePaths.map((name, index) => ({ name, index }));}}
     editingLevel={new EditorLevel(level)}
     bind:initialData={protocolData}
-    initialDefinition={protocolDefinition}
+    format={protocolDefinition}
     />
   </div>
   <div class="submit-cancel">

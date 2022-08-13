@@ -7,17 +7,18 @@
   import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
   import clone from "just-clone";
+  import type { Writable } from "svelte/store";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let definitionData : DefinitionData;
+  export let definitionData : Writable<DefinitionData>;
   const dispatch = createEventDispatcher();
   let arrayValue = [];
   let type : DefinitionData | string;
 
   $: {
-    arrayValue = definitionData.value as [];
-    type = definitionData.subtype as DefinitionData;
+    arrayValue = $definitionData.value as [];
+    type = $definitionData.subtype as DefinitionData;
   }
 
   const deleteProp = (index) => {

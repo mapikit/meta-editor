@@ -58,7 +58,7 @@
         {/each}
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
-          initialDefinition={$configuration.definition} initialData={{}}
+          format={$configuration.definition} initialData={{}}
           on:navigation-event={() => { paths = getPathsNames(); }}
           bind:getPathsNames
           bind:navigateBackToLevel

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onDestroy } from "svelte";
   import type { ObjectDefinition } from "@meta-system/object-definition";
   import {
     convertDefinitionDataToObjectDefinition,
@@ -8,25 +8,35 @@
   } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
   import ObjectDefinitionEditor from "./object-definition-editor.svelte";
+  import ArrowIcon from "../../icons/arrow-icon.svelte";
+  import { writable, Writable } from "svelte/store";
+  import deepClone from "deep-clone";
+  import ChevronIcon from "../../icons/chevron-icon.svelte";
 
   // Default mode is Creating an Obj Definition
   export let editingLevel : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let initialDefinition : ObjectDefinition;
+  export let format : Writable<ObjectDefinition>;
 
   const dispatch = createEventDispatcher();
 
   export let initialData : object;
 
-  let definitionData : DefinitionData[] = convertObjDefinitionToDefinitionData(initialDefinition, initialData);
-  const rootDefinitionData : DefinitionData = {
+  let definitionData : DefinitionData[] = convertObjDefinitionToDefinitionData(deepClone($format), initialData);
+  const rootDefinitionData : Writable<DefinitionData> = writable({
     subtype: definitionData,
     keyName: "root",
     type: "object",
     value: initialData,
     required: true,
-  };
+  });
 
-  let selectedData : DefinitionData = rootDefinitionData;
+  const selectedData : Writable<DefinitionData> = writable($rootDefinitionData);
+
+  const unsub = selectedData.subscribe(() => {
+    format.set(convertDefinitionDataToObjectDefinition($rootDefinitionData).definition["root"]["subtype"]);
+    console.log(format);
+    // tes
+  });
 
   // May contain deep paths like "prop.innerProp"
   let workingDefinitionPath : Array<string> = [];
@@ -41,7 +51,7 @@
     }
 
     currentLevel = new EditorLevel(lastValidLevel);
-    selectedData = selectDataDefinition();
+    selectedData.set(selectDataDefinition());
   };
 
   const selectDataDefinition = () : DefinitionData => {
@@ -51,7 +61,7 @@
       dicedDefinitionPath.push(...parts);
     });
 
-    let intermediarySelectedData = rootDefinitionData;
+    let intermediarySelectedData = $rootDefinitionData;
     for (let path of dicedDefinitionPath) {
       intermediarySelectedData = intermediarySelectedData[path];
     }
@@ -69,6 +79,7 @@
 
     const intermediarySelectedData = selectDataDefinition();
     levelsNames.push(intermediarySelectedData.keyName);
+    levelsNames = levelsNames;
 
     dispatch("navigation-event", { namePaths: levelsNames });
 
@@ -76,13 +87,7 @@
   };
 
   export const goBackOneLevel = () => {
-    levelOverrideMap.delete(workingDefinitionPath.length);
-
-    workingDefinitionPath.pop();
-    workingDefinitionPath = workingDefinitionPath;
-
-    dispatch("navigation-event", { namePaths: levelsNames });
-
+    navigateBackToLevel(workingDefinitionPath.length - 1);
     setWorkingDataAndLevel();
   };
 
@@ -90,6 +95,7 @@
     for (let i = workingDefinitionPath.length - 1; i >= levelIndex; i--) {
       levelOverrideMap.delete(workingDefinitionPath.length);
       levelsNames.pop();
+      levelsNames = levelsNames;
     }
 
     workingDefinitionPath = workingDefinitionPath.slice(0, levelIndex);
@@ -100,29 +106,40 @@
   };
 
   export const getDefinitionAndData = () => {
-    return convertDefinitionDataToObjectDefinition(rootDefinitionData);
+    return convertDefinitionDataToObjectDefinition($rootDefinitionData);
   };
 
   export const getPathsNames = () => {
     return levelsNames;
   };
 
+  onDestroy(() => {
+    unsub();
+  });
+
 </script>
 
-<div class="editor">
+<div class="mt-4 bg-norbalt-300 rounded">
+  <div class="bg-norbalt-350 py-2 px-4 rounded-t h-9 flex flex-row items-center mb-3"> <!-- Header BreadCrumb -->
+    {#if levelsNames.length >= 1}
+      <div class="h-5 w-2.5 mr-2 cursor-pointer" on:click="{() => { goBackOneLevel(); }}">
+        <ArrowIcon style="stroke-white rotate-180 h-5 w-2.5"/>
+      </div>
+    {/if}
+    {#each levelsNames as level, index}
+      <div class="flex flex-row ml-2 first:ml-0 items-center text-lg text-offWhite last:text-white hover:text-white transition-all cursor-pointer"
+        on:click="{() => navigateBackToLevel(index + 1)}"
+      >
+        {#if index !== 0}
+          <ChevronIcon style="stroke-white -rotate-90"/>
+        {/if}
+        <p class="ml-1"> {level} </p>
+      </div>
+    {/each}
+  </div>
   <ObjectDefinitionEditor
     editingLevel={currentLevel}
-    bind:workingData={selectedData}
+    workingData={selectedData}
     on:navigate-definition={(event) => { navigateTo(event.detail.path, event.detail.levelOverride); }}
   />
 </div>
-
-
-<style lang="scss">
-  .editor {
-    font-family: 'Dosis';
-    font-size: 16px;
-    display: flex;
-    flex-flow: column nowrap;
-  }
-</style>

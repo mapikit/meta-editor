@@ -71,7 +71,7 @@
     <span class="typeSelect"><TypeSelect bind:currentType={selectedType} bind:currentSubtype={selectedSubtype}/></span>
     <input class="newConstName" bind:value={newConstName}  type="text" placeholder="New Constant Name" />
     {#if selectedType === "object"}
-      <div class="editionContainer"><ObjectDefinitionMiniApp initialData={{}} initialDefinition={{}} bind:this={MiniApp}/></div>
+      <div class="editionContainer"><ObjectDefinitionMiniApp initialData={{}} format={{}} bind:this={MiniApp}/></div>
     {:else if selectedType === "array" && selectedSubtype !== undefined}
       <div class="editionContainer"><ArrayDefinitionEditor bind:definitionData={arrayData}/></div>
     {:else}

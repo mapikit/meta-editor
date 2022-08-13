@@ -90,7 +90,7 @@ export class Protocol {
     const newProtocol = new Protocol({
       id: Math.floor(Math.random() * 10000000).toString(),
       validatedProtocolId: "---",
-      protocolName: "New Schema",
+      protocolName: "New Protocol",
       identifier: "<empty>",
       protocolVersion: "0.0.1",
       isStarred: false,

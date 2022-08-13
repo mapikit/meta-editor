@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Writable } from "svelte/store";
   import ArrayDefinitionEditor from "./array-definition-editor.svelte";
   import EnumDefinitionEditor from "./enum-definition-editor.svelte";
   import type { DefinitionData } from "./obj-def-converter";
@@ -7,16 +8,16 @@
 
   // Default mode is Creating an Obj Definition
   export let editingLevel : EditorLevel;
-  export let workingData : DefinitionData;
+  export let workingData : Writable<DefinitionData>;
   
-  let dataType = workingData.type;
+  let dataType = $workingData.type;
 
   $: {
-    dataType = workingData.type;
+    dataType = $workingData.type;
   }
 </script>
 
-<div class="editor">
+<div>
   {#if dataType === "object" || dataType === "cloudedObject"}
     <ObjectDefinitionObjectEditor
       level={editingLevel}
@@ -38,13 +39,3 @@
     />
   {/if}
 </div>
-
-<style lang="scss">
-  .editor {
-    font-family: 'Dosis';
-    font-size: 16px;
-    display: flex;
-    flex-flow: column nowrap;
-  }
-
-</style>

@@ -72,7 +72,7 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
         {/each}
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
-          initialDefinition={$configuration} initialData={{}}
+          format={$configuration} initialData={{}}
           on:navigation-event={() => { paths = getPathsNames() }}
           bind:getPathsNames
           bind:navigateBackToLevel

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import type { Writable } from "svelte/store";
   import CancelIcon from "../common/icons/cancel-icon.svelte";
   import RightArrow from "../common/icons/right-arrow.svelte";
   import DefinitionField from "./definition-field.svelte";
@@ -8,12 +9,12 @@
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let definitionData : DefinitionData;
+  export let definitionData : Writable<DefinitionData>;
 
   let objectDefinitionData;
 
   $: {
-    objectDefinitionData = definitionData.subtype as DefinitionData[];
+    objectDefinitionData = $definitionData.subtype as DefinitionData[];
   }
 
   const dispatch = createEventDispatcher();
@@ -23,7 +24,7 @@
     let newPropNumber = 1;
 
     if (objectDefinitionData.length === 0) {
-      definitionData.subtype = objectDefinitionData;
+      $definitionData.subtype = objectDefinitionData;
     }
 
     while (objectDefinitionData.find((value) => value.keyName === `new prop (${newPropNumber})`) !== undefined) {
@@ -38,6 +39,9 @@
     });
 
     objectDefinitionData = objectDefinitionData;
+    definitionData.update((current) => {
+      return { ...current, subtype: objectDefinitionData };
+    });
     dispatch("sync-value");
   };
 
@@ -46,6 +50,9 @@
       .keyName = data.detail.newKey;
 
     objectDefinitionData = objectDefinitionData;
+    definitionData.update((current) => {
+      return { ...current, subtype: objectDefinitionData };
+    });
   };
 
   const syncProp = (data : CustomEvent<{key : string; value : unknown; type : string; required : boolean; subtype : unknown}>) => {
@@ -57,12 +64,18 @@
     property.required = data.detail.required;
   
     objectDefinitionData = objectDefinitionData;
+    definitionData.update((current) => {
+      return { ...current, subtype: objectDefinitionData };
+    });
   };
 
   const deleteProp = (propName : string) => {
     const index = objectDefinitionData.findIndex((value) => value.keyName === propName);
     objectDefinitionData.splice(index, 1);
     objectDefinitionData = objectDefinitionData;
+    definitionData.update((current) => {
+      return { ...current, subtype: objectDefinitionData };
+    });
   };
 
   const navigateDefinition = (type : string, indexPath : string) => {
@@ -86,9 +99,9 @@
   };
 </script>
 
-<div class="editor-container">
+<div class="flex flex-col">
   {#if objectDefinitionData.length < 1}
-    <p class="no-props"> No properties in this object </p>
+    <p class="text-center text-offWhite"> No properties in this object </p>
   {/if}
   {#each objectDefinitionData as defKey, index}
   <div class="properties-holder">
@@ -127,13 +140,6 @@
 </div>
 
 <style lang="scss">
-  .editor-container {
-    font-family: 'Dosis';
-    font-size: 16px;
-    display: flex;
-    flex-flow: column nowrap;
-  }
-
   .no-props {
     text-align: center;
     color: #545474;
