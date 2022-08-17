@@ -53,7 +53,7 @@
             <Selector bind:field={$dbprotocol} options={protocolsOptions} selectedLabel={selectedProtocolLabel}/>
           </div>
         </div>
-        <div class="flex flex-row justify-between items-center text-lg font-semibold mt-4"> <!-- Information Section -->
+        <div class="flex flex-row justify-between items-center text-lg font-semibold mt-4"> <!-- Format Section -->
           <ChevronIcon />
           <p class="ml-3">  Format </p>
           <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
