@@ -42,7 +42,7 @@
 
 </script>
 
-<div class="editor-container">
+<div class="flex flex-col">
   {#if enumDefinitiondata.length === 0}
     <p class="no-options"> No options in ENUM </p>
   {/if}

@@ -1,8 +1,7 @@
 <script lang="ts">
+  import ArrowIcon from "../../icons/arrow-icon.svelte";
   import { createEventDispatcher } from "svelte";
   import type { Writable } from "svelte/store";
-  import CancelIcon from "../common/icons/cancel-icon.svelte";
-  import RightArrow from "../common/icons/right-arrow.svelte";
   import DefinitionField from "./definition-field.svelte";
   import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
@@ -69,8 +68,8 @@
     });
   };
 
-  const deleteProp = (propName : string) => {
-    const index = objectDefinitionData.findIndex((value) => value.keyName === propName);
+  const deleteProp = (data : CustomEvent<string>) : void => {
+    const index = objectDefinitionData.findIndex((value) => value.keyName === data.detail);
     objectDefinitionData.splice(index, 1);
     objectDefinitionData = objectDefinitionData;
     definitionData.update((current) => {
@@ -104,33 +103,29 @@
     <p class="text-center text-offWhite"> No properties in this object </p>
   {/if}
   {#each objectDefinitionData as defKey, index}
-  <div class="properties-holder">
-    {#if level.canAddProperty()}
-      <div class="exclude" on:click="{() => {deleteProp(defKey.keyName);}}">
-        <CancelIcon iconColor="#ffffff"/>
-      </div>
-    {/if}
-    <DefinitionField
-      on:nameUpdate="{updateName}"
-      on:syncProp="{syncProp}"
-      propName="{defKey.keyName}"
-      initialPropName="{defKey.keyName}"
-      propValue="{defKey.value}"
-      propType="{defKey.type}"
-      propRequired="{defKey.required}"
-      level="{level}"
-      propSubType="{defKey.subtype}"
-    />
-    {#if shouldDisplayArrow(defKey)}
-      <div class="see-obj" on:click={() => {
-        if (defKey.type === "cloudedObject") {
-          navigateCloudedDefinition(defKey.type, index.toString());
-          return;
-        }
-        navigateDefinition(defKey.type, index.toString());
-      }}> <RightArrow iconColor="white"/> </div>
-    {/if}
-  </div>
+    <div class="flex flex-row w-full mt-2 first:mt-0 px-4">
+      <DefinitionField
+        on:nameUpdate="{updateName}"
+        on:syncProp="{syncProp}"
+        propName="{defKey.keyName}"
+        initialPropName="{defKey.keyName}"
+        propValue="{defKey.value}"
+        propType="{defKey.type}"
+        propRequired="{defKey.required}"
+        level="{level}"
+        propSubType="{defKey.subtype}"
+        on:delete-prop="{deleteProp}"
+      />
+      {#if shouldDisplayArrow(defKey)}
+        <div class="ml-2 w-6 flex justify-center items-center cursor-pointer stroke-offWhite hover:stroke-white" on:click={() => {
+          if (defKey.type === "cloudedObject") {
+            navigateCloudedDefinition(defKey.type, index.toString());
+            return;
+          }
+          navigateDefinition(defKey.type, index.toString());
+        }}> <ArrowIcon style="stroke-inherit transition-all w-full h-3"/> </div>
+      {/if}
+    </div>
   {/each}
   {#if level.canAddProperty()}
     <div class="add-prop" on:click="{appendData}">

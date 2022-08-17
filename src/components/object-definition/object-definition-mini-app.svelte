@@ -34,8 +34,6 @@
 
   const unsub = selectedData.subscribe(() => {
     format.set(convertDefinitionDataToObjectDefinition($rootDefinitionData).definition["root"]["subtype"]);
-    console.log(format);
-    // tes
   });
 
   // May contain deep paths like "prop.innerProp"

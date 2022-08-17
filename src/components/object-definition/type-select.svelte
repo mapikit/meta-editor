@@ -6,7 +6,8 @@
   export let currentSubtype = undefined;
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
-import RightArrow from "../common/icons/right-arrow.svelte";
+  import ChevronIcon from "../../icons/chevron-icon.svelte";
+  import ArrowIcon from "../../icons/arrow-icon.svelte";
 
   const availableOptions = Object.keys(typeColors);
   const availableSubTypeOptions = availableOptions.filter((value) => {
@@ -14,6 +15,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
   });
   const dispatch = createEventDispatcher();
 
+  // eslint-disable-next-line max-lines-per-function
   const changeType = (type) => {
     if (type === "array") {
       dispatch("typeChange", type);
@@ -35,6 +37,7 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     collapsed = true;
   };
 
+  // eslint-disable-next-line max-lines-per-function
   const changeSubType = (subtype) => {
     if (subtype === "object") {
       dispatch ("subTypeChange", {
@@ -56,31 +59,32 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     subTypeCollapsed = true;
   };
 
+  $: collapsedChevronStyle = collapsed ? "" : "rotate-180";
 </script>
 
-<div class="selector" on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
-  <div class="current-type" on:click="{() => { collapsed = !collapsed; subTypeCollapsed = true; }}">
-    <div class="type-circle" style="background-color: {typeColors[currentType]};"/>
+<div class="w-11 ml-2 rounded bg-norbalt-350 h-6 border border-norbalt-100 stroke-offWhite hover:stroke-white relative hover:border-offWhite transition-all" on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
+  <div class="flex flex-row items-center justify-center h-full w-11 cursor-pointer" on:click="{() => { collapsed = !collapsed; subTypeCollapsed = true; }}">
+    <div class="transition-all rounded-full h-3 w-3" style="background-color: {typeColors[currentType]};"/>
     {#if currentSubtype !== undefined && typeof currentSubtype !== "object"}
-      <div class="subtype type-circle" style="background-color: {typeColors[currentSubtype]};"/>
+      <div class="transition-all rounded-full h-3 w-3 -ml-1.5" style="background-color: {typeColors[currentSubtype]};"/>
     {:else if typeof currentSubtype === "object" && currentType === "array"}
-      <div class="subtype type-circle" style="background-color: {typeColors["object"]};"/>
+      <div class="transition-all rounded-full h-3 w-3 -ml-1.5" style="background-color: {typeColors["object"]};"/>
     {/if}
-    <div class="{collapsed ? "chevron-collapse" : "chevron-collapse down"}">
-      <img src="/icon-chevron-up.svg" alt="chevron"/>
+    <div class="h-full w-3 flex items-center justify-center ml-1">
+      <ChevronIcon style="stroke-inherit w-2 transition-all {collapsedChevronStyle}"/>
     </div>
   </div>
   {#if !collapsed && subTypeCollapsed}
-    <div class="options-holder" transition:fade="{{ duration: 90 }}">
-      <div class="options">
+    <div class="z-10 absolute top-[calc(100%_+_8px)]" transition:fade="{{ duration: 90 }}">
+      <div class="w-32 rounded bg-norbalt-200 shadow">
         {#each availableOptions as option }
-          <div class="option" on:click="{() => {changeType(option);}}">
-            <div class="type-circle" style="background-color: {typeColors[option]};"/>
+          <div class="transition-all duration-75 cursor-pointer grid flex-row grid-cols-[12px_calc(100%_-_16px)] gap-2 items-center px-3 py-0.5 first:pt-1.5 first:rounded-t last:pb-1.5 last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white" on:click="{() => {changeType(option);}}">
+            <div class="transition-all rounded-full h-3 w-3 mt-0.5 " style="background-color: {typeColors[option]};"/>
             {#if option !== "array"}
               <p> {option} </p>
             {:else}
-              <p> {option}
-                <RightArrow iconColor="white"/>
+              <p class="flex flex-row justify-between items-center"> {option}
+                <ArrowIcon style="w-2.5 h-2.5 transition-all mt-1"/>
               </p>
             {/if}
           </div>
@@ -89,11 +93,11 @@ import RightArrow from "../common/icons/right-arrow.svelte";
     </div>
   {/if}
   {#if !subTypeCollapsed}
-    <div class="options-holder subtype" transition:fly="{{ duration: 120, delay: 90, x: 20 }}">
-      <div class="options">
+    <div class="z-10 absolute top-[calc(100%_+_8px)]" transition:fly="{{ duration: 120, delay: 90, x: 20 }}">
+      <div class="w-32 rounded bg-norbalt-200 shadow">
         {#each availableSubTypeOptions as option }
-          <div class="option" on:click="{() => {changeSubType(option);}}">
-            <div class="type-circle" style="background-color: {typeColors[option]};"/>
+          <div class="transition-all duration-75 cursor-pointer grid flex-row grid-cols-[12px_calc(100%_-_16px)] gap-2 items-center px-3 py-0.5 first:pt-1.5 first:rounded-t last:pb-1.5 last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white" on:click="{() => {changeSubType(option);}}">
+            <div class="transition-all rounded-full h-3 w-3 mt-0.5 " style="background-color: {typeColors[option]};"/>
             <p> {option} </p>
           </div>
         {/each}

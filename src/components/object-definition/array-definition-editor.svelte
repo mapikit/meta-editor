@@ -3,7 +3,7 @@
   import CancelIcon from "../common/icons/cancel-icon.svelte";
   import RightArrow from "../common/icons/right-arrow.svelte";
   import { defaultTypesValues } from "./default-types-values";
-  import DefinitionField from "./definition-field.svelte";
+  import DefinitionField from "./definition-field_old.svelte";
   import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
   import clone from "just-clone";
