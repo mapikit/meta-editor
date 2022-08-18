@@ -103,7 +103,7 @@
     <p class="text-center text-offWhite"> No properties in this object </p>
   {/if}
   {#each objectDefinitionData as defKey, index}
-    <div class="flex flex-row w-full mt-2 first:mt-0 px-4">
+    <div class="grid grid-cols-[calc(100%_-_32px)_32px] w-full mt-2 first:mt-0 px-4">
       <DefinitionField
         on:nameUpdate="{updateName}"
         on:syncProp="{syncProp}"
@@ -117,7 +117,7 @@
         on:delete-prop="{deleteProp}"
       />
       {#if shouldDisplayArrow(defKey)}
-        <div class="ml-2 w-6 flex justify-center items-center cursor-pointer stroke-offWhite hover:stroke-white" on:click={() => {
+        <div class="ml-2 w-6 flex justify-center items-center cursor-pointer stroke-offWhite hover:stroke-white col-start-2" on:click={() => {
           if (defKey.type === "cloudedObject") {
             navigateCloudedDefinition(defKey.type, index.toString());
             return;

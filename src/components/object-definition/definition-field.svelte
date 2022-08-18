@@ -58,21 +58,25 @@
 
 </script>
 
-<div class="bg-norbalt-200 rounded flex flex-row flex-1 h-8 items-center last:mr-8">
+<div class="bg-norbalt-200 rounded flex flex-row col-start-1 col-end-1 h-8 items-center w-full">
   <TypeSelect
     currentType={propType}
     currentSubtype={propSubType}
     on:typeChange={(data) => { updateType(data.detail);}}
     on:subTypeChange={(data) => { updateSubtype(data.detail);}}
   />
-  {#if !level.canAddProperty()}
-    <div class="flex-1 bg-norbalt-300 border rounded border-norbalt-100 h-6 mx-2"> {initialPropName} </div>
-  {:else}
-    <input class="flex-1 bg-norbalt-300 border rounded border-norbalt-100 transition-all hover:border-offWhite focus:border-offWhite px-2 outline-none h-6 mx-2" bind:value="{propName}" on:change="{updateName}"/>
-  {/if}
-  {#if level.canAddData()}
-    <EditingField updateFunction={syncProp} bind:propValue={propValue} editingType={propType} subtype={propSubType}/>
-  {/if}
+  <div class="flex-1 flex flex-row items-center justify-between mx-2">
+    {#if !level.canAddProperty()}
+      <div class="flex-1 bg-norbalt-300 border rounded border-norbalt-100 h-6 mr-2 last:mr-0"> {initialPropName} </div>
+    {:else}
+      <div class="flex-1 mr-2 last:mr-0">
+        <input class="w-full bg-norbalt-300 border rounded border-norbalt-100 transition-all hover:border-offWhite focus:border-offWhite px-2 outline-none h-6" bind:value="{propName}" on:change="{updateName}"/>
+      </div>
+    {/if}
+    {#if level.canAddData()}
+      <EditingField updateFunction={syncProp} bind:propValue={propValue} editingType={propType} subtype={propSubType}/>
+    {/if}
+  </div>
   {#if level.canAddProperty()}
   <div class="stroke-offWhite hover:stroke-roseRed transition-all w-7 flex items-center justify-center h-full cursor-pointer" on:click="{deleteProp}">
     <CrossIcon style="stroke-inherit"/>

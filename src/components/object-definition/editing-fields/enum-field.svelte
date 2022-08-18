@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ChevronIcon from "../../../icons/chevron-icon.svelte";
   import { fade } from "svelte/transition";
 
   export let subtype = [];
@@ -15,23 +16,26 @@
     hasPropValue = Boolean(propValue);
     hasAvailableOptions = subtype.length > 0;
   }
+
+  $: noSelectedColor = hasPropValue ? "text-white" : "text-offWhite";
+  $: chevronSelecting = collapsed ? "" : "rotate-180";
 </script>
 
-<div class="value-input">
+<div class="flex-1 bg-norbalt-300 border rounded border-norbalt-100 hover:border-offWhite h-6 transition-all">
   <div
-    class={hasPropValue ? "select" : "select void"}
+    class="relative px-2 {noSelectedColor} w-full flex flex-row justify-between items-center stroke-offWhite hover:stroke-white cursor-pointer"
     on:click="{() => { collapsed = !collapsed; }}"
   >
     <p> {displayText} </p>
-    <div class="{collapsed ? "chevron-collapse" : "chevron-collapse down"}">
-      <img src="/icon-chevron-up.svg" alt="chevron"/>
+    <div class="{chevronSelecting} transition-all">
+      <ChevronIcon style="stroke-inherit transition-all" />
     </div>
     {#if !collapsed}
-    <div class="options-holder" transition:fade={{ duration: 90 }}>
-      <div class="options">
+    <div class="absolute bg-norbalt-200 w-full top-7 left-0 rounded shadow text-white z-10" transition:fade={{ duration: 90 }}>
+      <div class="">
         {#if hasAvailableOptions}
           {#each subtype as enumOption }
-          <p class="option" on:click="{() => {
+          <p class="px-3 py-0.5 first:pt-1.5 first:rounded-t last:pb-1.5 last:rounded-b hover:bg-norbalt-100 transition-all cursor-pointer" on:click="{() => {
             propValue = enumOption;
             updateFunction();
           }}">
@@ -39,7 +43,7 @@
           </p>
           {/each}
         {:else}
-          <p class="option void">
+          <p class="px-3 py-0.5 first:pt-1.5 first:rounded-t last:pb-1.5 last:rounded-b text-offWhite cursor-default">
             No options available
           </p>
         {/if}
