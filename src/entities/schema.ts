@@ -36,7 +36,6 @@ export class Schema {
   }
 
   public static deleteSchema (id : string) : void {
-    console.log("WTF MERMÃO??");
     schemas.update((list) => {
       const itemIndex = list.findIndex((schema) => get(schema.id) === id);
 

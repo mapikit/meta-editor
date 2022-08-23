@@ -47,6 +47,15 @@
     .map((item : Schema | Protocol | UIBusinessOperation) => item.getCardInfo());
   $: chevronStyle = collapsed ? "-rotate-90" : "";
   $: currentStyle = iconStyles[type];
+
+  const navigateEdit = (item) : () => void => {
+    if (navigation.currentPath.includes(linkName)) {
+      const pathParams = navigation.currentPathParams;
+      // eslint-disable-next-line max-len
+      return (() => navigation.navigateTo(`/mapibox/system/${pathParams["systemId"]}/configuration/${pathParams["configurationId"]}${linkName}/${item.id}`));
+    }
+    return (() => navigation.navigateAppendTo(`/${linkName}/${item.id}`));
+  };
 </script>
 
 <div>
@@ -85,7 +94,7 @@
         </div>
         <div class="flex flex-row mt-2 justify-between">
           <div class="rounded bg-norbalt-300 px-3 py-1 cursor-pointer transition-all text-offWhite hover:text-white"
-            on:click="{() => { navigation.navigateAppendTo(`/${linkName}/${item.id}`);}}"
+            on:click="{navigateEdit(item)}"
           > Edit </div>
           {#if canDelete}
             <div class="rounded bg-norbalt-300 px-3 py-1 ml-4 cursor-pointer transition-all text-offWhite hover:text-roseRed"

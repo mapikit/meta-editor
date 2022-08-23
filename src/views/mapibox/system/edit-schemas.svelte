@@ -3,7 +3,7 @@
   import { get, writable } from "svelte/store";
   import { getSchemaById, protocols, schemas } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
   import ChevronIcon from "../../../icons/chevron-icon.svelte";
   import TextField from "../../../components/fields/text-field.svelte";
@@ -13,7 +13,8 @@
 
   let schemaList : Schema[] = $schemas;
 
-  $: pathParams = navigation.currentPathParamsSubscribable;
+  let pathParams = navigation.currentPathParamsSubscribable;
+
   $: schemaList = $schemas;
   $: currentSchemaId = $pathParams["schemaId"];
   $: currentSchema = getSchemaById(currentSchemaId);
@@ -25,15 +26,26 @@
     .map((protocol) => ({ value: get(protocol.identifier), label: get(protocol.protocolName) }));
 
   $: selectedProtocolLabel = protocolsOptions.find((protocol) => protocol.value === $dbprotocol)?.label;
-  // onDestroy(unsub);
+
+  let unsub = () : void => { void 0; };
+  
+  onDestroy(unsub);
+  // eslint-disable-next-line max-lines-per-function
   onMount(() => {
     const currentPathParams = navigation.currentPathParams;
+    // pathParams = navigation.currentPathParamsSubscribable;
     currentSchemaId = currentPathParams["schemaId"];
+
+    unsub = pathParams.subscribe(() => {
+      currentSchemaId = navigation.currentPathParams["schemaId"];
+      currentSchema = getSchemaById(currentSchemaId);
+    });
   });
 
 </script>
 
 <div class="px-8 w-[calc(100%-86px)] overflow-y-scroll pb-36">
+  {currentSchemaId}
   <ConfigurationSection type="Schemas" canDelete={true}/>
   <div class="w-full mt-12" >
     <p class="text-white font-bold text-2xl italic"> Editing '{$schemaName}' Schema </p>
@@ -58,13 +70,15 @@
           <p class="ml-3">  Format </p>
           <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
         </div>
-        {#if schemaFormat} <!-- this ensures the mini app is not rendered with bad values -->
-          <ObjectDefinitionMiniApp
-            editingLevel={new EditorLevel(EditorLevels.createAndSignDefinition)}
+        {#key currentSchemaId}
+          {#if $schemaFormat} <!-- this ensures the mini app is not rendered with bad values -->
+            <ObjectDefinitionMiniApp
+            editingLevel={new EditorLevel(EditorLevels.createDefinition)}
             format={schemaFormat}
             initialData={{}}
-          />
-        {/if}
+            />
+          {/if}
+        {/key}
       </div>
     </div>
   </div>
