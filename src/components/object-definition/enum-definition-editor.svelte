@@ -53,9 +53,13 @@
         <CancelIcon iconColor="#ffffff"/>
       </div>
     {/if}
-    <div class="field-holder">
-      <StringField bind:propValue={optionName} standalone updateFunction={() => { dispatch("sync-value"); }}/>
-    </div>
+    {#if level.canAddProperty()}
+      <div class="mb-2 col-start-2">
+        <StringField bind:propValue={optionName} updateFunction={() => { dispatch("sync-value"); }}/>
+      </div>
+    {:else}
+      <div class="w-full col-start-2 outline-none transition-all h-6 px-2 rounded bg-norbalt-300 border border-norbalt-100 mb-2"> {optionName} </div>
+    {/if}
   </div>
   {/each}
   {#if level.canAddProperty()}

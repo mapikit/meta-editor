@@ -33,40 +33,12 @@
 ;
 </script>
 
-<div class="value-input">
-  <div class="date-input">
+<div class="flex-1">
+  <div class="w-full outline-none transition-all h-6 px-2 rounded bg-norbalt-300 border border-norbalt-100 hover:border-offWhite focus:border-offWhite grid grid-cols-[22px_4px_22px_4px_44px]">
     <FlatNumberField bind:value={day} updateFunction={setTime} max={lastPossibleDayOfMonth} min={1}/>
     <p>/</p>
     <FlatNumberField bind:value={month} updateFunction={setTime} min={1} max={12}/>
     <p>/</p>
     <FlatNumberField bind:value={year} updateFunction={setTime} />
   </div>
-  <p class="format"> DD / MM / YYYY </p>
 </div>
-
-<style lang="scss">
-  .value-input {
-    padding: 4px;
-    background-color: #323248;
-    border-radius: 0 0px 6px 6px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    .date-input {
-      display: grid;
-      grid-template-columns: 22px 4px 22px 4px 44px;
-      column-gap: 2px;
-    }
-
-    .format {
-      color: #747492;
-      font-size: 14px;
-      align-self: center;
-      text-align: center;
-      width: 100%;
-    }
-    
-  }
-</style>

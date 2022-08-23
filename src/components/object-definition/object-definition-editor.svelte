@@ -17,7 +17,7 @@
   }
 </script>
 
-<div>
+<div class="pb-3">
   {#if dataType === "object" || dataType === "cloudedObject"}
     <ObjectDefinitionObjectEditor
       level={editingLevel}

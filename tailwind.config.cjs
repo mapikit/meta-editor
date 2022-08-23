@@ -8,7 +8,8 @@ module.exports = {
     extend: {
       boxShadow: {
         DEFAULT: '0 6px 6px -2px rgb(0 0 0 / 0.32);',
-        light: '0 4px 3px -1px rgb(0 0 0 / 0.2);'
+        light: '0 4px 3px -1px rgb(0 0 0 / 0.2);',
+        contrast: '0 0px 5px 1px rgb(0 0 0 / 0.8);'
       }
     },
     fontFamily: {

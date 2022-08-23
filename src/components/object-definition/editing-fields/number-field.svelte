@@ -17,30 +17,7 @@
   };
 </script>
 
-<div class="value-input">
-  <input type="number" bind:value="{propValue}" on:change="{updateFunction}" use:preventLetters="{propValue}"/>
+<div class="flex-1">
+  <input use:preventLetters="{propValue}"
+    class="w-full outline-none transition-all h-6 px-2 rounded bg-norbalt-300 border border-norbalt-100 hover:border-offWhite focus:border-offWhite" bind:value="{propValue}" on:change="{updateFunction}"/>
 </div>
-
-<style lang="scss">
-  .value-input {
-    padding: 4px;
-    background-color: #323248;
-    border-radius: 0 0px 6px 6px;
-
-    input {
-      width: 100%;
-      font-family: 'Dosis';
-      background-color: transparent;
-      border: none;
-      outline: none;
-      font-size: 16px;
-      color: white;
-      padding-left: 6px;
-      -moz-appearance: textfield;
-
-      &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-      }
-    }
-  }
-</style>

@@ -1,13 +1,16 @@
 <script lang="ts">
   import { typeColors } from "../../common/styles/type-colors";
-  let collapsed = true;
-  let subTypeCollapsed = true;
-  export let currentType = "string";
-  export let currentSubtype = undefined;
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
   import ChevronIcon from "../../icons/chevron-icon.svelte";
   import ArrowIcon from "../../icons/arrow-icon.svelte";
+  import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
+
+  let collapsed = true;
+  let subTypeCollapsed = true;
+  export let currentType = "string";
+  export let currentSubtype = undefined;
+  export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
 
   const availableOptions = Object.keys(typeColors);
   const availableSubTypeOptions = availableOptions.filter((value) => {
@@ -60,19 +63,29 @@
   };
 
   $: collapsedChevronStyle = collapsed ? "" : "rotate-180";
+
+  const toggleCollapse = () : void => {
+    if (level.canAddProperty()) {
+      collapsed = !collapsed; subTypeCollapsed = true;
+    }
+  };
+
+  $: cursorChangeType = level.canAddProperty() ? "cursor-pointer" : "";
 </script>
 
 <div class="w-11 ml-2 rounded bg-norbalt-350 h-6 border border-norbalt-100 stroke-offWhite hover:stroke-white relative hover:border-offWhite transition-all" on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
-  <div class="flex flex-row items-center justify-center h-full w-11 cursor-pointer" on:click="{() => { collapsed = !collapsed; subTypeCollapsed = true; }}">
+  <div class="flex flex-row items-center justify-center h-full w-11 {cursorChangeType}" on:click="{toggleCollapse}">
     <div class="transition-all rounded-full h-3 w-3" style="background-color: {typeColors[currentType]};"/>
     {#if currentSubtype !== undefined && typeof currentSubtype !== "object"}
       <div class="transition-all rounded-full h-3 w-3 -ml-1.5" style="background-color: {typeColors[currentSubtype]};"/>
     {:else if typeof currentSubtype === "object" && currentType === "array"}
       <div class="transition-all rounded-full h-3 w-3 -ml-1.5" style="background-color: {typeColors["object"]};"/>
     {/if}
-    <div class="h-full w-3 flex items-center justify-center ml-1">
-      <ChevronIcon style="stroke-inherit w-2 transition-all {collapsedChevronStyle}"/>
-    </div>
+    {#if level.canAddProperty()}
+      <div class="h-full w-3 flex items-center justify-center ml-1">
+        <ChevronIcon style="stroke-inherit w-2 transition-all {collapsedChevronStyle}"/>
+      </div>
+    {/if}
   </div>
   {#if !collapsed && subTypeCollapsed}
     <div class="z-10 absolute top-[calc(100%_+_8px)]" transition:fade="{{ duration: 90 }}">

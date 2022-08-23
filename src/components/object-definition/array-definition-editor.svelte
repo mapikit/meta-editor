@@ -1,13 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import CancelIcon from "../common/icons/cancel-icon.svelte";
   import RightArrow from "../common/icons/right-arrow.svelte";
   import { defaultTypesValues } from "./default-types-values";
-  import DefinitionField from "./definition-field_old.svelte";
+  import DefinitionField from "./definition-field.svelte";
   import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
   import clone from "just-clone";
   import type { Writable } from "svelte/store";
+  import ArrowIcon from "../../icons/arrow-icon.svelte";
+  import CrossIcon from "../../icons/cross-icon.svelte";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
@@ -59,43 +60,52 @@
     arrayValue.push(defaultTypesValues[type]);
     arrayValue = arrayValue;
   };
+
+  const getTypeDeep = (inputType : string | DefinitionData) : string => {
+    if (typeof inputType === "string") { return inputType; };
+
+    return inputType.type;
+  };
 </script>
 
-<div class="editor-container">
-  <div class="array-type">
+<div class="pb-1">
+  <div class="flex justify-center items-center">
     {#if typeof type === "object"}
       {#if level.canAddProperty()}
-      <p class="clickable" on:click="{() => { navigateArrayDefinition(); }}"> List of Objects
-        <span> <RightArrow iconColor="white"/> </span></p>
+      <p class="cursor-pointer flex flex-row items-center text-xl stroke-offWhite hover:stroke-white transition-all" on:click="{() => { navigateArrayDefinition(); }}">
+        List of Objects <span class="ml-2"> <ArrowIcon style="stroke-inherit h-3 w-3"/> </span></p>
       {:else}
-      <p> List of Objects </p>
+      <p class="flex flex-row items-center text-xl"> List of Objects </p>
       {/if}
     {:else}
-      List of {type}
+      <p class="flex flex-row items-center text-xl"> List of {type} </p>
     {/if}
   </div>
   {#if arrayValue.length === 0}
-    <div class="no-options"> No items in the List </div>
+    <div class="text-offWhite text-center mt-2"> No items in the List </div>
   {:else}
-  <div class="list-container">
+  <div class="mt-2">
     {#each arrayValue as arrayItem, index }
-      <div class="properties-holder">
-        {#if level.canAddData()}
-          <div class="exclude" on:click="{() => {deleteProp(index);}}">
-            <CancelIcon iconColor="#ffffff"/>
-          </div>
-        {/if}
-        <DefinitionField
-          propName="{`item ${index + 1}`}"
-          bind:propValue="{arrayItem}"
-          propType="{type}"
-          level="{new EditorLevel(EditorLevels.signDefinition)}"
-        />
+      <div class="grid grid-cols-[calc(100%_-_32px)_32px] w-full mt-2 first:mt-0 px-4">
+        <div class="bg-norbalt-200 rounded flex flex-row col-start-1 col-end-1 h-8 items-center w-full">
+          <DefinitionField
+            propName="{`item ${index + 1}`}"
+            bind:propValue="{arrayItem}"
+            propType="{getTypeDeep(type)}"
+            propSubType={undefined};
+            level="{new EditorLevel(EditorLevels.signDefinition)}"
+          />
+          {#if level.canAddData()}
+            <div class="stroke-offWhite hover:stroke-roseRed transition-all pr-2 h-full flex justify-center items-center cursor-pointer" on:click="{() => {deleteProp(index);}}">
+              <CrossIcon style="stroke-inherit"/>
+            </div>
+          {/if}
+        </div>
         {#if level.canAddData() && typeof type === "object"}
-          <div class="see-obj" on:click={() => navigateItemDefinition(index)}> <RightArrow iconColor="white"/> </div>
+          <div class="stroke-offWhite hover:stroke-white transition-all flex justify-center items-center cursor-pointer" on:click={() => navigateItemDefinition(index)}> <ArrowIcon style="stroke-inherit w-3 h-3" /> </div>
         {/if}
         {#if level.canAddData() && type === "cloudedObject"}
-          <div class="see-obj" on:click={() => navigateCloudedItemDefinition(index)}> <RightArrow iconColor="white"/> </div>
+          <div class="stroke-offWhite hover:stroke-white transition-all flex justify-center items-center cursor-pointer" on:click={() => navigateCloudedItemDefinition(index)}> <ArrowIcon style="stroke-inherit w-3 h-3" /> </div>
         {/if}
       </div>
     {/each}

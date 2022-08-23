@@ -64,10 +64,11 @@
     currentSubtype={propSubType}
     on:typeChange={(data) => { updateType(data.detail);}}
     on:subTypeChange={(data) => { updateSubtype(data.detail);}}
+    level={level}
   />
   <div class="flex-1 flex flex-row items-center justify-between mx-2">
     {#if !level.canAddProperty()}
-      <div class="flex-1 bg-norbalt-300 border rounded border-norbalt-100 h-6 mr-2 last:mr-0"> {initialPropName} </div>
+      <div class="flex-1 bg-norbalt-300 border rounded border-norbalt-100 h-6 mr-2 last:mr-0 px-2"> {initialPropName} </div>
     {:else}
       <div class="flex-1 mr-2 last:mr-0">
         <input class="w-full bg-norbalt-300 border rounded border-norbalt-100 transition-all hover:border-offWhite focus:border-offWhite px-2 outline-none h-6" bind:value="{propName}" on:change="{updateName}"/>
