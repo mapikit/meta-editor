@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Schema } from "../../../entities/schema";
   import { get, writable } from "svelte/store";
   import { getSchemaById, protocols, schemas } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
@@ -10,8 +9,6 @@
   import Selector from "../../../components/common/selector.svelte";
   import ObjectDefinitionMiniApp from "../../../components/object-definition/object-definition-mini-app.svelte";
   import { EditorLevel, EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
-
-  let schemaList : Schema[] = $schemas;
 
   let pathParams = navigation.currentPathParamsSubscribable;
 

@@ -33,6 +33,7 @@
   const selectedData : Writable<DefinitionData> = writable($rootDefinitionData);
 
   const unsub = selectedData.subscribe(() => {
+    if (!format) { return; }
     format.set(convertDefinitionDataToObjectDefinition($rootDefinitionData).definition["root"]["subtype"]);
   });
 

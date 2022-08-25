@@ -22,7 +22,7 @@ const isObjectDefinitionCheck = (value : object) : boolean => {
 // Also can populate the values of the definitionData if `objValue` is specified
 export const convertObjDefinitionToDefinitionData =
 (objDef : ObjectDefinition, objValue : object = {}) : DefinitionData[] => {
-  const keys = Object.keys(objDef);
+  const keys = Object.keys(objDef ?? {});
   const result : DefinitionData[] = [];
 
   keys.forEach((key) => {
