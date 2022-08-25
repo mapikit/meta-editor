@@ -17,7 +17,7 @@
   let description = system.description;
   let id = system.id;
   let versions = $availableConfigurations.filter((elm) => get(elm.projectId) === $id);
-  let selectedVersion = versions[0].version;
+  let selectedVersion = versions[0]?.version;
   let summary = system.getConfiguration().getConfigurationSummary(); // TODO get by selected config
   let currentVersion = versions[0];
   const pathStore = navigation.pathStore;

@@ -40,6 +40,8 @@ export const loadConfigurationsFromStore = () : void => {
       configs.push(...rawConfigs);
       return configs;
     });
+
+    console.log("Loaded !!!! << ");
   };
 
   setCurrentConfigData(get(currentProject).getConfiguration());

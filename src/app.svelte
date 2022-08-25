@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import { loadConfigurationsFromStore } from "./stores/configuration-store";
 import { loadProjectsFromStore } from "./stores/projects-store";
 import MainView from "./views/main-view.svelte";
@@ -6,11 +6,22 @@ import MainView from "./views/main-view.svelte";
 // This file contains general data about the App itself
 // and should not contain anything else.
 
+const promiseTest = () : Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), 3000);
+  });
+};
+
 loadProjectsFromStore();
 loadConfigurationsFromStore();
 </script>
 
-<MainView />
+
+{#await promiseTest()}
+	to caregadon pora
+{:then}
+  <MainView />
+{/await}
 
 <svelte:head>
   <link rel="preconnect" href="https://fonts.googleapis.com">

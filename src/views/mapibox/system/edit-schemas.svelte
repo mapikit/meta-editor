@@ -18,15 +18,15 @@
   $: schemaFormat = $currentSchema?.format;
   $: schemaName = $currentSchema?.name;
   $: description = $currentSchema?.description;
-  $: dbprotocol = $currentSchema?.dbProtocol ?? writable("");
+  $: dbprotocol = $currentSchema?.dbProtocol;
   $: protocolsOptions = $protocols
     .map((protocol) => ({ value: get(protocol.identifier), label: get(protocol.protocolName) }));
 
   $: selectedProtocolLabel = protocolsOptions.find((protocol) => protocol.value === $dbprotocol)?.label;
 
   let unsub = () : void => { void 0; };
-  
-  onDestroy(unsub);
+
+  onDestroy(() => unsub());
   // eslint-disable-next-line max-lines-per-function
   onMount(() => {
     const currentPathParams = navigation.currentPathParams;
@@ -42,7 +42,6 @@
 </script>
 
 <div class="px-8 w-[calc(100%-86px)] overflow-y-scroll pb-36">
-  {currentSchemaId}
   <ConfigurationSection type="Schemas" canDelete={true}/>
   <div class="w-full mt-12" >
     <p class="text-white font-bold text-2xl italic"> Editing '{$schemaName}' Schema </p>
