@@ -6,5 +6,5 @@ export type PropertyListEntry = {
   locked : Writable<boolean>;
   starred : Writable<boolean>;
   description : Writable<string>;
-  dataValues : Array<{ name : string; value : Writable<unknown>, editable ?: true }>
+  dataValues : Array<{ name : string; value : Writable<unknown>, editable ?: boolean }>
 };

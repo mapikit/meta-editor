@@ -1,169 +1,88 @@
 <script lang="ts">
-  import DefinitionApp from "../../../components/system-page/system-editor/definition-app.svelte";
-  import GuideText from "../../../components/common/guide-text.svelte";
-  import { EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
-  import { get, readable } from "svelte/store";
+  import { writable } from "svelte/store";
   import { getProtocolById, protocols } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
-  import { onDestroy } from "svelte";
-  import { guideText } from "../../../stores/layout-tabs-store";
-  import type { Protocol } from "../../../entities/protocol";
+  import { onMount, onDestroy } from "svelte";
+  import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
+  import ChevronIcon from "../../../icons/chevron-icon.svelte";
+  import TextField from "../../../components/fields/text-field.svelte";
+  import ObjectDefinitionMiniApp from "../../../components/object-definition/object-definition-mini-app.svelte";
+  import { EditorLevel, EditorLevels } from "../../../components/object-definition/obj-def-editor-types-and-helpers";
+  import ProtocolPicker from "../../../components/modal/protocol-picker.svelte";
+  import PencilIcon from "../../../icons/pencil-icon.svelte";
+  import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
 
-  let protocolList : Protocol[] = $protocols;
   let pathParams = navigation.currentPathParamsSubscribable;
-  let currentProtocolId = $pathParams["protocolId"];
-  let currentProtocol = getProtocolById(currentProtocolId);
-  let protocolFormat = currentProtocol?.definition;
 
-  $: protocolList = $protocols;
   $: currentProtocolId = $pathParams["protocolId"];
   $: currentProtocol = getProtocolById(currentProtocolId);
-  $: protocolFormat = currentProtocol?.definition;
+  $: protocolFormat = $currentProtocol?.configuration;
+  $: protocolName = $currentProtocol?.protocolName;
+  $: description = $currentProtocol?.description;
+  $: definition = $currentProtocol?.definition;
+  $: identifier = $currentProtocol?.identifier;
+  $: version = $currentProtocol?.protocolVersion;
+  $: protocolType = $currentProtocol?.protocolType;
 
-  const unsub = pathParams.subscribe(() => {
-    guideText.set(`Editing Protocol "${get(currentProtocol?.identifier) ?? ""}" (${currentProtocolId})`);
+  let unsub = () : void => { void 0; };
+
+  onDestroy(() => unsub());
+  // eslint-disable-next-line max-lines-per-function
+  onMount(() => {
+    const currentPathParams = navigation.currentPathParams;
+    // pathParams = navigation.currentPathParamsSubscribable;
+    currentProtocolId = currentPathParams["protocolId"];
+
+    unsub = pathParams.subscribe(() => {
+      currentProtocolId = navigation.currentPathParams["protocolId"];
+      currentProtocol = getProtocolById(currentProtocolId);
+    });
   });
 
-  onDestroy(unsub);
+  let openModal = () : void => {};
 
 </script>
 
-<div class="content">
-  <GuideText />
-  <div class="protocols-list">
-    {#each protocolList as protocol}
-      <div
-        class:current={currentProtocolId === get(protocol.id)}
-        class="listed-protocol"
-        on:click="{() => { navigation.navigateTo(`/mapibox/system/${$pathParams["systemId"]}/protocols/${get(protocol.id)}/edit`); }}">
-        {get(protocol.identifier)} [{get(protocol.id)}]
+<div class="px-8 w-[calc(100%-86px)] overflow-y-scroll pb-36">
+  <ConfigurationSection type="Protocols" canDelete={true}/>
+  <div class="w-full mt-12" >
+    <p class="text-white font-bold text-2xl italic"> Editing '{$protocolName}' </p>
+    <div class="flex flex-row w-full mt-4"> <!-- Card holder -->
+      <div class="rounded bg-norbalt-200 p-3 px-5 border-transparent border w-[550px]">
+        <div /> <!-- Confirm / Cancel -->
+        <div class="flex flex-row justify-between items-center text-lg font-semibold"> <!-- Information Section -->
+          <ChevronIcon />
+          <p class="ml-3">  Information </p>
+          <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
+        </div>
+        <TextField label="Name" bind:field={protocolName}/>
+        <TextField label="Description" bind:field={description} multiline/>
+        <div class="mt-2 w-full">
+          <p class="text-offWhite text-sm"> Chosen Protocol </p>
+          <div class="mt-1 flex flex-row items-center border-norbalt-100 hover:border-offWhite px-2 py-0.5 border rounded bg-norbalt-400 transition-all max-w-fit cursor-pointer fill-offWhite hover:fill-white" on:click="{openModal}">
+            <p>
+              {#if $protocolType === ProtocolKind.dbProtocol}
+                <span class="text-roseRed"> DB </span> -
+              {/if}
+              {$identifier} [{$version}] </p> <PencilIcon style="ml-2 fill-inherit" />
+          </div>
+        </div>
+        <ProtocolPicker bind:openModal/>
+        <div class="flex flex-row justify-between items-center text-lg font-semibold mt-4"> <!-- Format Section -->
+          <ChevronIcon />
+          <p class="ml-3">  Protocol Configuration </p>
+          <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
+        </div>
+        {#key currentProtocolId}
+          {#if $protocolFormat} <!-- this ensures the mini app is not rendered with bad values -->
+            <ObjectDefinitionMiniApp
+            editingLevel={new EditorLevel(EditorLevels.signDefinition)}
+            format={writable(definition)}
+            initialData={$protocolFormat}
+            />
+          {/if}
+        {/key}
       </div>
-      <!-- later: change style if it is the current protocol on the route -->
-    {/each}
-  </div>
-  <div class="divider" />
-  <div class="editor-lane">
-    {#key currentProtocolId}
-      {#if protocolList.length !== 0}
-        <div style="cursor: pointer;"
-          on:click="{async () => {
-            const format = JSON.parse(await navigator.clipboard.readText());
-            currentProtocol.definition = format;
-            currentProtocol.configuration.set({});
-            const newId = Math.floor(Math.random() * 10000000).toString();
-            currentProtocol.id = readable(newId);
-            navigation.navigateTo(`/mapibox/system/${$pathParams["systemId"]}/protocols/${newId}/edit`);
-          }}"
-        > Set format here </div>
-        <DefinitionApp
-        protocolDefinition={protocolFormat ?? {}}
-        protocolData={{}}
-        level={EditorLevels.signDefinition}
-        on:confirmed={(data) => {
-        currentProtocol.configuration.set(data.detail.result.data.root);
-      }}
-      />
-      {:else}
-        <p> There are no protocols created in this system. </p>
-      {/if}
-    {/key}
+    </div>
   </div>
 </div>
-
-<style lang="scss">
-  .content {
-    margin-top: 42px;
-    flex: 1;
-    display: flex;
-    flex-flow: row nowrap;
-    font-family: 'Dosis', monospace;
-  }
-
-  .divider {
-    width: 4px;
-    background-color: #1a1a2a;
-    height: calc(100% - 90px);
-    margin-right: 12px;
-    margin-top: 30px;
-  }
-
-  .solo-fields {
-    margin-bottom: 26px;
-    width: 450px;
-    padding: 12px;
-    border-radius: 12px;
-    background-color: #202031;
-
-    .field {
-      margin-bottom: 8px;
-      display: flex;
-      width: 100%;
-      flex-direction: row;
-      justify-content: space-between;
-
-      label {
-        margin-right: 16px;
-      }
-
-      input {
-        border: none;
-        background-color: #323242;
-        color: white;
-        font-family: 'dosis';
-        width: 300px;
-        text-align: right;
-        border-radius: 4px;
-        padding: 4px;
-      }
-    }
-  }
-
-  .protocols-list {
-    display: flex;
-    flex-direction: column;
-    width: 286px;
-    padding-left: 22px;
-    padding-top: 22px;
-
-    .listed-protocol {
-      width: calc(100% - 16px);
-      height: 35px;
-      border-radius: 12px;
-      font-size: 14px;
-      text-align: center;
-      background-color: #1a1a2a;
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: center;
-      align-items: center;
-      transition: all 75ms;
-      margin-top: 12px;
-      outline: #1d1d22 solid 0px;
-
-      &:hover {
-        background-color: #2c2c44;
-      }
-
-      &.current {
-        outline: #64647c solid 2px;
-      }
-    }
-  }
-
-  .editor-lane {
-    max-height: calc(100% - 82px);
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-  }
-
-  .preview {
-    max-height: calc(100% - 82px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-  }
-</style>

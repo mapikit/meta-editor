@@ -5,23 +5,13 @@ import MainView from "./views/main-view.svelte";
 
 // This file contains general data about the App itself
 // and should not contain anything else.
-
-const promiseTest = () : Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), 3000);
-  });
-};
-
 loadProjectsFromStore();
 loadConfigurationsFromStore();
 </script>
 
 
-{#await promiseTest()}
-	to caregadon pora
-{:then}
-  <MainView />
-{/await}
+
+<MainView />
 
 <svelte:head>
   <link rel="preconnect" href="https://fonts.googleapis.com">

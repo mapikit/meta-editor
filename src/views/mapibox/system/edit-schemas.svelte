@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { get, writable } from "svelte/store";
+  import { get } from "svelte/store";
   import { getSchemaById, protocols, schemas } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
   import { onMount, onDestroy } from "svelte";

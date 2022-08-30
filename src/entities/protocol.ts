@@ -14,6 +14,7 @@ type ProtocolParameters = {
   isLocked : boolean;
   description : string;
   configuration : object;
+  protocolType : string;
 }
 
 export class Protocol {
@@ -53,6 +54,7 @@ export class Protocol {
     isLocked,
     description,
     configuration,
+    protocolType,
   } : ProtocolParameters) {
     this.id = readable(id);
     this.identifier.set(identifier);
@@ -63,6 +65,7 @@ export class Protocol {
     this.isLocked.set(isLocked);
     this.description.set(description);
     this.configuration.set(configuration);
+    this.protocolType.set(protocolType as ProtocolKind);
 
     this.keepStorageUpdated();
   }
@@ -97,9 +100,10 @@ export class Protocol {
       isLocked: false,
       description: "Stub Protocol Description",
       configuration: {},
+      protocolType: ProtocolKind.dbProtocol,
     });
 
-    newProtocol.protocolType.set(ProtocolKind.normal);
+    // newProtocol.protocolType.set(ProtocolKind.normal);
 
     // adds it to the store
     protocols.update((value) => { value.push(newProtocol); return value; });
