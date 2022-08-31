@@ -2,7 +2,7 @@
   import { writable } from "svelte/store";
   import { fade } from "svelte/transition";
 
-  let open = writable(false);
+  let open = writable(true);
 
   export const openModal = () : void => {
     open.set(true);
