@@ -1,24 +1,14 @@
 <script lang="ts">
-import { loadConfigurationsFromStore } from "./stores/configuration-store";
-import { availableProjects, loadProjectsFromStore } from "./stores/projects-store";
 import { storageManager } from "./stores/storage-manager";
 import MainView from "./views/main-view.svelte";
 
 // This file contains general data about the App itself
 // and should not contain anything else.
 
-const promiseTest = () : Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), 3000);
-  });
-};
-
-// loadProjectsFromStore();
-// loadConfigurationsFromStore();
-const promise = async () => {
+const promise = async () : Promise<void> => {
   await storageManager.loadAllInfo();
   storageManager.subscribeUpdates();
-}
+};
 </script>
 
 
