@@ -27,7 +27,7 @@ export const loadProjectsFromStore = () : void => {
     });
   };
 
-  availableProjects.subscribe(saveProjects);
+  // availableProjects.subscribe(saveProjects);
 };
 
 export const currentProject = derived(selectedSystem,

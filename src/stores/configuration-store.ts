@@ -46,7 +46,7 @@ export const loadConfigurationsFromStore = () : void => {
 
   setCurrentConfigData(get(currentProject).getConfiguration());
 
-  availableConfigurations.subscribe(saveConfigurations);
+  // availableConfigurations.subscribe(saveConfigurations);
   startConfigurationStoreSync();
 };
 

@@ -1,17 +1,40 @@
 <script lang="ts">
 import { loadConfigurationsFromStore } from "./stores/configuration-store";
-import { loadProjectsFromStore } from "./stores/projects-store";
+import { availableProjects, loadProjectsFromStore } from "./stores/projects-store";
+import { storageManager } from "./stores/storage-manager";
 import MainView from "./views/main-view.svelte";
 
 // This file contains general data about the App itself
 // and should not contain anything else.
-loadProjectsFromStore();
-loadConfigurationsFromStore();
+
+const promiseTest = () : Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), 3000);
+  });
+};
+
+// loadProjectsFromStore();
+// loadConfigurationsFromStore();
+const promise = async () => {
+  await storageManager.loadAllInfo();
+  storageManager.subscribeUpdates();
+}
 </script>
 
 
+{#await promise()}
+	<p class="carregando">Aguarde, carregando informações...</p>
+{:then}
+  <MainView />
+{/await}
 
-<MainView />
+<style lang="scss">
+  .carregando {
+    margin-top: 100px;
+    text-align: center;
+    font-size: 42pt;
+  }
+</style>
 
 <svelte:head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
