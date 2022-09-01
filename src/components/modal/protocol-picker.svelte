@@ -4,6 +4,7 @@
   import TextField from "../fields/text-field.svelte";
   import Modal from "./modal.svelte";
   import CheckIcon from "../../icons/check-icon.svelte";
+  import ChangeIcon from "../../icons/change-icon.svelte";
   
   let closeModal;
   export let openModal;
@@ -30,9 +31,11 @@
     <div class="flex flex-row justify-between items-center text-lg font-semibold">
       <p> Protocol Picker </p>
       <div class="flex-1 ml-6 h-0.5 bg-norbalt-100"/>
-      <div class="px-3 text-sm py-1 bg-norbalt-400 text-offWhite ml-3 rounded shadow-sm hover:text-white cursor-pointer transition-all"
-        on:click="{changeTab}"
-      > {capitalize(unselectedTab)} </div>
+      <div class="px-3 text-sm py-1 flex flex-row items-center bg-norbalt-400 text-offWhite ml-3 rounded shadow-sm hover:text-white cursor-pointer stroke-offWhite hover:stroke-white transition-all"
+        on:click="{changeTab}" >
+        <ChangeIcon style="stroke-inherit mr-2"/>
+        {capitalize(unselectedTab)}
+      </div>
     </div>
     {#if selectedTab === "search"}
       <div class="w-full mt-3">
