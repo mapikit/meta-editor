@@ -17,22 +17,24 @@
   import type { ModuleCard } from "../../common/types/module-card";
   import { sectionsMap } from "./helpers/sections-map";
   import { History } from "../../common/helpers/generic-history";
+  import ArchitectToolbar from "./architect-toolbar.svelte";
+  import CurrentBopNametag from "./current-bop-nametag.svelte";
 
-  const pathParams = navigation.currentPathParamsSubscribable
+  const pathParams = navigation.currentPathParamsSubscribable;
   const currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
 
   const configurationHistory = new History({
-    storeToWatch: currentBop.configuration, 
-    validatingFunction: UIBusinessOperation.rebuildModuleCards
+    storeToWatch: currentBop.configuration,
+    validatingFunction: UIBusinessOperation.rebuildModuleCards,
   });
 
   onDestroy(() => configurationHistory.unsubscribe());
 
   let modulesInConfig : ModuleCard[];
   currentBop.configuration.subscribe(config => {
-    modulesInConfig = get(currentBop.configuration)
+    modulesInConfig = get(currentBop.configuration);
     return config;
-  })
+  });
 
   sectionsMap.refreshConnections(get(currentBop.configuration));
 
@@ -42,7 +44,7 @@
   let cutting = false;
   let storeHidden = true;
 
-   
+  
   function adjustCanvas () : void {
     const containerDimensions = canvas.parentElement.getBoundingClientRect();
     canvas.width = containerDimensions.width;
@@ -75,44 +77,47 @@
       updateTraces();
     });
     environment.subscribe(() => setTimeout(() => updateTraces(), 1));
-      // Investigate and avoid this kind of repetition & timeout
-      // Timeout Only: traces have "springness" (modules don't)
-      // No Timeout: traces don't update correctly (obvious with scaling)
+    // Investigate and avoid this kind of repetition & timeout
+    // Timeout Only: traces have "springness" (modules don't)
+    // No Timeout: traces don't update correctly (obvious with scaling)
   });
 
   let panning = false;
 
+  // eslint-disable-next-line max-lines-per-function
   function startMovement (event : MouseEvent) : void {
     if(cutting) {
       const linesToCut = updateTraces({ cutting: event });
-        currentBop.configuration.update(config => {
-          for(const identifier of linesToCut) {
-            const moduleId = identifier.split(".")[0];
-            const targetPath = identifier.split(".").slice(1).join(".");
-            let module : ModuleCard;
-            let dependencyIndex : number;
-            if(!targetPath) {
-              // Functional dep id pattern `originKey_parentKey`
-              const origin = Number(moduleId.split("_")[0])
-              const parentKey = Number(moduleId.split("_")[1])
-              module = config.find(_module => _module.key === parentKey)
-              dependencyIndex = module.dependencies.findIndex(dep => dep.origin === origin && dep.targetPath === undefined);
-            } else {
-              module = config.find(_module => _module.key === Number(moduleId));
-              dependencyIndex = module.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
-            }
-
-            module.dependencies.splice(dependencyIndex, 1);
-            sectionsMap.refreshConnections(get(currentBop.configuration));
+      // eslint-disable-next-line max-lines-per-function
+      currentBop.configuration.update(config => {
+        for(const identifier of linesToCut) {
+          const moduleId = identifier.split(".")[0];
+          const targetPath = identifier.split(".").slice(1).join(".");
+          let module : ModuleCard;
+          let dependencyIndex : number;
+          if(!targetPath) {
+            // Functional dep id pattern `originKey_parentKey`
+            const origin = Number(moduleId.split("_")[0]);
+            const parentKey = Number(moduleId.split("_")[1]);
+            module = config.find(_module => _module.key === parentKey);
+            dependencyIndex = module.dependencies.findIndex(dep => dep.origin === origin && dep.targetPath === undefined);
+          } else {
+            module = config.find(_module => _module.key === Number(moduleId));
+            dependencyIndex = module.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
           }
 
-          return config;
-        })
+          module.dependencies.splice(dependencyIndex, 1);
+          sectionsMap.refreshConnections(get(currentBop.configuration));
+        }
+
+        return config;
+      });
       context.shadowBlur = 0;
     }
     panning = event.button === 1;
   }
 
+  // eslint-disable-next-line max-lines-per-function
   function detectShortcut (event : KeyboardEvent) : void {
     context.shadowBlur = 0;
     if(document.activeElement.tagName === "INPUT") return;
@@ -122,7 +127,9 @@
         event.preventDefault();
         break;
       case "f":
-        environment.update(environment => {environment.functionalTraces = !environment.functionalTraces; return environment});
+        environment.update(env => {
+          env.functionalTraces = !env.functionalTraces; return env;
+        });
         event.preventDefault();
         break;
       case "z":
@@ -141,7 +148,7 @@
         break;
       case "Escape":
         cutting = false;
-        environment.update(environment => {environment.functionalTraces = false; return environment});
+        environment.update(env => {env.functionalTraces = false; return env;});
         break;
     };
     // bopStore.update(bop => bop);
@@ -208,8 +215,8 @@
   }
 
   function copyBOpToClipboard () {
-    console.log(getDeepStoreObject(currentBop))
-    console.log(sectionsMap)
+    console.log(getDeepStoreObject(currentBop));
+    console.log(sectionsMap);
 
     // TODO filter out ui properties
     navigator.clipboard.writeText(beautify(currentBop, null, 1, 110));
@@ -230,10 +237,8 @@
         <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>
         <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>      
     </div>
-  <input class="buttonCpy" type="button" value="Copy Bop" on:click={() => copyBOpToClipboard()}>
-  <input class="buttonScl" type="button" value="Reset Scale" on:click={() => { $environment.scale=1; }}>
-  <input class="buttonFit" type="button" value="Fit All" on:click={() => fitModules()}>
-  <input class="adjust" type="button" value="Adjust" on:click={() => adjustCanvas()}>
+  <CurrentBopNametag />
+  <ArchitectToolbar />
   <Trash bind:ref={trash} bind:hidden={storeHidden} bopModules={currentBop.configuration}/>
 </div>
 <svelte:window 
@@ -255,31 +260,6 @@
     width: 100%;
     height: 100%;
   }
-
-  .buttonCpy {
-    position: absolute;
-    top: 10px;
-    left: 160px;
-  }
-
-  .buttonScl {
-    position: absolute;
-    top: 10px;
-    left: 230px;
-  }
-
-  .buttonFit {
-    position: absolute;
-    top: 10px;
-    left: 310px;
-  }
-
-  .adjust {
-    position: absolute;
-    top: 10px;
-    left: 360px;
-  }
-
 
   .modulesArea {
     width: 100%;
