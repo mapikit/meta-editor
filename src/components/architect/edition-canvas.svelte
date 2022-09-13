@@ -2,7 +2,6 @@
   import Module from "./module-cards/module-card.svelte";
   import { onDestroy, onMount } from "svelte";
   import { updateTraces } from "./update-traces";
-  import beautify from "json-beautify";
   import ModuleStore from "./module-store.svelte";
   import Trash from "./trash.svelte";
   import { environment } from "../../stores/environment";
@@ -11,39 +10,37 @@
   import OutputCard from "./output-card.svelte";
   import { UIBusinessOperation } from "../../entities/business-operation";
   import { get } from "svelte/store";
-  import { navigation } from "../../lib/navigation";
-  import { businessOperations } from "../../stores/configuration-store";
-  import { getDeepStoreObject } from "./helpers/get-deep-store-obj";
   import type { ModuleCard } from "../../common/types/module-card";
   import { sectionsMap } from "./helpers/sections-map";
   import { History } from "../../common/helpers/generic-history";
   import ArchitectToolbar from "./architect-toolbar.svelte";
   import CurrentBopNametag from "./current-bop-nametag.svelte";
 
-  const pathParams = navigation.currentPathParamsSubscribable;
-  const currentBop : UIBusinessOperation = $businessOperations.find(bop => get(bop.id) === $pathParams.bopId);
+  export let currentBop : UIBusinessOperation;
 
-  const configurationHistory = new History({
-    storeToWatch: currentBop.configuration,
-    validatingFunction: UIBusinessOperation.rebuildModuleCards,
-  });
-
-  onDestroy(() => configurationHistory.unsubscribe());
-
+  let configurationHistory;
   let modulesInConfig : ModuleCard[];
-  currentBop.configuration.subscribe(config => {
-    modulesInConfig = get(currentBop.configuration);
-    return config;
-  });
-
-  sectionsMap.refreshConnections(get(currentBop.configuration));
-
   let trash : HTMLDivElement;
   let canvas : HTMLCanvasElement;
   let context : CanvasRenderingContext2D;
   let cutting = false;
   let storeHidden = true;
 
+  if (currentBop) {
+    configurationHistory = new History({
+      storeToWatch: currentBop.configuration,
+      validatingFunction: UIBusinessOperation.rebuildModuleCards,
+    });
+
+    currentBop.configuration?.subscribe(config => {
+      modulesInConfig = get(currentBop.configuration);
+      return config;
+    });
+
+    sectionsMap.refreshConnections(get(currentBop.configuration));
+  }
+
+  onDestroy(() => configurationHistory.unsubscribe());
   
   function adjustCanvas () : void {
     const containerDimensions = canvas.parentElement.getBoundingClientRect();
@@ -62,13 +59,10 @@
     context.lineWidth = 2;
   }
 
-
-  
   onMount(() => {
     context = canvas.getContext("2d");
     $environment.canvasContext = context;
     $environment.canvasOffset = canvas.getBoundingClientRect();
-    adjustCanvas();
 
     $environment.origin.moveTo(canvas.width/2, canvas.height/2);
     sectionsMap.refreshConnections(get(currentBop.configuration));
@@ -76,10 +70,12 @@
     currentBop.configuration.subscribe(() => {
       updateTraces();
     });
+
     environment.subscribe(() => setTimeout(() => updateTraces(), 1));
     // Investigate and avoid this kind of repetition & timeout
     // Timeout Only: traces have "springness" (modules don't)
     // No Timeout: traces don't update correctly (obvious with scaling)
+    adjustCanvas();
   });
 
   let panning = false;
@@ -127,7 +123,7 @@
         event.preventDefault();
         break;
       case "f":
-        environment.update(env => {
+        $environment.update(env => {
           env.functionalTraces = !env.functionalTraces; return env;
         });
         event.preventDefault();
@@ -148,7 +144,7 @@
         break;
       case "Escape":
         cutting = false;
-        environment.update(env => {env.functionalTraces = false; return env;});
+        $environment.update(env => {env.functionalTraces = false; return env;});
         break;
     };
     // bopStore.update(bop => bop);
@@ -175,7 +171,7 @@
 
   function fitModules () : void {
     // let maxX =-Infinity, maxY=-Infinity, minX=Infinity, minY=Infinity;
-    // $bopStore.configuration.forEach(module => {
+    // bopStore.configuration.forEach(module => {
     //   const correctedWidth = module.dimensions.width;
     //   const correctedHeight = module.dimensions.height;
     //   if(module.position.x < minX) minX = module.position.x;
@@ -213,18 +209,10 @@
     //   return env;
     // });
   }
-
-  function copyBOpToClipboard () {
-    console.log(getDeepStoreObject(currentBop));
-    console.log(sectionsMap);
-
-    // TODO filter out ui properties
-    navigator.clipboard.writeText(beautify(currentBop, null, 1, 110));
-  }
 </script>
 
-<div class="architect" id="architect">
-  <canvas class="canvas" bind:this={canvas}/>
+<div class="relative w-full h-full" id="architect">
+  <canvas class="absolute top-0 left-0 w-full h-full" bind:this={canvas}/>
     <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
     <div 
       class="modulesArea" 
@@ -237,7 +225,7 @@
         <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>
         <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>      
     </div>
-  <CurrentBopNametag />
+  <CurrentBopNametag businessOperation={currentBop}/>
   <ArchitectToolbar />
   <Trash bind:ref={trash} bind:hidden={storeHidden} bopModules={currentBop.configuration}/>
 </div>
@@ -248,19 +236,7 @@
   on:resize={adjustCanvas}
   />
 
-
-
 <style>
-  .canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    /* background: url("../../../static/images/dotted-back.jpg") rgb(16, 15, 17); */
-    /* background-color: gray; */
-    width: 100%;
-    height: 100%;
-  }
-
   .modulesArea {
     width: 100%;
     height: 100%;
@@ -268,14 +244,5 @@
     overflow: hidden;
     top: 0px;
     left: 0px;
-  }
-
-  .architect {
-    position: absolute;
-    top: 48px;
-    left: 10px;
-    height: calc(100% - 48px);
-    width: calc(100% - 10px);
-    overflow-x: hidden;
   }
 </style>

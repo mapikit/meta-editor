@@ -87,6 +87,14 @@ export const getProtocolById = (id : string) : Readable<Protocol> => {
   });
 };
 
+export const getBopById = (id : string) : Readable<UIBusinessOperation> => {
+  return derived(businessOperations, () => {
+    const result : UIBusinessOperation = get(businessOperations).find((value) => get(value.id) === id);
+
+    return result;
+  });
+};
+
 export const getCurrentMsysConfiguration = () : object => {
   const project = get(currentProject);
   const config = project.getConfiguration();

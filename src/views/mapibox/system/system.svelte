@@ -3,12 +3,12 @@
   import { fly } from "svelte/transition";
   import Route from "../../../lib/router/route.svelte";
   import EditProtocols from "./edit-protocols.svelte";
-  import EditionCanvas from "../../../components/architect/edition-canvas.svelte";
   import EditSchemas from "./edit-schemas.svelte";
   import { navigation } from "../../../lib/navigation";
   import { selectedSystem } from "../../../components/systems-sidebar/systems-stores";
   import { onMount } from "svelte";
   import ConfigurationEdit from "./configuration-edit.svelte";
+  import ArchitectDataLoader from "../../../components/architect/architect-data-loader.svelte";
 
   onMount(() => {
     selectedSystem.set(navigation.currentPathParams["systemId"]);
@@ -26,7 +26,7 @@
     <EditSchemas/>
   </Route>
   <Route path="/mapibox/system/:systemId/configuration/:configurationId/bops/:bopId">
-    <EditionCanvas />
+    <ArchitectDataLoader />
   </Route>
   <Route path="/mapibox/system/:systemId/configuration/:configurationId" deepMatch={false}>
     <ConfigurationEdit />
