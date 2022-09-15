@@ -9,6 +9,7 @@
   import StarIcon from "../../icons/star-icon.svelte";
   import LockIcon from "../../icons/lock-icon.svelte";
   import { navigation } from "../../lib/navigation";
+  import { slide } from "svelte/transition";
 
   type PropTypes = "Schemas" | "Business Operations" | "Protocols";
 
@@ -73,7 +74,7 @@
   <!-- Header -->
   <!-- List -->
   {#if !collapsed}
-  <div class="overflow-x-auto flex flex-row items-center mt-5 w-full pb-2">
+  <div class="overflow-x-auto flex flex-row items-center mt-5 w-full pb-2" transition:slide="{{ duration: 180 }}">
     {#each usedList as item}
       <div class="bg-norbalt-200 w-80 min-w-[20rem] p-2 px-4 rounded ml-6 first:ml-0 last:mr-10">
         <div class="flex flex-row justify-between items-center">

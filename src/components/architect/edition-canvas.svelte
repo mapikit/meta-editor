@@ -49,11 +49,6 @@
     context.strokeStyle = "#ffffff";
     context.lineWidth = 2;
 
-    // updateTraces();
-    // const canvasScale = canvas.clientWidth/canvas.width;
-    // canvas.width *= canvasScale;
-    // canvas.height *= canvasScale;
-
     updateTraces();
 
     context.lineWidth = 2;
