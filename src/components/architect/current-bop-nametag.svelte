@@ -16,7 +16,7 @@
   <BopIcon style="stroke-white fill-ochreYellow mr-4"/>
   
   {#if !editing}
-    <div class="text-lg font-bold"> {name} </div>
+    <div class="text-2xl font-bold"> {name} </div>
   {:else}
     <div class="ml-2 -mt-2">
       <TextField field={businessOperation.name} label="Business Operation Name"/>

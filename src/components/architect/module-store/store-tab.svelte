@@ -1,6 +1,21 @@
 <script lang="ts">
   import Tooltip from "../../common/tooltip.svelte";
 
+  type PossibleStores = "internal" | "external" | "schema" | "bops" | "protocols" | "constants" | "variables";
+  type TabInfo = { iconURI : string; title : string; }
+  type TabsInfo = Record<PossibleStores, TabInfo>;
+
+  const tabsInfo : TabsInfo = {
+    internal: { iconURI: "internal_modules_v1.png", title: "Internal Modules" },
+    external: { iconURI: "external_modules_v1.png", title: "External Modules" },
+    schema: { iconURI: "schemaFunctions_v1.png", title: "Schema Modules" },
+    protocols: { iconURI: "Protocols_v1.png", title: "Protocols Modules" },
+    bops: { iconURI: "businessOperations_v1.png", title: "BOps Modules" },
+    constants: { iconURI: "constants_v1.png", title: "Constants" },
+    variables: { iconURI: "variables_v1.png", title: "Variables" },
+  };
+
+
   export let ref : HTMLDivElement;
   export let tooltip : string;
   let clientWidth : number;
@@ -12,30 +27,3 @@
   </div>
   <Tooltip  tooltipContent={tooltip}/>
 </div>
-
-<style lang="scss">
-  .tab {
-    position: relative;
-    user-select: none;
-    margin: 2px;
-    display: block;
-    text-align: center;
-    border-radius: 5px 5px 5px 5px;
-    padding: 18px;
-    transition-duration: 200ms;
-  }
-
-  .tab:hover {
-    background-color: gray;
-    transition-duration: 200ms;
-  }
-
-  .icon {
-    position: absolute;
-    color: red;
-    left: -37%;
-    top: -32%;
-    font-size: 20;
-    transform: scale(0.7);
-  }
-</style>

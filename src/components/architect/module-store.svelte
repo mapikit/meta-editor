@@ -11,7 +11,7 @@
   import { getExternalModules } from "./module-store/helpers/get-external-modules";
   import type { UIBusinessOperation } from "../../entities/business-operation";
   import { protocols } from "../../stores/configuration-store";
-  
+  import LockIcon from "../../icons/lock-icon.svelte";
   
   export let hidden = true;
   export let currentBop : UIBusinessOperation;
@@ -23,11 +23,7 @@
 
   let locked = false;
   let internalLock = false;
-  let clientWidth = 0;
   let activity : NodeJS.Timeout;
-
-
-
 
   const tabsInfo : TabsInfo = {
     internal: { iconURI: "internal_modules_v1.png", title: "Internal Modules" },
@@ -44,60 +40,61 @@
     tabsRef[0].style.backgroundColor = "#7035fb";
   });
 
-  function handleMouseOver () {
-    if(activity !== undefined) clearTimeout(activity)
-    hidden = false
+  function handleMouseOver () : void {
+    if(activity !== undefined) clearTimeout(activity);
+    hidden = false;
   }
 
-  function handleMouseOut () {
+  function handleMouseOut () : void {
     if(!(locked || internalLock)) {
-      activity = setTimeout(() => hidden = true, 2000)
+      activity = setTimeout(() => { hidden = true, 2000; });
     }
   }
 
-  function handleTabClick(tab : string, index : number) {
+  function handleTabClick (tab : string, index : number) : void {
     selectedStore = tab as PossibleStores;
-    tabsRef.forEach(tab => { tab.style.backgroundColor = ""; })
+    tabsRef.forEach(tab => { tab.style.backgroundColor = ""; });
     tabsRef[index].style.backgroundColor = "#7035fb";
   }
 
-  function handleLock () { locked = !locked; }
+  function handleLock () : void { locked = !locked; }
 
-  function onInternalLockUpdate(_lock : boolean) {
-    if(!(internalLock || locked)) activity = setTimeout(() => hidden = true, 2000)
+  function onInternalLockUpdate (_lock : boolean) : void {
+    if(!(internalLock || locked)) activity = setTimeout(() => hidden = true, 2000);
   }
 
   $: onInternalLockUpdate(internalLock);
+  $: lockedLockIconColor = locked ? "fill-ochreYellow hover:fill-ochreYellow-light border-ochreYellow"
+    : "fill-offWhite hover:fill-white";
 
-  let search : string = "";
-  // 
+  let search = "";
 </script>
 
-
-
-<div id="store"
-  style="right: {hidden ? -clientWidth : 10}px;"
+<div
+  class="absolute right-0 z-10 top-16 w-96 h-[calc(100%_-_32px_-_4rem)] flex flex-row"
   on:mouseover={handleMouseOver}
   on:mouseleave={handleMouseOut}
   on:focus={() => {}}
 >
-  <div class="storeName"><span 
-    class="lockIcon"
-    style="background-color: {locked ? "red" : "green"};"
-    on:click={handleLock}
-    >L</span><span class="title">{tabsInfo[selectedStore].title}</span></div>
-  <div class="tabs">
-    {#each Object.keys(tabsInfo) as tab, index}
-      <div on:click={() => handleTabClick(tab, index)}>
-        <StoreTab bind:ref={tabsRef[tabsRef.length]} tooltip={tabsInfo[tab].title}>
-          <img src="/static/achitectect-module-store/{tabsInfo[tab].iconURI}" alt=""/></StoreTab></div>
-    {/each}
-  </div>
-  <div class="storeBody" bind:clientWidth>
-    <div class="search">
-      <span class="searchBar">L<input class="searchBox" type="text" bind:value={search}><div on:click={() => search = ""}>X</div></span>
+  <div class="h-full w-11 mr-3"> <!-- Sidebar (TOOLS and Lock) -->
+    <div class="mb-3 h-10 bg-norbalt-200 cursor-pointer border-2 border-transparent hover:bg-norbalt-100 flex items-center justify-center rounded-md shadow-contrast transition-all {lockedLockIconColor}" on:click={handleLock}>
+      <LockIcon locked="{locked}" style="fill-inherit h-5 w-5"/>
     </div>
-    <div class="selectedStore">
+    <div>
+      {#each Object.keys(tabsInfo) as tab, index}
+        <div on:click={() => handleTabClick(tab, index)}>
+          <StoreTab bind:ref={tabsRef[tabsRef.length]} tooltip={tabsInfo[tab].title}>
+            <img src="/achitectect-module-store/{tabsInfo[tab].iconURI}" alt=""/>
+          </StoreTab>
+        </div>
+      {/each}
+    </div>
+  </div>
+  <div>
+    <div>
+      <span><input type="text" bind:value={search}><div on:click={() => search = ""}>X</div></span>
+    </div>
+    <div>
       {#if selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}
       {#if selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
       {#if selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
@@ -108,114 +105,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  #store {
-    z-index: 2;
-    position: absolute;
-    display: grid;
-    grid-template-columns: min-content auto;
-    grid-template-rows: min-content 100%;
-    transition: right 250ms ease-in-out;
-    top: 10px;
-    width: 20%;
-    height: calc(100% - 40px);
-    border-radius: 7px;
-  }
-
-
-  .storeName {
-    display: grid;
-    grid-template-columns: min-content auto;;
-    grid-row: 1;
-    grid-column-start: 1;
-    grid-column-end: 3;
-    border-radius: 7px 7px 0 0;
-    background-color: #7035fb;
-    font-size: 110%;
-    top: 0;
-    color: white;
-  }
-
-  .lockIcon {
-    width: 20px;
-    height: 20px;
-    border-radius: 6px 0 0 0;
-    grid-column: 1;
-    justify-self: left;
-    user-select: none;
-  }
-
-  .title {
-    grid-column: 2;
-    width: 20px;
-    height: 20px;
-    width: 100%;
-    margin-bottom: 2px;
-    text-align: center;
-  }
-
-  .tabs {
-    grid-row: 2;
-    grid-column: 1;
-    align-items: center;
-    height: min-content;
-    border-radius: 0 0 0 7px;
-    background-color: #10101a;
-  }
-
-  .storeBody {
-    grid-row: 2;
-    grid-column: 2;
-    display: grid;
-    grid-template-rows: min-content auto;
-    grid-template-columns: 1fr;
-    height: 100%;
-    background-color: #202031;
-    border-radius: 0 0 7px 7px;
-    padding-right: 3px;
-  }
-
-  .search {
-    grid-column: 1;
-    grid-row: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 3px;
-    border-radius: 5px;
-    background-color: #191928;
-  }
-
-  .searchBar {
-    user-select: none;
-    background-color: #13131f;
-    display: flex;
-    text-align: center;
-    width: 70%;
-    justify-content: center;
-    border-radius: 5px;
-    margin:  3px;
-  }
-
-  .searchBox {
-    width: 70%;
-    border: none;
-    color: white;
-    margin-left: 5px;
-    outline: none;
-    background-color: inherit;
-  }
-
-  
-
-  .selectedStore {
-    border-radius: 7px;
-    grid-column: 1;
-    grid-row: 2;
-    height: 100%;
-    width: calc(100% - 3px);
-    overflow-y: hidden;
-    margin-left: 3px;
-  }
-</style>
