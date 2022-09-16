@@ -35,11 +35,6 @@
     variables: { iconURI: "variables_v1.png", title: "Variables" },
   };
 
-  const tabsRef : Array<HTMLDivElement> = [];
-  onMount(() => {
-    tabsRef[0].style.backgroundColor = "#7035fb";
-  });
-
   function handleMouseOver () : void {
     if(activity !== undefined) clearTimeout(activity);
     hidden = false;
@@ -51,10 +46,8 @@
     }
   }
 
-  function handleTabClick (tab : string, index : number) : void {
+  function handleTabClick (tab : string) : void {
     selectedStore = tab as PossibleStores;
-    tabsRef.forEach(tab => { tab.style.backgroundColor = ""; });
-    tabsRef[index].style.backgroundColor = "#7035fb";
   }
 
   function handleLock () : void { locked = !locked; }
@@ -76,16 +69,14 @@
   on:mouseleave={handleMouseOut}
   on:focus={() => {}}
 >
-  <div class="h-full w-11 mr-3"> <!-- Sidebar (TOOLS and Lock) -->
+  <div class="h-full w-11 mr-3 flex flex-col"> <!-- Sidebar (TOOLS and Lock) -->
     <div class="mb-3 h-10 bg-norbalt-200 cursor-pointer border-2 border-transparent hover:bg-norbalt-100 flex items-center justify-center rounded-md shadow-contrast transition-all {lockedLockIconColor}" on:click={handleLock}>
       <LockIcon locked="{locked}" style="fill-inherit h-5 w-5"/>
     </div>
-    <div>
+    <div class="mb-3 bg-norbalt-200 cursor-pointer flex flex-col items-center justify-center rounded-md shadow-contrast transition-all">
       {#each Object.keys(tabsInfo) as tab, index}
-        <div on:click={() => handleTabClick(tab, index)}>
-          <StoreTab bind:ref={tabsRef[tabsRef.length]} tooltip={tabsInfo[tab].title}>
-            <img src="/achitectect-module-store/{tabsInfo[tab].iconURI}" alt=""/>
-          </StoreTab>
+        <div class="w-11 hover:bg-norbalt-100 bg-transparent first:rounded-t-md last:rounded-b-md h-10 stroke-offWhite fill-offWhite hover:stroke-white hover:fill-white transition-all" on:click={() => handleTabClick(tab, index)}>
+          <StoreTab tab={tab} />
         </div>
       {/each}
     </div>

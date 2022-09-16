@@ -1,29 +1,48 @@
 <script lang="ts">
+  import ArchitectSchemasModulesIcon from "../../../icons/architect/architect-schemas-modules-icon.svelte";
+  import ArchitectExternalModulesIcon from "../../../icons/architect/architect-external-modules-icon.svelte";
+  import ArchitectInternalModulesIcon from "../../../icons/architect/architect-internal-modules-icon.svelte";
   import Tooltip from "../../common/tooltip.svelte";
+  import ArchitectProtocolModulesIcon from "../../../icons/architect/architect-protocol-modules-icon.svelte";
+  import ArchitectBopModulesIcon from "../../../icons/architect/architect-bop-modules-icon.svelte";
+  import ArchitectConstantsIcon from "../../../icons/architect/architect-constants-icon.svelte";
+  import ArchitectVariablesIcon from "../../../icons/architect/architect-variables-icon.svelte";
 
   type PossibleStores = "internal" | "external" | "schema" | "bops" | "protocols" | "constants" | "variables";
-  type TabInfo = { iconURI : string; title : string; }
+  type TabInfo = { title : string; }
   type TabsInfo = Record<PossibleStores, TabInfo>;
 
   const tabsInfo : TabsInfo = {
-    internal: { iconURI: "internal_modules_v1.png", title: "Internal Modules" },
-    external: { iconURI: "external_modules_v1.png", title: "External Modules" },
-    schema: { iconURI: "schemaFunctions_v1.png", title: "Schema Modules" },
-    protocols: { iconURI: "Protocols_v1.png", title: "Protocols Modules" },
-    bops: { iconURI: "businessOperations_v1.png", title: "BOps Modules" },
-    constants: { iconURI: "constants_v1.png", title: "Constants" },
-    variables: { iconURI: "variables_v1.png", title: "Variables" },
+    internal: { title: "Internal Modules" },
+    external: { title: "External Modules" },
+    schema: { title: "Schema Modules" },
+    protocols: { title: "Protocols Modules" },
+    bops: { title: "BOps Modules" },
+    constants: { title: "Constants" },
+    variables: { title: "Variables" },
   };
 
-
-  export let ref : HTMLDivElement;
-  export let tooltip : string;
-  let clientWidth : number;
+  let hovered = false;
+  export let tab : PossibleStores;
 </script>
 
-<div bind:this={ref} class="tab" bind:clientWidth style="height: {clientWidth}px;">
-  <div class="icon" >
-    <slot></slot>
-  </div>
-  <Tooltip  tooltipContent={tooltip}/>
+<div class="w-full h-full flex items-center justify-center stroke-inherit fill-inherit relative"
+  on:mouseenter="{() => { hovered = true; }}" on:mouseleave="{() => { hovered = false; }}"
+>
+  {#if tab === "internal"}
+    <ArchitectInternalModulesIcon style="h-4 w-4 stroke-inherit fill-inherit transition-all" />
+  {:else if tab === "external"}
+    <ArchitectExternalModulesIcon style="h-5 w-5 stroke-inherit fill-inherit transition-all" />
+  {:else if tab === "schema"}
+    <ArchitectSchemasModulesIcon style="h-5 w-5 stroke-inherit fill-inherit transition-all" />
+  {:else if tab === "protocols"}
+    <ArchitectProtocolModulesIcon style="h-5 w-5 stroke-inherit fill-inherit transition-all" />
+  {:else if tab === "bops"}
+    <ArchitectBopModulesIcon style="h-5 w-5 stroke-inherit fill-inherit transition-all" />
+  {:else if tab === "constants"}
+    <ArchitectConstantsIcon style="h-6 w-6 stroke-inherit fill-inherit transition-all" />
+  {:else if tab === "variables"}
+    <ArchitectVariablesIcon style="h-5 w-5 stroke-inherit fill-inherit transition-all" />
+  {/if}
+  <Tooltip tooltipContent={tabsInfo[tab].title} position="left" visible={hovered}/>
 </div>

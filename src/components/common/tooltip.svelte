@@ -39,7 +39,7 @@
 
   const getPosition = (...comp) => {
     switch (position) {
-      case "left": return "transform: translateX(-16px) translateY(-50%);";
+      case "left": return "transform: translateX(calc(-100% - 16px)) translateY(-50%);";
       case "right": return "transform: translateX(14px) translateY(-50%);";
       case "top": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)) translateY(calc(-100% - 18px))`;
       case "bottom": return `transform: translateX(calc(-50% - ${getMarginXDisplacement()}px)) translateY(18px);`;
@@ -75,13 +75,14 @@
   }
 
   let hiddenClass = "";
+  $: leftDirection = position === "left" ? "" : "" ;
   $: hiddenClass = showing ? "" : "opacity-0";
 
 </script>
 
 
 {#if showing}
-  <div class="absolute opacity-100 transition-all delay-200 {hiddenClass}" transition:fade={{ duration: 80 }} style="{anchorPos}">
+  <div class="absolute opacity-100 transition-all duration-200 delay-200 {hiddenClass}" transition:fade={{ duration: 160 }} style="{anchorPos}">
     <div class="fixed z-20 px-3 py-1 rounded-lg bg-norbalt-100 w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
       <div class="bg-norbalt-100 origin-center w-4 h-4 rounded-sm absolute" style="{arrowPos}"/>
       {tooltipContent}

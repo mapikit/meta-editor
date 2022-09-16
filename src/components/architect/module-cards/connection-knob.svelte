@@ -2,14 +2,14 @@
   import type { TypeDefinition } from "@meta-system/object-definition";
   import { SectionsMap, sectionsMap } from "../helpers/sections-map";
   import { EditorLevel, EditorLevels } from "../../object-definition/obj-def-editor-types-and-helpers";
-  import { typeColors } from "../../../common/styles/type-colors"
+  import { typeColors } from "../../../common/styles/type-colors";
   import { selectedNob } from "../../../stores/connection-stores";
   import { solveConnection } from "../helpers/solve-connection";
   import type { Unsubscriber, Writable } from "svelte/store";
   import type { ModuleCard } from "../../../common/types/module-card";
   import ObjectDefinitionMiniApp from "../../object-definition/object-definition-mini-app.svelte";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-  import { onDestroy, onMount,  } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import ConstantTag from "../tags/constant-tag.svelte";
   import { updateTraces } from "../update-traces";
 
@@ -24,7 +24,7 @@
   const isModuleRoot = nobType === "module" && !fullPathName;
   const colorType = isModuleRoot ? "function" : info.type;
 
-  const prePath = 
+  const prePath =
     nobType === "output" ? "result" :
     nobType === "module" ? "module" : undefined;
 
