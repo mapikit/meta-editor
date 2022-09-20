@@ -23,8 +23,10 @@
     if(visibilityDelay !== undefined) clearTimeout(visibilityDelay);
     switch (visible) {
       case true:
-        showing = true;
-        return;
+        visibilityDelay = setTimeout(() => {
+          showing = true;
+        }, 650);
+        break;
       case false:
         visibilityDelay = setTimeout(() => {
           showing = false;
@@ -82,7 +84,7 @@
 
 
 {#if showing}
-  <div class="absolute opacity-100 transition-all duration-200 delay-200 {hiddenClass}" transition:fade={{ duration: 160 }} style="{anchorPos}">
+  <div class="absolute opacity-100 transition-all duration-200 delay-200 {hiddenClass}" transition:fade={{ duration: 120 }} style="{anchorPos}">
     <div class="fixed z-20 px-3 py-1 rounded-lg bg-norbalt-100 w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
       <div class="bg-norbalt-100 origin-center w-4 h-4 rounded-sm absolute" style="{arrowPos}"/>
       {tooltipContent}

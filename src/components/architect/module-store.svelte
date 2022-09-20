@@ -12,6 +12,7 @@
   import type { UIBusinessOperation } from "../../entities/business-operation";
   import { protocols } from "../../stores/configuration-store";
   import LockIcon from "../../icons/lock-icon.svelte";
+  import { capitalize } from "../../common/helpers/capitalize";
   
   export let hidden = true;
   export let currentBop : UIBusinessOperation;
@@ -64,16 +65,16 @@
 </script>
 
 <div
-  class="absolute right-0 z-10 top-16 w-96 h-[calc(100%_-_32px_-_4rem)] flex flex-row"
+  class="absolute right-0 z-10 top-4 w-96 h-[calc(100%_-_32px)] flex flex-row"
   on:mouseover={handleMouseOver}
   on:mouseleave={handleMouseOut}
   on:focus={() => {}}
 >
   <div class="h-full w-11 mr-3 flex flex-col"> <!-- Sidebar (TOOLS and Lock) -->
-    <div class="mb-3 h-10 bg-norbalt-200 cursor-pointer border-2 border-transparent hover:bg-norbalt-100 flex items-center justify-center rounded-md shadow-contrast transition-all {lockedLockIconColor}" on:click={handleLock}>
+    <div class="mb-3 h-10 bg-norbalt-200 cursor-pointer border-2 border-transparent hover:bg-norbalt-100 flex items-center justify-center rounded-md shadow transition-all {lockedLockIconColor}" on:click={handleLock}>
       <LockIcon locked="{locked}" style="fill-inherit h-5 w-5"/>
     </div>
-    <div class="mb-3 bg-norbalt-200 cursor-pointer flex flex-col items-center justify-center rounded-md shadow-contrast transition-all">
+    <div class="mb-3 bg-norbalt-200 cursor-pointer flex flex-col items-center justify-center rounded-md shadow transition-all">
       {#each Object.keys(tabsInfo) as tab, index}
         <div class="w-11 hover:bg-norbalt-100 bg-transparent first:rounded-t-md last:rounded-b-md h-10 stroke-offWhite fill-offWhite hover:stroke-white hover:fill-white transition-all" on:click={() => handleTabClick(tab, index)}>
           <StoreTab tab={tab} />
@@ -81,11 +82,9 @@
       {/each}
     </div>
   </div>
-  <div>
-    <div>
-      <span><input type="text" bind:value={search}><div on:click={() => search = ""}>X</div></span>
-    </div>
-    <div>
+  <div class="w-80 rounded bg-norbalt-200 shadow">
+    <div class="rounded-t bg-norbalt-100 text-lg font-bold pl-4 py-1"> {capitalize(selectedStore)} </div>
+    <div class="px-4 pt-2">
       {#if selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}
       {#if selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
       {#if selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
