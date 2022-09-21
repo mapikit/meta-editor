@@ -8,7 +8,6 @@
   import { Coordinate } from "../../../../common/types/geometry";
   import type { Writable } from "svelte/store";
   import type { ModuleCard } from "../../../../common/types/module-card";
-  import { FunctionsInfo } from "../../helpers/functions-info";
   import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
 
 
@@ -87,7 +86,7 @@
 </script>
 
 
-<div class="items" bind:this={ref} on:mousedown={startMovement}>
+<div class="w-full mt-4 first:mt-0 shadow" bind:this={ref} on:mousedown={startMovement}>
   <ModuleCardSkeleton definition={module}>
     <div slot="content" class="IO">
       <div class="inputs">

@@ -1,47 +1,40 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
+	import { each } from "svelte/internal";
   import InfoIcon from "../../../../static/info-icon.svelte";
   import Tooltip from "../../../components/common/tooltip.svelte";
   export let definition : FunctionDefinition;
   export let tooltipPosition :  "top" | "bottom" | "left" | "right" = "left";
   export let parentSchema = undefined;
 
-
-
-
   let tooltipVisible = false;
 
   //SAVE: tooltipContent={definition["description"]}
 </script>
 
-
-
-<div class="module">
-<div class="header">
-  <slot name="functionalDep"/><span class="modName" >{definition.functionName}</span> {#if parentSchema} <span class="schemaName">@{parentSchema}</span> {/if}
-  <div class="tooltipIcon"
-    on:focus={undefined}
-    on:mouseenter={() => { tooltipVisible = true; } }
-    on:mouseleave={() => { tooltipVisible = false; } }
-  ><InfoIcon width="20px"/>
-  <Tooltip visible={tooltipVisible} tooltipContent={definition["description"]} position={tooltipPosition}/>
-</div>
-  <slot name="moduleNob" ></slot>
-</div>
-<slot name="content"></slot>
+<div class="select-none min-w-[120px] cursor-default bg-norbalt-350 rounded">
+  <div class="h-8 bg-norbalt-300 rounded-t flex flex-row items-center justify-between">
+    <slot name="functionalDep"/>
+    <div class="flex flex-row h-4 ml-1">
+      {#each [0,1,2] as num}
+        <div class="h-full w-[2px] rounded bg-norbalt-100 ml-1.5"/>
+      {/each}
+    </div>
+    <span class="text-offWhite" >{definition.functionName}</span> {#if parentSchema} <span class="schemaName">@{parentSchema}</span> {/if}
+    <div class="tooltipIcon"
+      on:focus={undefined}
+      on:mouseenter={() => { tooltipVisible = true; } }
+      on:mouseleave={() => { tooltipVisible = false; } }
+    >
+    
+    <Tooltip visible={tooltipVisible} tooltipContent={definition["description"]} position={tooltipPosition}/>
+  </div>
+    <slot name="moduleNob" ></slot>
+  </div>
+  <slot name="content"></slot>
 </div>
 
 <style lang="scss">
-  .module {
-    min-width: 120px;
-    user-select: none;
-    cursor: default;
-    background-color: #34344b;
-    border-radius: 5px;
-    padding: 0 0 7px 0;
-    margin-top: 5px;
-  }
-
   .schemaName {
     color: rgb(148, 148, 148);
   }
