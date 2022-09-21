@@ -12,7 +12,7 @@
   //SAVE: tooltipContent={definition["description"]}
 </script>
 
-<div class="select-none min-w-[120px] cursor-default bg-norbalt-350 rounded">
+<div class="select-none min-w-[120px] bg-norbalt-350 rounded cursor-grab">
   <div class="h-8 bg-norbalt-300 rounded-t flex flex-row items-center justify-between">
     <slot name="functionalDep"/>
     <div class="flex flex-row h-4 ml-1">
@@ -26,7 +26,7 @@
       on:mouseenter={() => { tooltipVisible = true; } }
       on:mouseleave={() => { tooltipVisible = false; } }
     >
-    
+
     <Tooltip visible={tooltipVisible} tooltipContent={definition["description"]} position={tooltipPosition}/>
   </div>
     <slot name="moduleNob" ></slot>
