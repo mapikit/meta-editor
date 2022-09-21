@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import type { ModuleType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import type { Writable } from "svelte/store";
-import type { ModuleCard } from "../../../common/types/module-card";
+  import type { Writable } from "svelte/store";
+  import type { ModuleCard } from "../../../common/types/module-card";
   import DropdownIcon from "./dropdown-icon.svelte";
   import StoreModule from "./module-components/store-module.svelte";
   import type { StoreModuleInfo } from "../../../common/types/store-module-info";
+import ChevronIcon from "../../../icons/chevron-icon.svelte";
 
   export let sectionModulesType : ModuleType;
   export let summary : string;
@@ -30,67 +31,29 @@ import type { ModuleCard } from "../../../common/types/module-card";
   //     searchDelay = undefined;
   //   }, 300);
   // }
+
+  $: openChevronRotation = open ? "" : "-rotate-90"
 </script>
 
 
-<details class="section" bind:open>
-  <summary><span class="icon"><DropdownIcon/></span>{summary + ` (${searchedModules.length})`}</summary>
-    {#if open}
-      {#each searchedModules as module}
-        <div class="module"><StoreModule bind:bopModules bind:storeLocked module={module} moduleType={sectionModulesType}/></div>
-      {/each}
-    {/if}
-</details>
+<div class="w-full flex flex-col mt-1 first:mt-0">
+  <div class="w-full flex flex-row items-center cursor-pointer stroke-offWhite hover:stroke-white transition-all text-offWhite hover:text-white"
+    on:click="{() => open = !open }"
+  >
+    <ChevronIcon style="stroke-inherit mr-2 w-2 transition-transform {openChevronRotation}"/>
+    <span class="mr-2"> {summary} </span>
+    <div class="flex-1 h-[1px] bg-norbalt-100"/>
+  </div>
 
-<style lang="scss">
-  summary {
-    position: relative;
-    cursor: default;
-    user-select: none;
-    background-color: #191928;
-    padding: 6px 0 6px 0;
-    margin: 3px 0 3px 0;
-    border-radius: 5px;
-    list-style: none;
-    transition: all 1s;
-    width: 100%;
-    text-align: center;
-  }
-
-  .icon {
-    width: 18px;
-    height: 18px;
-    align-self: center;
-    left: 5px;
-    position: absolute;
-    transform-origin: center;
-    transition: all 200ms ease-in-out;
-    stroke: white;
-  }
-
-  .section {
-    border-radius: 7px;
-    display: flex;
-    width: 100%;
-    overflow: hidden;
-  
-    &[open] {
-      margin-bottom: 10px;
-    }
-
-    &[open] > summary > .icon {
-      transform: rotate(90deg);
-    }
-
-    &[open] > summary ~ * {
-      animation: grow 450ms;
-    }
-  }
-
-  @keyframes grow {
-    0% { width: 0%; opacity: 0; }
-    20% { width: 20%; opacity: 0; }
-    100% { width: 100%; opacity: 1; }
-  }
-</style>
-
+  {#if open}
+    {#each searchedModules as module}
+      <StoreModule bind:bopModules bind:storeLocked module={module} moduleType={sectionModulesType} />
+    {/each}
+  {/if}
+  <!-- <summary><span class="icon"><DropdownIcon/></span>{summary + ` (${searchedModules.length})`}</summary> -->
+    <!-- {#if open} -->
+      <!-- {#each searchedModules as module} -->
+        <!-- <div class="module"><StoreModule bind:bopModules bind:storeLocked module={module} moduleType={sectionModulesType}/></div> -->
+      <!-- {/each} -->
+    <!-- {/if} -->
+</div>

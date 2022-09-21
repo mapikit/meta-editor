@@ -2,8 +2,7 @@
   import type { FunctionDefinition } from "@meta-system/meta-function-helper";
   import type { Writable } from "svelte/store";
   import type { ModuleCard } from "../../../../common/types/module-card";
-  import List from "../../../list/list.svelte";
-import { FunctionsInfo } from "../../helpers/functions-info";
+  import { FunctionsInfo } from "../../helpers/functions-info";
   import StoreSection from "../store-section.svelte";
   
   export let search : string = "";
@@ -90,8 +89,8 @@ import { FunctionsInfo } from "../../helpers/functions-info";
   const separatedModules = getSeparatedModules();
 </script>
 
-<div class="list">
-  <List contents={Object.keys(separatedModules)} let:item>
+<div class="h-full w-full overflow-y-auto">
+  {#each Object.keys(separatedModules) as item}
     <StoreSection
       sectionModulesType="internal"
       summary={item} 
@@ -100,13 +99,5 @@ import { FunctionsInfo } from "../../helpers/functions-info";
       bind:storeLocked
       bind:bopModules
     />
-  </List>
+  {/each}
 </div>
-
-
-<style lang="scss">
-  .list {
-    height: 100%;
-    width: 100%;
-  }
-</style>
