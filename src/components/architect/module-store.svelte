@@ -83,9 +83,9 @@
       {/each}
     </div>
   </div>
-  <div class="w-80 rounded bg-norbalt-200 shadow">
+  <div class="w-80 h-full rounded bg-norbalt-200 shadow overflow-hidden">
     <div class="rounded-t bg-norbalt-100 text-lg font-bold pl-4 py-1"> {capitalize(selectedStore)} </div>
-    <div class="px-4 pt-2">
+    <div class="px-4 pt-2 overflow-y-auto h-full pb-16">
       {#if selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}
       {#if selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
       {#if selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
