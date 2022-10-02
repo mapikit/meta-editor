@@ -32,7 +32,7 @@ import ChevronIcon from "../../../icons/chevron-icon.svelte";
   //   }, 300);
   // }
 
-  $: openChevronRotation = open ? "" : "-rotate-90"
+  $: openChevronRotation = open ? "" : "-rotate-90";
 </script>
 
 

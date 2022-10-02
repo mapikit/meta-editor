@@ -5,9 +5,9 @@
   import { FunctionsInfo } from "../../helpers/functions-info";
   import StoreSection from "../store-section.svelte";
   
-  export let search : string = "";
+  export let search = "";
   export let storeLocked = false;
-  export let bopModules : Writable<ModuleCard[]>
+  export let bopModules : Writable<ModuleCard[]>;
 
   interface ModuleSeparation {
     name : string;

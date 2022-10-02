@@ -69,6 +69,7 @@
   on:mouseover={handleMouseOver}
   on:mouseleave={handleMouseOut}
   on:focus={() => {}}
+  id="store"
 >
   <div class="h-full w-11 mr-3 flex flex-col"> <!-- Sidebar (TOOLS and Lock) -->
     <div class="mb-3 h-10 bg-norbalt-200 cursor-pointer border-2 border-transparent hover:bg-norbalt-100 flex items-center justify-center rounded-md shadow transition-all {lockedLockIconColor}" on:click={handleLock}>
