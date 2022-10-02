@@ -61,11 +61,13 @@
   $: lockedLockIconColor = locked ? "fill-ochreYellow hover:fill-ochreYellow-light border-ochreYellow"
     : "fill-offWhite hover:fill-white";
 
+  $: hiddenStoreStyles = hidden ? "translate-x-[calc(24rem_-_3.5rem)] delay-500" : "";
+
   let search = "";
 </script>
 
 <div
-  class="absolute right-0 z-10 top-4 w-96 h-[calc(100%_-_32px)] flex flex-row"
+  class="absolute right-0 z-10 top-4 w-96 h-[calc(100%_-_32px)] flex flex-row transition-all duration-500 {hiddenStoreStyles}"
   on:mouseover={handleMouseOver}
   on:mouseleave={handleMouseOut}
   on:focus={() => {}}
