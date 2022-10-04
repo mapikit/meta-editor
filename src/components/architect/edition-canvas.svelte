@@ -15,6 +15,8 @@
   import { History } from "../../common/helpers/generic-history";
   import ArchitectToolbar from "./architect-toolbar.svelte";
   import CurrentBopNametag from "./current-bop-nametag.svelte";
+	import { Tools, toolsController } from "./view-store";
+	import { ShortcutsController } from "../../common/helpers/shortcut-controller";
 
   export let currentBop : UIBusinessOperation;
 
@@ -25,6 +27,8 @@
   let context : CanvasRenderingContext2D;
   let cutting = false;
   let storeHidden = true;
+
+  const shortcuts = new ShortcutsController();
 
   if (currentBop) {
     configurationHistory = new History({
@@ -71,6 +75,8 @@
     // Timeout Only: traces have "springness" (modules don't)
     // No Timeout: traces don't update correctly (obvious with scaling)
     adjustCanvas();
+
+    shortcuts.setShortcut("c", () => { cutting = !cutting });
   });
 
   let panning = false;
@@ -113,12 +119,8 @@
     context.shadowBlur = 0;
     if(document.activeElement.tagName === "INPUT") return;
     switch (event.key) {
-      case "c":
-        cutting = !cutting;
-        event.preventDefault();
-        break;
       case "f":
-        $environment.update(env => {
+        environment.update(env => {
           env.functionalTraces = !env.functionalTraces; return env;
         });
         event.preventDefault();
@@ -139,7 +141,7 @@
         break;
       case "Escape":
         cutting = false;
-        $environment.update(env => {env.functionalTraces = false; return env;});
+        environment.update(env => {env.functionalTraces = false; return env;});
         break;
     };
     // bopStore.update(bop => bop);
@@ -204,13 +206,16 @@
     //   return env;
     // });
   }
+
+    let currentTool = toolsController.currentTool;
+    $: cursorStyle = $currentTool === Tools.cutTool ? "crosshair" : $currentTool === Tools.panTool ? "grab" : "default"
 </script>
 
 <div class="relative w-full h-full" id="architect">
   <canvas class="absolute top-0 left-0 w-full h-full" bind:this={canvas}/>
     <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
     <div 
-      class="modulesArea" 
+      class="modulesArea {cursorStyle}" 
       on:mousedown={startMovement} on:wheel={handleMouseWheel} style="cursor: {cutting ? "crosshair" : "default"};">
         {#each modulesInConfig as config (config.key)}
           {#if config.moduleType !== "output"}
@@ -227,7 +232,7 @@
 <svelte:window 
   on:mousemove={handleMouseMove} 
   on:mouseup={() => panning = false}
-  on:keydown={detectShortcut}
+  on:keydown={shortcuts.getShortcutEventHandler}
   on:resize={adjustCanvas}
   />
 

@@ -10,7 +10,6 @@
   import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
   import Tooltip from "../../../../components/common/tooltip.svelte";
 
-
   export let module : StoreModuleInfo;
   export let moduleType : ModuleType;
   export let storeLocked = false;
