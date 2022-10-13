@@ -24,7 +24,7 @@ export const saveConfigurations = () : void => {
 export const loadConfigurationsFromStore = () : void => {
   if (localStorageService.isInStorage("configurations")) {
     const configurationsData = localStorageService.fetchKey("configurations") as object[];
-    const rawConfigs = [];
+    const rawConfigs : Configuration[] = [];
 
     configurationsData.forEach((value) => {
       const businessOperations = (value["businessOperations"] as any[]).map((bop) => new UIBusinessOperation(bop));
@@ -35,12 +35,7 @@ export const loadConfigurationsFromStore = () : void => {
       rawConfigs.push(new Configuration({ ...value, businessOperations, envs, protocols, schemas } as any));
     });
 
-    availableConfigurations.update((configs) => {
-      configs.push(...rawConfigs);
-      return configs;
-    });
-
-    console.log("Loaded !!!! << ");
+    availableConfigurations.set(rawConfigs);
   };
 
   setCurrentConfigData(get(currentProject).getConfiguration());
@@ -56,7 +51,7 @@ const setCurrentConfigData = (configuration : Configuration) : void => {
   environmentVariables.set(configuration.envs);
 };
 
-const startConfigurationStoreSync = () : void => {
+export const startConfigurationStoreSync = () : void => {
   currentProject.subscribe((project) => {
     const currentConfig = project.getConfiguration();
     setCurrentConfigData(currentConfig);
@@ -71,9 +66,11 @@ export const protocols : Writable<Protocol[]> = writable([]);
 export const environmentVariables : Writable<EnvironmentVariable[]> = writable([]);
 
 export const getSchemaById = (id : string) : Readable<Schema> => {
+  console.log("Getting schema", id);
+  console.log("Available:", get(schemas));
   return derived(schemas, () => {
     const result : Schema = get(schemas).find((value) => get(value.id) === id);
-
+    console.log("Result", result);
     return result;
   });
 };

@@ -4,8 +4,9 @@ import { nanoid } from "nanoid";
 import type { PropertyListEntry } from "src/common/types/property-list-entry";
 import { get, Readable, readable, Writable, writable } from "svelte/store";
 import { protocols, saveConfigurations } from "../stores/configuration-store";
+import type { Serialized } from "./serialized-type";
 
-type ProtocolParameters = {
+export type ProtocolParameters = {
   id : string;
   identifier : string;
   validatedProtocolId : string;
@@ -88,9 +89,7 @@ export class Protocol {
   }
 
   // eslint-disable-next-line max-lines-per-function
-  public static async createNewProtocol () : Promise<void> {
-    // TODO: Creates a new Protocol in the Db
-
+  public static async createNewProtocol () : Promise<Protocol> {
     const newProtocol = new Protocol({
       id: nanoid(),
       validatedProtocolId: "---",
@@ -104,11 +103,10 @@ export class Protocol {
       protocolType: ProtocolKind.dbProtocol,
     });
 
-    // newProtocol.protocolType.set(ProtocolKind.normal);
 
-    // adds it to the store
-    protocols.update((value) => { value.push(newProtocol); return value; });
-    saveConfigurations();
+    // protocols.update((value) => { value.push(newProtocol); return value; });
+    // saveConfigurations();
+    return newProtocol;
   }
 
   public getCardInfo () : PropertyListEntry {
@@ -130,7 +128,8 @@ export class Protocol {
     return result;
   }
 
-  public serialized () : object {
+  // eslint-disable-next-line max-lines-per-function
+  public serialized () : Serialized<Protocol, "definition"> {
     return ({
       id: get(this.id),
       identifier: get(this.identifier),
@@ -141,6 +140,8 @@ export class Protocol {
       isLocked: get(this.isLocked),
       description: get(this.description),
       configuration: get(this.configuration),
+      protocolType: get(this.protocolType),
+      protocolConfig: get(this.protocolConfig),
     });
   }
 

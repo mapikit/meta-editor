@@ -1,10 +1,11 @@
-import { availableProjects, saveProjects } from "../stores/projects-store";
+import { saveProjects } from "../stores/projects-store";
 import { get, readable, Readable, writable, Writable } from "svelte/store";
 import { Configuration } from "./configuration";
 import { availableConfigurations } from "../stores/configuration-store";
 import { nanoid } from "nanoid";
+import type { Serialized } from "./serialized-type";
 
-type ProjectContructorParameter = {
+type ProjectConstructorParameter = {
   id : string;
   name : string;
   description : string;
@@ -17,7 +18,7 @@ export class Project {
   public readonly description : Writable<string> = writable("");
   public readonly isStarred : Writable<boolean> = writable(false);
 
-  constructor ({ id, name, description, isStarred } : ProjectContructorParameter) {
+  constructor ({ id, name, description, isStarred } : ProjectConstructorParameter) {
     this.id = readable(id);
     this.name.set(name);
     this.description.set(description);
@@ -46,7 +47,7 @@ export class Project {
   }
 
   // eslint-disable-next-line max-lines-per-function
-  public static async addNewProject () : Promise<void> {
+  public static createNewProject () : Project {
     // We should add a new new system in the backEnd instantly here.
     // Then modify the store with the new values
 
@@ -57,23 +58,7 @@ export class Project {
       isStarred: false,
     });
 
-    availableProjects.update((current) => {
-      current.push(newProject);
-
-      return current;
-    });
-
-    availableConfigurations.update((current) => {
-      current.push(new Configuration({
-        id: "MOCK_ID",
-        projectId: get(newProject.id),
-        version: "0.0.1",
-        createdAt: new Date(Date.now()),
-        updatedAt: new Date(Date.now()),
-      }));
-
-      return current;
-    });
+    return newProject;
   }
 
   public getConfiguration () : Configuration {
@@ -82,7 +67,7 @@ export class Project {
     }) ?? Configuration.getNullable();
   }
 
-  public serialized () : object {
+  public serialized () : Serialized<Project> {
     return {
       id: get(this.id),
       name: get(this.name),

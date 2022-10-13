@@ -3,8 +3,9 @@ import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { get, readable, Readable, Writable, writable } from "svelte/store";
 import { saveConfigurations, schemas } from "../stores/configuration-store";
 import { nanoid } from "nanoid";
+import type { Serialized } from "./serialized-type";
 
-type SchemaParameters = {
+export type SchemaParameters = {
   id : string;
   format : ObjectDefinition;
   name : string;
@@ -61,9 +62,7 @@ export class Schema {
     };
   }
 
-  public static async createNewSchema () : Promise<void> {
-    // TODO: Creates a new schema in the Db
-
+  public static async createNewSchema () : Promise<Schema> {
     const newSchema = new Schema({
       id: nanoid(),
       format: {},
@@ -74,12 +73,10 @@ export class Schema {
       description: "New Schema Description",
     });
 
-    // adds it to the store
-    schemas.update((value) => { value.push(newSchema); return value; });
-    saveConfigurations();
+    return newSchema;
   }
 
-  public serialized () : object {
+  public serialized () : Serialized<Schema> {
     return ({
       format: get(this.format),
       description: get(this.description),

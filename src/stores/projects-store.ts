@@ -15,16 +15,13 @@ export const saveProjects = () : void => {
 export const loadProjectsFromStore = () : void => {
   if (localStorageService.isInStorage("projects")) {
     const projectsData = localStorageService.fetchKey("projects") as object[];
-    const rawProjects = [];
+    const rawProjects : Project[] = [];
 
     projectsData.forEach((value) => {
       rawProjects.push(new Project(value as any));
     });
 
-    availableProjects.update((projects) => {
-      projects.push(...rawProjects);
-      return projects;
-    });
+    availableProjects.set(rawProjects);
   };
 
   // availableProjects.subscribe(saveProjects);

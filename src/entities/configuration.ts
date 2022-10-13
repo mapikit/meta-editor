@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { get, readable, Readable, writable, Writable } from "svelte/store";
 import type { EnvironmentVariable } from "./environment-variable";
-import type { Protocol } from "./protocol";
-import type { Schema } from "./schema";
-import type { UIBusinessOperation } from "./business-operation";
+import { Protocol, ProtocolParameters } from "./protocol";
+import { Schema, SchemaParameters } from "./schema";
+import { BOpParameters, UIBusinessOperation } from "./business-operation";
 import { saveConfigurations } from "../stores/configuration-store";
+import type { Serialized } from "./serialized-type";
 
 type ConfigurationParameter = {
   projectId : string;
@@ -25,6 +26,9 @@ export type ConfigurationSummary = {
   bopsCount : number;
   protocolsCount : number;
 }
+
+type SerializedConfiguration =
+  { protocols : Array<Serialized<Protocol, "definition">> } & Serialized<Configuration, "protocols">;
 
 export class Configuration {
   public readonly projectId : Readable<string>;
@@ -60,9 +64,12 @@ export class Configuration {
     this.updatedAt = readable(updatedAt);
 
     this.envs = envs;
-    this.schemas = schemas;
-    this.businessOperations = businessOperations;
-    this.protocols = protocols;
+    this.schemas = schemas.map(schema => schema instanceof Schema ? schema :
+      new Schema(schema as SchemaParameters));
+    this.businessOperations = businessOperations.map(bop => bop instanceof UIBusinessOperation ? bop :
+      new UIBusinessOperation(bop as BOpParameters));
+    this.protocols = protocols.map(protocol => protocol instanceof Protocol ? protocol :
+      new Protocol(protocol as ProtocolParameters));
   }
 
   public static getNullable () : Configuration {
@@ -90,7 +97,7 @@ export class Configuration {
     };
   }
 
-  public serialized () : object {
+  public serialized () : SerializedConfiguration {
     return {
       projectId: get(this.projectId),
       id: get(this.id),
@@ -99,6 +106,8 @@ export class Configuration {
       envs: this.envs.map((x) => x.serialized()),
       protocols: this.protocols.map((x) => x.serialized()),
       schemas: this.schemas.map((x) => x.serialized()),
+      createdAt: get(this.createdAt),
+      updatedAt: get(this.updatedAt),
     };
   }
 

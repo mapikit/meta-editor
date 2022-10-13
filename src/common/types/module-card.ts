@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import { get, writable, Writable } from "svelte/store";
 import { Coordinate, CoordinateInfo, Dimensions } from "./geometry";
 import { FunctionsInfo } from "../../components/architect/helpers/functions-info";
+import type { Serialized } from "../../entities/serialized-type";
 
 export type UICompliantDependency = Dependency & {
   matchingType : boolean;
@@ -93,7 +94,7 @@ export class ModuleCard {
     }
   }
 
-  public serialize () : SerializedModuleCard {
+  public serialize () : Serialized<ModuleCard> {
     return ({
       id: this.id,
       position: get(this.position),
@@ -103,6 +104,7 @@ export class ModuleCard {
       storedDefinition: get(this.storedDefinition),
       moduleName: this.moduleName,
       moduleType: this.moduleType,
+      modulePackage: this.modulePackage,
       key: this.key,
     });
   }

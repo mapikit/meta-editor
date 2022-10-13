@@ -1,10 +1,15 @@
 /* eslint-disable max-classes-per-file */
 
-import { get, Writable } from "svelte/store";
+import { get, Unsubscriber, Writable } from "svelte/store";
+import { getDeepStoreObject } from "../components/architect/helpers/get-deep-store-obj";
+import type { UIBusinessOperation } from "../entities/business-operation";
 import { Configuration } from "../entities/configuration";
 import { Project } from "../entities/project";
-import { availableConfigurations } from "./configuration-store";
-import { LocalStorageManager } from "./local-storage";
+import type { Protocol } from "../entities/protocol";
+import type { Schema } from "../entities/schema";
+import { availableConfigurations, startConfigurationStoreSync } from "./configuration-store";
+import { HttpStorageManager } from "./http-storage";
+// import { LocalStorageManager } from "./local-storage";
 import { availableProjects } from "./projects-store";
 
 type Stores = {
@@ -13,42 +18,58 @@ type Stores = {
 }
 
 export interface StorageManagerType {
-  loadProjectsToStores : (userAuth : string) => Promise<void>;
-  loadVersionsToStores : (userAuth : string, projectId : string) => Promise<void>;
-  updateVersions : (userAuth : string, versions : Configuration[]) => Promise<void>;
-  updateProjects : (userAuth : string, projects : Project[]) => Promise<void>;
+  loginUser (email : string, password : string) : Promise<void>;
+  refreshUserAuth : () => Promise<void>;
+  loadProjectsToStores : () => Promise<void>;
+  loadVersionsToStores : (projectId : string) => Promise<void>;
+
+  updateProject : (projects : Project) => Promise<void>;
+  updateVersion : (version : Configuration) => Promise<void>;
+  updateSchema : (versionId : string, schema : Schema) => Promise<void>;
+  updateBop : (versionId : string, bop : UIBusinessOperation) => Promise<void>;
+  updateProtocol : (versionId : string, protocol : Protocol) => Promise<void>;
+
+  createProject : (project : Project) => Promise<void>;
+  createVersion : (projectId : string) => Promise<void>;
+  createSchema : (versionId : string) => Promise<void>;
+  createBop : (versionId : string) => Promise<void>;
+  createProtocol : (versionId : string) => Promise<void>;
+
+  deleteProject : (projectId : string) => Promise<void>;
+  deleteVersion : (versionId : string) => Promise<void>;
+  deleteSchema : (versionId : string, schemaId : string) => Promise<void>;
+  deleteBop : (versionId : string, bopId : string) => Promise<void>;
+  deleteProtocol : (versionId : string, protocolId : string) => Promise<void>;
 };
 
 class MapikitStorageManager<T extends StorageManagerType> {
-  private userToken : string;
-  constructor (private manager : T, private stores : Stores) {}
+  private unsubscribers : Unsubscriber[] = [];
+  constructor (public manager : T, private stores : Stores) {}
 
-  public set userAuth (newToken : string) { this.userToken = newToken; }
+  public async login (email : string, password : string) : Promise<void> {
+    await this.manager.loginUser(email, password);
+  }
+
+  public unsubscribeAll () : void { for(const unsubscribe of this.unsubscribers) unsubscribe(); }
 
   async loadAllInfo () : Promise<void> {
-    console.log("Starting info load...");
-    await this.manager.loadProjectsToStores(this.userToken);
+    await this.manager.refreshUserAuth();
+    await this.manager.loadProjectsToStores();
     await this.assessProjectsSuccess();
-    console.log("Loaded Projects:", get(this.stores.projectsStore));
+
+    this.stores.configurationsStore.set([]);
     for(const project of get(this.stores.projectsStore)) {
-      console.log("Loading versions from:", project);
-      await this.manager.loadVersionsToStores(this.userToken, get(project.id));
-      console.log("Done");
+      await this.manager.loadVersionsToStores(get(project.id));
     }
     await this.assessVersionsSuccess();
-    console.log("Loaded Versions:", get(this.stores.configurationsStore));
+
+    startConfigurationStoreSync();
+
+    console.log(getDeepStoreObject(this.stores.configurationsStore));
+    console.log(getDeepStoreObject(this.stores.projectsStore));
   }
 
-  public subscribeUpdates () : void {
-    this.stores.configurationsStore.subscribe(configurations => {
-      this.manager.updateVersions(this.userToken, configurations)
-        .catch(err => { throw err; });
-    });
-    this.stores.projectsStore.subscribe(projects => {
-      this.manager.updateProjects(this.userToken, projects)
-        .catch(err => { throw err; });
-    });
-  }
+  // eslint-disable-next-line max-lines-per-function
 
   private async assessProjectsSuccess () : Promise<void> {
     let tries = 20;
@@ -78,13 +99,15 @@ class MapikitStorageManager<T extends StorageManagerType> {
           const firstProject = value[0];
           if(firstProject instanceof instance) resolve(true);
         } catch (err) { resolve(false); }
+        resolve(false);
       }, 200);
     });
   }
 }
 
 
-const manager = new LocalStorageManager();
+const manager = new HttpStorageManager();
+
 const storageManager = new MapikitStorageManager(
   manager,
   {
@@ -93,4 +116,5 @@ const storageManager = new MapikitStorageManager(
   },
 );
 
+// eslint-disable-next-line max-len
 export { storageManager };

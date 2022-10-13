@@ -10,8 +10,9 @@ import { Coordinate } from "../common/types/geometry";
 import { businessOperations, saveConfigurations } from "../stores/configuration-store";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
+import type { Serialized } from "./serialized-type";
 
-type SerializedBop = {
+export type BOpParameters = {
   id : string,
   name : string,
   description : string,
@@ -41,7 +42,7 @@ export class UIBusinessOperation {
   // eslint-disable-next-line max-lines-per-function
   constructor ({
     id, name, description, input, output, configuration, constants, customObjects, variables, isLocked, isStarred,
-  } : SerializedBop) {
+  } : BOpParameters) {
     this.id = readable(id);
     this.name = writable(name);
     this.description = writable(description);
@@ -98,7 +99,7 @@ export class UIBusinessOperation {
   }
 
   // eslint-disable-next-line max-lines-per-function
-  public static async createNewBOp () : Promise<void> {
+  public static async createNewBOp () : Promise<UIBusinessOperation> {
     const newBop = new UIBusinessOperation({
       id: nanoid(),
       name: "New BOp",
@@ -113,9 +114,7 @@ export class UIBusinessOperation {
       isStarred: false,
     });
 
-    // adds it to the store
-    businessOperations.update((value) => { value.push(newBop); return value; });
-    saveConfigurations();
+    return newBop;
   }
 
   private validateInput (input : SerializedModuleCard | ObjectDefinition) : void {
@@ -211,7 +210,7 @@ export class UIBusinessOperation {
     });
   }
 
-  public serialized () : SerializedBop {
+  public serialized () : Serialized<UIBusinessOperation> {
     return ({
       configuration: get(this.configuration).map((module) => module.serialize()),
       input: this.input.serialize(),

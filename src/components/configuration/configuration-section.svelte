@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { businessOperations, protocols, schemas } from "../../stores/configuration-store";
+  import { businessOperations, getConfigurationById, protocols, schemas } from "../../stores/configuration-store";
   import ChevronIcon from "../../icons/chevron-icon.svelte";
   import SystemPropIcon from "../common/system-prop-icon.svelte";
   import { Schema } from "../../entities/schema";
@@ -10,6 +10,15 @@
   import LockIcon from "../../icons/lock-icon.svelte";
   import { navigation } from "../../lib/navigation";
   import { slide } from "svelte/transition";
+	import { storageManager } from "../../stores/storage-manager";
+	import { onMount } from "svelte";
+	import type { Configuration } from "../../entities/configuration";
+
+  let currentVersion : Configuration
+
+  onMount(() => {
+    currentVersion = getConfigurationById(navigation.currentPathParams["configurationId"]);
+  });
 
   type PropTypes = "Schemas" | "Business Operations" | "Protocols";
 
@@ -29,11 +38,11 @@
     : type === "Business Operations"
       ? (bop) : () => void => () => UIBusinessOperation.deleteBop(bop.id)
       : (protocol) : () => void => () => Protocol.deleteProtocol(protocol.id);
-  $: creationFunction = type === "Schemas"
-    ? Schema.createNewSchema
-    : type === "Business Operations"
-      ? UIBusinessOperation.createNewBOp
-      : Protocol.createNewProtocol;
+  $: creationFunction =
+    type === "Schemas" ? storageManager.manager.createSchema : 
+    type === "Business Operations" ? storageManager.manager.createBop : 
+    type === "Protocols" ? storageManager.manager.createProtocol :
+    () => window.alert("Not Yet Implemented");
 
   $: linkName = type === "Schemas"
     ? "/schemas"
@@ -50,6 +59,7 @@
   $: currentStyle = iconStyles[type];
 
   const navigateEdit = (item) : () => void => {
+    console.log(item);
     if (navigation.currentPath.includes(linkName)) {
       const pathParams = navigation.currentPathParams;
       // eslint-disable-next-line max-len
@@ -67,7 +77,7 @@
       <p class="ml-3 flex flex-row text-xl font-semibold"> <span class="mr-2 mt-0.5"> <SystemPropIcon type={type} iconStyle={currentStyle}/> </span> {type} </p>
     </div>
     <div class="ml-5 py-1 px-4 bg-norbalt-200 rounded text-offWhite cursor-pointer hover:bg-norbalt-100 hover:text-white transition-all"
-      on:click="{creationFunction}"
+      on:click="{() => creationFunction(get(currentVersion.id))}"
     > Create New </div> <!-- TODO: Add call to Back End here -->
     <div class="ml-6 flex-1 h-[calc(2px)] bg-norbalt-100"/>
   </div>
