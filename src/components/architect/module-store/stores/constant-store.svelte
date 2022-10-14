@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { ObjectDefinition, TypeDefinition } from "@meta-system/object-definition";
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
-  import type { BopsConfigurationEntry, BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import type { BopsConfigurationEntry, BopsConstant }
+    from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import ChevronIcon from "../../../../icons/chevron-icon.svelte";
   import type { Writable } from "svelte/store";
   import ArrayDefinitionEditor from "../../../object-definition/array-definition-editor.svelte";
   import EditingField from "../../../object-definition/editing-fields/editing-field.svelte";
@@ -10,12 +12,15 @@
   import TypeSelect from "../../../object-definition/type-select.svelte";
   import DropdownIcon from "../dropdown-icon.svelte";
   import StoreConstant from "../module-components/store-constant.svelte";
+  import { getContext, setContext } from "svelte";
 
-  export let bopModules : Writable<BopsConfigurationEntry[]>
-  export let bopConstants : Writable<BopsConstant[]>
+  export let bopModules : Writable<BopsConfigurationEntry[]>;
+  export let bopConstants : Writable<BopsConstant[]>;
 
-  let addingConst = false;
-  let newConstName : string = "";
+  let addingConst = true;
+  let storeModalOpen = getContext<Writable<boolean>>("storeModalOpen");
+  let storeModalContent = getContext<Writable<string>>("storeModalContent");
+  let newConstName = "";
   let selectedType : string = undefined;
   let selectedSubtype = undefined;
   let selectedValue : unknown = undefined;
@@ -27,8 +32,8 @@
     required: false,
     type: selectedType,
     subtype: selectedSubtype,
-    value: []
-  }
+    value: [],
+  };
 
 
   let MiniApp;
@@ -38,8 +43,9 @@
     addingConst = true;
   }
 
+  // eslint-disable-next-line max-lines-per-function
   function confirmNewConst () : void {
-    let newConst : Partial<TypeDefinition<{ name: string, value: unknown }>> = { name: newConstName };
+    let newConst : Partial<TypeDefinition<{ name : string, value : unknown }>> = { name: newConstName };
     switch (selectedType) {
       case "object":
         const definition = MiniApp.getDefinitionAndData();
@@ -58,16 +64,26 @@
         break;
     }
     bopConstants.update(constants => {
-      constants.push(newConst as BopsConstant)
+      constants.push(newConst as BopsConstant);
       return constants;
-    })
+    });
     addingConst = false;
   }
 
 </script>
 
 <div class="constantStore">
-  {#if addingConst}
+  <div class="w-full flex flex-col mt-1 first:mt-0">
+    <div class="w-full flex flex-row items-center">
+      <span class="mr-2"> Values </span>
+      <div class="flex-1 h-[1px] bg-norbalt-100"/>
+      <div class="ml-1.5 rounded bg-norbalt-350 text-xs text-offWhite px-2 py-1 cursor-pointer hover:text-white transition-all"
+        on:click={() => { storeModalOpen.set(true); storeModalContent.set("createConstant"); }}
+      > Create New </div>
+    </div>
+  </div>
+
+  <!-- {#if addingConst}
     <span class="typeSelect"><TypeSelect bind:currentType={selectedType} bind:currentSubtype={selectedSubtype}/></span>
     <input class="newConstName" bind:value={newConstName}  type="text" placeholder="New Constant Name" />
     {#if selectedType === "object"}
@@ -85,7 +101,7 @@
       {/each}
     </div>
     <div class="addButton" on:click={startAddingConst}><div class="addIcon"><DropdownIcon/></div></div>
-  {/if}
+  {/if} -->
 </div>
 
 <svelte:window on:keydown={(e) => { if(e.key === "Escape") addingConst = false; } } />

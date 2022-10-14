@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import InternalStore from "./module-store/stores/internal-store.svelte";
   import StoreTab from "./module-store/store-tab.svelte";
   import SchemaStore from "./module-store/stores/schema-store.svelte";
@@ -13,6 +12,9 @@
   import { protocols } from "../../stores/configuration-store";
   import LockIcon from "../../icons/lock-icon.svelte";
   import { capitalize } from "../../common/helpers/capitalize";
+  import { setContext } from "svelte";
+  import { writable } from "svelte/store";
+  import StoreModal from "./module-store/store-modal.svelte";
   
   export let hidden = true;
   export let currentBop : UIBusinessOperation;
@@ -64,6 +66,11 @@
   $: hiddenStoreStyles = hidden ? "translate-x-[calc(24rem_-_3.5rem)] delay-500" : "";
 
   let search = "";
+
+  let storeModalOpen = writable(false);
+  setContext("storeModalOpen", storeModalOpen);
+  let storeModalContent = writable("");
+  setContext("storeModalContent", storeModalContent);
 </script>
 
 <div
@@ -85,7 +92,7 @@
       {/each}
     </div>
   </div>
-  <div class="w-80 h-full rounded bg-norbalt-200 shadow overflow-hidden">
+  <div class="w-80 h-full rounded bg-norbalt-200 shadow overflow-hidden"> <!-- Body-->
     <div class="rounded-t bg-norbalt-100 text-lg font-bold pl-4 py-1"> {capitalize(selectedStore)} </div>
     <div class="px-4 pt-2 overflow-y-auto h-full pb-16">
       {#if selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}
@@ -97,4 +104,10 @@
       {#if selectedStore === "protocols"} <ProtocolsFunctionsStore bind:storeLocked={internalLock} bind:search modules={getProtocolModules($protocols)} /> {/if}
     </div>
   </div>
+  {#if $storeModalOpen}
+    <div class="bg-norbalt-350 rounded-md fixed w-80 bottom-4 right-2 h-72">
+      <StoreModal />
+    </div>
+  {/if}
+
 </div>

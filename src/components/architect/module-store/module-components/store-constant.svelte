@@ -18,7 +18,7 @@ let top = 0;
 let availableInputs : NodeListOf<HTMLSpanElement>;
 
 
-function startMovement (event : MouseEvent) {
+function startMovement (event : MouseEvent) : void {
   moving = event.button === 0;
   const achitectRef = document.getElementById("architect");
   newCard = achitectRef.appendChild(ref.cloneNode(true)) as HTMLDivElement;
@@ -35,10 +35,11 @@ function startMovement (event : MouseEvent) {
   ref.style.visibility = "hidden";
 }
 
-function stopMovement () {
+// eslint-disable-next-line max-lines-per-function
+function stopMovement () : void {
   moving = false;
   if(newCard !== undefined) {
-    availableInputs.forEach(nob => nob.style.boxShadow = "none");
+    availableInputs.forEach(nob => { nob.style.boxShadow = "none"; });
     const closestInRange : [number, HTMLSpanElement] = getClosest(availableInputs, newCard.getBoundingClientRect());
     ref.style.visibility = "visible";
 
@@ -51,14 +52,15 @@ function stopMovement () {
           origin: "constant",
           originPath: constant.name,
           targetPath,
-        }
-        const alreadyPresentIndex = cardToAdd.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
+        };
+        const alreadyPresentIndex = cardToAdd.dependencies
+          .findIndex(dependency => dependency.targetPath === targetPath);
         if(alreadyPresentIndex !== -1) {
           cardToAdd.dependencies.splice(alreadyPresentIndex, 1);
         }
         cardToAdd.dependencies.push(newConstDependency);
         return modules;
-      })
+      });
     }
     newCard?.remove();
     newCard = undefined;
@@ -68,7 +70,8 @@ function stopMovement () {
   left = top = 0;
 }
 
-function moveCard (event : MouseEvent) {
+// eslint-disable-next-line max-lines-per-function
+function moveCard (event : MouseEvent) : void {
   if(moving) {
     const scale = $environment.scale;
 
@@ -100,7 +103,7 @@ function moveCard (event : MouseEvent) {
   }
 }
 
-function getExtendedString (value : unknown) {
+function getExtendedString (value : unknown) : string {
   if(typeof value === "object") return beautify(value, null, 1);
   return value.toString();
 }
