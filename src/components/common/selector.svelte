@@ -18,6 +18,9 @@
   $: focusClass = focused ? "border-white" : "";
   $: hoveredClass = hovered ? "border-offWhite" : "";
   $: focusChevronClass = focused ? "" : "-rotate-180";
+
+  // TODO: Fazer com que o selector abra pra cima quando não há espaço vertical suficiente pra baixo pra mostrar pelo menos 2 opções
+  // -> Quando há espaço pra pelo menos 2 opções, fazer scroll
 </script>
 
 <div class="bg-norbalt-350 relative rounded py-1 flex flex-row flex-nowrap border border-norbalt-100 transition-all {hoveredClass} {focusClass} select-none {styleClass} cursor-pointer"

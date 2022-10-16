@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { typeColors } from "../../../../common/styles/type-colors";
+  import { typeColors } from "../../../../common/styles/type-colors";
 
-    export let type : string;
+  export let type : string;
 </script>
   
   <style lang="scss">

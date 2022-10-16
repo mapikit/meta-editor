@@ -4,7 +4,7 @@
 
   export let field : Writable<string>;
   export let label : string = undefined;
-  export let placeholder : string = "";
+  export let placeholder = "";
   export let multiline = false;
 
   let content;
