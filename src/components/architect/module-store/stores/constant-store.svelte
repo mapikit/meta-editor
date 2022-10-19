@@ -4,7 +4,7 @@
   import type { BopsConfigurationEntry, BopsConstant }
     from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import ChevronIcon from "../../../../icons/chevron-icon.svelte";
-  import type { Writable } from "svelte/store";
+  import { get, Writable } from "svelte/store";
   import ArrayDefinitionEditor from "../../../object-definition/array-definition-editor.svelte";
   import EditingField from "../../../object-definition/editing-fields/editing-field.svelte";
   import type { DefinitionData } from "../../../object-definition/obj-def-converter";
@@ -13,9 +13,13 @@
   import DropdownIcon from "../dropdown-icon.svelte";
   import StoreConstant from "../module-components/store-constant.svelte";
   import { getContext, setContext } from "svelte";
+  import type { UIBusinessOperation } from "../../../../entities/business-operation";
 
   export let bopModules : Writable<BopsConfigurationEntry[]>;
-  export let bopConstants : Writable<BopsConstant[]>;
+  
+  let bopConstants : Writable<BopsConstant[]>;
+  
+  bopConstants = getContext<UIBusinessOperation>("currentBop").constants;
 
   let addingConst = true;
   let storeModalOpen = getContext<Writable<boolean>>("storeModalOpen");
@@ -82,6 +86,10 @@
       > Create New </div>
     </div>
   </div>
+
+  {#each $bopConstants as constant}
+    <div class="listItem"><StoreConstant bopModules={bopModules} constant={constant}/></div>
+  {/each}
 
   <!-- {#if addingConst}
     <span class="typeSelect"><TypeSelect bind:currentType={selectedType} bind:currentSubtype={selectedSubtype}/></span>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, setContext } from "svelte";
   import { navigation } from "../../lib/navigation";
   import { getBopById } from "../../stores/configuration-store";
   import EditionCanvas from "./edition-canvas.svelte";
@@ -18,6 +18,8 @@
       currentBop = getBopById(currentBopId);
     });
   });
+
+  setContext("currentBop", currentBop);
 
 </script>
 

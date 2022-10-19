@@ -1,6 +1,6 @@
 <script lang="ts">
   import Module from "./module-cards/module-card.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, setContext } from "svelte";
   import { updateTraces } from "./update-traces";
   import ModuleStore from "./module-store.svelte";
   import Trash from "./trash.svelte";
@@ -15,10 +15,12 @@
   import { History } from "../../common/helpers/generic-history";
   import ArchitectToolbar from "./architect-toolbar.svelte";
   import CurrentBopNametag from "./current-bop-nametag.svelte";
-	import { Tools, toolsController } from "./view-store";
-	import { ShortcutsController } from "../../common/helpers/shortcut-controller";
+  import { Tools, toolsController } from "./view-store";
+  import { ShortcutsController } from "../../common/helpers/shortcut-controller";
 
   export let currentBop : UIBusinessOperation;
+
+  setContext("currentBop", currentBop);
 
   let configurationHistory;
   let modulesInConfig : ModuleCard[];
