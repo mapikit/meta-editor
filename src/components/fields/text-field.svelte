@@ -6,6 +6,7 @@
   export let label : string = undefined;
   export let placeholder = "";
   export let multiline = false;
+  export let onChange = () => {};
 
   let content;
 
@@ -29,6 +30,7 @@
   {/if}
   <input
     placeholder="{placeholder}"
+    on:input={onChange}
     bind:value={$field} class="outline-none rounded border border-norbalt-100 focus:border-offWhite transition-all bg-norbalt-350 w-full {fieldMtNoLabel} px-1"/>
 </div>
 {:else}

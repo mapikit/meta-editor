@@ -66,12 +66,16 @@ export const protocols : Writable<Protocol[]> = writable([]);
 export const environmentVariables : Writable<EnvironmentVariable[]> = writable([]);
 
 export const getSchemaById = (id : string) : Readable<Schema> => {
-  console.log("Getting schema", id);
-  console.log("Available:", get(schemas));
-  return derived(schemas, () => {
-    const result : Schema = get(schemas).find((value) => get(value.id) === id);
-    console.log("Result", result);
+  return derived(currentProject, (project) => {
+    const result : Schema = project.getConfiguration().schemas.find((value) => get(value.id) === id);
     return result;
+  });
+};
+
+// TEMPORARY, this will likely be moved later
+export const setSchema = (updatedSchema : Schema) : void => {
+  schemas.update(_schemas => {
+    return _schemas.map(schema => get(schema.id) === get(updatedSchema.id) ? updatedSchema : schema);
   });
 };
 
