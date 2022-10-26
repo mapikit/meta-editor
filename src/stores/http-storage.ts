@@ -5,14 +5,14 @@ import { Configuration } from "../entities/configuration";
 import { Project } from "../entities/project";
 import { Protocol } from "../entities/protocol";
 import { Schema } from "../entities/schema";
+import { localStorageService } from "../services/local-storage-service";
 import { availableConfigurations } from "./configuration-store";
 import { availableProjects } from "./projects-store";
 import type { StorageManagerType } from "./storage-manager";
 
 export class HttpStorageManager implements StorageManagerType {
   private userToken : string;
-  // eslint-disable-next-line max-len
-  private refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RFbWFpbEBnbWFpbC5jb20iLCJpYXQiOjE2NjQyMzAwMTUsImV4cCI6MTY2NjgyMjAxNX0.PjFwbAcwWgJCiStpqb6hJA3LkbDg4WrJ8sxVtD9QOvY";
+  private refreshToken = localStorageService.fetchKey("refreshToken");
 
   private readonly requester = axios.create({
     baseURL: "http://localhost:3530",
@@ -33,6 +33,8 @@ export class HttpStorageManager implements StorageManagerType {
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Invalid Login");
 
+    // This will be unnecessary after HTTP-JSON-Protocol adds support for cookies
+    localStorageService.save("refreshToken", res.data.refreshToken);
     this.refreshToken = res.data.refreshToken;
     this.userToken = res.data.token;
   }
@@ -44,6 +46,8 @@ export class HttpStorageManager implements StorageManagerType {
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Failed to refresh user auth");
 
+    // This will be unnecessary after HTTP-JSON-Protocol adds support for cookies
+    localStorageService.save("refreshToken", res.data.refreshToken);
     this.refreshToken = res.data.refreshToken;
     this.userToken = res.data.authorizationToken;
   };
