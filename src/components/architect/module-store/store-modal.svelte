@@ -1,9 +1,9 @@
 <script lang="ts">
+  import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
   import { getContext } from "svelte";
-  import type { Writable } from "svelte/store";
   import CreateConstantModal from "./modals/create-constant-modal.svelte";
 
-  const storeModalContent = getContext<Writable<string>>("storeModalContent");
+  const storeModalContent = getContext<ArchitectContext>("architectContext").storeModalContent;
 </script>
 
 <div class="h-full w-full px-2 py-1 pt-3">

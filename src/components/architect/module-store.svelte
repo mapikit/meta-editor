@@ -12,9 +12,9 @@
   import { protocols } from "../../stores/configuration-store";
   import LockIcon from "../../icons/lock-icon.svelte";
   import { capitalize } from "../../common/helpers/capitalize";
-  import { setContext } from "svelte";
-  import { writable } from "svelte/store";
+  import { getContext } from "svelte";
   import StoreModal from "./module-store/store-modal.svelte";
+  import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
   
   export let hidden = true;
   export let currentBop : UIBusinessOperation;
@@ -67,10 +67,9 @@
 
   let search = "";
 
-  let storeModalOpen = writable(false);
-  setContext("storeModalOpen", storeModalOpen);
-  let storeModalContent = writable("");
-  setContext("storeModalContent", storeModalContent);
+  let context = getContext<ArchitectContext>("architectContext");
+  let storeModalOpen = context.storeModalOpen;
+  let mouseOverStore = context.mouseOverStore;
 </script>
 
 <div
@@ -92,7 +91,10 @@
       {/each}
     </div>
   </div>
-  <div class="w-80 h-full rounded bg-norbalt-200 shadow overflow-hidden"> <!-- Body-->
+  <div class="w-80 h-full rounded bg-norbalt-200 shadow overflow-hidden"
+    on:mouseenter="{() => mouseOverStore.set(true)}"
+    on:mouseleave="{() => mouseOverStore.set(false)}"
+  > <!-- Body-->
     <div class="rounded-t bg-norbalt-100 text-lg font-bold pl-4 py-1"> {capitalize(selectedStore)} </div>
     <div class="px-4 pt-2 overflow-y-auto h-full pb-16">
       {#if selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}

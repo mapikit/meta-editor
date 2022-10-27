@@ -12,13 +12,15 @@
   import { getContext } from "svelte";
   import type { UIBusinessOperation } from "../../../../entities/business-operation";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
 
   export let initialValue = "";
   export let initialName = "";
   export let initialType = "string";
 
   let currentBop = getContext<UIBusinessOperation>("currentBop");
-  let storeModalOpen = getContext<Writable<boolean>>("storeModalOpen");
+  const context = getContext<ArchitectContext>("architectContext");
+  let storeModalOpen = context.storeModalOpen;
 
   const name = writable(initialName);
   const type = writable(initialType);

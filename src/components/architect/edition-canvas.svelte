@@ -17,10 +17,17 @@
   import CurrentBopNametag from "./current-bop-nametag.svelte";
   import { Tools, toolsController } from "./view-store";
   import { ShortcutsController } from "../../common/helpers/shortcut-controller";
+  import { ArchitectContext } from "../../entities/auxiliary-entities/architect-context";
 
   export let currentBop : UIBusinessOperation;
 
+  // Editing Context START
+  const editingContext = new ArchitectContext;
+
   setContext("currentBop", currentBop);
+  setContext("architectContext", editingContext);
+
+  // Editing Context END
 
   let configurationHistory;
   let modulesInConfig : ModuleCard[];
@@ -78,7 +85,7 @@
     // No Timeout: traces don't update correctly (obvious with scaling)
     adjustCanvas();
 
-    shortcuts.setShortcut("c", () => { cutting = !cutting });
+    shortcuts.setShortcut("c", () => { cutting = !cutting; });
   });
 
   let panning = false;
@@ -209,8 +216,8 @@
     // });
   }
 
-    let currentTool = toolsController.currentTool;
-    $: cursorStyle = $currentTool === Tools.cutTool ? "crosshair" : $currentTool === Tools.panTool ? "grab" : "default"
+  let currentTool = toolsController.currentTool;
+  $: cursorStyle = $currentTool === Tools.cutTool ? "crosshair" : $currentTool === Tools.panTool ? "grab" : "default";
 </script>
 
 <div class="relative w-full h-full" id="architect">

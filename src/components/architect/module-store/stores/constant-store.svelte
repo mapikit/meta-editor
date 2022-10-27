@@ -14,16 +14,18 @@
   import StoreConstant from "../module-components/store-constant.svelte";
   import { getContext, setContext } from "svelte";
   import type { UIBusinessOperation } from "../../../../entities/business-operation";
+  import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
 
   export let bopModules : Writable<BopsConfigurationEntry[]>;
   
   let bopConstants : Writable<BopsConstant[]>;
   
   bopConstants = getContext<UIBusinessOperation>("currentBop").constants;
+  const context = getContext<ArchitectContext>("architectContext");
 
   let addingConst = true;
-  let storeModalOpen = getContext<Writable<boolean>>("storeModalOpen");
-  let storeModalContent = getContext<Writable<string>>("storeModalContent");
+  let storeModalOpen = context.storeModalOpen;
+  let storeModalContent = context.storeModalContent;
   let newConstName = "";
   let selectedType : string = undefined;
   let selectedSubtype = undefined;
