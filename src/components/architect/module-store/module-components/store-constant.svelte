@@ -1,6 +1,8 @@
 <script lang="ts">
 import beautify from "json-beautify";
-import type { BopsConfigurationEntry, BopsConstant, Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { BopsConfigurationEntry, BopsConstant, Dependency }
+  from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import CrossIcon from "../../../../icons/cross-icon.svelte";
 import type { Writable } from "svelte/store";
 import { getClosest } from "../../../../common/helpers/get-closest";
 import { typeColors } from "../../../../common/styles/type-colors";
@@ -16,7 +18,6 @@ let ref : HTMLDivElement;
 let left = 0;
 let top = 0;
 let availableInputs : NodeListOf<HTMLSpanElement>;
-
 
 function startMovement (event : MouseEvent) : void {
   moving = event.button === 0;
@@ -70,6 +71,10 @@ function stopMovement () : void {
   left = top = 0;
 }
 
+const removeConst = () : void => {
+  // TODO
+}
+
 // eslint-disable-next-line max-lines-per-function
 function moveCard (event : MouseEvent) : void {
   if(moving) {
@@ -108,33 +113,30 @@ function getExtendedString (value : unknown) : string {
   return value.toString();
 }
 </script>
-<div class=total bind:this={ref} on:mousedown={startMovement}>
-<div class="constant">
-  <div class="name">{constant.name}: </div>
-  <abbr title={getExtendedString(constant.value)} class="text" style="color: {typeColors[constant.type]};">{constant.value}</abbr>
-  <div class="indicator" style="color: {typeColors[constant.type]};">  ●</div>
-</div>
+<div class="total mt-1 h-7 flex flex-row w-full transition-all" bind:this={ref} on:mousedown={startMovement}>
+  <div class="bg-norbalt-350 h-full max-w-full rounded-l-full select-none relative pr-6 pl-3 constant-nip">
+    <div class="name">{constant.name}: </div>
+    <abbr title={getExtendedString(constant.value)} class="text" style="color: {typeColors[constant.type]};">{constant.value}</abbr>
+    <div class="indicator" style="color: {typeColors[constant.type]};">  ●</div>
+  </div>
+  <div class="h-full flex justify-center items-center ml-2 pt-2 stroke-offWhite hover:stroke-roseRed cursor-pointer transition-all"
+    on:click={() => { removeConst(); }}
+  >
+    <CrossIcon style="stroke-inherit"/>
+  </div>
 </div>
 <svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
 
 <style lang="scss">
   .total {
-    transition: filter 50ms cubic-bezier(0.075, 1.045, 0.805, 0.980), transform 500ms ease-in-out;
-    display: block;
+    transition: filter 30ms cubic-bezier(0.075, 1.045, 0.805, 0.980), transform 500ms ease-in-out;
     width: 100%;
   }
 
-  .constant {
+  .constant-nip {
     margin-top: 3px;
-    position: relative;
-    user-select: none;
-    background-color: #191928;
-    border-radius: 20px 0 0 20px;
-    padding: 1px 19px 3px 10px;
-    max-width: 100%;
     text-align:  left;
     clip-path: polygon(0% 0%, calc(100% - 16px) 0%, 100% 50%, calc(100% - 16px) 100%, 0% 100%);
-    display: inline-block;
   }
 
   .indicator {

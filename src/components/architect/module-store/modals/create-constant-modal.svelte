@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { get, writable } from "svelte/store";
+  import { get, Writable, writable } from "svelte/store";
   import CheckIcon from "../../../../icons/check-icon.svelte";
   import CancelIcon from "../../../../icons/cancel-icon.svelte";
   import TextField from "../../../../components/fields/text-field.svelte";
@@ -18,9 +18,10 @@
   export let initialType = "string";
 
   let currentBop = getContext<UIBusinessOperation>("currentBop");
+  let storeModalOpen = getContext<Writable<boolean>>("storeModalOpen");
 
-  const name = writable("");
-  const type = writable("string");
+  const name = writable(initialName);
+  const type = writable(initialType);
   const typeOptions = [
     { label: "String", value: "string" },
     { label: "Number", value: "number" },
@@ -41,7 +42,7 @@
       return constants;
     });
 
-    closeObjectModal();
+    storeModalOpen.set(false);
   };
 </script>
 
@@ -51,9 +52,9 @@
     <div class="h-full w-7 flex justify-center items-center rounded transition-all border-transparent hover:border-brightGreen border stroke-offWhite hover:stroke-brightGreen cursor-pointer"
       on:click={() => { confirmNewConst(); }}
     > <CheckIcon style="stroke-inherit"/> </div>
-    <div class="ml-2 h-full w-7 flex justify-center items-center rounded border transition-all border-transparent hover:border-ochreYellow stroke-offWhite hover:stroke-ochreYellow cursor-pointer"> <CancelIcon style="stroke-inherit"
-      on:click={() => { closeObjectModal(); }}  
-    /> </div>
+    <div class="ml-2 h-full w-7 flex justify-center items-center rounded border transition-all border-transparent hover:border-ochreYellow stroke-offWhite hover:stroke-ochreYellow cursor-pointer"
+      on:click={() => { storeModalOpen.set(false); }}  
+    > <CancelIcon style="stroke-inherit"/> </div>
   </div>
 </div>
 <TextField field="{name}" label="Name" />
@@ -89,7 +90,7 @@
   </div>
 {/if}
 
-<Modal bind:closeModal={closeObjectModal} bind:openModal={openObjectModal}>
+<Modal bind:closeModal={closeObjectModal} bind:openModal={openObjectModal} >
   <div class="flex flex-col" on:click={(e) => { e.stopPropagation(); }}>
     <div class="flex flex-row justify-between">
       <p class="text-lg font-bold mb-3"> Set Constant "{$name}" value </p>
