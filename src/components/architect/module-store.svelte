@@ -21,8 +21,9 @@
   type PossibleStores = "internal" | "external" | "schema" | "bops" | "protocols" | "constants" | "variables";
   type TabInfo = { iconURI : string; title : string; }
   type TabsInfo = Record<PossibleStores, TabInfo>;
+  const context = getContext<ArchitectContext>("architectContext");
 
-  let selectedStore : PossibleStores = "internal";
+  let { selectedStore, storeModalOpen, mouseOverStore, storeVisible } = context;
 
   let locked = false;
   let internalLock = false;
@@ -38,45 +39,30 @@
     variables: { iconURI: "variables_v1.png", title: "Variables" },
   };
 
-  function handleMouseOver () : void {
-    if(activity !== undefined) clearTimeout(activity);
-    hidden = false;
-  }
+  const handleMouseEnter = () : void => {
+    storeVisible.set(true);
+  };
 
-  function handleMouseOut () : void {
-    if(!(locked || internalLock)) {
-      activity = setTimeout(() => { hidden = true, 2000; });
+  const handleMouseLeave = () : void => {
+    if (!locked) {
+      storeVisible.set(false);
     }
-  }
-
-  function handleTabClick (tab : string) : void {
-    selectedStore = tab as PossibleStores;
-  }
+  };
 
   function handleLock () : void { locked = !locked; }
 
-  function onInternalLockUpdate (_lock : boolean) : void {
-    if(!(internalLock || locked)) activity = setTimeout(() => hidden = true, 2000);
-  }
-
-  $: onInternalLockUpdate(internalLock);
   $: lockedLockIconColor = locked ? "fill-ochreYellow hover:fill-ochreYellow-light border-ochreYellow"
     : "fill-offWhite hover:fill-white";
 
-  $: hiddenStoreStyles = hidden ? "translate-x-[calc(24rem_-_3.5rem)] delay-500" : "";
+  $: hiddenStoreStyles = !$storeVisible ? "-right-[calc(24rem_-_3.5rem)] delay-[1500ms]" : "";
 
   let search = "";
-
-  let context = getContext<ArchitectContext>("architectContext");
-  let storeModalOpen = context.storeModalOpen;
-  let mouseOverStore = context.mouseOverStore;
 </script>
 
 <div
   class="absolute right-0 z-10 top-4 w-96 h-[calc(100%_-_32px)] flex flex-row transition-all duration-500 {hiddenStoreStyles}"
-  on:mouseover={handleMouseOver}
-  on:mouseleave={handleMouseOut}
-  on:focus={() => {}}
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}
   id="store"
 >
   <div class="h-full w-11 mr-3 flex flex-col"> <!-- Sidebar (TOOLS and Lock) -->
@@ -95,15 +81,15 @@
     on:mouseenter="{() => mouseOverStore.set(true)}"
     on:mouseleave="{() => mouseOverStore.set(false)}"
   > <!-- Body-->
-    <div class="rounded-t bg-norbalt-100 text-lg font-bold pl-4 py-1"> {capitalize(selectedStore)} </div>
+    <div class="rounded-t bg-norbalt-100 text-lg font-bold pl-4 py-1"> {capitalize($selectedStore)} </div>
     <div class="px-4 pt-2 overflow-y-auto h-full pb-16">
-      {#if selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}
-      {#if selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
-      {#if selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
-      {#if selectedStore === "schema"} <SchemaStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
-      {#if selectedStore === "constants"} <ConstantStore bopModules={currentBop.configuration} bopConstants={currentBop.constants} /> {/if}
-      {#if selectedStore === "variables"} <div></div> {/if}
-      {#if selectedStore === "protocols"} <ProtocolsFunctionsStore bind:storeLocked={internalLock} bind:search modules={getProtocolModules($protocols)} /> {/if}
+      {#if $selectedStore === "internal"} <InternalStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration}/> {/if}
+      {#if $selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
+      {#if $selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
+      {#if $selectedStore === "schema"} <SchemaStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
+      {#if $selectedStore === "constants"} <ConstantStore bopModules={currentBop.configuration} bopConstants={currentBop.constants} /> {/if}
+      {#if $selectedStore === "variables"} <div></div> {/if}
+      {#if $selectedStore === "protocols"} <ProtocolsFunctionsStore bind:storeLocked={internalLock} bind:search modules={getProtocolModules($protocols)} /> {/if}
     </div>
   </div>
   {#if $storeModalOpen}

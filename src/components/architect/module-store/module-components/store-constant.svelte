@@ -1,16 +1,20 @@
 <script lang="ts">
 import beautify from "json-beautify";
+	import clone from "just-clone";
 import type { BopsConfigurationEntry, BopsConstant, Dependency }
   from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import CrossIcon from "../../../../icons/cross-icon.svelte";
+import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
+import { getContext } from "svelte";
 import type { Writable } from "svelte/store";
 import { getClosest } from "../../../../common/helpers/get-closest";
 import { typeColors } from "../../../../common/styles/type-colors";
 import { environment } from "../../../../stores/environment";
 import { sectionsMap } from "../../helpers/sections-map";
+import DraggingStoreConstant from "./dragging-store-constant.svelte";
 
 export let bopModules : Writable<BopsConfigurationEntry[]>;
 export let constant : BopsConstant;
+const context = getContext<ArchitectContext>("architectContext");
 
 let moving = false;
 let newCard : HTMLDivElement;
@@ -18,6 +22,25 @@ let ref : HTMLDivElement;
 let left = 0;
 let top = 0;
 let availableInputs : NodeListOf<HTMLSpanElement>;
+let { mousePos, dragging, draggingElement } = context;
+
+const startDragging = (event : MouseEvent) : void => {
+  if (event.button !== 0) { return; }
+  dragging.set(true);
+  draggingElement.set(ref);
+  // let dragIcon = document.createElement("img");
+  // dragIcon.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+  // dragIcon.width = 0;
+  // dragIcon.height = 0;
+  // dragIcon.style.opacity = "0";
+
+  // event.dataTransfer.setDragImage(dragIcon, 0, 0);
+};
+
+const stopDragging = (event : MouseEvent) : void => {
+  if (event.button !== 0) { return; }
+  // dragging.set(false);
+};
 
 function startMovement (event : MouseEvent) : void {
   moving = event.button === 0;
@@ -71,10 +94,6 @@ function stopMovement () : void {
   left = top = 0;
 }
 
-const removeConst = () : void => {
-  // TODO
-}
-
 // eslint-disable-next-line max-lines-per-function
 function moveCard (event : MouseEvent) : void {
   if(moving) {
@@ -112,20 +131,23 @@ function getExtendedString (value : unknown) : string {
   if(typeof value === "object") return beautify(value, null, 1);
   return value.toString();
 }
+
+$: x = ($mousePos).x;
+$: y = ($mousePos).y;
 </script>
-<div class="total mt-1 h-7 flex flex-row w-full transition-all" bind:this={ref} on:mousedown={startMovement}>
-  <div class="bg-norbalt-350 h-full max-w-full rounded-l-full select-none relative pr-6 pl-3 constant-nip">
+<div class="total mt-1 h-7 flex flex-row w-full transition-all" bind:this={ref}
+  on:mousedown={startDragging}
+  on:mouseup={stopDragging}
+>
+  <div class="bg-norbalt-350 h-full max-w-full rounded-md select-none relative pr-6 pl-2 constant-nip">
     <div class="name">{constant.name}: </div>
     <abbr title={getExtendedString(constant.value)} class="text" style="color: {typeColors[constant.type]};">{constant.value}</abbr>
     <div class="indicator" style="color: {typeColors[constant.type]};">  ●</div>
   </div>
-  <div class="h-full flex justify-center items-center ml-2 pt-2 stroke-offWhite hover:stroke-roseRed cursor-pointer transition-all"
-    on:click={() => { removeConst(); }}
-  >
-    <CrossIcon style="stroke-inherit"/>
-  </div>
 </div>
-<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
+{#if $dragging && ($draggingElement === ref)}
+  <DraggingStoreConstant constantName={constant.name}/>
+{/if}
 
 <style lang="scss">
   .total {

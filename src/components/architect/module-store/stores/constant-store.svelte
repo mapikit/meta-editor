@@ -24,8 +24,7 @@
   const context = getContext<ArchitectContext>("architectContext");
 
   let addingConst = true;
-  let storeModalOpen = context.storeModalOpen;
-  let storeModalContent = context.storeModalContent;
+  let { storeModalOpen, storeModalContent }  = context;
   let newConstName = "";
   let selectedType : string = undefined;
   let selectedSubtype = undefined;

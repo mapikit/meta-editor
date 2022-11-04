@@ -27,6 +27,9 @@
   setContext("currentBop", currentBop);
   setContext("architectContext", editingContext);
 
+  editingContext.dragging.subscribe(() => {
+    console.log("i was set lol");
+  });
   // Editing Context END
 
   let configurationHistory;
@@ -36,6 +39,8 @@
   let context : CanvasRenderingContext2D;
   let cutting = false;
   let storeHidden = true;
+  let modulesLayer : HTMLElement;
+  let overlayLayer : HTMLElement;
 
   const shortcuts = new ShortcutsController();
 
@@ -86,6 +91,9 @@
     adjustCanvas();
 
     shortcuts.setShortcut("c", () => { cutting = !cutting; });
+
+    editingContext.modulesLayer.set(modulesLayer);
+    editingContext.overlayLayer.set(overlayLayer);
   });
 
   let panning = false;
@@ -158,6 +166,8 @@
   }
 
   function handleMouseMove (event : MouseEvent) : void {
+    editingContext.mousePos.set({ x: event.clientX, y: event.clientY });
+
     if(cutting) updateTraces({ cutting: event });
     else if(panning) {
       environment.update(env => {
@@ -218,22 +228,38 @@
 
   let currentTool = toolsController.currentTool;
   $: cursorStyle = $currentTool === Tools.cutTool ? "crosshair" : $currentTool === Tools.panTool ? "grab" : "default";
+  let { mousePos } = editingContext;
+
+  $: pos = $mousePos;
+
+  const releaseDrag = (event : MouseEvent) : void => {
+    if (event.button === 0) { // Left click drag
+      editingContext.dragging.set(false);
+    }
+  };
 </script>
 
-<div class="relative w-full h-full" id="architect">
+<div class="relative w-full h-full" id="architect"
+on:mouseup={releaseDrag}
+>
+  {JSON.stringify(pos)}
   <canvas class="absolute top-0 left-0 w-full h-full" bind:this={canvas}/>
-    <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
-    <div 
-      class="modulesArea {cursorStyle}" 
-      on:mousedown={startMovement} on:wheel={handleMouseWheel} style="cursor: {cutting ? "crosshair" : "default"};">
-        {#each modulesInConfig as config (config.key)}
-          {#if config.moduleType !== "output"}
-            <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} trash={trash}/>
-          {/if}
-        {/each}
-        <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>
-        <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>      
-    </div>
+  <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
+  <div class="modulesArea {cursorStyle}" 
+    on:mousedown={startMovement}
+    on:wheel={handleMouseWheel}
+    style="cursor: {cutting ? "crosshair" : "default"};"
+    bind:this={modulesLayer}
+  > <!-- Modules Layer-->
+    {#each modulesInConfig as config (config.key)}
+      {#if config.moduleType !== "output"}
+        <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} trash={trash}/>
+      {/if}
+    {/each}
+    <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>
+    <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>      
+  </div>
+  <div class="fixed top-0 left-0 w-full h-full pointer-events-none" bind:this={overlayLayer}/>
   <CurrentBopNametag businessOperation={currentBop}/>
   <ArchitectToolbar />
   <Trash bind:ref={trash} bind:hidden={storeHidden} bopModules={currentBop.configuration}/>
