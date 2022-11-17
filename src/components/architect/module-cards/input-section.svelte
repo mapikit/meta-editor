@@ -24,7 +24,7 @@
   const isClouded = info.type === "cloudedObject";
 </script>
 
-<div class="total">
+<div class="w-min whitespace-nowrap">
   <ConnectionKnob
     bopModules={bopModules}
     bind:info={currentInfo}

@@ -6,7 +6,7 @@
   import { sectionsMap, SectionsMap } from "../helpers/sections-map";
   import { solveConnection } from "../helpers/solve-connection";
   import DraggableList from "./draggable-list.svelte";
-  import { slide } from "svelte/transition"
+  import { slide } from "svelte/transition";
 
   export let parentKey : number;
   export let bopModules : Writable<ModuleCard[]>;
@@ -15,21 +15,21 @@
   const knobIdentifier = SectionsMap.getIdentifier(parentKey, undefined);
 
   function setAsHovered () {
-    const found = sectionsMap.hoveredFunctionalKnob.find(id => id === knobIdentifier)
+    const found = sectionsMap.hoveredFunctionalKnob.find(id => id === knobIdentifier);
     if(found === undefined) sectionsMap.hoveredFunctionalKnob.push(knobIdentifier);
     bopModules.update(bop => bop);
   }
 
   function unsetAsHovered () {
     if(!expanded) {
-      const index = sectionsMap.hoveredFunctionalKnob.findIndex(id => id === knobIdentifier)
+      const index = sectionsMap.hoveredFunctionalKnob.findIndex(id => id === knobIdentifier);
       sectionsMap.hoveredFunctionalKnob.splice(index, 1);
       bopModules.update(bop => bop);
     }
   }
 
   function expandNob () {
-    expanded = !expanded
+    expanded = !expanded;
   }
 
   function attemptConnection () {
@@ -38,7 +38,7 @@
       nob: sectionsMap.functional[knobIdentifier],
       property: undefined,
       nobType: "functional",
-      propertyType: undefined
+      propertyType: undefined,
     }, bopModules);
     selectedNob.set(undefined);
     sectionsMap.refreshConnections($bopModules);

@@ -13,12 +13,14 @@
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
   import FunctionalKnob from "./functional-knob.svelte";
   import ModularSection from "./modular-section.svelte";
-import type { DeleteModuleEvent } from "../../../common/types/events";
+  import type { DeleteModuleEvent } from "../../../common/types/events";
+	import CardProperty from "./card-property.svelte";
 
   export let moduleConfig : ModuleCard;
-  export let bopModules : Writable<ModuleCard[]>
+  export let bopModules : Writable<ModuleCard[]>;
   export let bopConstants : Writable<BopsConstant[]>;
   export let trash : HTMLDivElement;
+  let functionalDepsOpen = false;
 
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];
@@ -28,8 +30,9 @@ import type { DeleteModuleEvent } from "../../../common/types/events";
   moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70);
   $: cardInfo = FunctionsInfo.getCardInfo(moduleConfig);
 
-  function attemptDeletion (stopEvent : CustomEvent<MouseEvent>) {
-    const event = new CustomEvent<DeleteModuleEvent>("deleteModule", { detail: { key: moduleConfig.key, mouseEvent: stopEvent.detail } })
+  function attemptDeletion (stopEvent : CustomEvent<MouseEvent>) : void {
+    const event = new CustomEvent<DeleteModuleEvent>("deleteModule",
+      { detail: { key: moduleConfig.key, mouseEvent: stopEvent.detail } });
     trash.dispatchEvent(event);
   }
 
@@ -38,13 +41,32 @@ import type { DeleteModuleEvent } from "../../../common/types/events";
   $: modularInfo = {
     type: "object",
     subtype: cardInfo.output,
-  }
+  };
 </script>
 
 
 {#if cardInfo !== undefined}
   <MovableCard moduleConfig={moduleConfig} bopModules={bopModules} on:movementStopped={attemptDeletion}>
-    <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
+    <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
+      <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
+        <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> F </div>
+        <div class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>
+        <div class="h-6 absolute w-6 bg-norbalt-200 rounded right-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> > </div>
+      </div>
+      <div class="text-sm text-white pb-3 pt-2">
+        <div class="pr-6 flex flex-col items-start">
+          {#each Object.keys(cardInfo.input) as key}
+            <CardProperty mode="input" keyType={cardInfo.input[key]} name={key}/>
+          {/each}
+        </div>
+        <div class="pl-6 pt-2 flex flex-col items-end">
+          {#each Object.keys(cardInfo.output) as key}
+          <CardProperty mode="output" keyType={cardInfo.output[key]} name={key}/>
+          {/each}
+        </div>
+      </div>
+    </div>
+    <!-- <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
       <span slot="functionalDep" class="functionalKnob">
         <FunctionalKnob
           bopModules={bopModules}
@@ -70,7 +92,7 @@ import type { DeleteModuleEvent } from "../../../common/types/events";
           {/each}
         </div>
       </div>
-    </StaticCardBody>
+    </StaticCardBody> -->
   </MovableCard>
 {:else}
   <MovableCard moduleConfig={moduleConfig} bopModules={bopModules}>

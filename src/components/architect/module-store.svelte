@@ -16,7 +16,6 @@
   import StoreModal from "./module-store/store-modal.svelte";
   import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
   
-  export let hidden = true;
   export let currentBop : UIBusinessOperation;
   type PossibleStores = "internal" | "external" | "schema" | "bops" | "protocols" | "constants" | "variables";
   type TabInfo = { iconURI : string; title : string; }
@@ -48,6 +47,10 @@
       storeVisible.set(false);
     }
   };
+
+  function handleTabClick (tab : string) : void {
+    selectedStore.set(tab);
+  }
 
   function handleLock () : void { locked = !locked; }
 
