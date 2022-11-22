@@ -14,13 +14,16 @@
   import FunctionalKnob from "./functional-knob.svelte";
   import ModularSection from "./modular-section.svelte";
   import type { DeleteModuleEvent } from "../../../common/types/events";
-	import CardProperty from "./card-property.svelte";
+  import CardProperty from "./card-property.svelte";
+  import { setContext } from "svelte";
 
   export let moduleConfig : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>;
   export let bopConstants : Writable<BopsConstant[]>;
   export let trash : HTMLDivElement;
   let functionalDepsOpen = false;
+
+  setContext("moduleConfig", moduleConfig);
 
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
   moduleConfig.dependencies = moduleConfig.dependencies ?? [];

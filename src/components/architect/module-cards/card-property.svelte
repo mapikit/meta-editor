@@ -12,9 +12,9 @@
 </script>
 
 <div class="flex {positionFloat} {roundedSide} justify-center items-center px-0.5 py-0.5 bg-norbalt-200 mt-1.5 first:mt-0">
-  <ConnectionPoint mode={mode} typeDetails={keyType}/>
+  <ConnectionPoint mode={mode} bind:typeDetails={keyType} parentPaths={[name]}/>
   <div class="w-1"/>
-  <div class="text-xs">
+  <div class="text-xs -mt-0.5">
     {name}
   </div>
 </div>

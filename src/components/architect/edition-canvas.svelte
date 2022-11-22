@@ -18,6 +18,7 @@
   import { Tools, toolsController } from "./view-store";
   import { ShortcutsController } from "../../common/helpers/shortcut-controller";
   import { ArchitectContext } from "../../entities/auxiliary-entities/architect-context";
+	import ModuleCard from "./module-cards/module-card.svelte";
 
   export let currentBop : UIBusinessOperation;
 
@@ -26,10 +27,6 @@
 
   setContext("currentBop", currentBop);
   setContext("architectContext", editingContext);
-
-  editingContext.dragging.subscribe(() => {
-    console.log("i was set lol");
-  });
   // Editing Context END
 
   let configurationHistory;
@@ -227,28 +224,54 @@
   }
 
   let currentTool = toolsController.currentTool;
-  $: cursorStyle = $currentTool === Tools.cutTool ? "crosshair" : $currentTool === Tools.panTool ? "grab" : "default";
-  let { mousePos } = editingContext;
+  let { mouseOverDraggable } = editingContext;
+
+  const getCursorStyle = (...dummyArgs : unknown[]) : string => {
+    if ($dragging) return "cursor-grabbing";
+    if ($mouseOverDraggable) return "cursor-grab";
+    if ($currentTool === Tools.cutTool) return "cursor-crosshair";
+    if ($currentTool === Tools.panTool) return "cursor-grab";
+  };
+
+  $: cursorStyle = getCursorStyle($currentTool, $dragging, $mouseOverDraggable);
+  let { mousePos, draggingElement, dragging } = editingContext;
 
   $: pos = $mousePos;
 
+  // eslint-disable-next-line max-lines-per-function
   const releaseDrag = (event : MouseEvent) : void => {
+    if (event.button !== 0) { // right click mouseup
+      return;
+    }
+
+    if ($dragging && $draggingElement.type === "module") {
+      console.log("SHOULD SPAWN MODULE HERE");
+
+      currentBop.configuration.update(modules => {
+        const newModule : ModuleCard = { ...$draggingElement.data as object } as ModuleCard;
+        newModule.position = new Coordinate(pos.x, pos.y)
+          .moveBy(-$environment.origin.x - 106, -$environment.origin.y - 60)
+          .scale(1/$environment.scale),
+        modules.push(newModule);
+        return modules;
+      });
+    }
+
     if (event.button === 0) { // Left click drag
       editingContext.dragging.set(false);
     }
   };
 </script>
 
-<div class="relative w-full h-full" id="architect"
+<div class="relative w-full h-full {cursorStyle}" id="architect"
 on:mouseup={releaseDrag}
 >
   {JSON.stringify(pos)}
   <canvas class="absolute top-0 left-0 w-full h-full" bind:this={canvas}/>
   <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
-  <div class="modulesArea {cursorStyle}" 
+  <div class="modulesArea" 
     on:mousedown={startMovement}
     on:wheel={handleMouseWheel}
-    style="cursor: {cutting ? "crosshair" : "default"};"
     bind:this={modulesLayer}
   > <!-- Modules Layer-->
     {#each modulesInConfig as config (config.key)}

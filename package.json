@@ -38,6 +38,7 @@
     "json-beautify": "^1.1.1",
     "just-clone": "^5.0.1",
     "meta-system": "^0.3.0-RC1",
+    "nanoid": "^4.0.0",
     "sass": "^1.49.8"
   }
 }

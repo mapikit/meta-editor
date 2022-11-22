@@ -11,15 +11,15 @@
   import { updateByIdInfo } from "meta-system/dist/src/schemas/application/schema-functions-info/update-by-id"
   import { updateInfo } from "meta-system/dist/src/schemas/application/schema-functions-info/update"
   import type { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-type";
-  import clone from "deep-clone"
+  import clone from "deep-clone";
   import { schemas } from "../../../../stores/configuration-store";
   import { get, Writable } from "svelte/store";
   import type { ModuleCard } from "../../../../common/types/module-card";
-import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
-import { FunctionsInfo } from "../../helpers/functions-info";
+  import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
+  import { FunctionsInfo } from "../../helpers/functions-info";
   export let search : string;
   export let storeLocked = false;
-  export let bopModules : Writable<ModuleCard[]>
+  export let bopModules : Writable<ModuleCard[]>;
 
   const schemasFunctions : Record<string, Array<StoreModuleInfo>> = {};
   for(const schema of $schemas) {
@@ -30,7 +30,7 @@ import { FunctionsInfo } from "../../helpers/functions-info";
       schemasFunctions[sectionTitle].push({
         ...info,
         schemaName,
-      })
+      });
     }
   }
 

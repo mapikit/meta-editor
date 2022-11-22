@@ -9,11 +9,17 @@
   import type { ModuleCard } from "../../../../common/types/module-card";
   import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
   import Tooltip from "../../../../components/common/tooltip.svelte";
+  import Draggable from "../../draggable.svelte";
+  import type { ArchitectContext } from "../../../../entities/auxiliary-entities/architect-context";
+  import { getContext } from "svelte";
 
   export let module : StoreModuleInfo;
   export let moduleType : ModuleType;
   export let storeLocked = false;
   export let bopModules : Writable<ModuleCard[]>;
+
+  const context = getContext<ArchitectContext>("architectContext");
+  let { dragging, draggingElement } = context;
 
   let moving = false;
   let ref : HTMLDivElement;
@@ -31,7 +37,7 @@
     newCard.style.position = "absolute";
     newCard.style.width = `${ref.getBoundingClientRect().width}px`;
     const currentPos = ref.getBoundingClientRect();
-    const parentOffset = currentParent.getBoundingClientRect()
+    const parentOffset = currentParent.getBoundingClientRect();
     top = currentPos.y-parentOffset.y;
     left = currentPos.x-parentOffset.x;
     newCard.style.left = `${left}px`;
@@ -84,11 +90,24 @@
     }
   }
   
+  $: availableKey = getAvailableKey($bopModules);
+
+  const moduleDragData = {
+    dependencies: [],
+    key: availableKey,
+    moduleName: module.functionName,
+    modulePackage: getPackage(),
+    moduleType: moduleType,
+    position: new Coordinate(left, top)
+      .moveBy(-$environment.origin.x, -$environment.origin.y)
+      .scale(1/$environment.scale),
+    bopId: module["bopId"],
+  };
 </script>
 
-
-<div class="w-full mt-4 first:mt-0 shadow" bind:this={ref} on:mousedown={startMovement}>
-  <div class="select-none min-w-[120px] bg-norbalt-350 rounded cursor-grab">
+<Draggable style={"w-full mt-4 first:mt-0"} dragType="module" dragElement={ref} dragData={moduleDragData}>
+<div class="w-full shadow" bind:this={ref}>
+  <div class="select-none min-w-[120px] bg-norbalt-350 rounded">
     <div class="h-8 bg-norbalt-300 rounded-t flex flex-row items-center justify-between">
       <slot name="functionalDep"/>
       <div class="flex flex-row h-4 ml-1">
@@ -122,8 +141,11 @@
     </div>
   </div>
 </div>
+</Draggable>
 
-<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
+{#if $dragging && (($draggingElement).element === ref)}
+  <div> eu sou um modulo, trust me </div>
+{/if}
 
 <style lang="scss">
   .items {

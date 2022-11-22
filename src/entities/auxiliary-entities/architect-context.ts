@@ -8,10 +8,11 @@ export interface DragElement {
 
 export class ArchitectContext {
   public storeVisible = writable(false);
-  public selectedStore = writable("constants");
+  public selectedStore = writable("internal");
   public storeModalOpen = writable(false);
   public storeModalContent = writable("");
   public mouseOverStore = writable(false);
+  public mouseOverDraggable = writable(false);
   public mousePos = writable({ x:0, y:0 });
 
   public modulesLayer = writable<HTMLElement>(undefined);

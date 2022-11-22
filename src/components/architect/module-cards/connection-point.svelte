@@ -3,9 +3,18 @@
   import ArrowIcon from "../../../icons/arrow-icon.svelte";
   import Typedot from "../../../components/common/typedot.svelte";
   import CrossIcon from "../../../icons/cross-icon.svelte";
+  import { getContext } from "svelte";
+  import type { UIBusinessOperation } from "src/entities/business-operation";
+  import type { ModuleCard } from "../../../common/types/module-card";
 
   export let mode : "input" | "output";
   export let typeDetails : TypeDefinition;
+  export let parentPaths : string[] = [];
+
+  let moduleConfig = getContext<ModuleCard>("moduleConfig");
+
+  const currentBop = getContext<UIBusinessOperation>("currentBop");
+  let { configuration } = currentBop;
 
   let deepOpen = false;
   // If it is a deep type, should be albe to open and select deeper options
@@ -26,7 +35,6 @@
   const getDeepProperties = () : Array<{key : string; type : TypeDefinition }> => {
     if (typeDetails["type"] === "array") { return []; }
 
-    console.log(typeDetails);
     const keys = Object.keys(typeDetails["subtype"] ?? {});
 
     let result = [];
@@ -35,6 +43,26 @@
     });
 
     return result;
+  };
+
+  const addPropertyAsField = () : void => {
+    console.log(moduleConfig);
+    let currentStep = moduleConfig.storedDefinition.input;
+
+    for (let path of parentPaths) {
+      currentStep = currentStep[path]["subtype"];
+    };
+
+    console.log(currentStep);
+
+    if (!typeDetails["subtype"]) {
+      typeDetails["subtype"] = {};
+    }
+
+    typeDetails["subtype"]["anotherField"] = { type : "string", required: false };
+    configuration.update((value) => value);
+
+    console.log(typeDetails);
   };
 </script>
 
@@ -59,11 +87,13 @@
         <div class="flex {containerOrder} px-1 justify-end mt-0.5 first:mt-0 text-xs">
           <div class=""> {property.key} </div>
           <div class="w-2"/>
-          <svelte:self mode={mode} typeDetails={property.type}/>
+          <svelte:self mode={mode} typeDetails={property.type} parentPaths={[...parentPaths, property.key]}/>
         </div>
       {/each}
       {#if canEditType}
-        <div class="border cursor-pointer rounded border-norbalt-100 hover:border-offWhite stroke-norbalt-100 hover:stroke-offWhite transition-all p-1 mx-1 flex justify-center items-center">
+        <div class="border cursor-pointer rounded border-norbalt-100 hover:border-offWhite stroke-norbalt-100 hover:stroke-offWhite transition-all p-1 mx-1 flex justify-center items-center"
+          on:click={addPropertyAsField}
+        >
           <CrossIcon style="stroke-inherit w-1.5 h-1.5 rotate-45"/>
         </div>
       {/if}
