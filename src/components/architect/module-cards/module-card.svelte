@@ -50,7 +50,7 @@
 
 {#if cardInfo !== undefined}
   <MovableCard moduleConfig={moduleConfig} bopModules={bopModules} on:movementStopped={attemptDeletion}>
-    <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
+    <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light -translate-x-[50%] -translate-y-[50%]">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> F </div>
         <div class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>

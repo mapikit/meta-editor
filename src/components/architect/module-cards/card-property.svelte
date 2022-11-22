@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { TypeDefinition } from "@meta-system/object-definition";
+  import DropArea from "../drop-area.svelte";
   import ConnectionPoint from "./connection-point.svelte";
 
   export let mode : "input" | "output";
@@ -11,10 +12,13 @@
   $: roundedSide = mode === "input" ? "rounded-r pr-2" : "rounded-l pl-2";
 </script>
 
-<div class="flex {positionFloat} {roundedSide} justify-center items-center px-0.5 py-0.5 bg-norbalt-200 mt-1.5 first:mt-0">
+<div class="flex relative {positionFloat} {roundedSide} justify-center items-center px-0.5 py-0.5 bg-norbalt-200 mt-1.5 first:mt-0">
   <ConnectionPoint mode={mode} bind:typeDetails={keyType} parentPaths={[name]}/>
   <div class="w-1"/>
   <div class="text-xs -mt-0.5">
     {name}
   </div>
+  {#if mode === "input"}
+    <DropArea acceptTypes={["constant"]} onDropContent={() => { console.log("Dropped constant here :D"); }} style="px-12 right-0 rounded"/>
+  {/if}
 </div>

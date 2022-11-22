@@ -10,30 +10,43 @@
     (droppedElement : DragElement) : void => {};
   export let debug = false;
 
+  let isOverSelf = false;
+  let dropEnabled = false;
+
   const context = getContext<ArchitectContext>("architectContext");
-  const { mouseOverModule, draggingElement } = context;
+  const { mouseOverModule, draggingElement, dragging } = context;
   const mouseEnter = () : void => {
     mouseOverModule.set({ type: "drop_area", element });
+    isOverSelf = true; ;
+
+    const isAccepted = acceptTypes.includes(($draggingElement)?.type);
+    if (isAccepted) {
+      dropEnabled = true;
+    }
   };
   const mouseLeave = () : void => {
     if ($mouseOverModule.element === element) {
       mouseOverModule.set(undefined);
     }
+
+    isOverSelf = false;
+    dropEnabled = false;
   };
 
-  const drop = (e : MouseEvent) => {
-    if (e.button !== 1) { return; }
+  const drop = (e : MouseEvent) : void => {
+    if (e.button === 1) { return; }
 
-    const isAccepted = acceptTypes.includes(($draggingElement).type);
-
+    const isAccepted = acceptTypes.includes(($draggingElement)?.type);
     if (isAccepted) {
       onDropContent($draggingElement);
+      dropEnabled = false;
     }
 
     return;
   };
 
   $: debugStyle = debug ? "border border-roseRed" : "";
+  $: validOverStyle = dropEnabled && $dragging ? "backdrop-brightness-[2]" : "";
 </script>
 
 <div
@@ -41,7 +54,15 @@
   on:mouseenter={mouseEnter}
   on:mouseleave={mouseLeave}
   bind:this={element}
-  class="w-full h-full {debugStyle} {style}"
+  class="bdrop w-full h-full absolute z-15 {debugStyle} {validOverStyle}"
 >
-  <slot></slot>
+<div class="{style}">
+
 </div>
+</div>
+
+<style lang="scss">
+.bdrop {
+  transition: backdrop-filter 200ms;
+}
+</style>

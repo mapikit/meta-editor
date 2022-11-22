@@ -24,6 +24,7 @@
     if (event.button !== 0) { return; }
 
     dragging.set(false);
+    draggingElement.set(undefined);
   };
 
   $: draggingHomeStyle = $dragging && (($draggingElement).element === dragElement) ? "opacity-25" : "opacity-100";

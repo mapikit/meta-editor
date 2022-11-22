@@ -234,7 +234,7 @@
   };
 
   $: cursorStyle = getCursorStyle($currentTool, $dragging, $mouseOverDraggable);
-  let { mousePos, draggingElement, dragging } = editingContext;
+  let { mousePos, draggingElement, dragging, mouseOverModule } = editingContext;
 
   $: pos = $mousePos;
 
@@ -245,8 +245,6 @@
     }
 
     if ($dragging && $draggingElement.type === "module") {
-      console.log("SHOULD SPAWN MODULE HERE");
-
       currentBop.configuration.update(modules => {
         const newModule : ModuleCard = { ...$draggingElement.data as object } as ModuleCard;
         newModule.position = new Coordinate(pos.x, pos.y)
@@ -269,6 +267,10 @@ on:mouseup={releaseDrag}
   {JSON.stringify(pos)}
   <canvas class="absolute top-0 left-0 w-full h-full" bind:this={canvas}/>
   <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
+  <div class="absolute bottom-0">
+    {$dragging } : { $draggingElement?.type }
+    OverModule: {$mouseOverModule?.type }
+  </div>
   <div class="modulesArea" 
     on:mousedown={startMovement}
     on:wheel={handleMouseWheel}
