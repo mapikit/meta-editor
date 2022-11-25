@@ -19,6 +19,6 @@
     {name}
   </div>
   {#if mode === "input"}
-    <DropArea acceptTypes={["constant"]} onDropContent={() => { console.log("Dropped constant here :D"); }} style="px-12 right-0 rounded"/>
+    <DropArea acceptTypes={["constant"]} onDropContent={() => { console.log("Dropped constant here :D"); }} style="w-[calc(100%_+_4rem)] right-0 rounded"/>
   {/if}
 </div>

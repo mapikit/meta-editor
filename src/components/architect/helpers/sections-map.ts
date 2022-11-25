@@ -1,6 +1,6 @@
-import type {
-  BopsConfigurationEntry,
-  Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import { get } from "svelte/store";
+import type { ModuleCard } from "../../../common/types/module-card";
 
 
 export class SectionsMap {
@@ -42,11 +42,11 @@ export class SectionsMap {
     }
   }
 
-  private connectModule (module : BopsConfigurationEntry) : void {
-    for(const dependency of module.dependencies) this.addConnection(dependency, module.key);
+  private connectModule (module : ModuleCard) : void {
+    for(const dependency of get(module.dependencies)) this.addConnection(dependency, module.key);
   }
 
-  private connectModules (modules : BopsConfigurationEntry[]) : void {
+  private connectModules (modules : ModuleCard[]) : void {
     for(const module of modules) this.connectModule(module);
   }
 
@@ -90,7 +90,7 @@ export class SectionsMap {
     }
   }
 
-  public refreshConnections (bopModules : BopsConfigurationEntry[]) : void {
+  public refreshConnections (bopModules : ModuleCard[]) : void {
     this.connections = {};
     this.functionalConnections = {};
     this.connectModules(bopModules);

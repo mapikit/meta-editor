@@ -18,15 +18,16 @@
   import { Tools, toolsController } from "./view-store";
   import { ShortcutsController } from "../../common/helpers/shortcut-controller";
   import { ArchitectContext } from "../../entities/auxiliary-entities/architect-context";
-	import ModuleCard from "./module-cards/module-card.svelte";
 
   export let currentBop : UIBusinessOperation;
 
   // Editing Context START
   const editingContext = new ArchitectContext;
+  const shortcuts = new ShortcutsController();
 
   setContext("currentBop", currentBop);
   setContext("architectContext", editingContext);
+  setContext("shortcutsController", shortcuts);
   // Editing Context END
 
   let configurationHistory;
@@ -38,8 +39,6 @@
   let storeHidden = true;
   let modulesLayer : HTMLElement;
   let overlayLayer : HTMLElement;
-
-  const shortcuts = new ShortcutsController();
 
   if (currentBop) {
     configurationHistory = new History({
@@ -111,13 +110,15 @@
             const origin = Number(moduleId.split("_")[0]);
             const parentKey = Number(moduleId.split("_")[1]);
             module = config.find(_module => _module.key === parentKey);
-            dependencyIndex = module.dependencies.findIndex(dep => dep.origin === origin && dep.targetPath === undefined);
+            dependencyIndex = get(module.dependencies)
+              .findIndex(dep => dep.origin === origin && dep.targetPath === undefined);
           } else {
             module = config.find(_module => _module.key === Number(moduleId));
-            dependencyIndex = module.dependencies.findIndex(dependency => dependency.targetPath === targetPath);
+            dependencyIndex = get(module.dependencies)
+              .findIndex(dependency => dependency.targetPath === targetPath);
           }
 
-          module.dependencies.splice(dependencyIndex, 1);
+          get(module.dependencies).splice(dependencyIndex, 1);
           sectionsMap.refreshConnections(get(currentBop.configuration));
         }
 
@@ -126,40 +127,6 @@
       context.shadowBlur = 0;
     }
     panning = event.button === 1;
-  }
-
-  // eslint-disable-next-line max-lines-per-function
-  function detectShortcut (event : KeyboardEvent) : void {
-    context.shadowBlur = 0;
-    if(document.activeElement.tagName === "INPUT") return;
-    switch (event.key) {
-      case "f":
-        environment.update(env => {
-          env.functionalTraces = !env.functionalTraces; return env;
-        });
-        event.preventDefault();
-        break;
-      case "z":
-        if(event.ctrlKey) {
-          configurationHistory.undo();
-          setTimeout(updateTraces, 20);
-          event.preventDefault();
-        }
-        break;
-      case "r":
-        if(event.ctrlKey) {
-          configurationHistory.redo();
-          setTimeout(updateTraces, 20);
-          event.preventDefault();
-        }
-        break;
-      case "Escape":
-        cutting = false;
-        environment.update(env => {env.functionalTraces = false; return env;});
-        break;
-    };
-    // bopStore.update(bop => bop);
-    cutting = cutting;
   }
 
   function handleMouseMove (event : MouseEvent) : void {
@@ -247,9 +214,9 @@
     if ($dragging && $draggingElement.type === "module") {
       currentBop.configuration.update(modules => {
         const newModule : ModuleCard = { ...$draggingElement.data as object } as ModuleCard;
-        newModule.position = new Coordinate(pos.x, pos.y)
+        newModule.position.set(new Coordinate(pos.x, pos.y)
           .moveBy(-$environment.origin.x - 106, -$environment.origin.y - 60)
-          .scale(1/$environment.scale),
+          .scale(1/$environment.scale));
         modules.push(newModule);
         return modules;
       });
@@ -266,7 +233,7 @@ on:mouseup={releaseDrag}
 >
   {JSON.stringify(pos)}
   <canvas class="absolute top-0 left-0 w-full h-full" bind:this={canvas}/>
-  <ModuleStore bind:hidden={storeHidden} currentBop={currentBop}/>
+  <ModuleStore currentBop={currentBop}/>
   <div class="absolute bottom-0">
     {$dragging } : { $draggingElement?.type }
     OverModule: {$mouseOverModule?.type }
@@ -291,7 +258,7 @@ on:mouseup={releaseDrag}
 </div>
 <svelte:window 
   on:mousemove={handleMouseMove} 
-  on:mouseup={() => panning = false}
+  on:mouseup={() => { panning = false; }}
   on:keydown={shortcuts.getShortcutEventHandler}
   on:resize={adjustCanvas}
   />

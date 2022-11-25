@@ -1,7 +1,8 @@
 <script lang="ts">
 import type { BopsConfigurationEntry }
   from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { createEventDispatcher } from "svelte";
+import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
+import { createEventDispatcher, getContext } from "svelte";
 
 import type { Writable } from "svelte/store";
 import { AdvancedMath } from "../../../common/helpers/math";
@@ -11,66 +12,76 @@ import type { ModuleCard } from "../../../common/types/module-card";
 import type { UIInput } from "../../../common/types/ui-input";
 import { environment } from "../../../stores/environment";
 
+let context = getContext<ArchitectContext>("architectContext");
+const { dragging, mousePos } = context;
+
+type MovingPosision = {
+  origin : Coordinate;
+  delta : Coordinate;
+}
 
 export let moduleConfig : ModuleCard | UIInput;
 export let bopModules : Writable<BopsConfigurationEntry[]>;
 
 let ref : HTMLDivElement;
 export let moving = false;
-let movingPos = {
+let movingPos : MovingPosision = {
   origin : undefined,
   delta : undefined,
 };
 
 const dispatch = createEventDispatcher<{ movementStopped : MouseEvent }>();
+let lastMousePosition;
 
 function startMovement (event : MouseEvent) : void {
   if(event.button !== 0) return;
 
   movingPos.origin = new Coordinate(moduleConfig.position.x, moduleConfig.position.y);
   movingPos.delta = new Coordinate(0, 0);
-  ref.style.zIndex = "1";
-  ref.style.opacity = "0.5";
+
   moving = true;
+  lastMousePosition = $mousePos;
 }
 
 function stopMovement (event : MouseEvent) : void {
   if(moving) {
-    ref.style.opacity = "1";
-    ref.style.zIndex = "0";
     moving = false;
     dispatch("movementStopped", event);
   }
 }
 
-function moveCard (event : MouseEvent) : void {
-  if(moving) {
-    movingPos.delta.moveBy(event.movementX/$environment.scale, event.movementY/$environment.scale);
-    let newX =  movingPos.origin.x + movingPos.delta.x;
-    let newY =  movingPos.origin.y + movingPos.delta.y;
-    if(event.shiftKey) {
-      newX = AdvancedMath.round(newX, 50);
-      newY = AdvancedMath.round(newY, 50);
-    }
-    moduleConfig.position = moduleConfig.position.moveTo(newX, newY);
-    bopModules.update(modules => modules);
-  }
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
+function moveCard (node : Node, mousePosition : {x : number; y : number}) {
+  return {
+    update: (updateMousePos : {x : number; y : number}) : void => {
+      if(moving) {
+        movingPos.delta
+          .moveBy(
+            (updateMousePos.x - lastMousePosition.x)/$environment.scale,
+            (updateMousePos.y - lastMousePosition.y)/$environment.scale);
+        lastMousePosition = updateMousePos;
+        let newX =  movingPos.origin.x + movingPos.delta.x;
+        let newY =  movingPos.origin.y + movingPos.delta.y;
+        moduleConfig.position = moduleConfig.position.moveTo(newX, newY);
+        bopModules.update(modules => modules);
+      }
+    },
+  };
 }
 
-
+$: movingStyle = moving ? "z-10 opacity-60" : "z-0 opacity-100";
 
 </script>
 
-<div class="card" bind:this={ref} on:mousedown={startMovement}
-style="
-  left: {(moduleConfig.position.x + $environment.origin.x)*$environment.scale}px; 
-  top: {(moduleConfig.position.y + $environment.origin.y)*$environment.scale}px; 
-  transform: scale({$environment.scale});
-  transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
+<div use:moveCard={$mousePos} class="card {movingStyle}" bind:this={ref} on:mousedown={startMovement} on:mouseup={stopMovement}
+  style="
+    left: {(moduleConfig.position.x + $environment.origin.x)*$environment.scale}px; 
+    top: {(moduleConfig.position.y + $environment.origin.y)*$environment.scale}px; 
+    transform: scale({$environment.scale}) translateX(-50%) translateY(-50%);
+    transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
 >
   <slot/>
 </div>
-<svelte:window on:mousemove={moveCard} on:mouseup={stopMovement}/>
 
 <style lang="scss">
   .card {

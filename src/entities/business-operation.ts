@@ -4,12 +4,13 @@ import type {
   BopsConstant,
   BopsVariable,
   BopsCustomObject } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import type { ModuleCard } from "../common/types/module-card";
+import { ModuleCard } from "../common/types/module-card";
 import type { UIInput } from "../common/types/ui-input";
 import { writable, Writable, readable, Readable, get } from "svelte/store";
 import { Coordinate } from "../common/types/geometry";
 import { businessOperations, saveConfigurations } from "../stores/configuration-store";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
+import { nanoid } from "nanoid";
 
 type BOpConstructorArgument = {
   id : string,
@@ -17,7 +18,7 @@ type BOpConstructorArgument = {
   description : string,
   input : UIInput | ObjectDefinition,
   output : ObjectDefinition,
-  configuration : ModuleCard[] | BopsConfigurationEntry[],
+  configuration : ModuleCard[] | ModuleCard[],
   constants : BopsConstant[],
   variables : BopsVariable[],
   customObjects : BopsCustomObject[],
@@ -116,29 +117,29 @@ export class UIBusinessOperation {
     this.input.set(resolvedInput);
   }
 
-  public static rebuildModuleCards (configuration : BopsConfigurationEntry[]) : ModuleCard[] {
+  public static rebuildModuleCards (configuration : ModuleCard[]) : ModuleCard[] {
     const result = [] as ModuleCard[];
     for(const config of configuration) {
-      if((config as ModuleCard).position === undefined) {
-        (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
-      } else {
-        const position = (config as ModuleCard).position;
-        (config as ModuleCard).position = new Coordinate(position.x, position.y);
-      }
-      result.push(config as ModuleCard);
+      // if((config as ModuleCard).position === undefined) {
+      //   (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
+      // } else {
+      //   const position = (config as ModuleCard).position;
+      //   (config as ModuleCard).position = new Coordinate(position.x, position.y);
+      // }
+      // result.push(config as ModuleCard);
     }
     return result;
   }
 
-  private validateConfigurationForUI (configuration : BopsConfigurationEntry[] | ModuleCard[])
+  private validateConfigurationForUI (configuration : ModuleCard[] | ModuleCard[])
     : asserts configuration is ModuleCard[] {
     for(const config of configuration) {
-      if((config as ModuleCard).position === undefined) {
-        (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
-      } else {
-        const position = (config as ModuleCard).position;
-        (config as ModuleCard).position = new Coordinate(position.x, position.y);
-      }
+      // if((config as ModuleCard).position === undefined) {
+      //   (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
+      // } else {
+      //   const position = (config as ModuleCard).position;
+      //   (config as ModuleCard).position = new Coordinate(position.x, position.y);
+      // }
 
       this.configuration.update(bopConfig => {
         bopConfig.push(config as ModuleCard);
@@ -158,17 +159,32 @@ export class UIBusinessOperation {
 
 
   public addModule (module : BopsConfigurationEntry) : void {
-    this.convertModuleToUI(module);
+    const convertedModule = this.convertModuleToUI(module);
     this.configuration.update(configuration => {
-      configuration.push(module);
+      configuration.push(convertedModule);
       return configuration;
     });
   }
 
-  private convertModuleToUI (module : BopsConfigurationEntry) : asserts module is ModuleCard {
+  // eslint-disable-next-line max-lines-per-function
+  private convertModuleToUI (module : BopsConfigurationEntry) : ModuleCard {
+    const fallbackCoords = new Coordinate(Math.random() * 1414, Math.random() * 577);
+    let position = new Coordinate(module["position"]["x"] ?? 0, module["position"]["y"] ?? 0);
     if(module["position"] === undefined) {
-      module["position"] = new Coordinate(Math.random() * 1414, Math.random() * 577);
+      position = fallbackCoords;
     }
+
+    return new ModuleCard({
+      position,
+      bopId: get(this.id),
+      id: nanoid(),
+      dependencies: module.dependencies.map((dep) => ({ ...dep, matchingType: false })),
+      storedDefinition: { input: {}, output: {} },
+      moduleName: module.moduleName,
+      key: module.key,
+      moduleType: module.moduleType,
+      modulePackage: module.modulePackage,
+    });
   }
 
   public serialized () : object {

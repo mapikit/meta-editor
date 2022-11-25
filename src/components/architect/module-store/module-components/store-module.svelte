@@ -5,20 +5,23 @@
   import { environment } from "../../../../stores/environment";
   import type { ModuleType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import { Coordinate } from "../../../../common/types/geometry";
-  import type { Writable } from "svelte/store";
-  import type { ModuleCard } from "../../../../common/types/module-card";
+  import { get, Writable } from "svelte/store";
+  import { ModuleCard as ModuleCardType } from "../../../../common/types/module-card";
   import type { StoreModuleInfo } from "../../../../common/types/store-module-info";
   import Tooltip from "../../../../components/common/tooltip.svelte";
   import Draggable from "../../draggable.svelte";
   import type { ArchitectContext } from "../../../../entities/auxiliary-entities/architect-context";
   import { getContext } from "svelte";
   import DraggingModule from "../../module-cards/dragging-module.svelte";
-
+	import ModuleCard from "../../module-cards/module-card.svelte";
+	import type { UIBusinessOperation } from "src/entities/business-operation";
+  ModuleCard
   export let module : StoreModuleInfo;
   export let moduleType : ModuleType;
-  export let bopModules : Writable<ModuleCard[]>;
+  export let bopModules : Writable<ModuleCardType[]>;
 
   const context = getContext<ArchitectContext>("architectContext");
+  const currentBop = getContext<UIBusinessOperation>("currentBop");
   let { dragging, draggingElement } = context;
 
   let ref : HTMLDivElement;
@@ -33,19 +36,20 @@
       default: return undefined;
     }
   }
-  
-  $: availableKey = getAvailableKey($bopModules);
 
-  const moduleDragData = {
-    dependencies: [],
-    key: availableKey,
-    moduleName: module.functionName,
-    modulePackage: getPackage(),
-    moduleType: moduleType,
-    position: new Coordinate(left, top)
-      .moveBy(-$environment.origin.x, -$environment.origin.y)
-      .scale(1/$environment.scale),
-    bopId: module["bopId"],
+  $: moduleDragData = $bopModules && getModuleDragData();
+
+  const getModuleDragData = () : ModuleCardType => {
+    return ModuleCardType.generate({
+      key: getAvailableKey($bopModules),
+      moduleName: module.functionName,
+      modulePackage: getPackage(),
+      moduleType: moduleType,
+      position: new Coordinate(left, top)
+        .moveBy(-$environment.origin.x, -$environment.origin.y)
+        .scale(1/$environment.scale),
+      bopId: get(currentBop.id),
+    });
   };
 </script>
 

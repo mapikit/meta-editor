@@ -43,6 +43,7 @@ export class FunctionsInfo {
   }
 
   public static getCardInfo (moduleConfig : ModuleCard) : FunctionDefinition {
+    console.log("Generating data for module Config", moduleConfig);
     switch (moduleConfig.moduleType) {
       case "bop": {
         const bop = get(businessOperations).find(_bop => get(_bop.id) === moduleConfig.bopId);

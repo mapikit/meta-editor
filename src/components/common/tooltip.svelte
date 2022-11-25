@@ -66,7 +66,7 @@
 
   $: arrowPos = getArrowPos(component);
 
-  function getArrowPos (...comp) {
+  function getArrowPos (...comp) : string {
     // console.log(component?.getBoundingClientRect())
     switch (position) {
       case "left": return "right: -5px; top: calc(50% - 9px); transform: rotate(45deg);";

@@ -45,6 +45,7 @@
     return;
   };
 
+  $: clickThrough = $dragging ? "" : "pointer-events-none";
   $: debugStyle = debug ? "border border-roseRed" : "";
   $: validOverStyle = dropEnabled && $dragging ? "backdrop-brightness-[2]" : "";
 </script>
@@ -54,7 +55,7 @@
   on:mouseenter={mouseEnter}
   on:mouseleave={mouseLeave}
   bind:this={element}
-  class="bdrop w-full h-full absolute z-15 {debugStyle} {validOverStyle}"
+  class="bdrop w-full h-full absolute z-15 {debugStyle} {validOverStyle} {clickThrough}"
 >
 <div class="{style}">
 

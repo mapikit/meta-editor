@@ -26,7 +26,6 @@
 
   let locked = false;
   let internalLock = false;
-  let activity : NodeJS.Timeout;
 
   const tabsInfo : TabsInfo = {
     internal: { iconURI: "internal_modules_v1.png", title: "Internal Modules" },
@@ -57,18 +56,18 @@
   $: lockedLockIconColor = locked ? "fill-ochreYellow hover:fill-ochreYellow-light border-ochreYellow"
     : "fill-offWhite hover:fill-white";
 
-  $: hiddenStoreStyles = !$storeVisible ? "-right-[calc(24rem_-_3.5rem)] delay-[1500ms]" : "";
+  $: hiddenStoreStyles = !$storeVisible ? "-right-[calc(24rem_-_3.5rem)] delay-[1500ms]" : "right-0";
 
   let search = "";
 </script>
 
 <div
-  class="absolute right-0 z-10 top-4 w-96 h-[calc(100%_-_32px)] flex flex-row transition-all duration-500 {hiddenStoreStyles}"
+  class="absolute z-10 top-4 w-96 h-[calc(100%_-_32px)] flex flex-row transition-all duration-500 {hiddenStoreStyles}"
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
   id="store"
 >
-  <div class="h-full w-11 mr-3 flex flex-col"> <!-- Sidebar (TOOLS and Lock) -->
+  <div class="w-11 h-fit mr-3 flex flex-col"> <!-- Sidebar (TOOLS and Lock) -->
     <div class="mb-3 h-10 bg-norbalt-200 cursor-pointer border-2 border-transparent hover:bg-norbalt-100 flex items-center justify-center rounded-md shadow transition-all {lockedLockIconColor}" on:click={handleLock}>
       <LockIcon locked="{locked}" style="fill-inherit h-5 w-5"/>
     </div>
