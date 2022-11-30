@@ -8,7 +8,7 @@
   import { Coordinate } from "../../common/types/geometry";
   import InputCard from "./input-card.svelte";
   import OutputCard from "./output-card.svelte";
-  import { UIBusinessOperation } from "../../entities/business-operation";
+  import type { UIBusinessOperation } from "../../entities/business-operation";
   import { get } from "svelte/store";
   import type { ModuleCard } from "../../common/types/module-card";
   import { sectionsMap } from "./helpers/sections-map";
@@ -43,13 +43,13 @@
   if (currentBop) {
     configurationHistory = new History({
       storeToWatch: currentBop.configuration,
-      validatingFunction: UIBusinessOperation.rebuildModuleCards,
     });
 
     currentBop.configuration?.subscribe(config => {
-      modulesInConfig = get(currentBop.configuration);
-      return config;
+      modulesInConfig = config;
     });
+
+    console.log(get(currentBop.configuration), "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,");
 
     sectionsMap.refreshConnections(get(currentBop.configuration));
   }

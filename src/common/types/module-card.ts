@@ -44,7 +44,7 @@ export class ModuleCard {
     moduleType : ModuleType;
     moduleName : string;
     key : number;
-    modulePackage : string })
+    modulePackage ?: string })
     : ModuleCard {
     const result = new ModuleCard({
       id: nanoid(),
@@ -61,8 +61,8 @@ export class ModuleCard {
     const inputOutputData = FunctionsInfo.getCardInfo(result);
 
     result.storedDefinition.set({
-      input: inputOutputData.input,
-      output: inputOutputData.output,
+      input: inputOutputData?.input ?? {},
+      output: inputOutputData?.output ?? {},
     });
 
     return result;

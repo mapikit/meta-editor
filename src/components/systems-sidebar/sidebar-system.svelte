@@ -10,6 +10,8 @@
   import SystemPropAmountDisplay from "./system-prop-amount-display.svelte";
   import CogSmall from "../../icons/cog-small.svelte";
   import ClipboardIcon from "../../icons/clipboard-icon.svelte";
+  import { format } from "date-fns";
+	import DateField from "../object-definition/editing-fields/date-field.svelte";
   
   export let system : Project;
   let collapsed = true;
@@ -45,6 +47,10 @@
     navigation.navigateTo(`/mapibox/system/${$id}/configuration/${get(currentVersion.id)}`);
   };
 
+  const displayDate = (date : Date) : string => {
+    return format(date ?? new Date(), "dd/MM/yyyy HH:mm");
+  };
+
 </script>
 
 <div class="bg-norbalt-200 shadow mt-10 first:mt-3 rounded-md px-3 pt-3 pb-4 border-[3px] border-transparent transition-all hover:border-norbalt-100 cursor-pointer"
@@ -75,8 +81,8 @@
       </div>
       <Selector bind:field={$selectedVersion} options={versions.map((elm) => ({ value: get(elm.version), label: get(elm.version) }))} />
       <div class="w-full text-offWhite text-xs mt-3">
-        <div> Last Edit: <span class="float-right"> {get(currentVersion.updatedAt)} </span></div>
-        <div class="mt-1"> Created At: <span class="float-right"> {get(currentVersion.createdAt)} </span></div>
+        <div> Last Edit: <span class="float-right"> {displayDate(get(currentVersion.updatedAt))} </span></div>
+        <div class="mt-1"> Created At: <span class="float-right"> {displayDate(get(currentVersion.createdAt))} </span></div>
       </div>
       <div class="flex flex-row justify-around mt-3">
         <div class="rounded bg-norbalt-300 flex w-4/6 flex-row justify-around h-7">

@@ -1,46 +1,51 @@
 <script lang="ts">
   import type { ObjectDefinition } from "@meta-system/object-definition";
 import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+	import type { UIBusinessOperation } from "src/entities/business-operation";
+	import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
   import { slide } from "svelte/transition";
 
 
   import { Coordinate } from "../../common/types/geometry";
-  import type { ModuleCard } from "../../common/types/module-card";
+  import { ModuleCard as ModuleCardClass } from "../../common/types/module-card";
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import { getAvailableKey } from "./helpers/get-available-key";
   import MovableCard from "./helpers/movable-card.svelte";
   import InputSection from "./module-cards/input-section.svelte";
+	import ModuleCard from "./module-cards/module-card.svelte";
 
 
   export let configuration : Writable<ObjectDefinition>;
-  export let bopModules : Writable<ModuleCard[]>;
+  export let bopModules : Writable<ModuleCardClass[]>;
   export let bopConstants : Writable<BopsConstant[]>;
 
-  let module = $bopModules.find((module) => module.moduleType === "output")
+  const { id } = getContext<UIBusinessOperation>("currentBop");
+
+  let module = $bopModules.find((bopModule) => bopModule.moduleType === "output");
   if (module === undefined) {
-    module = {
-      dependencies: [],
+    module = ModuleCardClass.generate({
       moduleType: "output",
       key: getAvailableKey($bopModules),
       moduleName: "output",
       position: new Coordinate(200, 200),
-    };
+      bopId: $id,
+    });
+
     bopModules.update(modules => {
       modules.push(module);
       return modules;
-    })
+    });
   }
 
-  module.dimensions = module.dimensions ?? { height: undefined, width: undefined };
-  module.position = module.position ?? new Coordinate(200, 200);
+  module.position.set(new Coordinate(200, 200));
 
 
   let paths = [];
   let getPathsNames : () => string[];
-  let navigateBackToLevel : (index : number) => void
-  let getDefinitionAndData : () => { definition: ObjectDefinition, data : object }
+  let navigateBackToLevel : (index : number) => void;
+  let getDefinitionAndData : () => { definition: ObjectDefinition, data : object };
   let editing = false;
 
   function finishEdition() {
@@ -73,7 +78,7 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
         <ObjectDefinitionMiniApp
           editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
           format={$configuration} initialData={{}}
-          on:navigation-event={() => { paths = getPathsNames() }}
+          on:navigation-event={() => { paths = getPathsNames(); }}
           bind:getPathsNames
           bind:navigateBackToLevel
           bind:getDefinitionAndData

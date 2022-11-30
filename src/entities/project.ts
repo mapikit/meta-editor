@@ -2,6 +2,7 @@ import { availableProjects, saveProjects } from "../stores/projects-store";
 import { get, readable, Readable, writable, Writable } from "svelte/store";
 import { Configuration } from "./configuration";
 import { availableConfigurations } from "../stores/configuration-store";
+import { nanoid } from "nanoid";
 
 type ProjectContructorParameter = {
   id : string;
@@ -50,7 +51,7 @@ export class Project {
     // Then modify the store with the new values
 
     const newProject = new Project({
-      id: Math.floor(Math.random()*1000000).toString(),
+      id: nanoid(),
       name: "New System",
       description: "system's description.",
       isStarred: false,
@@ -67,6 +68,8 @@ export class Project {
         id: "MOCK_ID",
         projectId: get(newProject.id),
         version: "0.0.1",
+        createdAt: new Date(Date.now()),
+        updatedAt: new Date(Date.now()),
       }));
 
       return current;

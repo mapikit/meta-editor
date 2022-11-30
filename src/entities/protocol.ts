@@ -1,5 +1,6 @@
 import type { ObjectDefinition } from "@meta-system/object-definition";
 import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/protocols-type";
+import { nanoid } from "nanoid";
 import type { PropertyListEntry } from "src/common/types/property-list-entry";
 import { get, Readable, readable, Writable, writable } from "svelte/store";
 import { protocols, saveConfigurations } from "../stores/configuration-store";
@@ -91,7 +92,7 @@ export class Protocol {
     // TODO: Creates a new Protocol in the Db
 
     const newProtocol = new Protocol({
-      id: Math.floor(Math.random() * 10000000).toString(),
+      id: nanoid(),
       validatedProtocolId: "---",
       protocolName: "New Protocol",
       identifier: "<empty>",

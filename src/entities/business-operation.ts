@@ -4,7 +4,7 @@ import type {
   BopsConstant,
   BopsVariable,
   BopsCustomObject } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { ModuleCard } from "../common/types/module-card";
+import { ModuleCard, SerializedModuleCard } from "../common/types/module-card";
 import type { UIInput } from "../common/types/ui-input";
 import { writable, Writable, readable, Readable, get } from "svelte/store";
 import { Coordinate } from "../common/types/geometry";
@@ -12,13 +12,13 @@ import { businessOperations, saveConfigurations } from "../stores/configuration-
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
 
-type BOpConstructorArgument = {
+type SerializedBop = {
   id : string,
   name : string,
   description : string,
   input : UIInput | ObjectDefinition,
   output : ObjectDefinition,
-  configuration : ModuleCard[] | ModuleCard[],
+  configuration : SerializedModuleCard[],
   constants : BopsConstant[],
   variables : BopsVariable[],
   customObjects : BopsCustomObject[],
@@ -42,7 +42,7 @@ export class UIBusinessOperation {
   // eslint-disable-next-line max-lines-per-function
   constructor ({
     id, name, description, input, output, configuration, constants, customObjects, variables, isLocked, isStarred,
-  } : BOpConstructorArgument) {
+  } : SerializedBop) {
     this.id = readable(id);
     this.name = writable(name);
     this.description = writable(description);
@@ -54,7 +54,7 @@ export class UIBusinessOperation {
     this.isStarred = writable(isStarred);
 
     this.validateInput(input);
-    this.validateConfigurationForUI(configuration);
+    this.configuration.set(this.rebuildConfigurationForUI(configuration));
 
     this.keepStorageUpdated();
   }
@@ -85,7 +85,7 @@ export class UIBusinessOperation {
   // eslint-disable-next-line max-lines-per-function
   public static async createNewBOp () : Promise<void> {
     const newBop = new UIBusinessOperation({
-      id: Math.floor(Math.random()*1000000).toString(),
+      id: nanoid(),
       name: "New BOp",
       configuration: [],
       constants: [],
@@ -131,21 +131,18 @@ export class UIBusinessOperation {
     return result;
   }
 
-  private validateConfigurationForUI (configuration : ModuleCard[] | ModuleCard[])
-    : asserts configuration is ModuleCard[] {
-    for(const config of configuration) {
-      // if((config as ModuleCard).position === undefined) {
-      //   (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
-      // } else {
-      //   const position = (config as ModuleCard).position;
-      //   (config as ModuleCard).position = new Coordinate(position.x, position.y);
-      // }
+  // eslint-disable-next-line max-lines-per-function
+  private rebuildConfigurationForUI (configuration : SerializedModuleCard[])
+    : ModuleCard[] {
+    const result = [];
 
-      this.configuration.update(bopConfig => {
-        bopConfig.push(config as ModuleCard);
-        return bopConfig;
-      });
+    for(const config of configuration) {
+      const builtModuleCard = new ModuleCard(config);
+
+      result.push(builtModuleCard);
     }
+
+    return result;
   }
 
   // TODO Recursive search separating modules by their node depth in the tree (from output)
@@ -187,9 +184,11 @@ export class UIBusinessOperation {
     });
   }
 
-  public serialized () : object {
+  public serialized () : SerializedBop {
+    console.log('--------------------', get(this.configuration));
+
     return ({
-      configuration: get(this.configuration),
+      configuration: get(this.configuration).map((module) => module.serialize()),
       input: get(this.input),
       id: get(this.id),
       constants: get(this.constants),

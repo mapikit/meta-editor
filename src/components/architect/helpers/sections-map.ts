@@ -43,6 +43,7 @@ export class SectionsMap {
   }
 
   private connectModule (module : ModuleCard) : void {
+    console.log("attempting connection", get(module.dependencies));
     for(const dependency of get(module.dependencies)) this.addConnection(dependency, module.key);
   }
 

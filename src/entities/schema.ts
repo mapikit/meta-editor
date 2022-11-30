@@ -2,6 +2,7 @@ import type { ObjectDefinition } from "@meta-system/object-definition";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { get, readable, Readable, Writable, writable } from "svelte/store";
 import { saveConfigurations, schemas } from "../stores/configuration-store";
+import { nanoid } from "nanoid";
 
 type SchemaParameters = {
   id : string;
@@ -39,8 +40,6 @@ export class Schema {
     schemas.update((list) => {
       const itemIndex = list.findIndex((schema) => get(schema.id) === id);
 
-      console.log(itemIndex, "<<<<<<<<<<<<<<<<<<<<<");
-
       list.splice(itemIndex, 1);
 
       return list;
@@ -66,7 +65,7 @@ export class Schema {
     // TODO: Creates a new schema in the Db
 
     const newSchema = new Schema({
-      id: Math.floor(Math.random() * 10000000).toString(),
+      id: nanoid(),
       format: {},
       name: "New Schema",
       dbProtocol: "<empty>",
