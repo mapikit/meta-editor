@@ -45,7 +45,7 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
   let paths = [];
   let getPathsNames : () => string[];
   let navigateBackToLevel : (index : number) => void;
-  let getDefinitionAndData : () => { definition: ObjectDefinition, data : object };
+  let getDefinitionAndData : () => { definition : ObjectDefinition, data : object };
   let editing = false;
 
   function finishEdition() {
@@ -59,7 +59,7 @@ import type { BopsConstant } from "meta-system/dist/src/configuration/business-o
 </script>
 
 <MovableCard moduleConfig={module} bopModules={bopModules}>
-  <div slot="content">
+  <div>
     {#if !editing}
       <div class="outputModule" in:slide>
         <div class="header">Output<button class="button" on:click={() => editing=!editing }>Edit</button></div>

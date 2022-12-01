@@ -3,7 +3,7 @@ import type { BopsConfigurationEntry, Dependency, ModuleType }
   from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import { nanoid } from "nanoid";
 import { get, writable, Writable } from "svelte/store";
-import { Coordinate, Dimensions } from "./geometry";
+import { Coordinate, CoordinateInfo, Dimensions } from "./geometry";
 import { FunctionsInfo } from "../../components/architect/helpers/functions-info";
 
 export type UICompliantDependency = Dependency & {
@@ -12,7 +12,7 @@ export type UICompliantDependency = Dependency & {
 
 export interface SerializedModuleCard extends BopsConfigurationEntry {
   id : string;
-  position : Coordinate;
+  position : CoordinateInfo;
   dimensions ?: Dimensions;
   bopId : string;
   dependencies : Array<UICompliantDependency>;
@@ -70,7 +70,7 @@ export class ModuleCard {
 
   public constructor (parameters : SerializedModuleCard) {
     this.id = parameters.id;
-    this.position.set(parameters.position);
+    this.position.set(new Coordinate(parameters.position.x, parameters.position.y));
     this.dimensions = parameters.dimensions ?? { height: 0, width: 0 };
     this.bopId = parameters.bopId;
     this.dependencies.set(parameters.dependencies);
@@ -78,6 +78,8 @@ export class ModuleCard {
     this.moduleType = parameters.moduleType;
     this.key = parameters.key;
     this.modulePackage = parameters.modulePackage;
+
+    this.serialize = this.serialize.bind(this);
   }
 
   public serialize () : SerializedModuleCard {

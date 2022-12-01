@@ -13,7 +13,7 @@ export class Coordinate  implements CoordinateInfo {
   constructor (
     public x : number,
     public y : number,
-  ) {}
+  ) { }
 
   /**
    * Returns a cardinal vector (x, y) to the targetPoint.

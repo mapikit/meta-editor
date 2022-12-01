@@ -4,24 +4,22 @@ import type { BopsConfigurationEntry }
 import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
 import { createEventDispatcher, getContext } from "svelte";
 
-import type { Writable } from "svelte/store";
-import { AdvancedMath } from "../../../common/helpers/math";
+import { get } from "svelte/store";
 import { Coordinate } from "../../../common/types/geometry";
 
 import type { ModuleCard } from "../../../common/types/module-card";
-import type { UIInput } from "../../../common/types/ui-input";
 import { environment } from "../../../stores/environment";
 
 let context = getContext<ArchitectContext>("architectContext");
-const { dragging, mousePos } = context;
+const { mousePos } = context;
 
 type MovingPosision = {
   origin : Coordinate;
   delta : Coordinate;
 }
 
-export let moduleConfig : ModuleCard | UIInput;
-export let bopModules : Writable<BopsConfigurationEntry[]>;
+export let moduleConfig : ModuleCard;
+const { position } = moduleConfig;
 
 let ref : HTMLDivElement;
 export let moving = false;
@@ -36,7 +34,7 @@ let lastMousePosition;
 function startMovement (event : MouseEvent) : void {
   if(event.button !== 0) return;
 
-  movingPos.origin = new Coordinate(moduleConfig.position.x, moduleConfig.position.y);
+  movingPos.origin = new Coordinate($position.x, $position.y);
   movingPos.delta = new Coordinate(0, 0);
 
   moving = true;
@@ -53,6 +51,7 @@ function stopMovement (event : MouseEvent) : void {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
 function moveCard (node : Node, mousePosition : {x : number; y : number}) {
   return {
+    // eslint-disable-next-line max-lines-per-function
     update: (updateMousePos : {x : number; y : number}) : void => {
       if(moving) {
         movingPos.delta
@@ -62,24 +61,31 @@ function moveCard (node : Node, mousePosition : {x : number; y : number}) {
         lastMousePosition = updateMousePos;
         let newX =  movingPos.origin.x + movingPos.delta.x;
         let newY =  movingPos.origin.y + movingPos.delta.y;
-        moduleConfig.position = moduleConfig.position.moveTo(newX, newY);
-        bopModules.update(modules => modules);
+        // console.log({ newX, newY }, moduleConfig.moduleName);
+        moduleConfig.position.update((updatePosition) : Coordinate => {
+          updatePosition.moveTo(newX, newY);
+          return updatePosition;
+        });
+        // bopModules.update(modules => modules);
       }
     },
   };
 }
 
 $: movingStyle = moving ? "z-10 opacity-60" : "z-0 opacity-100";
+$: posX = $position.x;
+$: posY = $position.y;
 
 </script>
 
 <div use:moveCard={$mousePos} class="card {movingStyle}" bind:this={ref} on:mousedown={startMovement} on:mouseup={stopMovement}
   style="
-    left: {(moduleConfig.position.x + $environment.origin.x)*$environment.scale}px; 
-    top: {(moduleConfig.position.y + $environment.origin.y)*$environment.scale}px; 
+    left: {(posX+ $environment.origin.x)*$environment.scale}px; 
+    top: {(posY + $environment.origin.y)*$environment.scale}px; 
     transform: scale({$environment.scale}) translateX(-50%) translateY(-50%);
     transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
 >
+  x {posX} | y {posY}
   <slot/>
 </div>
 

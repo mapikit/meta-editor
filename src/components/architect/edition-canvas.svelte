@@ -10,7 +10,7 @@
   import OutputCard from "./output-card.svelte";
   import type { UIBusinessOperation } from "../../entities/business-operation";
   import { get } from "svelte/store";
-  import type { ModuleCard } from "../../common/types/module-card";
+  import { ModuleCard } from "../../common/types/module-card";
   import { sectionsMap } from "./helpers/sections-map";
   import { History } from "../../common/helpers/generic-history";
   import ArchitectToolbar from "./architect-toolbar.svelte";
@@ -226,6 +226,16 @@
       editingContext.dragging.set(false);
     }
   };
+
+  $: generatedInput = currentBop.configuration && ModuleCard.generate({
+    position: new Coordinate(0, 0),
+    bopId: get(currentBop.id),
+    moduleName: "Input",
+    moduleType: "internal",
+    key: -1,
+  });
+
+  console.log(get(currentBop.configuration));
 </script>
 
 <div class="relative w-full h-full {cursorStyle}" id="architect"
@@ -248,7 +258,7 @@ on:mouseup={releaseDrag}
         <Module bopModules={currentBop.configuration} bopConstants={currentBop.constants} moduleConfig={config} trash={trash}/>
       {/if}
     {/each}
-    <InputCard bopModules={currentBop.configuration} configuration={currentBop.input}/>
+    <InputCard bopModules={currentBop.configuration} configuration={generatedInput}/>
     <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>      
   </div>
   <div class="fixed top-0 left-0 w-full h-full pointer-events-none" bind:this={overlayLayer}/>

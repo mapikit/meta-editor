@@ -10,13 +10,13 @@
   import OutputSection from "./module-cards/output-section.svelte";
 
 
-  export let configuration : Writable<UIInput>;
+  export let configuration : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>;
 
-  let paths = [];
-  let getPathsNames : () => string[];
-  let navigateBackToLevel : (index : number) => void;
-  let getDefinitionAndData : () => { definition: ObjectDefinition, data : object };
+  // let paths = [];
+  // let getPathsNames : () => string[];
+  // let navigateBackToLevel : (index : number) => void;
+  // let getDefinitionAndData : () => { definition : ObjectDefinition, data : object };
   let editing = false;
 
 
@@ -25,22 +25,23 @@
   }
 
   // eslint-disable-next-line max-lines-per-function
-  function finishEdition() {
+  function finishEdition () {
     editing = false;
 
-    configuration.update(input => {
-      navigateBackToLevel(0);
-      input.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
+    // configuration.update(input => {
+    //   navigateBackToLevel(0);
+    //   input.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
 
-      return input;
-    });
+    //   return input;
+    // });
   }
 
 </script>
 
-<MovableCard moduleConfig={$configuration} bopModules={bopModules}>
-  <div slot="content">
-    {#if !editing}
+<MovableCard moduleConfig={configuration} bopModules={bopModules}>
+  <div>
+    aaaa eu sou um input
+    <!-- {#if !editing}
       <div class="inputModule" in:slide>
         <div class="header">Input  <button on:click={startEditing} class="button">Edit</button></div>
         {#each Object.keys($configuration.definition) as key}
@@ -65,7 +66,7 @@
           bind:getDefinitionAndData
           />
       </div>      
-    {/if}
+    {/if} -->
   </div>
 </MovableCard>
 

@@ -185,8 +185,6 @@ export class UIBusinessOperation {
   }
 
   public serialized () : SerializedBop {
-    console.log('--------------------', get(this.configuration));
-
     return ({
       configuration: get(this.configuration).map((module) => module.serialize()),
       input: get(this.input),
