@@ -65,9 +65,12 @@ export class ModuleCard {
       output: inputOutputData?.output ?? {},
     });
 
+    console.log("GENERATED CARD: ", { moduleName: generationArgs.moduleName, inputOutputData });
+
     return result;
   }
 
+  // eslint-disable-next-line max-lines-per-function
   public constructor (parameters : SerializedModuleCard) {
     this.id = parameters.id;
     this.position.set(new Coordinate(parameters.position.x, parameters.position.y));
@@ -80,6 +83,16 @@ export class ModuleCard {
     this.modulePackage = parameters.modulePackage;
 
     this.serialize = this.serialize.bind(this);
+
+    if (parameters.storedDefinition) {
+      this.storedDefinition.set(parameters.storedDefinition);
+    } else {
+      const inputOutputData = FunctionsInfo.getCardInfo(this);
+      this.storedDefinition.set({
+        input: inputOutputData?.input ?? {},
+        output: inputOutputData?.output ?? {},
+      });
+    }
   }
 
   public serialize () : SerializedModuleCard {

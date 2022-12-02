@@ -218,6 +218,7 @@
           .moveBy(-$environment.origin.x - 106, -$environment.origin.y - 60)
           .scale(1/$environment.scale));
         modules.push(newModule);
+
         return modules;
       });
     }
@@ -234,8 +235,6 @@
     moduleType: "internal",
     key: -1,
   });
-
-  console.log(get(currentBop.configuration));
 </script>
 
 <div class="relative w-full h-full {cursorStyle}" id="architect"

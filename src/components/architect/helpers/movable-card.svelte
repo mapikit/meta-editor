@@ -85,7 +85,6 @@ $: posY = $position.y;
     transform: scale({$environment.scale}) translateX(-50%) translateY(-50%);
     transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
 >
-  x {posX} | y {posY}
   <slot/>
 </div>
 

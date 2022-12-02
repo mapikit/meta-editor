@@ -176,7 +176,7 @@ export class UIBusinessOperation {
       bopId: get(this.id),
       id: nanoid(),
       dependencies: module.dependencies.map((dep) => ({ ...dep, matchingType: false })),
-      storedDefinition: { input: {}, output: {} },
+      storedDefinition: { input: {}, output: {} }, // TODO: get input and output data THIS WILL CAUSE BUGS IF NOT DONE
       moduleName: module.moduleName,
       key: module.key,
       moduleType: module.moduleType,
