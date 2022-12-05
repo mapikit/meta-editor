@@ -6,6 +6,7 @@
   import { getContext } from "svelte";
   import type { UIBusinessOperation } from "src/entities/business-operation";
   import type { ModuleCard } from "../../../common/types/module-card";
+	import { get } from "svelte/store";
 
   export let mode : "input" | "output";
   export let typeDetails : TypeDefinition;
@@ -43,10 +44,11 @@
       result.push({ key, type: typeDetails["subtype"][key] });
     });
 
+    console.log(typeDetails, get(moduleConfig.storedDefinition));
     return result;
   };
 
-  $: deepProperties = $configuration && getDeepProperties();
+  $: deepProperties = deepOpen ? $configuration && getDeepProperties() : [];
 
   // Only for Objects
   const addPropertyAsField = () : void => {

@@ -23,6 +23,8 @@
   export let trash : HTMLDivElement;
   let functionalDepsOpen = false;
 
+  const { storedDefinition } = moduleConfig;
+
   setContext("moduleConfig", moduleConfig);
 
   moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
@@ -31,7 +33,8 @@
   moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70);
   moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
   moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70);
-  $: cardInfo = FunctionsInfo.getCardInfo(moduleConfig);
+  
+  let cardInfo = $storedDefinition;
 
   function attemptDeletion (stopEvent : CustomEvent<MouseEvent>) : void {
     const event = new CustomEvent<DeleteModuleEvent>("deleteModule",
