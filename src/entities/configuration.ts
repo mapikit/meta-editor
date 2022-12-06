@@ -4,7 +4,6 @@ import type { EnvironmentVariable } from "./environment-variable";
 import { Protocol, ProtocolParameters } from "./protocol";
 import { Schema, SchemaParameters } from "./schema";
 import { BOpParameters, UIBusinessOperation } from "./business-operation";
-import { saveConfigurations } from "../stores/configuration-store";
 import type { Serialized } from "./serialized-type";
 
 type ConfigurationParameter = {
@@ -109,11 +108,5 @@ export class Configuration {
       createdAt: get(this.createdAt),
       updatedAt: get(this.updatedAt),
     };
-  }
-
-  public keepStorageUpdated () : void {
-    this.projectId.subscribe(saveConfigurations);
-    this.id.subscribe(saveConfigurations);
-    this.version.subscribe(saveConfigurations);
   }
 }

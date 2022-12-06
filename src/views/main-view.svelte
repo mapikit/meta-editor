@@ -1,21 +1,22 @@
 <script lang="ts">
-import Route from "../lib/router/route.svelte";
-import HomeContent from "./home/home-content.svelte";
-import Mapibox from "./mapibox/mapibox.svelte";
-import PageBaseLayout from "./layouts/page-base-layout.svelte";
-import System from "./mapibox/system/system.svelte";
+  import Route from "../lib/router/route.svelte";
+  import HomeContent from "./home/home-content.svelte";
+  import Mapibox from "./mapibox/mapibox.svelte";
+  import PageBaseLayout from "./layouts/page-base-layout.svelte";
+  import System from "./mapibox/system/system.svelte";
 	import Login from "./login/login.svelte";
 	import { storageManager } from "../stores/storage-manager";
 	import { navigation } from "../lib/navigation";
+	import Register from "./register/register.svelte";
 
-const promise = async () => {
-  await storageManager.loadAllInfo();
-}
+  const promise = async () => {
+    await storageManager.loadAllInfo();
+  }
 
 
-function goToLogin () {
-  navigation.navigateTo("/login");
-}
+  function goToLogin () {
+    navigation.navigateTo("/login");
+  }
 </script>
 
 {#await promise().catch(() => goToLogin())}
@@ -37,6 +38,9 @@ function goToLogin () {
     </Route>
     <Route path="/login">
       <Login />
+    </Route>
+    <Route path="/register">
+      <Register />
     </Route>
   </PageBaseLayout>
 </div>

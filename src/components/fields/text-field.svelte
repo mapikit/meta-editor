@@ -41,6 +41,6 @@
   <textarea bind:value={$field}
   class="outline-none rounded border border-norbalt-100 focus:border-offWhite transition-all bg-norbalt-350 w-full {fieldMtNoLabel} px-1 resize-none"
   bind:this="{content}"
-  on:input={resizeTextArea}/>
+  on:input={() => { resizeTextArea(); onChange(); }}/>
 </div>
 {/if}

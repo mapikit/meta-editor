@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, onDestroy } from "svelte";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import type { ObjectDefinition } from "@meta-system/object-definition";
   import {
     convertDefinitionDataToObjectDefinition,
@@ -17,6 +17,7 @@
   export let editingLevel : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
   export let format : Writable<ObjectDefinition>;
   export let rootStyle = "mt-4 bg-norbalt-300 rounded";
+  export let onChange = () => {};
 
   const dispatch = createEventDispatcher();
 
@@ -113,8 +114,13 @@
     return levelsNames;
   };
 
+  let unsubChange = () => {};
+  let changeFunction = () => {};
+  onMount(() => { unsubChange = selectedData.subscribe(() => changeFunction()); changeFunction = onChange})
+  // This "changeFunction" is required to prevent an update on right after the subscription
   onDestroy(() => {
     unsub();
+    unsubChange();
   });
 
 </script>

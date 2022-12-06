@@ -1,13 +1,12 @@
 /* eslint-disable max-classes-per-file */
 
 import { get, Unsubscriber, Writable } from "svelte/store";
-import { getDeepStoreObject } from "../components/architect/helpers/get-deep-store-obj";
 import type { UIBusinessOperation } from "../entities/business-operation";
 import { Configuration } from "../entities/configuration";
 import { Project } from "../entities/project";
 import type { Protocol } from "../entities/protocol";
 import type { Schema } from "../entities/schema";
-import { availableConfigurations, startConfigurationStoreSync } from "./configuration-store";
+import { availableConfigurations } from "./configuration-store";
 import { HttpStorageManager } from "./http-storage";
 // import { LocalStorageManager } from "./local-storage";
 import { availableProjects } from "./projects-store";
@@ -18,7 +17,9 @@ type Stores = {
 }
 
 export interface StorageManagerType {
-  loginUser (email : string, password : string) : Promise<void>;
+  loginUser : (email : string, password : string) => Promise<void>;
+  registerUser : (email : string, password : string) => Promise<void>;
+  userExists : (email : string) => Promise<boolean>;
   refreshUserAuth : () => Promise<void>;
   loadProjectsToStores : () => Promise<void>;
   loadVersionsToStores : (projectId : string) => Promise<void>;
@@ -62,11 +63,6 @@ class MapikitStorageManager<T extends StorageManagerType> {
       await this.manager.loadVersionsToStores(get(project.id));
     }
     await this.assessVersionsSuccess();
-
-    startConfigurationStoreSync();
-
-    console.log(getDeepStoreObject(this.stores.configurationsStore));
-    console.log(getDeepStoreObject(this.stores.projectsStore));
   }
 
   // eslint-disable-next-line max-lines-per-function

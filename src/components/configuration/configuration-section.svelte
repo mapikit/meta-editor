@@ -2,17 +2,18 @@
   import { businessOperations, getConfigurationById, protocols, schemas } from "../../stores/configuration-store";
   import ChevronIcon from "../../icons/chevron-icon.svelte";
   import SystemPropIcon from "../common/system-prop-icon.svelte";
-  import { Schema } from "../../entities/schema";
-  import { Protocol } from "../../entities/protocol";
-  import { UIBusinessOperation } from "../../entities/business-operation";
+  import type { Schema } from "../../entities/schema";
+  import type { Protocol } from "../../entities/protocol";
+  import type { UIBusinessOperation } from "../../entities/business-operation";
   import { get } from "svelte/store";
   import StarIcon from "../../icons/star-icon.svelte";
   import LockIcon from "../../icons/lock-icon.svelte";
   import { navigation } from "../../lib/navigation";
   import { slide } from "svelte/transition";
-	import { storageManager } from "../../stores/storage-manager";
 	import { onMount } from "svelte";
 	import type { Configuration } from "../../entities/configuration";
+	import { createBop, createProtocol, createSchema } from "./creation-functions";
+	import { deleteBop, deleteProtocol, deleteSchema } from "./deletion-functions";
 
   let currentVersion : Configuration
 
@@ -33,33 +34,29 @@
     "Protocols": "stroke-white fill-crystalBlue",
   };
 
-  $: deleteFunction = type === "Schemas"
-    ? (schema) : () => void => { return () => Schema.deleteSchema(schema.id); }
-    : type === "Business Operations"
-      ? (bop) : () => void => () => UIBusinessOperation.deleteBop(bop.id)
-      : (protocol) : () => void => () => Protocol.deleteProtocol(protocol.id);
+  $: deleteFunction = 
+    type === "Schemas" ? deleteSchema : 
+    type === "Business Operations" ? deleteBop : 
+    type === "Protocols" ? deleteProtocol :
+      () => console.log(`Deletion for ${type} not yet implemented`);
+  
   $: creationFunction =
-    type === "Schemas" ? storageManager.manager.createSchema : 
-    type === "Business Operations" ? storageManager.manager.createBop : 
-    type === "Protocols" ? storageManager.manager.createProtocol :
-    () => window.alert("Not Yet Implemented");
+    type === "Schemas" ? createSchema : 
+    type === "Business Operations" ? createBop : 
+    type === "Protocols" ? createProtocol :
+      () => console.log(`Creation for ${type} not yet implemented`);
 
-  $: linkName = type === "Schemas"
-    ? "/schemas"
-    : type === "Business Operations"
-      ? "/bops"
-      : "/protocols";
-  $: schemaList = $schemas;
-  $: bopsList = $businessOperations;
-  $: protocolList = $protocols;
+  $: linkName = 
+    type === "Schemas" ? "/schemas": 
+    type === "Business Operations" ? "/bops" : 
+    "/protocols";
 
-  $: usedList = (type === "Schemas" ? schemaList : type === "Business Operations" ? bopsList : protocolList)
+  $: usedList = (type === "Schemas" ? $schemas : type === "Business Operations" ?  $businessOperations : $protocols)
     .map((item : Schema | Protocol | UIBusinessOperation) => item.getCardInfo());
   $: chevronStyle = collapsed ? "-rotate-90" : "";
   $: currentStyle = iconStyles[type];
 
   const navigateEdit = (item) : () => void => {
-    console.log(item);
     if (navigation.currentPath.includes(linkName)) {
       const pathParams = navigation.currentPathParams;
       // eslint-disable-next-line max-len
@@ -109,7 +106,7 @@
           > Edit </div>
           {#if canDelete}
             <div class="rounded bg-norbalt-300 px-3 py-1 ml-4 cursor-pointer transition-all text-offWhite hover:text-roseRed"
-              on:click="{deleteFunction(item)}"
+              on:click="{() => deleteFunction(get(currentVersion.id), item.id)}"
             > Delete </div>
           {/if}
           <div class="rounded bg-norbalt-300 ml-auto h-8 px-2.5 flex flex-col justify-center {get(item.locked) ? "fill-ochreYellow" : "fill-offWhite"} hover:fill-ochreYellow-light transition-all cursor-pointer"

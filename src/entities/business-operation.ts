@@ -7,7 +7,7 @@ import type {
 import { ModuleCard, SerializedModuleCard } from "../common/types/module-card";
 import { writable, Writable, readable, Readable, get } from "svelte/store";
 import { Coordinate } from "../common/types/geometry";
-import { businessOperations, saveConfigurations } from "../stores/configuration-store";
+import { availableConfigurations, currentConfigId } from "../stores/configuration-store";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
 import type { Serialized } from "./serialized-type";
@@ -71,20 +71,15 @@ export class UIBusinessOperation {
     this.validateInput(input);
     this.validateOutput(output);
     this.configuration.set(this.rebuildConfigurationForUI(configuration));
-
-    this.keepStorageUpdated();
   }
 
   public static deleteBop (id : string) : void {
-    businessOperations.update((list) => {
-      const itemIndex = list.findIndex((bop) => get(bop.id) === id);
-
-      list.splice(itemIndex, 1);
-
-      return list;
+    availableConfigurations.update(configs => {
+      const bops = configs.find(config => get(config.id) === get(currentConfigId)).protocols;
+      const itemIndex = bops.findIndex((bop) => get(bop.id) === id);
+      bops.splice(itemIndex, 1);
+      return configs;
     });
-
-    saveConfigurations();
   }
 
   public getCardInfo () : PropertyListEntry {
@@ -99,7 +94,7 @@ export class UIBusinessOperation {
   }
 
   // eslint-disable-next-line max-lines-per-function
-  public static async createNewBOp () : Promise<UIBusinessOperation> {
+  public static createNewBOp () : UIBusinessOperation {
     const newBop = new UIBusinessOperation({
       id: nanoid(),
       name: "New BOp",
@@ -237,17 +232,5 @@ export class UIBusinessOperation {
       configuration: get(this.configuration),
       customObjects: get(this.customObjects),
     });
-  }
-
-  private keepStorageUpdated () : void {
-    this.configuration.subscribe(saveConfigurations);
-    this.id.subscribe(saveConfigurations);
-    this.constants.subscribe(saveConfigurations);
-    this.variables.subscribe(saveConfigurations);
-    this.name.subscribe(saveConfigurations);
-    this.description.subscribe(saveConfigurations);
-    this.customObjects.subscribe(saveConfigurations);
-    this.isStarred.subscribe(saveConfigurations);
-    this.isLocked.subscribe(saveConfigurations);
   }
 }

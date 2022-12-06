@@ -1,6 +1,6 @@
 <script lang="ts">
   import { get } from "svelte/store";
-  import { getSchemaById, protocols, schemas, setSchema } from "../../../stores/configuration-store";
+  import { availableConfigurations, getSchemaById, protocols } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
   import { onMount, onDestroy } from "svelte";
   import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
@@ -16,7 +16,6 @@
 
   let pathParams = navigation.currentPathParamsSubscribable;
 
-  $: schemaList = $schemas;
   $: versionId = $pathParams.configurationId
   $: currentSchemaId = $pathParams["schemaId"];
   $: currentSchema = getSchemaById(currentSchemaId);
@@ -30,22 +29,19 @@
   $: selectedProtocolLabel = protocolsOptions.find((protocol) => protocol.value === $dbprotocol)?.label;
 
   let unsub = () : void => { void 0; };
-  let unsubSchema = () : void => { void 0; };
   let editted = false;
   let previousSchemaState : Serialized<Schema> = undefined;
 
-  onDestroy(() => { unsub(); unsubSchema() });
+  onDestroy(() => { 
+    currentSchema.set(new Schema(previousSchemaState));
+    unsub()
+  });
   // eslint-disable-next-line max-lines-per-function
   onMount(() => {
-    console.log("Mounted");
     const currentPathParams = navigation.currentPathParams;
-    // pathParams = navigation.currentPathParamsSubscribable;
     currentSchemaId = currentPathParams["schemaId"];
-    console.log(currentSchemaId)
     currentSchema = getSchemaById(currentSchemaId);
-    console.log(currentSchema, "(equates to)", get(currentSchema), "or", $currentSchema)
     previousSchemaState = get(currentSchema)?.serialized();
-    console.log(previousSchemaState)
 
     unsub = pathParams.subscribe(() => {
       currentSchemaId = navigation.currentPathParams["schemaId"];
@@ -56,15 +52,20 @@
   });
 
   function saveSchema () {
-    storageManager.manager.updateSchema(versionId, get(currentSchema));
-    previousSchemaState = $currentSchema.serialized();
-    editted = false;
+    storageManager.manager.updateSchema(versionId, get(currentSchema))
+      .catch(err => { window.alert("Error while saving schema\n" + err)})
+      .then(() => {
+        previousSchemaState = $currentSchema.serialized();
+        currentSchema.set($currentSchema)
+        editted = false;
+      })
   }
 
+  let rerender = false;
   function cancelEdit () {
-    console.log(previousSchemaState);
     const previous = new Schema(previousSchemaState);
-    setSchema(previous);
+    currentSchema.set(previous);
+    rerender = !rerender;
     editted = false;
   }
 </script>
@@ -72,7 +73,7 @@
 <div class="px-8 w-[calc(100%-86px)] overflow-y-scroll pb-36">
   <ConfigurationSection type="Schemas" canDelete={true}/>
   <div class="w-full mt-12" >
-    <p class="text-white font-bold text-2xl italic"> Editing '{$schemaName}' Schema</p>
+    <p class="text-white font-bold text-2xl italic"> Editing '{schemaName}' Schema</p>
     <div class="flex flex-row w-full mt-4"> <!-- Card holder -->
       <div class="rounded bg-norbalt-200 p-3 px-5 border-transparent border w-[550px]">
         <div /> <!-- Confirm / Cancel -->
@@ -98,11 +99,14 @@
         </div>
         {#key currentSchemaId}
           {#if $schemaFormat} <!-- this ensures the mini app is not rendered with bad values -->
-            <ObjectDefinitionMiniApp
-            editingLevel={new EditorLevel(EditorLevels.createDefinition)}
-            format={schemaFormat}
-            initialData={{}}
-            />
+            {#key rerender} <!-- this is required to refresh the ODMiniApp on edition cancel -->
+              <ObjectDefinitionMiniApp
+              onChange={() => editted = true}
+              editingLevel={new EditorLevel(EditorLevels.createDefinition)}
+              format={schemaFormat}
+              initialData={{}}
+              />         
+            {/key}
           {/if}
         {/key}
       </div>

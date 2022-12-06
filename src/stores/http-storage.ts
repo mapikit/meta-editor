@@ -16,17 +16,34 @@ export class HttpStorageManager implements StorageManagerType {
 
   private readonly requester = axios.create({
     baseURL: "http://localhost:3530",
-    // transformResponse: (res) : object => JSON.parse(res),
   });
 
   constructor () {
     this.createSchema = this.createSchema.bind(this);
     this.createProtocol = this.createProtocol.bind(this);
     this.createBop = this.createBop.bind(this);
+    this.deleteSchema = this.deleteSchema.bind(this);
   }
 
   private wasRequestUnsuccessful = (code : number) : boolean => (!(code >= 200) || !(code < 300));
 
+  async userExists (email : string) : Promise<boolean> {
+    const res = await this.requester.post("/user-exists", { email });
+
+    if(this.wasRequestUnsuccessful(res.status)) throw Error("Invalid Registration");
+
+    return res.data.exists;
+  };
+
+
+  async registerUser (email : string, password : string) : Promise<void> {
+    const res = await this.requester.post("/register", { email, password });
+
+
+    if(this.wasRequestUnsuccessful(res.status)) throw Error("Invalid Registration");
+  };
+
+  // USER METHODS ================================================================
   async loginUser (email : string, password : string) : Promise<void> {
     const res = await this.requester.post("/login", { email, password });
 
@@ -52,18 +69,13 @@ export class HttpStorageManager implements StorageManagerType {
     this.userToken = res.data.authorizationToken;
   };
 
-  // DELETE METHODS
+  // DELETE METHODS ================================================================
   async deleteProject (projectId : string) : Promise<void> {
     const res = await this.requester.post("delete-project", {
       projectId,
     },{ headers: { authorization: this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableProjects.update(projects => {
-      const index = projects.findIndex(_project => get(_project.id) === projectId);
-      projects.splice(index, 1);
-      return projects;
-    });
   };
 
   async deleteVersion (versionId : string) : Promise<void> {
@@ -72,15 +84,13 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization: this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      const index = versions.findIndex(version => get(version.id) === versionId);
-      versions.splice(index, 1);
-      return versions;
-    });
   };
 
   async deleteSchema (versionId : string, schemaId : string) : Promise<void> {
+    console.log(versionId, schemaId);
+    console.log(get(availableConfigurations).map(config => config.serialized()));
     const serializedVersion = get(availableConfigurations).find(version => get(version.id) === versionId).serialized();
+    console.log("version", serializedVersion);
     const index = serializedVersion.schemas.findIndex(schema => schema.id === schemaId);
     serializedVersion.schemas.splice(index, 1);
 
@@ -89,10 +99,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).schemas.splice(index);
-      return versions;
-    });
   };
 
   async deleteBop (versionId : string, bopId : string) : Promise<void> {
@@ -105,10 +111,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).businessOperations.splice(index);
-      return versions;
-    });
   };
 
   async deleteProtocol (versionId : string, protocolId : string) : Promise<void> {
@@ -121,25 +123,16 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).protocols.splice(index);
-      return versions;
-    });
   };
 
 
-  // UPDATE METHODS
+  // UPDATE METHODS ================================================================
   async updateProject (project : Project) : Promise<void> {
     const res = await this.requester.post("update-project", {
       project: project,
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableProjects.update(projects => {
-      const index = projects.findIndex(_project => get(_project.id) === get(project.id));
-      projects[index] = project;
-      return projects;
-    });
   }
 
   async updateVersion (version : Configuration) : Promise<void> {
@@ -148,11 +141,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(configs => {
-      const index = configs.findIndex(_project => get(_project.id) === get(version.id));
-      configs[index] = version;
-      return configs;
-    });
   };
 
   async updateSchema (versionId : string, schema : Schema) : Promise<void> {
@@ -165,10 +153,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).schemas.push(schema);
-      return versions;
-    });
   };
 
   async updateBop (versionId : string, bop : UIBusinessOperation) : Promise<void> {
@@ -181,10 +165,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization: this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).businessOperations.push(bop);
-      return versions;
-    });
   }
 
   async updateProtocol (versionId : string, protocol : Protocol) : Promise<void> {
@@ -197,13 +177,9 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).protocols.push(protocol);
-      return versions;
-    });
   };
 
-  // CREATION METHODS
+  // CREATION METHODS ================================================================
   async createProject (project : Project) : Promise<void> {
     const serializedProject = project.serialized();
 
@@ -215,13 +191,6 @@ export class HttpStorageManager implements StorageManagerType {
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
 
     await this.loadVersionsToStores(res.data.createdProjectId);
-
-
-    availableProjects.update((current) => {
-      current.push(new Project({ ...project.serialized(), id: res.data.createdProjectId }));
-
-      return current;
-    });
   };
 
   async createVersion (projectId : string) : Promise<void> {
@@ -230,10 +199,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.push(res.data.createdVersion);
-      return versions;
-    });
   };
 
   async createSchema (versionId : string) : Promise<void> {
@@ -246,10 +211,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).schemas.push(schema);
-      return versions;
-    });
   };
 
   async createBop (versionId : string) : Promise<void> {
@@ -262,10 +223,6 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).businessOperations.push(bop);
-      return versions;
-    });
   }
 
   async createProtocol (versionId : string) : Promise<void> {
@@ -278,32 +235,19 @@ export class HttpStorageManager implements StorageManagerType {
     }, { headers: { authorization:this.userToken } });
 
     if(this.wasRequestUnsuccessful(res.status)) throw Error("Request Error");
-    availableConfigurations.update(versions => {
-      versions.find(version => get(version.id) === versionId).protocols.push(protocol);
-      return versions;
-    });
   };
 
   async loadProjectsToStores () : Promise<void> {
-    // const test = await (new Axios({})).get("www.google.com");
-    // console.log(test);
     const response = await this.requester.get("/projects", {
       headers: { Authorization:this.userToken },
     });
 
-    console.log(response.data);
 
     response.data.projects = (response.data.projects as Array<any>)
       .map(project => new Project({ ...project, id: project["_id"] }));
 
-    console.log(response.data);
-
 
     availableProjects.set(response.data.projects);
-    // availableProjects.update(projects => {
-    //   projects.push(...response.data.projects);
-    //   return projects;
-    // });
   }
 
   async loadVersionsToStores (projectId : string) : Promise<void> {
@@ -311,8 +255,6 @@ export class HttpStorageManager implements StorageManagerType {
       headers: { authorization:this.userToken },
       params: { projectId: projectId },
     });
-
-    // console.log(response);
 
     availableConfigurations.update(configs => {
       configs.push(...response.data.versions.map(version => new Configuration({ ...version, id: version._id })));

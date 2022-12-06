@@ -1,4 +1,3 @@
-import { saveProjects } from "../stores/projects-store";
 import { get, readable, Readable, writable, Writable } from "svelte/store";
 import { Configuration } from "./configuration";
 import { availableConfigurations } from "../stores/configuration-store";
@@ -23,8 +22,6 @@ export class Project {
     this.name.set(name);
     this.description.set(description);
     this.isStarred.set(isStarred);
-
-    this.keepStorageUpdated();
   }
 
   public getConfigurations () : Configuration[] {
@@ -74,12 +71,5 @@ export class Project {
       description: get(this.description),
       isStarred: get(this.isStarred),
     };
-  }
-
-  private keepStorageUpdated () : void {
-    this.id.subscribe(saveProjects);
-    this.name.subscribe(saveProjects);
-    this.description.subscribe(saveProjects);
-    this.isStarred.subscribe(saveProjects);
   }
 }

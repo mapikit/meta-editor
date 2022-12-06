@@ -1,11 +1,18 @@
 <script lang="ts">
-import { availableProjects } from "../../stores/projects-store";
-import { get } from "svelte/store";
+  import { availableProjects } from "../../stores/projects-store";
+  import { get } from "svelte/store";
+  import MinifiedSystem from "./minified-system.svelte";
+	import { onMount } from "svelte";
+	import { currentConfigId } from "../../stores/configuration-store";
+	import { navigation } from "../../lib/navigation";
 
-import MinifiedSystem from "./minified-system.svelte";
-let systems = [];
+  let systems = [];
 
-$: systems = $availableProjects;
+  onMount(() => {
+    currentConfigId.set(navigation.currentPathParams["configurationId"]);
+  });
+
+  $: systems = $availableProjects;
 </script>
 
 <div class="text-md font-sans text-white w-24 h-full flex flex-row justify-between">

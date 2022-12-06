@@ -3,7 +3,7 @@ import { ProtocolKind } from "meta-system/dist/src/configuration/protocols/proto
 import { nanoid } from "nanoid";
 import type { PropertyListEntry } from "src/common/types/property-list-entry";
 import { get, Readable, readable, Writable, writable } from "svelte/store";
-import { protocols, saveConfigurations } from "../stores/configuration-store";
+import { availableConfigurations, currentConfigId } from "../stores/configuration-store";
 import type { Serialized } from "./serialized-type";
 
 export type ProtocolParameters = {
@@ -68,20 +68,15 @@ export class Protocol {
     this.description.set(description);
     this.configuration.set(configuration);
     this.protocolType.set(protocolType as ProtocolKind);
-
-    this.keepStorageUpdated();
   }
 
   public static deleteProtocol (id : string) : void {
-    protocols.update((list) => {
+    availableConfigurations.update(configs => {
+      const list = configs.find(config => get(config.id) === get(currentConfigId)).protocols;
       const itemIndex = list.findIndex((protocol) => get(protocol.id) === id);
-
       list.splice(itemIndex, 1);
-
-      return list;
+      return configs;
     });
-
-    saveConfigurations();
   }
 
   public async getDataFromValidatedProtocol () : Promise<void> {
@@ -89,7 +84,7 @@ export class Protocol {
   }
 
   // eslint-disable-next-line max-lines-per-function
-  public static async createNewProtocol () : Promise<Protocol> {
+  public static createNewProtocol () : Protocol {
     const newProtocol = new Protocol({
       id: nanoid(),
       validatedProtocolId: "---",
@@ -153,17 +148,5 @@ export class Protocol {
       protocolVersion: get(this.protocolVersion),
       identifier: get(this.identifier),
     });
-  }
-
-  private keepStorageUpdated () : void {
-    this.id.subscribe(saveConfigurations);
-    this.identifier.subscribe(saveConfigurations);
-    this.validatedProtocolId.subscribe(saveConfigurations);
-    this.protocolName.subscribe(saveConfigurations);
-    this.protocolVersion.subscribe(saveConfigurations);
-    this.isStarred.subscribe(saveConfigurations);
-    this.isLocked.subscribe(saveConfigurations);
-    this.description.subscribe(saveConfigurations);
-    this.configuration.subscribe(saveConfigurations);
   }
 }

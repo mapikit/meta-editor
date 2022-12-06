@@ -1,14 +1,20 @@
 <script lang="ts">
+	import { get } from "svelte/store";
   import { navigation } from "../../../lib/navigation";
+	import { availableConfigurations } from "../../../stores/configuration-store";
+	import { availableProjects } from "../../../stores/projects-store";
 
-  const favorites = [
-    { type: "BOp", name: "Business procedure 48", description: "This" },
-    { type: "BOp", name: "Business procedure 49", description: "This" },
-    { type: "BOp", name: "Business procedure 50", description: "This" },
-    { type: "BOp", name: "Business procedure 51", description: "This" },
-    { type: "BOp", name: "Business procedure 52", description: "This" },
-  ];
+  // const favorites = [
+  //   { type: "BOp", name: "Business procedure 48", description: "This" },
+  //   { type: "BOp", name: "Business procedure 49", description: "This" },
+  //   { type: "BOp", name: "Business procedure 50", description: "This" },
+  //   { type: "BOp", name: "Business procedure 51", description: "This" },
+  //   { type: "BOp", name: "Business procedure 52", description: "This" },
+  // ];
 
+  const favorites = $availableProjects
+    .filter(config => config.isStarred)
+    .map(config => ({ type: "Project", name: get(config.name), description: get(config.description) }))
   const navigateToFavorite = () : void => { navigation.navigateTo("/mapibox"); };
 </script>
 

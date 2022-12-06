@@ -1,8 +1,8 @@
 import type { ObjectDefinition } from "@meta-system/object-definition";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { get, readable, Readable, Writable, writable } from "svelte/store";
-import { saveConfigurations, schemas } from "../stores/configuration-store";
 import { nanoid } from "nanoid";
+import { availableConfigurations, currentConfigId } from "../stores/configuration-store";
 import type { Serialized } from "./serialized-type";
 
 export type SchemaParameters = {
@@ -34,19 +34,16 @@ export class Schema {
     this.description.set(description);
 
     this.id = readable(id);
-    this.keepStorageUpdated();
   }
 
   public static deleteSchema (id : string) : void {
-    schemas.update((list) => {
+    availableConfigurations.update(configs => {
+      const list = configs.find(config => get(config.id) === get(currentConfigId)).schemas;
       const itemIndex = list.findIndex((schema) => get(schema.id) === id);
 
       list.splice(itemIndex, 1);
-
-      return list;
+      return configs;
     });
-
-    saveConfigurations();
   }
 
   public getCardInfo () : PropertyListEntry {
@@ -62,7 +59,7 @@ export class Schema {
     };
   }
 
-  public static async createNewSchema () : Promise<Schema> {
+  public static createNewSchema () : Schema {
     const newSchema = new Schema({
       id: nanoid(),
       format: {},
@@ -95,15 +92,5 @@ export class Schema {
       dbProtocol: get(this.dbProtocol),
       identifier: get(this.id),
     });
-  }
-
-  private keepStorageUpdated () : void {
-    this.format.subscribe(saveConfigurations);
-    this.description.subscribe(saveConfigurations);
-    this.name.subscribe(saveConfigurations);
-    this.dbProtocol.subscribe(saveConfigurations);
-    this.isStarred.subscribe(saveConfigurations);
-    this.isLocked.subscribe(saveConfigurations);
-    this.id.subscribe(saveConfigurations);
   }
 }
