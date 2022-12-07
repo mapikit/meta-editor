@@ -6,7 +6,7 @@
   import { getContext } from "svelte";
   import type { UIBusinessOperation } from "src/entities/business-operation";
   import type { ModuleCard } from "../../../common/types/module-card";
-	import { get } from "svelte/store";
+  import EditableProperty from "./editable-property.svelte";
 
   export let mode : "input" | "output";
   export let typeDetails : TypeDefinition;
@@ -44,7 +44,7 @@
       result.push({ key, type: typeDetails["subtype"][key] });
     });
 
-    console.log(typeDetails, get(moduleConfig.storedDefinition));
+    console.log(parentPaths);
     return result;
   };
 
@@ -85,11 +85,9 @@
   {#if deepOpen && isDeep}
     <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-0.5 min-w-[3.5rem]">
       {#each deepProperties as property}
-        <div class="flex {containerOrder} px-1 justify-end mt-0.5 first:mt-0 text-xs">
-          <div class=""> {property.key} </div>
-          <div class="w-2"/>
+        <EditableProperty storedDefinition={storedDefinition} mode={mode} parentPaths={[...parentPaths, property.key]}>
           <svelte:self mode={mode} typeDetails={property.type} parentPaths={[...parentPaths, property.key]}/>
-        </div>
+        </EditableProperty>
       {/each}
       {#if canEditType}
         <div class="border cursor-pointer rounded border-norbalt-100 hover:border-offWhite stroke-norbalt-100 hover:stroke-offWhite transition-all p-1 mx-1 flex justify-center items-center mt-1.5 first:mt-0"
