@@ -65,8 +65,6 @@ export class ModuleCard {
       output: inputOutputData?.output ?? {},
     });
 
-    console.log("GENERATED CARD: ", { moduleName: generationArgs.moduleName, inputOutputData });
-
     return result;
   }
 

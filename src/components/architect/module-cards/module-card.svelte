@@ -26,15 +26,14 @@
   const { storedDefinition } = moduleConfig;
 
   setContext("moduleConfig", moduleConfig);
-
-  moduleConfig.key = moduleConfig.key ?? getAvailableKey($bopModules);
-  moduleConfig.dependencies = moduleConfig.dependencies ?? [];
-  moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
-  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70);
-  moduleConfig.dimensions = moduleConfig.dimensions ?? { height: undefined, width: undefined };
-  moduleConfig.position = moduleConfig.position ?? new Coordinate(220*$environment.distributionColumn++, 70);
   
-  let cardInfo = $storedDefinition;
+  $: cardInfo = $storedDefinition;
+  $: inputValues = Object.keys($storedDefinition.input);
+  $: outputValues = Object.keys($storedDefinition.output);
+
+  storedDefinition.subscribe((value) => {
+    console.log("updated value", value.input, inputValues);
+  });
 
   function attemptDeletion (stopEvent : CustomEvent<MouseEvent>) : void {
     const event = new CustomEvent<DeleteModuleEvent>("deleteModule",
@@ -52,7 +51,7 @@
 
 
 {#if cardInfo !== undefined}
-  <MovableCard moduleConfig={moduleConfig} bopModules={bopModules} on:movementStopped={attemptDeletion}>
+  <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion}>
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> F </div>
@@ -61,13 +60,13 @@
       </div>
       <div class="text-sm text-white pb-3 pt-2">
         <div class="pr-6 flex flex-col items-start">
-          {#each Object.keys(cardInfo.input) as key}
-            <CardProperty mode="input" keyType={cardInfo.input[key]} name={key}/>
+          {#each inputValues as key}
+            <CardProperty mode="input" keyType={$storedDefinition.input[key]} name={key}/>
           {/each}
         </div>
         <div class="pl-6 pt-2 flex flex-col items-end">
-          {#each Object.keys(cardInfo.output) as key}
-          <CardProperty mode="output" keyType={cardInfo.output[key]} name={key}/>
+          {#each outputValues as key}
+          <CardProperty mode="output" keyType={$storedDefinition.output[key]} name={key}/>
           {/each}
         </div>
       </div>

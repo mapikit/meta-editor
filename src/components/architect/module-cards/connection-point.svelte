@@ -7,9 +7,9 @@
   import type { UIBusinessOperation } from "src/entities/business-operation";
   import type { ModuleCard } from "../../../common/types/module-card";
   import EditableProperty from "./editable-property.svelte";
+	import clone from "just-clone";
 
   export let mode : "input" | "output";
-  export let typeDetails : TypeDefinition;
   export let parentPaths : string[] = [];
 
   let moduleConfig = getContext<ModuleCard>("moduleConfig");
@@ -22,12 +22,26 @@
   // If it is a deep type, should be albe to open and select deeper options
   // Is still selectable itself
 
-  $: isDeep = ["array", "object", "cloudedObject"].includes(typeDetails.type);
+  const getTypeDetails = () : TypeDefinition => {
+    const partialDefinition = $storedDefinition[mode];
+    const previousPath = parentPaths.slice(0, parentPaths.length);
+
+    let tempData = partialDefinition;
+    for (let path of previousPath) {
+      if (previousPath[previousPath.length -1] === path) { continue; }
+
+      tempData = tempData[path]["subtype"];
+    }
+
+    return tempData[previousPath[parentPaths.length -1]];
+  };
+
+  $: isDeep = ["array", "object", "cloudedObject"].includes(getTypeDetails().type);
   $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
   $: deepArrowRotate = mode === "input" ? "rotate-180" : "flex-row-reverse";
   $: innerTypePosition = mode === "input" ? "-translate-x-[calc(100%_+_6px)]" : "translate-x-[6px] left-[100%]";
 
-  let canEditType = ["array", "cloudedObject"].includes(typeDetails.type);
+  let canEditType = ["array", "cloudedObject"].includes(getTypeDetails().type);
 
   const toggleDeep = (e : MouseEvent) : void => {
     e.stopPropagation();
@@ -35,42 +49,48 @@
   };
 
   const getDeepProperties = () : Array<{key : string; type : TypeDefinition }> => {
-    if (typeDetails["type"] === "array") { return []; }
+    if (getTypeDetails()["type"] === "array") { return []; }
 
-    const keys = Object.keys(typeDetails["subtype"] ?? {});
+    const keys = Object.keys(getTypeDetails()["subtype"] ?? {});
 
     let result = [];
     keys.forEach((key : string) => {
-      result.push({ key, type: typeDetails["subtype"][key] });
+      result.push({ key, type: getTypeDetails()["subtype"][key] });
     });
 
-    console.log(parentPaths);
     return result;
   };
 
-  $: deepProperties = deepOpen ? $configuration && getDeepProperties() : [];
+  $: deepProperties = deepOpen ? $configuration && $storedDefinition && getDeepProperties() : [];
 
   // Only for Objects
+  // eslint-disable-next-line max-lines-per-function
   const addPropertyAsField = () : void => {
-    let currentStep = $storedDefinition.input;
+    storedDefinition.update((value) => {
+      const updatedDefinition = clone(value);
+      let currentStep = updatedDefinition[mode];
+      const previousPath = parentPaths.slice(0, parentPaths.length);
 
-    for (let path of parentPaths) {
-      currentStep = currentStep[path]["subtype"];
-    };
+      for (let path of previousPath) {
+        if (previousPath[previousPath.length -1] === path) { continue; }
+        currentStep = currentStep[path]["subtype"];
+      };
 
-    if (!typeDetails["subtype"]) {
-      typeDetails["subtype"] = {};
-    }
+      if (!currentStep[previousPath[previousPath.length -1]]["subtype"]) {
+        currentStep[previousPath[previousPath.length -1]]["subtype"] = {};
+      }
 
-    typeDetails["subtype"]["anotherField"] = { type : "string", required: false };
-    configuration.update((value) => value);
+      currentStep[previousPath[previousPath.length -1]]["subtype"]["newProperty"] = { type : "string", required: false };
+
+      return updatedDefinition;
+    });
   };
 </script>
 
 <div class="relative">
   <div class="relative flex {containerOrder} justify-center items-center">
     <div class="w-4 h-4 rounded flex justify-center items-center hover:bg-offWhite bg-transparent transition-all"> <!-- Clickable section -->
-      <Typedot size={2} type={typeDetails} />
+      <Typedot size={2} type={getTypeDetails()} />
     </div>
 
     {#if isDeep}

@@ -49,8 +49,6 @@
       modulesInConfig = config;
     });
 
-    console.log(get(currentBop.configuration), "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,");
-
     sectionsMap.refreshConnections(get(currentBop.configuration));
   }
 
