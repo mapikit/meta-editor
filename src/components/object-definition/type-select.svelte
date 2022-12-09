@@ -12,6 +12,8 @@
   export let currentSubtype = undefined;
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
 
+  export let size : "default" | "small" = "default";
+
   const availableOptions = Object.keys(typeColors);
   const availableSubTypeOptions = availableOptions.filter((value) => {
     return value !== "array" && value !== "any" && value !== "enum";
@@ -71,15 +73,26 @@
   };
 
   $: cursorChangeType = level.canAddProperty() ? "cursor-pointer" : "";
+  
+  // Size changes
+  $: sizeWidth = size === "small" ? "w-8" : "w-11";
+  $: sizeHeight = size === "small" ? "h-5" : "h-6";
+  $: sizeBall = size === "small" ? "h-2 w-2" : "h-3 w-3";
+  $: marginSize = size === "small" ? "" : "ml-2";
+  $: dropdownMarginSize = size === "small" ? "top-[calc(100%_+_4px)]" : "top-[calc(100%_+_8px)]";
+  $: dropdownWidthSize = size === "small" ? "w-26" : "w-32";
+  // eslint-disable-next-line max-len
+  $: dropdownItemSize = size === "small" ? "gap-1 px-1.5 py-0.5 first:pt-0.5 last:pb-0.5" : "gap-2 px-3 py-0.5 first:pt-1.5 last:pb-1.5";
+  $: dropdownArrowSize = size === "small" ? "w-2 h-2" : "w-2.5 h-2.5";
 </script>
 
-<div class="w-11 ml-2 rounded bg-norbalt-350 h-6 border border-norbalt-100 stroke-offWhite hover:stroke-white relative hover:border-offWhite transition-all" on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
-  <div class="flex flex-row items-center justify-center h-full w-11 {cursorChangeType}" on:click="{toggleCollapse}">
-    <div class="transition-all rounded-full h-3 w-3" style="background-color: {typeColors[currentType]};"/>
+<div class="{sizeWidth} {marginSize} rounded bg-norbalt-350 {sizeHeight} border border-norbalt-100 stroke-offWhite hover:stroke-white relative hover:border-offWhite transition-all" on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
+  <div class="flex flex-row items-center justify-center h-full {sizeWidth} {cursorChangeType}" on:click="{toggleCollapse}">
+    <div class="transition-all rounded-full {sizeBall}" style="background-color: {typeColors[currentType]};"/>
     {#if currentSubtype !== undefined && typeof currentSubtype !== "object"}
-      <div class="transition-all rounded-full h-3 w-3 -ml-1.5" style="background-color: {typeColors[currentSubtype]};"/>
+      <div class="transition-all rounded-full {sizeBall} -ml-1.5" style="background-color: {typeColors[currentSubtype]};"/>
     {:else if typeof currentSubtype === "object" && currentType === "array"}
-      <div class="transition-all rounded-full h-3 w-3 -ml-1.5" style="background-color: {typeColors["object"]};"/>
+      <div class="transition-all rounded-full {sizeBall} -ml-1.5" style="background-color: {typeColors["object"]};"/>
     {/if}
     {#if level.canAddProperty()}
       <div class="h-full w-3 flex items-center justify-center ml-1">
@@ -88,16 +101,16 @@
     {/if}
   </div>
   {#if !collapsed && subTypeCollapsed}
-    <div class="z-10 absolute top-[calc(100%_+_8px)]" transition:fade="{{ duration: 90 }}">
-      <div class="w-32 rounded bg-norbalt-200 shadow">
+    <div class="z-10 absolute {dropdownMarginSize}" transition:fade="{{ duration: 90 }}">
+      <div class="{dropdownWidthSize} rounded bg-norbalt-200 shadow-contrast">
         {#each availableOptions as option }
-          <div class="transition-all duration-75 cursor-pointer grid flex-row grid-cols-[12px_calc(100%_-_16px)] gap-2 items-center px-3 py-0.5 first:pt-1.5 first:rounded-t last:pb-1.5 last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white" on:click="{() => {changeType(option);}}">
-            <div class="transition-all rounded-full h-3 w-3 mt-0.5 " style="background-color: {typeColors[option]};"/>
+          <div class="transition-all duration-75 cursor-pointer grid flex-row grid-cols-[12px_calc(100%_-_16px)] items-center {dropdownItemSize} first:rounded-t last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white" on:click="{() => {changeType(option);}}">
+            <div class="transition-all rounded-full {sizeBall} mt-0.5 " style="background-color: {typeColors[option]};"/>
             {#if option !== "array"}
               <p> {option} </p>
             {:else}
               <p class="flex flex-row justify-between items-center"> {option}
-                <ArrowIcon style="w-2.5 h-2.5 transition-all mt-1"/>
+                <ArrowIcon style="{dropdownArrowSize} transition-all mt-1"/>
               </p>
             {/if}
           </div>
@@ -106,11 +119,11 @@
     </div>
   {/if}
   {#if !subTypeCollapsed}
-    <div class="z-10 absolute top-[calc(100%_+_8px)]" transition:fly="{{ duration: 120, delay: 90, x: 20 }}">
-      <div class="w-32 rounded bg-norbalt-200 shadow">
+    <div class="z-10 absolute {dropdownMarginSize}" transition:fly="{{ duration: 120, delay: 90, x: 20 }}">
+      <div class="{dropdownWidthSize} rounded bg-norbalt-200 shadow">
         {#each availableSubTypeOptions as option }
-          <div class="transition-all duration-75 cursor-pointer grid flex-row grid-cols-[12px_calc(100%_-_16px)] gap-2 items-center px-3 py-0.5 first:pt-1.5 first:rounded-t last:pb-1.5 last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white" on:click="{() => {changeSubType(option);}}">
-            <div class="transition-all rounded-full h-3 w-3 mt-0.5 " style="background-color: {typeColors[option]};"/>
+          <div class="transition-all duration-75 cursor-pointer grid flex-row grid-cols-[12px_calc(100%_-_16px)] items-center {dropdownItemSize} first:rounded-t last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white" on:click="{() => {changeSubType(option);}}">
+            <div class="transition-all rounded-full {sizeBall} mt-0.5 " style="background-color: {typeColors[option]};"/>
             <p> {option} </p>
           </div>
         {/each}

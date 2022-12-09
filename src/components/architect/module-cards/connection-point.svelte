@@ -103,7 +103,7 @@
   </div>
 
   {#if deepOpen && isDeep}
-    <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-0.5 min-w-[3.5rem]">
+    <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-1 min-w-[3.5rem]">
       {#each deepProperties as property}
         <EditableProperty storedDefinition={storedDefinition} mode={mode} parentPaths={[...parentPaths, property.key]}>
           <svelte:self mode={mode} typeDetails={property.type} parentPaths={[...parentPaths, property.key]}/>

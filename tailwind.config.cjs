@@ -9,7 +9,7 @@ module.exports = {
       boxShadow: {
         DEFAULT: '0 6px 6px -2px rgb(0 0 0 / 0.4);',
         light: '0 3px 6px -2px rgb(0 0 0 / 0.24);',
-        contrast: '0 0px 5px 1px rgb(0 0 0 / 0.8);'
+        contrast: '0 3px 5px -1px rgb(0 0 0 / 0.5);'
       }
     },
     fontFamily: {
