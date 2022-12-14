@@ -8,7 +8,6 @@
   import type { ModuleCard } from "../../../common/types/module-card";
   import EditableProperty from "./editable-property.svelte";
   import clone from "just-clone";
-  import { nanoid } from "nanoid";
 
   export let mode : "input" | "output";
   export let parentPaths : string[] = [];
@@ -39,7 +38,6 @@
   $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
   $: deepArrowRotate = mode === "input" ? "rotate-180" : "flex-row-reverse";
   $: innerTypePosition = mode === "input" ? "-translate-x-[calc(100%_+_6px)]" : "translate-x-[6px] left-[100%]";
-  $: renderKey = $storedDefinition && nanoid();
 
   let canEditType = ["array", "cloudedObject"].includes(getTypeDetails().type);
 
