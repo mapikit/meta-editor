@@ -4,50 +4,71 @@
   import { clickOutside } from "../helpers/click-outside";
   import clone from "just-clone";
   import TypeSelect from "../../../components/object-definition/type-select.svelte";
-	import { init } from "svelte/internal";
+  import { onDestroy } from "svelte";
+  import { renameObjKey } from "../../../common/helpers/renameObjectKey";
 
   let editing = false;
   export let storedDefinition : ModuleCard["storedDefinition"];
   export let mode : "input" | "output";
   export let parentPaths : string[];
 
-  $: currentName = parentPaths[parentPaths.length -1];
   $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
-  $: currentDefinition = $storedDefinition[mode];
 
+  const getCurrentType = () : string => {
+    const finalPath = [...parentPaths.slice(0, parentPaths.length -1)];
+    let tempData = $storedDefinition[mode];
+    for (let path of finalPath) {
+      if (!tempData) continue;
+      tempData = tempData[path]["subtype"];
+    }
+
+    if (!tempData) { return "string"; };
+
+    return tempData[currentName].type;
+  };
+
+  let currentName = parentPaths[parentPaths.length -1];
+  let currentType = getCurrentType();
   let newName = currentName;
   let newType = "string";
   let newSubtype = undefined;
 
-  let initialName = newName;
-  let initialType = newType;
   let initialSubtype = newSubtype;
-
+  
   const startEditing = (ev : MouseEvent) : void => {
     ev.stopPropagation();
 
     newName = currentName;
+    newType = getCurrentType();
 
+    editing = true;
+  };
+
+  // keep display synced with store, but only update if affected
+  const unsub = storedDefinition.subscribe((value) => {
     const finalPath = [...parentPaths.slice(0, parentPaths.length -1)];
-    let tempData = currentDefinition;
+    let tempData = value[mode];
+
     for (let path of finalPath) {
       tempData = tempData[path]["subtype"];
     }
 
-    newType = tempData[currentName].type;
+    if (currentName === newName && tempData[currentName].type === currentType) { return; }
 
-    editing = true;
-  };
+    currentName = newName;
+    currentType = getCurrentType();
+  });
 
   // eslint-disable-next-line max-lines-per-function
   const confirmData = () : void => {
     const finalPath = [...parentPaths.slice(0, parentPaths.length -1)];
 
-    if (newName === initialName && newType === initialType && newSubtype === initialSubtype) {
+    if (newName === currentName && newType === currentType && newSubtype === initialSubtype) {
       editing = false;
       return;
     }
 
+    // eslint-disable-next-line max-lines-per-function
     storedDefinition.update((currentValue) => {
       const clonedValue = clone(currentValue);
       let tempData = clonedValue[mode];
@@ -62,15 +83,22 @@
       }
 
       const finalData = { required: false, type: newType, subtype };
-      delete tempData[currentName];
+      tempData[currentName] = finalData;
 
-      tempData[newName] = finalData;
+      if (currentName !== newName) {
+        let updatedTempData = clonedValue[mode];
+        for (let path of finalPath.slice(0, finalPath.length -1)) {
+          updatedTempData = updatedTempData[path]["subtype"];
+        }
+
+        updatedTempData[finalPath[finalPath.length-1]]["subtype"] = renameObjKey(tempData, currentName, newName);;
+      }
 
       return clonedValue;
     });
 
-    initialName = newName;
-    initialType = newType;
+    currentName = newName;
+    currentType = newType;
     initialSubtype = newSubtype;
     editing = false;
   };
@@ -78,6 +106,8 @@
   const stopPropagation = (ev : MouseEvent) => {
     ev.stopPropagation();
   };
+
+  onDestroy(unsub);
 </script>
 
 {#if !editing}
@@ -92,6 +122,6 @@
 <div use:clickOutside on:outclick={confirmData} on:mousedown={stopPropagation} on:dblclick={stopPropagation} class="w-28 px-1 text-xs flex {containerOrder} flex-nowrap">
   <StringField bind:propValue={newName} size={"small"}/>
   <div class="w-1"/>
-  <TypeSelect bind:currentType={newType} bind:currentSubtype={newSubtype} size={"small"} />
+  <TypeSelect bind:currentType={newType} bind:currentSubtype={newSubtype} size={"small"} omittedTypes={["object"]}/>
 </div>
 {/if}

@@ -7,7 +7,8 @@
   import type { UIBusinessOperation } from "src/entities/business-operation";
   import type { ModuleCard } from "../../../common/types/module-card";
   import EditableProperty from "./editable-property.svelte";
-	import clone from "just-clone";
+  import clone from "just-clone";
+  import { nanoid } from "nanoid";
 
   export let mode : "input" | "output";
   export let parentPaths : string[] = [];
@@ -24,22 +25,21 @@
 
   const getTypeDetails = () : TypeDefinition => {
     const partialDefinition = $storedDefinition[mode];
-    const previousPath = parentPaths.slice(0, parentPaths.length);
+    const previousPath = parentPaths.slice(0, parentPaths.length -1);
 
     let tempData = partialDefinition;
     for (let path of previousPath) {
-      if (previousPath[previousPath.length -1] === path) { continue; }
-
       tempData = tempData[path]["subtype"];
     }
 
-    return tempData[previousPath[parentPaths.length -1]];
+    return tempData[parentPaths[parentPaths.length -1]];
   };
 
   $: isDeep = ["array", "object", "cloudedObject"].includes(getTypeDetails().type);
   $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
   $: deepArrowRotate = mode === "input" ? "rotate-180" : "flex-row-reverse";
   $: innerTypePosition = mode === "input" ? "-translate-x-[calc(100%_+_6px)]" : "translate-x-[6px] left-[100%]";
+  $: renderKey = $storedDefinition && nanoid();
 
   let canEditType = ["array", "cloudedObject"].includes(getTypeDetails().type);
 
@@ -66,6 +66,7 @@
   // Only for Objects
   // eslint-disable-next-line max-lines-per-function
   const addPropertyAsField = () : void => {
+    // eslint-disable-next-line max-lines-per-function
     storedDefinition.update((value) => {
       const updatedDefinition = clone(value);
       let currentStep = updatedDefinition[mode];
@@ -80,7 +81,11 @@
         currentStep[previousPath[previousPath.length -1]]["subtype"] = {};
       }
 
-      currentStep[previousPath[previousPath.length -1]]["subtype"]["newProperty"] = { type : "string", required: false };
+      const availableKeyName = "newProperty" + (Object.keys(currentStep[previousPath[previousPath.length -1]]["subtype"])
+        .filter((name) => name.includes("newProperty")).length + 1);
+
+      currentStep[previousPath[previousPath.length -1]]["subtype"][availableKeyName]
+        = { type : "string", required: false };
 
       return updatedDefinition;
     });
@@ -106,7 +111,7 @@
     <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-1 min-w-[3.5rem]">
       {#each deepProperties as property}
         <EditableProperty storedDefinition={storedDefinition} mode={mode} parentPaths={[...parentPaths, property.key]}>
-          <svelte:self mode={mode} typeDetails={property.type} parentPaths={[...parentPaths, property.key]}/>
+          <svelte:self mode={mode} parentPaths={[...parentPaths, property.key]}/>
         </EditableProperty>
       {/each}
       {#if canEditType}

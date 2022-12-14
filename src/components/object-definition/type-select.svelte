@@ -11,17 +11,18 @@
   export let currentType = "string";
   export let currentSubtype = undefined;
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-
+  export let omittedTypes : Array<keyof typeof typeColors> = [];
   export let size : "default" | "small" = "default";
 
-  const availableOptions = Object.keys(typeColors);
+  const availableOptions = Object.keys(typeColors)
+    .filter((typeName) => !omittedTypes.includes(typeName as keyof typeof typeColors));
   const availableSubTypeOptions = availableOptions.filter((value) => {
     return value !== "array" && value !== "any" && value !== "enum";
   });
   const dispatch = createEventDispatcher();
 
   // eslint-disable-next-line max-lines-per-function
-  const changeType = (type) => {
+  const changeType = (type : string) : void => {
     if (type === "array") {
       dispatch("typeChange", type);
       currentType = type;
@@ -43,7 +44,7 @@
   };
 
   // eslint-disable-next-line max-lines-per-function
-  const changeSubType = (subtype) => {
+  const changeSubType = (subtype : unknown) : void => {
     if (subtype === "object") {
       dispatch ("subTypeChange", {
         subtype: [],

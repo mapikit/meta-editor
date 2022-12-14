@@ -31,10 +31,6 @@
   $: inputValues = Object.keys($storedDefinition.input);
   $: outputValues = Object.keys($storedDefinition.output);
 
-  storedDefinition.subscribe((value) => {
-    console.log("updated value", value.input, inputValues);
-  });
-
   function attemptDeletion (stopEvent : CustomEvent<MouseEvent>) : void {
     const event = new CustomEvent<DeleteModuleEvent>("deleteModule",
       { detail: { key: moduleConfig.key, mouseEvent: stopEvent.detail } });
@@ -61,12 +57,12 @@
       <div class="text-sm text-white pb-3 pt-2">
         <div class="pr-6 flex flex-col items-start">
           {#each inputValues as key}
-            <CardProperty mode="input" keyType={$storedDefinition.input[key]} name={key}/>
+            <CardProperty mode="input" name={key}/>
           {/each}
         </div>
         <div class="pl-6 pt-2 flex flex-col items-end">
           {#each outputValues as key}
-          <CardProperty mode="output" keyType={$storedDefinition.output[key]} name={key}/>
+          <CardProperty mode="output" name={key}/>
           {/each}
         </div>
       </div>
@@ -100,7 +96,7 @@
     </StaticCardBody> -->
   </MovableCard>
 {:else}
-  <MovableCard moduleConfig={moduleConfig} bopModules={bopModules}>
+  <MovableCard moduleConfig={moduleConfig}>
     <div class="undefinedModule" slot="content">! UNAVAILABLE MODULE !<br>
       This card has been deleted. This is usually happens when you delete a BOp that was used internally, or an external package that was removed from
       our database for security reasons. 

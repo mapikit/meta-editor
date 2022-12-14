@@ -1,5 +1,4 @@
-
-export const typeColors : Record<string, string> = {
+export const typeColors = {
   string: "#62fff2",
   enum: "#f5ce42",
   function: "#ced100",
