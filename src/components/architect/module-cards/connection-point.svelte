@@ -28,6 +28,7 @@
 
     let tempData = partialDefinition;
     for (let path of previousPath) {
+      if (tempData[path]["type"] === "array") { tempData = tempData[path]["data"]; continue; }
       tempData = tempData[path]["subtype"];
     }
 
@@ -47,7 +48,18 @@
   };
 
   const getDeepProperties = () : Array<{key : string; type : TypeDefinition }> => {
-    if (getTypeDetails()["type"] === "array") { return []; }
+    if (getTypeDetails()["type"] === "array") {
+      const keys = Object.keys(getTypeDetails()["data"] ?? []);    
+      const result = [];
+      keys.forEach((item, index) : void => {
+        const type = {};
+        type[item.toString()] = getTypeDetails()["subtype"];
+
+        result.push({ key: index, type });
+      });
+  
+      return result;
+    }
 
     const keys = Object.keys(getTypeDetails()["subtype"] ?? {});
 
@@ -61,29 +73,39 @@
 
   $: deepProperties = deepOpen ? $configuration && $storedDefinition && getDeepProperties() : [];
 
-  // Only for Objects
   // eslint-disable-next-line max-lines-per-function
   const addPropertyAsField = () : void => {
+    const isArray = getTypeDetails().type === "array";
+
     // eslint-disable-next-line max-lines-per-function
     storedDefinition.update((value) => {
+      let fieldName = isArray ? "data" : "subtype";
+
       const updatedDefinition = clone(value);
       let currentStep = updatedDefinition[mode];
       const previousPath = parentPaths.slice(0, parentPaths.length);
 
       for (let path of previousPath) {
         if (previousPath[previousPath.length -1] === path) { continue; }
-        currentStep = currentStep[path]["subtype"];
+        currentStep = currentStep[path][fieldName];
       };
 
-      if (!currentStep[previousPath[previousPath.length -1]]["subtype"]) {
-        currentStep[previousPath[previousPath.length -1]]["subtype"] = {};
+      if (!currentStep[previousPath[previousPath.length -1]][fieldName]) {
+        currentStep[previousPath[previousPath.length -1]][fieldName] = {};
       }
 
-      const availableKeyName = "newProperty" + (Object.keys(currentStep[previousPath[previousPath.length -1]]["subtype"])
-        .filter((name) => name.includes("newProperty")).length + 1);
+      const indexingIfNotArray = isArray ? 0 : 1;
+      const nameIfArray = isArray ? "" : "newProperty";
+      const type = isArray ? currentStep[previousPath[previousPath.length -1]]["subtype"] : "string";
+      let availableKeyName = (Object.keys(currentStep[previousPath[previousPath.length -1]][fieldName])
+        .filter((name) => name.includes(nameIfArray)).length + indexingIfNotArray).toString();
 
-      currentStep[previousPath[previousPath.length -1]]["subtype"][availableKeyName]
-        = { type : "string", required: false };
+      if (!isArray) {
+        availableKeyName = nameIfArray + availableKeyName;
+      }
+
+      currentStep[previousPath[previousPath.length -1]][fieldName][availableKeyName]
+        = { type, required: false };
 
       return updatedDefinition;
     });

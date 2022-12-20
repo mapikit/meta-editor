@@ -11,6 +11,7 @@
   export let storedDefinition : ModuleCard["storedDefinition"];
   export let mode : "input" | "output";
   export let parentPaths : string[];
+  let isItemOfArray = false;
 
   $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
 
@@ -19,6 +20,14 @@
     let tempData = $storedDefinition[mode];
     for (let path of finalPath) {
       if (!tempData) continue;
+
+      if (tempData[path].type === "array") {
+        tempData = tempData[path]["data"];
+        isItemOfArray = true;
+        continue;
+      }
+
+      isItemOfArray = false;
       tempData = tempData[path]["subtype"];
     }
 
@@ -38,6 +47,7 @@
   const startEditing = (ev : MouseEvent) : void => {
     ev.stopPropagation();
 
+    if (isItemOfArray) { return; }
     newName = currentName;
     newType = getCurrentType();
 
@@ -50,6 +60,10 @@
     let tempData = value[mode];
 
     for (let path of finalPath) {
+      if (tempData[path].type === "array") {
+        tempData = tempData[path]["data"]; continue;
+      }
+
       tempData = tempData[path]["subtype"];
     }
 
