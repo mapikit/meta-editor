@@ -6,12 +6,15 @@
   import CardProperty from "./module-cards/card-property.svelte";
   import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
-  import { getContext } from "svelte";
-  import type { UIBusinessOperation } from "../../entities/business-operation";
+  import CheckIcon from "../../icons/check-icon.svelte";
+  import CancelIcon from "../../icons/cancel-icon.svelte";
+  import { setContext } from "svelte";
 
   export let configuration : ModuleCard;
   const storedDefinition = configuration.storedDefinition;
   const formatStore = writable($storedDefinition.output ?? {});
+  let previousValue = {};
+  setContext("moduleConfig", configuration);
 
   $: outputValues = Object.keys($storedDefinition.output ?? {});
 
@@ -23,18 +26,18 @@
 
   function startEditing () : void {
     editing = true;
+    previousValue = $formatStore;
   }
 
   // eslint-disable-next-line max-lines-per-function
-  function finishEdition () {
+  function finishEdition () : void {
     editing = false;
+    storedDefinition.set({ input: {}, output: $formatStore });
+  }
 
-    // configuration.update(input => {
-    //   navigateBackToLevel(0);
-    //   input.definition = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
-
-    //   return input;
-    // });
+  function cancelEditing () : void {
+    formatStore.set(previousValue);
+    editing = false;
   }
 
 </script>
@@ -63,13 +66,28 @@
         </div>
       </div>
     {:else}
-      <div class="select-none min-w-[120px] bg-ochreYellow-light rounded shadow p-0.5">
-        <ObjectDefinitionMiniApp
+      <div class="select-none min-w-[120px] bg-ochreYellow-light rounded shadow p-[1px]">
+      <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
+        <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
+          <div class="h-6 absolute w-6 bg-norbalt-200 rounded right-1 flex justify-center cursor-pointer content-center text-center stroke-offWhite hover:stroke-brightGreen hover:bg-norbalt-100 transition-all"
+            on:click={finishEdition}
+          >
+            <CheckIcon style="w-3.5 h-auto stroke-inherit"/>
+          </div>
+          <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 flex justify-center cursor-pointer content-center text-center stroke-offWhite hover:stroke-ochreYellow hover:bg-norbalt-100 transition-all"
+            on:click={cancelEditing}
+          >
+            <CancelIcon style="w-3.5 h-auto stroke-inherit"/>
+          </div>
+          <div class="text-sm text-offWhite px-9"> {configuration.moduleName} </div>
+        </div>
+          <ObjectDefinitionMiniApp
           rootStyle="rounded bg-norbalt-350 p-2"
           editingLevel={new EditorLevel(EditorLevels.createDefinition)}
           format={formatStore}
           initialData={{}}
-        />
+          />
+        </div>
       </div>
     {/if}
   </div>

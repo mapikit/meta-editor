@@ -98,7 +98,7 @@
   };
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col items-center">
   {#if objectDefinitionData.length < 1}
     <p class="text-center text-offWhite"> No properties in this object </p>
   {/if}
@@ -128,8 +128,8 @@
     </div>
   {/each}
   {#if level.canAddProperty()}
-    <div class="add-prop" on:click="{appendData}">
-      add property
+    <div class="w-28 rounded bg-norbalt-200 mt-4 text-center cursor-pointer" on:click="{appendData}">
+      Add Property
     </div>
   {/if}
 </div>
