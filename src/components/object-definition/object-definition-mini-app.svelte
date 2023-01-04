@@ -16,6 +16,7 @@
   // Default mode is Creating an Obj Definition
   export let editingLevel : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
   export let format : Writable<ObjectDefinition>;
+  export let rootStyle = "mt-4 bg-norbalt-300 rounded";
 
   const dispatch = createEventDispatcher();
 
@@ -118,7 +119,7 @@
 
 </script>
 
-<div class="mt-4 bg-norbalt-300 rounded">
+<div class="{rootStyle}">
   <div class="bg-norbalt-350 py-2 px-4 rounded-t h-9 flex flex-row items-center mb-3"> <!-- Header BreadCrumb -->
     {#if levelsNames.length >= 1}
       <div class="h-5 w-2.5 mr-2 cursor-pointer" on:click="{() => { goBackOneLevel(); }}">

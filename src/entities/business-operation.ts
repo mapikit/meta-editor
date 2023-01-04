@@ -5,7 +5,6 @@ import type {
   BopsVariable,
   BopsCustomObject } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import { ModuleCard, SerializedModuleCard } from "../common/types/module-card";
-import type { UIInput } from "../common/types/ui-input";
 import { writable, Writable, readable, Readable, get } from "svelte/store";
 import { Coordinate } from "../common/types/geometry";
 import { businessOperations, saveConfigurations } from "../stores/configuration-store";
@@ -16,7 +15,7 @@ type SerializedBop = {
   id : string,
   name : string,
   description : string,
-  input : UIInput | ObjectDefinition,
+  input : SerializedModuleCard | ObjectDefinition,
   output : ObjectDefinition,
   configuration : SerializedModuleCard[],
   constants : BopsConstant[],
@@ -28,8 +27,8 @@ type SerializedBop = {
 
 export class UIBusinessOperation {
   public readonly configuration : Writable<ModuleCard[]> = writable([]);
-  public readonly input : Writable<UIInput> = writable({ definition: undefined, position: undefined });
   public readonly id : Readable<string>;
+  public readonly input : ModuleCard;
   public readonly constants : Writable<BopsConstant[]>;
   public readonly variables : Writable<BopsVariable[]>;
   public readonly name : Writable<string>;
@@ -52,6 +51,14 @@ export class UIBusinessOperation {
     this.customObjects = writable(customObjects);
     this.isLocked = writable(isLocked);
     this.isStarred = writable(isStarred);
+
+    this.input = ModuleCard.generate({
+      position: new Coordinate(0, 0),
+      bopId: get(this.id),
+      moduleName: "Input",
+      moduleType: "internal",
+      key: -1,
+    });
 
     this.validateInput(input);
     this.configuration.set(this.rebuildConfigurationForUI(configuration));
@@ -103,18 +110,18 @@ export class UIBusinessOperation {
     saveConfigurations();
   }
 
-  private validateInput (input : UIInput | ObjectDefinition) : asserts input is UIInput {
-    const resolvedInput : UIInput = { definition: undefined, position: undefined };
+  // eslint-disable-next-line max-lines-per-function
+  private validateInput (input : SerializedModuleCard | ObjectDefinition) : void {
     try { isObjectDefinition(input); }
     catch {
-      const position = (input as UIInput).position;
-      resolvedInput.position =  position ? new Coordinate(position.x, position.y) : new Coordinate(0, 0);
-      resolvedInput.definition = (input as UIInput).definition ?? {};
-      return this.input.set(resolvedInput);
+      const position = (input as SerializedModuleCard).position;
+      this.input.position.set(position ? new Coordinate(position.x, position.y) : new Coordinate(0, 0));
+      this.input.storedDefinition.set((input as SerializedModuleCard).storedDefinition ?? { input: {}, output: {} });
+
+      return;
     }
-    resolvedInput.definition = input;
-    resolvedInput.position = new Coordinate(0, 0);
-    this.input.set(resolvedInput);
+
+    this.input.storedDefinition.set({ input: {}, output: input });
   }
 
   public static rebuildModuleCards (configuration : ModuleCard[]) : ModuleCard[] {
@@ -187,7 +194,7 @@ export class UIBusinessOperation {
   public serialized () : SerializedBop {
     return ({
       configuration: get(this.configuration).map((module) => module.serialize()),
-      input: get(this.input),
+      input: this.input.serialize(),
       id: get(this.id),
       constants: get(this.constants),
       variables: get(this.variables),
@@ -204,7 +211,7 @@ export class UIBusinessOperation {
     return ({
       name: get(this.name),
       description: get(this.description),
-      input: get(this.input).definition,
+      input: get(this.input.storedDefinition).input,
       output: get(this.output),
       constants: get(this.constants),
       variables: get(this.variables),
@@ -215,7 +222,6 @@ export class UIBusinessOperation {
 
   private keepStorageUpdated () : void {
     this.configuration.subscribe(saveConfigurations);
-    this.input.subscribe(saveConfigurations);
     this.id.subscribe(saveConfigurations);
     this.constants.subscribe(saveConfigurations);
     this.variables.subscribe(saveConfigurations);

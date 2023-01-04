@@ -1,24 +1,25 @@
 <script lang="ts">
-  import type { ObjectDefinition } from "@meta-system/object-definition";
-  import type { Writable } from "svelte/store";
-  import { slide } from "svelte/transition";
+  import PencilIcon from "../../icons/pencil-icon.svelte";
+  import { writable } from "svelte/store";
   import type { ModuleCard } from "../../common/types/module-card";
-  import type { UIInput } from "../../common/types/ui-input";
-  import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
-  import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
   import MovableCard from "./helpers/movable-card.svelte";
-  import OutputSection from "./module-cards/output-section.svelte";
-
+  import CardProperty from "./module-cards/card-property.svelte";
+  import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
+  import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
+  import { getContext } from "svelte";
+  import type { UIBusinessOperation } from "../../entities/business-operation";
 
   export let configuration : ModuleCard;
-  export let bopModules : Writable<ModuleCard[]>;
+  const storedDefinition = configuration.storedDefinition;
+  const formatStore = writable($storedDefinition.output ?? {});
+
+  $: outputValues = Object.keys($storedDefinition.output ?? {});
 
   // let paths = [];
   // let getPathsNames : () => string[];
   // let navigateBackToLevel : (index : number) => void;
   // let getDefinitionAndData : () => { definition : ObjectDefinition, data : object };
   let editing = false;
-
 
   function startEditing () : void {
     editing = true;
@@ -38,67 +39,38 @@
 
 </script>
 
-<MovableCard moduleConfig={configuration} bopModules={bopModules}>
+<MovableCard moduleConfig={configuration}>
   <div>
-    aaaa eu sou um input
-    <!-- {#if !editing}
-      <div class="inputModule" in:slide>
-        <div class="header">Input  <button on:click={startEditing} class="button">Edit</button></div>
-        {#each Object.keys($configuration.definition) as key}
-          <OutputSection info={$configuration.definition[key]} bopModules={bopModules} name={key} parentKey={"input"}/>
-        {/each}
+    {#if !editing}
+      <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
+        <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
+          <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 flex justify-center cursor-pointer content-center text-center fill-offWhite hover:fill-white hover:bg-norbalt-100 transition-all"
+            on:click={startEditing}
+          >
+            <PencilIcon style="w-3.5 h-auto fill-inherit"/>
+          </div>
+          <div class="text-sm text-offWhite px-9"> {configuration.moduleName} </div>
+        </div>
+        <div class="text-sm text-white pb-3 pt-2">
+          {#if outputValues.length === 0}
+            <p class="text-center text-offWhite"> No properties </p>
+          {/if}
+          <div class="pl-6 flex flex-col items-end">
+            {#each outputValues as key}
+            <CardProperty mode="output" name={key}/>
+            {/each}
+          </div>
+        </div>
       </div>
     {:else}
-      <div class="inputDefinition" in:slide>
-        <div class="header">
-          <span on:click={() => navigateBackToLevel(0)} class="clickablePath">Input</span>
-          <button on:click={() => finishEdition() } class="button">Edit</button>
-        </div>
-        {#each paths as path, index}
-          &gt <span class="clickablePath" on:click={() => navigateBackToLevel(index+1)}>{path}</span>
-        {/each}
+      <div class="select-none min-w-[120px] bg-ochreYellow-light rounded shadow p-0.5">
         <ObjectDefinitionMiniApp
-          editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
-          format={$configuration.definition} initialData={{}}
-          on:navigation-event={() => { paths = getPathsNames(); }}
-          bind:getPathsNames
-          bind:navigateBackToLevel
-          bind:getDefinitionAndData
-          />
-      </div>      
-    {/if} -->
+          rootStyle="rounded bg-norbalt-350 p-2"
+          editingLevel={new EditorLevel(EditorLevels.createDefinition)}
+          format={formatStore}
+          initialData={{}}
+        />
+      </div>
+    {/if}
   </div>
 </MovableCard>
-
-
-
-<style lang="scss">
-  .header {
-    border-radius: 5px 5px 0 0;
-    padding: 2px 2px 0 8px;
-    background-color: rgb(94, 94, 94);
-    margin-bottom: 5px;
-  }
-  .button {
-    position: absolute;
-    right: 3px;
-  }
-
-  .inputModule {
-    border-radius: 5px;
-    background-color: #34344b;
-    padding-bottom: 8px;
-    min-width: 150px;
-  }
-
-  .inputDefinition {
-    transition: width 2s ease-in-out;
-    background-color: #34344b;
-    border-radius: 5px;
-  }
-
-  .clickablePath {
-    cursor: pointer;
-  }
-</style>
-

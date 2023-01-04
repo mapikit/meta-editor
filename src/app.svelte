@@ -1,14 +1,20 @@
 <script lang="ts">
+	import { onDestroy } from "svelte";
+	import { saveConfigurations } from "./stores/configuration-store";
 import { storageManager } from "./stores/storage-manager";
 import MainView from "./views/main-view.svelte";
 
 // This file contains general data about the App itself
 // and should not contain anything else.
 
+const interval = setInterval(() => { saveConfigurations(); }, 2000);
+
 const promise = async () : Promise<void> => {
   await storageManager.loadAllInfo();
   storageManager.subscribeUpdates();
 };
+
+onDestroy(() => { clearInterval(interval); });
 </script>
 
 

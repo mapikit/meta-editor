@@ -9,7 +9,6 @@ import { currentProject } from "./projects-store";
 
 export const availableConfigurations : Writable<Configuration[]> = writable([]);
 
-
 export const saveConfigurations = () : void => {
   const configs = get(availableConfigurations);
   const savingData = configs.map((config) => config.serialized());
