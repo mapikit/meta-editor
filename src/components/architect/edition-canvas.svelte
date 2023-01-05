@@ -227,6 +227,7 @@
   };
 
   $: generatedInput = currentBop.configuration && currentBop.input;
+  $: generatedOutput = currentBop.configuration && currentBop.output;
 </script>
 
 <div class="relative w-full h-full {cursorStyle}" id="architect"
@@ -250,7 +251,7 @@ on:mouseup={releaseDrag}
       {/if}
     {/each}
     <InputCard configuration={generatedInput}/>
-    <OutputCard bopModules={currentBop.configuration} configuration={currentBop.output} bopConstants={currentBop.constants}/>      
+    <OutputCard configuration={generatedOutput}/>
   </div>
   <div class="fixed top-0 left-0 w-full h-full pointer-events-none" bind:this={overlayLayer}/>
   <CurrentBopNametag businessOperation={currentBop}/>

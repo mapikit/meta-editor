@@ -16,7 +16,7 @@ type SerializedBop = {
   name : string,
   description : string,
   input : SerializedModuleCard | ObjectDefinition,
-  output : ObjectDefinition,
+  output : SerializedModuleCard | ObjectDefinition,
   configuration : SerializedModuleCard[],
   constants : BopsConstant[],
   variables : BopsVariable[],
@@ -33,7 +33,7 @@ export class UIBusinessOperation {
   public readonly variables : Writable<BopsVariable[]>;
   public readonly name : Writable<string>;
   public readonly description : Writable<string>;
-  public readonly output : Writable<ObjectDefinition>;
+  public readonly output : ModuleCard;
   public readonly customObjects : Writable<BopsCustomObject[]>;
   public readonly isStarred : Writable<boolean> = writable(false);
   public readonly isLocked : Writable<boolean> = writable(false);
@@ -45,15 +45,22 @@ export class UIBusinessOperation {
     this.id = readable(id);
     this.name = writable(name);
     this.description = writable(description);
-    this.output = writable(output);
     this.constants = writable(constants);
     this.variables = writable(variables);
     this.customObjects = writable(customObjects);
     this.isLocked = writable(isLocked);
     this.isStarred = writable(isStarred);
 
-    this.input = ModuleCard.generate({
+    this.output = ModuleCard.generate({
       position: new Coordinate(0, 0),
+      bopId: get(this.id),
+      moduleName: "output",
+      moduleType: "output",
+      key: -2,
+    });
+
+    this.input = ModuleCard.generate({
+      position: new Coordinate(200, 0),
       bopId: get(this.id),
       moduleName: "Input",
       moduleType: "internal",
@@ -61,6 +68,7 @@ export class UIBusinessOperation {
     });
 
     this.validateInput(input);
+    this.validateOutput(output);
     this.configuration.set(this.rebuildConfigurationForUI(configuration));
 
     this.keepStorageUpdated();
@@ -110,7 +118,6 @@ export class UIBusinessOperation {
     saveConfigurations();
   }
 
-  // eslint-disable-next-line max-lines-per-function
   private validateInput (input : SerializedModuleCard | ObjectDefinition) : void {
     try { isObjectDefinition(input); }
     catch {
@@ -122,6 +129,19 @@ export class UIBusinessOperation {
     }
 
     this.input.storedDefinition.set({ input: {}, output: input });
+  }
+
+  private validateOutput (output : SerializedModuleCard | ObjectDefinition) : void {
+    try { isObjectDefinition(output); }
+    catch {
+      const position = (output as SerializedModuleCard).position;
+      this.output.position.set(position ? new Coordinate(position.x, position.y) : new Coordinate(0, 0));
+      this.output.storedDefinition.set((output as SerializedModuleCard).storedDefinition ?? { input: {}, output: {} });
+
+      return;
+    }
+
+    this.output.storedDefinition.set({ input: output, output: {} });
   }
 
   public static rebuildModuleCards (configuration : ModuleCard[]) : ModuleCard[] {
@@ -200,7 +220,7 @@ export class UIBusinessOperation {
       variables: get(this.variables),
       name: get(this.name),
       description: get(this.description),
-      output: get(this.output),
+      output: this.output.serialize(),
       customObjects: get(this.customObjects),
       isStarred: get(this.isStarred),
       isLocked: get(this.isLocked),
@@ -211,8 +231,8 @@ export class UIBusinessOperation {
     return ({
       name: get(this.name),
       description: get(this.description),
-      input: get(this.input.storedDefinition).input,
-      output: get(this.output),
+      input: get(this.input.storedDefinition).output,
+      output: get(this.output.storedDefinition).input,
       constants: get(this.constants),
       variables: get(this.variables),
       configuration: get(this.configuration),
@@ -227,7 +247,6 @@ export class UIBusinessOperation {
     this.variables.subscribe(saveConfigurations);
     this.name.subscribe(saveConfigurations);
     this.description.subscribe(saveConfigurations);
-    this.output.subscribe(saveConfigurations);
     this.customObjects.subscribe(saveConfigurations);
     this.isStarred.subscribe(saveConfigurations);
     this.isLocked.subscribe(saveConfigurations);

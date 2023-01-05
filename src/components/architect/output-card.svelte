@@ -1,122 +1,90 @@
 <script lang="ts">
-  import type { ObjectDefinition } from "@meta-system/object-definition";
-import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-	import type { UIBusinessOperation } from "src/entities/business-operation";
-	import { getContext } from "svelte";
-  import type { Writable } from "svelte/store";
-  import { slide } from "svelte/transition";
-
-
-  import { Coordinate } from "../../common/types/geometry";
-  import { ModuleCard as ModuleCardClass } from "../../common/types/module-card";
-  import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
-  import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
-  import { getAvailableKey } from "./helpers/get-available-key";
+  import PencilIcon from "../../icons/pencil-icon.svelte";
+  import { writable } from "svelte/store";
+  import type { ModuleCard } from "../../common/types/module-card";
   import MovableCard from "./helpers/movable-card.svelte";
-  import InputSection from "./module-cards/input-section.svelte";
-	import ModuleCard from "./module-cards/module-card.svelte";
+  import CardProperty from "./module-cards/card-property.svelte";
+  import ObjectDefinitionMiniApp from "../object-definition/object-definition-mini-app.svelte";
+  import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
+  import CheckIcon from "../../icons/check-icon.svelte";
+  import CancelIcon from "../../icons/cancel-icon.svelte";
+  import { setContext } from "svelte";
 
+  export let configuration : ModuleCard;
+  const storedDefinition = configuration.storedDefinition;
+  const formatStore = writable($storedDefinition.input ?? {});
+  let previousValue = {};
+  setContext("moduleConfig", configuration);
 
-  export let configuration : Writable<ObjectDefinition>;
-  export let bopModules : Writable<ModuleCardClass[]>;
-  export let bopConstants : Writable<BopsConstant[]>;
+  $: inputValues = Object.keys($storedDefinition.input ?? {});
 
-  const { id } = getContext<UIBusinessOperation>("currentBop");
-
-  let module = $bopModules.find((bopModule) => bopModule.moduleType === "output");
-  if (module === undefined) {
-    module = ModuleCardClass.generate({
-      moduleType: "output",
-      key: getAvailableKey($bopModules),
-      moduleName: "output",
-      position: new Coordinate(200, 200),
-      bopId: $id,
-    });
-
-    bopModules.update(modules => {
-      modules.push(module);
-      return modules;
-    });
-  }
-
-  module.position.set(new Coordinate(200, 200));
-
-
-  let paths = [];
-  let getPathsNames : () => string[];
-  let navigateBackToLevel : (index : number) => void;
-  let getDefinitionAndData : () => { definition : ObjectDefinition, data : object };
   let editing = false;
 
-  function finishEdition() {
-    navigateBackToLevel(0);
-    const updatedConfig = getDefinitionAndData().definition["root"]["subtype"] as ObjectDefinition;
-    configuration.set(updatedConfig);
-    editing = false;
-
-    setTimeout(() => bopModules.update(mods => mods), 200);
+  function startEditing () : void {
+    editing = true;
+    previousValue = $formatStore;
   }
+
+  // eslint-disable-next-line max-lines-per-function
+  function finishEdition () : void {
+    editing = false;
+    storedDefinition.set({ output: {}, input: $formatStore });
+  }
+
+  function cancelEditing () : void {
+    formatStore.set(previousValue);
+    editing = false;
+  }
+
 </script>
 
-<MovableCard moduleConfig={module} bopModules={bopModules}>
+<MovableCard moduleConfig={configuration}>
   <div>
     {#if !editing}
-      <div class="outputModule" in:slide>
-        <div class="header">Output<button class="button" on:click={() => editing=!editing }>Edit</button></div>
-        {#each Object.keys($configuration) as key}
-          <InputSection info={$configuration[key]} name={key} parentKey={module.key} bind:bopModules bind:bopConstants/>
-        {/each}
+      <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
+        <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
+          <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 flex justify-center cursor-pointer content-center text-center fill-offWhite hover:fill-white hover:bg-norbalt-100 transition-all"
+            on:click={startEditing}
+          >
+            <PencilIcon style="w-3.5 h-auto fill-inherit"/>
+          </div>
+          <div class="text-sm text-offWhite px-9"> {configuration.moduleName} </div>
+        </div>
+        <div class="text-sm text-white pb-3 pt-2">
+          {#if inputValues.length === 0}
+            <p class="text-center text-offWhite"> No properties </p>
+          {/if}
+          <div class="pr-6 flex flex-col items-start">
+            {#each inputValues as key}
+            <CardProperty mode="input" name={key}/>
+            {/each}
+          </div>
+        </div>
       </div>
     {:else}
-      <div class="outputDefinition" in:slide>
-        <div class="header">
-          <span on:click={() => navigateBackToLevel(0)} class="clickablePath">Output</span><button class="button" on:click={() => finishEdition() }>Edit</button>
+      <div class="select-none min-w-[120px] bg-ochreYellow-light rounded shadow p-[1px]">
+      <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
+        <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
+          <div class="h-6 absolute w-6 bg-norbalt-200 rounded right-1 flex justify-center cursor-pointer content-center text-center stroke-offWhite hover:stroke-brightGreen hover:bg-norbalt-100 transition-all"
+            on:click={finishEdition}
+          >
+            <CheckIcon style="w-3.5 h-auto stroke-inherit"/>
+          </div>
+          <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 flex justify-center cursor-pointer content-center text-center stroke-offWhite hover:stroke-ochreYellow hover:bg-norbalt-100 transition-all"
+            on:click={cancelEditing}
+          >
+            <CancelIcon style="w-3.5 h-auto stroke-inherit"/>
+          </div>
+          <div class="text-sm text-offWhite px-9"> {configuration.moduleName} </div>
         </div>
-        {#each paths as path, index}
-          &gt <span class="clickablePath" on:click={() => navigateBackToLevel(index+1)}>{path}</span>
-        {/each}
-        <ObjectDefinitionMiniApp
-          editingLevel={new EditorLevel(EditorLevels.createDefinition)} 
-          format={$configuration} initialData={{}}
-          on:navigation-event={() => { paths = getPathsNames(); }}
-          bind:getPathsNames
-          bind:navigateBackToLevel
-          bind:getDefinitionAndData
+          <ObjectDefinitionMiniApp
+          rootStyle="rounded bg-norbalt-350 p-2"
+          editingLevel={new EditorLevel(EditorLevels.createDefinition)}
+          format={formatStore}
+          initialData={{}}
           />
+        </div>
       </div>
     {/if}
   </div>
 </MovableCard>
-
-
-
-<style lang="scss">
-  .header {
-    border-radius: 5px 5px 0 0;
-    padding: 2px 2px 0 8px;
-    background-color: rgb(94, 94, 94);
-    margin-bottom: 5px;
-  }
-  .button {
-    position: absolute;
-    right: 3px;
-  }
-
-  .outputModule {
-    border-radius: 5px;
-    background-color: #34344b;
-    padding-bottom: 8px;
-    min-width: 150px;
-  }
-
-  .outputDefinition {
-    transition: width 2s ease-in-out;
-    background-color: #34344b;
-    border-radius: 5px;
-  }
-
-  .clickablePath {
-    cursor: pointer;
-  }
-</style>
-
