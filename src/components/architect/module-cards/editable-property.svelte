@@ -87,7 +87,8 @@
       const clonedValue = clone(currentValue);
       let tempData = clonedValue[mode];
       for (let path of finalPath) {
-        tempData = tempData[path]["subtype"];
+        let complimentaryPathName = tempData[path].type === "array" ? "data" : "subtype";
+        tempData = tempData[path][complimentaryPathName];
       }
 
       let subtype = undefined;
@@ -102,7 +103,8 @@
       if (currentName !== newName) {
         let updatedTempData = clonedValue[mode];
         for (let path of finalPath.slice(0, finalPath.length -1)) {
-          updatedTempData = updatedTempData[path]["subtype"];
+          let complimentaryPathName = updatedTempData[path].type === "array" ? "data" : "subtype";
+          updatedTempData = updatedTempData[path][complimentaryPathName];
         }
 
         updatedTempData[finalPath[finalPath.length-1]]["subtype"] = renameObjKey(tempData, currentName, newName);;

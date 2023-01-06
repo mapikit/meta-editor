@@ -47,9 +47,10 @@
     deepOpen = !deepOpen;
   };
 
+  // eslint-disable-next-line max-lines-per-function
   const getDeepProperties = () : Array<{key : string; type : TypeDefinition }> => {
     if (getTypeDetails()["type"] === "array") {
-      const keys = Object.keys(getTypeDetails()["data"] ?? []);    
+      const keys = Object.keys(getTypeDetails()["data"] ?? []);
       const result = [];
       keys.forEach((item, index) : void => {
         const type = {};
@@ -86,8 +87,9 @@
       const previousPath = parentPaths.slice(0, parentPaths.length);
 
       for (let path of previousPath) {
+        let complimentaryPathName = currentStep[path].type === "array" ? "data" : "subtype";
         if (previousPath[previousPath.length -1] === path) { continue; }
-        currentStep = currentStep[path][fieldName];
+        currentStep = currentStep[path][complimentaryPathName];
       };
 
       if (!currentStep[previousPath[previousPath.length -1]][fieldName]) {
