@@ -59,8 +59,8 @@ export class Configuration {
     this.projectId = readable(projectId);
     this.id = readable(id);
     this.version.set(version);
-    this.createdAt = readable(createdAt);
-    this.updatedAt = readable(updatedAt);
+    this.createdAt = readable(createdAt ? new Date(createdAt) : new Date());
+    this.updatedAt = readable(updatedAt ? new Date(updatedAt) : new Date());
 
     this.envs = envs;
     this.schemas = schemas.map(schema => schema instanceof Schema ? schema :

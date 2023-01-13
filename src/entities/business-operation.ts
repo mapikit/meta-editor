@@ -138,17 +138,17 @@ export class UIBusinessOperation {
     this.output.storedDefinition.set({ input: output, output: {} });
   }
 
-  public static rebuildModuleCards (configuration : ModuleCard[]) : ModuleCard[] {
+  public static rebuildModuleCards (/*configuration : ModuleCard[]*/) : ModuleCard[] {
     const result = [] as ModuleCard[];
-    for(const config of configuration) {
-      // if((config as ModuleCard).position === undefined) {
-      //   (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
-      // } else {
-      //   const position = (config as ModuleCard).position;
-      //   (config as ModuleCard).position = new Coordinate(position.x, position.y);
-      // }
-      // result.push(config as ModuleCard);
-    }
+    // for(const config of configuration) {
+    //   if((config as ModuleCard).position === undefined) {
+    //     (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
+    //   } else {
+    //     const position = (config as ModuleCard).position;
+    //     (config as ModuleCard).position = new Coordinate(position.x, position.y);
+    //   }
+    //   result.push(config as ModuleCard);
+    // }
     return result;
   }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { get } from "svelte/store";
-  import { availableConfigurations, getSchemaById, protocols } from "../../../stores/configuration-store";
+  import { getSchemaById, protocols } from "../../../stores/configuration-store";
   import { navigation } from "../../../lib/navigation";
   import { onMount, onDestroy } from "svelte";
   import ConfigurationSection from "../../../components/configuration/configuration-section.svelte";
@@ -32,10 +32,8 @@
   let editted = false;
   let previousSchemaState : Serialized<Schema> = undefined;
 
-  onDestroy(() => { 
-    currentSchema.set(new Schema(previousSchemaState));
-    unsub()
-  });
+  onDestroy(() => unsub());
+
   // eslint-disable-next-line max-lines-per-function
   onMount(() => {
     const currentPathParams = navigation.currentPathParams;
@@ -73,7 +71,7 @@
 <div class="px-8 w-[calc(100%-86px)] overflow-y-scroll pb-36">
   <ConfigurationSection type="Schemas" canDelete={true}/>
   <div class="w-full mt-12" >
-    <p class="text-white font-bold text-2xl italic"> Editing '{schemaName}' Schema</p>
+    <p class="text-white font-bold text-2xl italic"> Editing '{$schemaName}' Schema</p>
     <div class="flex flex-row w-full mt-4"> <!-- Card holder -->
       <div class="rounded bg-norbalt-200 p-3 px-5 border-transparent border w-[550px]">
         <div /> <!-- Confirm / Cancel -->

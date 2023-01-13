@@ -28,7 +28,7 @@ export class Schema {
   public constructor ({ id, format, name, dbProtocol, isLocked, isStarred, description } : SchemaParameters) {
     this.format.set(format);
     this.name.set(name);
-    this.dbProtocol.set(dbProtocol);
+    this.dbProtocol.set(dbProtocol ?? "");
     this.isLocked.set(isLocked);
     this.isStarred.set(isStarred);
     this.description.set(description);
