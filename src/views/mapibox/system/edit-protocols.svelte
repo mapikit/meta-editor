@@ -33,10 +33,7 @@
 
   let unsub = () : void => { void 0; };
 
-  onDestroy(() => { 
-    currentProtocol.set(new Protocol(previousProtocolState));
-    unsub();
-  });
+  onDestroy(() => unsub());
   // eslint-disable-next-line max-lines-per-function
   onMount(() => {
     const currentPathParams = navigation.currentPathParams;
