@@ -158,6 +158,5 @@ function drawFunctionalConnections (
       env.canvasContext.stroke();
     }
   }
-
 }
 

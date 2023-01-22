@@ -15,6 +15,7 @@
   };
 
   const startDragging = (event : MouseEvent) : void => {
+    event.stopPropagation();
     if (event.button !== 0) { return; }
     dragging.set(true);
     draggingElement.set({ type: dragType, element: dragElement, data: dragData });

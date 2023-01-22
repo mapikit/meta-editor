@@ -55,11 +55,9 @@
   on:mouseenter={mouseEnter}
   on:mouseleave={mouseLeave}
   bind:this={element}
-  class="bdrop w-full h-full absolute z-15 {debugStyle} {validOverStyle} {clickThrough}"
+  class="bdrop w-full h-full absolute z-15 {style} {debugStyle} {validOverStyle} {clickThrough}"
 >
-<div class="{style}">
 
-</div>
 </div>
 
 <style lang="scss">

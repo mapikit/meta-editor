@@ -8,9 +8,12 @@
   import type { ModuleCard } from "../../../common/types/module-card";
   import EditableProperty from "./editable-property.svelte";
   import clone from "just-clone";
+  import Draggable from "../draggable.svelte";
+	import DropArea from "../drop-area.svelte";
 
   export let mode : "input" | "output";
   export let parentPaths : string[] = [];
+  let dotDrag : HTMLDivElement;
 
   let moduleConfig = getContext<ModuleCard>("moduleConfig");
   const { storedDefinition } = moduleConfig;
@@ -39,6 +42,7 @@
   $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
   $: deepArrowRotate = mode === "input" ? "rotate-180" : "flex-row-reverse";
   $: innerTypePosition = mode === "input" ? "-translate-x-[calc(100%_+_6px)]" : "translate-x-[6px] left-[100%]";
+  $: dropAreaAnchoring = mode === "input" ? "right-0" : "left-0";
 
   let canEditType = ["array", "cloudedObject"].includes(getTypeDetails().type);
 
@@ -112,13 +116,17 @@
       return updatedDefinition;
     });
   };
+
+  $: acceptedTypes = mode === "input" ? ["prop", "constant"] : ["prop"];
 </script>
 
 <div class="relative">
   <div class="relative flex {containerOrder} justify-center items-center">
-    <div class="w-4 h-4 rounded flex justify-center items-center hover:bg-offWhite bg-transparent transition-all"> <!-- Clickable section -->
-      <Typedot size={2} type={getTypeDetails()} />
-    </div>
+    <Draggable dragElement={dotDrag} dragType="prop">
+      <div class="w-4 h-4 rounded flex justify-center items-center hover:bg-offWhite bg-transparent transition-all"> <!-- Clickable section -->
+        <Typedot bind:ref={dotDrag} size={2} type={getTypeDetails()}/>
+      </div>
+    </Draggable>
 
     {#if isDeep}
       <div class="w-3 h-3 flex {deepArrowRotate} cursor-pointer justify-center items-center top-0 transition-all stroke-offWhite hover:stroke-white"
@@ -128,6 +136,8 @@
       </div>
     {/if}
   </div>
+
+  <DropArea style="-translate-y-[0.1rem] top-0 absolute h-[calc(100%_+_0.2rem)] w-[calc(100%_+_4rem)] {dropAreaAnchoring} rounded" acceptTypes={acceptedTypes} onDropContent={() => { console.log("Dropped valid thing here :D"); }}/>
 
   {#if deepOpen && isDeep}
     <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-1 min-w-[3.5rem]">

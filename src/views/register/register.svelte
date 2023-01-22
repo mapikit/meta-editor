@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { slide } from "svelte/transition";
-	import { storageManager } from "../../stores/storage-manager";
+  import { slide } from "svelte/transition";
+  import { storageManager } from "../../stores/storage-manager";
 
   let emailTaken = false;
   let emailInvalid = false;
@@ -10,17 +10,17 @@
   let loading = false;
   let emailField = "";
   let passwordField = "";
-  let checkDelay : NodeJS.Timeout = undefined
+  let checkDelay : NodeJS.Timeout = undefined;
 
   $: userIsAvailable(emailField)
 
   
   function timeoutCheck (email : string) {
-    return async () => {
+    return async () : Promise<void> => {
       if(emailInvalid) return;
       emailTaken = await storageManager.manager.userExists(email);
       loading = false;
-    }
+    };
   }
 
   async function userIsAvailable (email : string) {
@@ -47,17 +47,18 @@
 
   }
 
+  // eslint-disable-next-line max-len
   const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   $: emailInvalid = emailField !== "" && !emailRegex.test(emailField.toLowerCase());
 
   let emailBorder = "border-transparent", passwordBorder = "border-transparent";
 
-  $: emailBorder = emailTaken || emailInvalid ? "border-roseRed" : "border-transparent"
-  $: passwordBorder = passwordInvalid ? "border-roseRed" : "border-transparent"
+  $: emailBorder = emailTaken || emailInvalid ? "border-roseRed" : "border-transparent";
+  $: passwordBorder = passwordInvalid ? "border-roseRed" : "border-transparent";
   $: emailEmpty = emailField === "";
   $: passwordEmpty = passwordField === "";
   $: registerColor = emailEmpty || emailInvalid || emailTaken || passwordEmpty || loading
-    ? "bg-norbalt-400 text-norbalt-200 hover:text-norbalt-200 hover:border-transparent" : "bg-norbalt-100"
+    ? "bg-norbalt-400 text-norbalt-200 hover:text-norbalt-200 hover:border-transparent" : "bg-norbalt-100";
 
 </script>
 

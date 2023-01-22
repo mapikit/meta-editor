@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DropArea from "../drop-area.svelte";
   import ConnectionPoint from "./connection-point.svelte";
 
   export let mode : "input" | "output";
@@ -16,7 +15,4 @@
   <div class="text-xs -mt-0.5">
     {name}
   </div>
-  {#if mode === "input"}
-    <DropArea acceptTypes={["constant"]} onDropContent={() => { console.log("Dropped constant here :D"); }} style="w-[calc(100%_+_4rem)] right-0 rounded"/>
-  {/if}
 </div>

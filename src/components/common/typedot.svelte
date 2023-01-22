@@ -8,8 +8,6 @@
   $: dotSize = size === 2 ? "w-2 h-2" : "w-3 h-3";
   $: dotShift = size === 2 ? "ml-1" : "ml-1.5";
   $: color = typeColors[type.type];
-
-  console.log("Rendered with type", type.type);
 </script>
 
 <div class="rounded-full {dotSize} overflow-hidden" style="background-color: {color}">

@@ -1,10 +1,7 @@
 <script lang="ts">
-import type { BopsConfigurationEntry }
-  from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
 import { createEventDispatcher, getContext } from "svelte";
 
-import { get } from "svelte/store";
 import { Coordinate } from "../../../common/types/geometry";
 
 import type { ModuleCard } from "../../../common/types/module-card";
