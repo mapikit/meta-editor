@@ -5,12 +5,23 @@
   import SaveIcon from "../../icons/save-icon.svelte";
   import TestBopIcon from "../../icons/test-bop-icon.svelte";
   import Tooltip from "../common/tooltip.svelte";
+  import { storageManager } from "../../stores/storage-manager";
+  import type { UIBusinessOperation } from "../../entities/business-operation";
+  import { getContext } from "svelte";
+  import { currentConfigId } from "../../stores/configuration-store";
+
+  const currentBop = getContext<UIBusinessOperation>("currentBop");
+  
 
   let hoverCursor = false;
   let hoverScissors = false;
   let hoverSave = false;
   let hoverTest = false;
   let hoverPan = false;
+
+  const save = async () : Promise<void> => {
+    await storageManager.manager.updateBop($currentConfigId, currentBop);
+  };
 
 </script>
 
@@ -37,6 +48,7 @@
     </div>
     <div class="flex items-center justify-center w-10 h-full hover:bg-norbalt-100 transition-all cursor-pointer fill-offWhite hover:fill-white"
       on:mouseenter="{() => {hoverSave=true;}}" on:mouseleave="{() => {hoverSave=false;}}"
+      on:click={save}
     >
       <SaveIcon style="fill-inherit"/>
       <Tooltip position="bottom" tooltipContent="Save" visible="{hoverSave}"/>

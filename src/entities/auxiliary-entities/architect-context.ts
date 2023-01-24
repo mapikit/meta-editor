@@ -1,9 +1,9 @@
 import { writable } from "svelte/store";
 
-export interface DragElement {
+export interface DragElement<T = unknown> {
   type : string;
   element : HTMLElement;
-  data ?: unknown;
+  data ?: T;
 }
 
 export class ArchitectContext {

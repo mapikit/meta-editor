@@ -125,7 +125,9 @@
 
 </script>
 
-<div class="{rootStyle}">
+<div class="{rootStyle}"
+  on:mousedown={(e) => {e.stopPropagation();}}
+>
   <div class="bg-norbalt-350 py-2 px-4 rounded-t h-9 flex flex-row items-center mb-3"> <!-- Header BreadCrumb -->
     {#if levelsNames.length >= 1}
       <div class="h-5 w-2.5 mr-2 cursor-pointer" on:click="{() => { goBackOneLevel(); }}">

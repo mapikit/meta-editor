@@ -16,6 +16,7 @@ type MovingPosision = {
 }
 
 export let moduleConfig : ModuleCard;
+export let onMove : () => void = undefined;
 const { position } = moduleConfig;
 
 let ref : HTMLDivElement;
@@ -43,6 +44,8 @@ function stopMovement (event : MouseEvent) : void {
     moving = false;
     dispatch("movementStopped", event);
   }
+
+  onMove();
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
@@ -58,12 +61,12 @@ function moveCard (node : Node, mousePosition : {x : number; y : number}) {
         lastMousePosition = updateMousePos;
         let newX =  movingPos.origin.x + movingPos.delta.x;
         let newY =  movingPos.origin.y + movingPos.delta.y;
-        // console.log({ newX, newY }, moduleConfig.moduleName);
         moduleConfig.position.update((updatePosition) : Coordinate => {
           updatePosition.moveTo(newX, newY);
           return updatePosition;
         });
-        // bopModules.update(modules => modules);
+
+        if (onMove) onMove();
       }
     },
   };

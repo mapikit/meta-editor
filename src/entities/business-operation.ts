@@ -4,13 +4,18 @@ import type {
   BopsConstant,
   BopsVariable,
   BopsCustomObject } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { ModuleCard, SerializedModuleCard } from "../common/types/module-card";
+import { ModuleCard, SerializedModuleCard, UICompliantDependency } from "../common/types/module-card";
 import { writable, Writable, readable, Readable, get } from "svelte/store";
 import { Coordinate } from "../common/types/geometry";
 import { availableConfigurations, currentConfigId } from "../stores/configuration-store";
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
 import type { Serialized } from "./serialized-type";
+import type { ConnectionPointSelection } from "../stores/knob-selection-type";
+import { SectionsMap, sectionsMap } from "../components/architect/helpers/sections-map";
+import { updateTraces } from "../components/architect/update-traces";
+// TODO The right thing here, since this is a high level class, is to receive this as a
+// property in the constructor instead of simply importing this.
 
 export type BOpParameters = {
   id : string,
@@ -69,8 +74,13 @@ export class UIBusinessOperation {
     });
 
     this.validateInput(input);
-    this.validateOutput(output);
     this.configuration.set(this.rebuildConfigurationForUI(configuration));
+    const existingOutput = this.getOutputFromConfiguration();
+    if (existingOutput) {
+      this.output = existingOutput;
+    } else {
+      this.validateOutput(output);
+    }
   }
 
   public static deleteBop (id : string) : void {
@@ -125,31 +135,27 @@ export class UIBusinessOperation {
     this.input.storedDefinition.set({ input: {}, output: input });
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private validateOutput (output : SerializedModuleCard | ObjectDefinition) : void {
     try { isObjectDefinition(output); }
     catch {
       const position = (output as SerializedModuleCard).position;
       this.output.position.set(position ? new Coordinate(position.x, position.y) : new Coordinate(0, 0));
-      this.output.storedDefinition.set((output as SerializedModuleCard).storedDefinition ?? { input: {}, output: {} });
+      this.output.storedDefinition
+        .set((output as SerializedModuleCard).storedDefinition ?? { input: {}, output: {} });
+
+      this.configuration.set([this.output]);
 
       return;
     }
 
     this.output.storedDefinition.set({ input: output, output: {} });
+
+    this.configuration.set([this.output]);
   }
 
-  public static rebuildModuleCards (/*configuration : ModuleCard[]*/) : ModuleCard[] {
-    const result = [] as ModuleCard[];
-    // for(const config of configuration) {
-    //   if((config as ModuleCard).position === undefined) {
-    //     (config as ModuleCard).position = new Coordinate(Math.random() * 1414, Math.random() * 577);
-    //   } else {
-    //     const position = (config as ModuleCard).position;
-    //     (config as ModuleCard).position = new Coordinate(position.x, position.y);
-    //   }
-    //   result.push(config as ModuleCard);
-    // }
-    return result;
+  private getOutputFromConfiguration () : ModuleCard {
+    return get(this.configuration).find((item) => item.moduleType === "output");
   }
 
   // eslint-disable-next-line max-lines-per-function
@@ -173,8 +179,6 @@ export class UIBusinessOperation {
 
   //   return depthTree;
   // }
-
-
 
   public addModule (module : BopsConfigurationEntry) : void {
     const convertedModule = this.convertModuleToUI(module);
@@ -231,6 +235,79 @@ export class UIBusinessOperation {
       variables: get(this.variables),
       configuration: get(this.configuration),
       customObjects: get(this.customObjects),
+    });
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  public solveConnection (
+    currentConnectionPoint : ConnectionPointSelection,
+    targetConnectionPoint : ConnectionPointSelection,
+  ) : void {
+    if(currentConnectionPoint === undefined) return;
+    if(currentConnectionPoint.connectionType === targetConnectionPoint.connectionType) return;
+
+    const currentIsOutput = ["output", "module"].includes(currentConnectionPoint.connectionType);
+    const [origin, target] = currentIsOutput
+      ? [currentConnectionPoint, targetConnectionPoint]
+      : [targetConnectionPoint, currentConnectionPoint];
+
+    if(target.connectionType === "functional") return this.addFunctionalDependency(origin, target);
+
+    // eslint-disable-next-line max-lines-per-function
+    this.configuration.update((modules) => {
+      const targetModule = modules.find(module => module.key == target.parentKey);
+
+      const firstPathStep = origin.parentKey === "input" ? ""
+        : origin.connectionType === "output" ? "result." : "module.";
+
+      const newDependency : UICompliantDependency = {
+        origin: origin.parentKey,
+        originPath: `${firstPathStep}${origin.property}`,
+        targetPath: target.property,
+        matchingType: (origin.propertyType === target.propertyType) || target.propertyType === "any",
+      };
+
+      const targetModuleDependencies = get(targetModule.dependencies);
+      const alreadyPresent = targetModuleDependencies
+        .findIndex(dep => dep.targetPath === newDependency.targetPath);
+
+      if(alreadyPresent !== -1) {
+        targetModule.dependencies.update((currentValue) => currentValue.splice(alreadyPresent, 1));
+        target.element.dispatchEvent(new Event("removeTag"));
+        sectionsMap.removeConnection(SectionsMap.getIdentifier(targetModule.key, newDependency.targetPath));
+      }
+
+      targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
+      sectionsMap.addConnection(newDependency, target.parentKey, target.connectionType);
+
+      return modules;
+    });
+
+    updateTraces();
+
+    currentConnectionPoint.element.style.outline = "";
+    return undefined;
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  private addFunctionalDependency (
+    origin : ConnectionPointSelection, target : ConnectionPointSelection) : void
+  {
+    if(origin.connectionType !== "module") return window.alert("Functional Dependencies only connect to modules");
+
+    this.configuration.update(modules => {
+      const targetModule = get(this.configuration).find(module => module.key == target.parentKey);
+      const targetModuleDependencies = get(targetModule.dependencies);
+      const alreadyPresent = targetModuleDependencies.findIndex(dependency => {
+        return dependency.origin === origin.parentKey && dependency.targetPath === undefined;
+      });
+      if(alreadyPresent !== -1) {
+        targetModule.dependencies.update((currentValue) => currentValue.splice(alreadyPresent, 1));
+      }
+
+      targetModule.dependencies
+        .update((currentValue) => { currentValue.unshift({ origin: origin.parentKey }); return currentValue; });
+      return modules;
     });
   }
 }

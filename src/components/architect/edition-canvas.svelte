@@ -18,6 +18,7 @@
   import { Tools, toolsController } from "./view-store";
   import { ShortcutsController } from "../../common/helpers/shortcut-controller";
   import { ArchitectContext } from "../../entities/auxiliary-entities/architect-context";
+  import ArchitectCanvas from "./architect-canvas.svelte";
 
   export let currentBop : UIBusinessOperation;
 
@@ -33,12 +34,13 @@
   let configurationHistory;
   let modulesInConfig : ModuleCard[];
   let trash : HTMLDivElement;
-  let canvas : HTMLCanvasElement;
   let context : CanvasRenderingContext2D;
   let cutting = false;
   let storeHidden = true;
   let modulesLayer : HTMLElement;
   let overlayLayer : HTMLElement;
+
+  let adjustCanvas;
 
   if (currentBop) {
     configurationHistory = new History({
@@ -53,37 +55,8 @@
   }
 
   onDestroy(() => configurationHistory.unsubscribe());
-  
-  function adjustCanvas () : void {
-    const containerDimensions = canvas.parentElement.getBoundingClientRect();
-    canvas.width = containerDimensions.width;
-    canvas.height = containerDimensions.height;
-    context.strokeStyle = "#ffffff";
-    context.lineWidth = 2;
-
-    updateTraces();
-
-    context.lineWidth = 2;
-  }
 
   onMount(() => {
-    context = canvas.getContext("2d");
-    $environment.canvasContext = context;
-    $environment.canvasOffset = canvas.getBoundingClientRect();
-
-    $environment.origin.moveTo(canvas.width/2, canvas.height/2);
-    sectionsMap.refreshConnections(get(currentBop.configuration));
-
-    currentBop.configuration.subscribe(() => {
-      updateTraces();
-    });
-
-    environment.subscribe(() => setTimeout(() => updateTraces(), 1));
-    // Investigate and avoid this kind of repetition & timeout
-    // Timeout Only: traces have "springness" (modules don't)
-    // No Timeout: traces don't update correctly (obvious with scaling)
-    adjustCanvas();
-
     shortcuts.setShortcut("c", () => { cutting = !cutting; });
 
     editingContext.modulesLayer.set(modulesLayer);
@@ -228,13 +201,14 @@
 
   $: generatedInput = currentBop.configuration && currentBop.input;
   $: generatedOutput = currentBop.configuration && currentBop.output;
+  
 </script>
 
 <div class="relative w-full h-full {cursorStyle}" id="architect"
 on:mouseup={releaseDrag}
 >
   {JSON.stringify(pos)}
-  <canvas class="absolute top-0 left-0 w-full h-full" bind:this={canvas}/>
+  <ArchitectCanvas bind:adjustCanvas={adjustCanvas} bind:context={context}/>
   <ModuleStore currentBop={currentBop}/>
   <div class="absolute bottom-0">
     {$dragging } : { $draggingElement?.type }

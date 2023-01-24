@@ -8,7 +8,7 @@ import { FunctionsInfo } from "../../components/architect/helpers/functions-info
 import type { Serialized } from "../../entities/serialized-type";
 
 export type UICompliantDependency = Dependency & {
-  matchingType : boolean;
+  matchingType ?: boolean;
 }
 
 export interface SerializedModuleCard extends BopsConfigurationEntry {

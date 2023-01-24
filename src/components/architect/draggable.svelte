@@ -28,7 +28,9 @@
     draggingElement.set({});
   };
 
-  $: draggingHomeStyle = $dragging && (($draggingElement).element === dragElement) ? "opacity-25" : "opacity-100";
+  $: draggingHomeStyle = $dragging
+    && (($draggingElement).element === dragElement)
+    && (($draggingElement).data === dragData) ? "opacity-25" : "opacity-100";
 </script>
 
 <div class="{style} {draggingHomeStyle} transition-opacity"

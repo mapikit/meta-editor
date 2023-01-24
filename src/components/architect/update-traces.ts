@@ -6,7 +6,7 @@ import { get } from "svelte/store";
 
 export type ExtraTracingInfo = {
   cutting ?: MouseEvent;
-  cursor ?: MouseEvent;
+  cursor ?: { x : number, y : number };
 }
 
 

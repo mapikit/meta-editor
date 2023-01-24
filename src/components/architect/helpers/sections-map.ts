@@ -1,9 +1,10 @@
 import type { Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+import type { ConnectionPointSelection } from "src/stores/knob-selection-type";
 import { get } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
 
-
 export class SectionsMap {
+  // TODO change these records to literal Maps
   public output : Record<string, HTMLSpanElement> =  {};
   public module = this.output;
   public input : Record<string, HTMLSpanElement> =  {};
@@ -15,14 +16,22 @@ export class SectionsMap {
   public activeLinkingOrigin : HTMLSpanElement = undefined;
   public hoveredFunctionalKnob : Array<string> = [];
 
-  public static getIdentifier (key : string | number, path : string) : string {
-    return `${key}.${path ?? ""}`;
+  public static getIdentifier (
+    key : string | number, path : string, type ?: ConnectionPointSelection["connectionType"]) : string {
+    const typeStep = type === "output" ? "result." : type === "module" ? "module." : "";
+    const isInput = key === "input";
+
+    return isInput ? `${key}.${path}` : `${key}.${typeStep}${path ?? ""}`;
   }
 
-  public addConnection (newDependency : Dependency, targetKey : number | "input") : void {
+  public addConnection (
+    newDependency : Dependency,
+    targetKey : number | "input",
+    outputType ?: ConnectionPointSelection["connectionType"],
+  ) : void {
     const outputPath = newDependency.originPath;
 
-    let outputId = SectionsMap.getIdentifier(newDependency.origin, outputPath);
+    let outputId = SectionsMap.getIdentifier(newDependency.origin, outputPath, outputType);
     const targetId = SectionsMap.getIdentifier(targetKey, newDependency.targetPath);
     if(outputPath === undefined) outputId = outputId + "module";
     const isFunctional = newDependency.originPath == undefined && newDependency.targetPath == undefined;
@@ -43,11 +52,11 @@ export class SectionsMap {
   }
 
   private connectModule (module : ModuleCard) : void {
-    console.log("attempting connection", get(module.dependencies));
     for(const dependency of get(module.dependencies)) this.addConnection(dependency, module.key);
   }
 
   private connectModules (modules : ModuleCard[]) : void {
+
     for(const module of modules) this.connectModule(module);
   }
 
@@ -56,16 +65,17 @@ export class SectionsMap {
   // eslint-disable-next-line max-lines-per-function
   private solveDeepConnections () : void {
     for(const output in this.connections) {
-      const outSteps = output.split(".");
-      while(this.isNill(this.output[outSteps.join(".")]) && outSteps.length > 0) {
-        outSteps.pop();
+      const outputSteps = output.split(".");
+      while(this.isNill(this.output[outputSteps.join(".")]) && outputSteps.length > 0) {
+        outputSteps.pop();
       }
-      if(outSteps.length === 0) delete this.connections[output];
+
+      if(outputSteps.length === 0) delete this.connections[output];
       else {
-        const correctedOutId = outSteps.join(".");
+        const correctedOutId = outputSteps.join(".");
         if(output !== correctedOutId) {
-          this.connections[outSteps.join(".")] =
-            [...this.connections[output], ...this.connections[outSteps.join(".")] ?? []];
+          this.connections[outputSteps.join(".")] =
+            [...this.connections[output], ...this.connections[outputSteps.join(".")] ?? []];
           delete this.connections[output];
         }
 

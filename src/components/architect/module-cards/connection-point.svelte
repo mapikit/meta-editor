@@ -3,13 +3,18 @@
   import ArrowIcon from "../../../icons/arrow-icon.svelte";
   import Typedot from "../../../components/common/typedot.svelte";
   import CrossIcon from "../../../icons/cross-icon.svelte";
-  import { getContext } from "svelte";
+  import { getContext, onDestroy, onMount } from "svelte";
   import type { UIBusinessOperation } from "src/entities/business-operation";
   import type { ModuleCard } from "../../../common/types/module-card";
   import EditableProperty from "./editable-property.svelte";
   import clone from "just-clone";
   import Draggable from "../draggable.svelte";
-	import DropArea from "../drop-area.svelte";
+  import DropArea from "../drop-area.svelte";
+  import type { ArchitectContext, DragElement } from "../../../entities/auxiliary-entities/architect-context";
+  import type { ConnectionPointSelection } from "../../../stores/knob-selection-type";
+  import { SectionsMap, sectionsMap } from "../helpers/sections-map";
+  import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
+  import { updateTraces } from "../update-traces";
 
   export let mode : "input" | "output";
   export let parentPaths : string[] = [];
@@ -19,11 +24,26 @@
   const { storedDefinition } = moduleConfig;
 
   const currentBop = getContext<UIBusinessOperation>("currentBop");
+  const context = getContext<ArchitectContext>("architectContext");
   let { configuration } = currentBop;
+  let { dragging, draggingElement } = context;
 
   let deepOpen = false;
   // If it is a deep type, should be albe to open and select deeper options
   // Is still selectable itself
+
+  onMount(() => {
+    sectionsMap[mode][SectionsMap
+      .getIdentifier(moduleConfig.key === -1 ? "input" : moduleConfig.key, parentPaths.join("."), mode)] = dotDrag;
+  
+    sectionsMap.refreshConnections($configuration);
+    updateTraces();
+  });
+
+  onDestroy(() => {
+    sectionsMap.refreshConnections($configuration);
+    updateTraces();
+  });
 
   const getTypeDetails = () : TypeDefinition => {
     const partialDefinition = $storedDefinition[mode];
@@ -49,6 +69,8 @@
   const toggleDeep = (e : MouseEvent) : void => {
     e.stopPropagation();
     deepOpen = !deepOpen;
+    sectionsMap.refreshConnections($configuration);
+    updateTraces();
   };
 
   // eslint-disable-next-line max-lines-per-function
@@ -117,14 +139,40 @@
     });
   };
 
-  $: acceptedTypes = mode === "input" ? ["prop", "constant"] : ["prop"];
+  $: acceptedTypes = mode === "input" ? ["output", "constant"] : ["input"];
+
+  type DragDataType = {
+    type : "input" | "output" | "module" | "functional";
+    propertyType : string;
+    property : string;
+    key : number | "input";
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  const makeConnection = (dropped : DragElement<DragDataType>) : void => {
+    const thisPoint : ConnectionPointSelection = {
+      connectionType: mode,
+      propertyType: getTypeDetails().type,
+      property: parentPaths.join("."),
+      element: dotDrag,
+      parentKey: moduleConfig.key === -1 ? "input" : moduleConfig.key,
+    };
+    const droppedPoint : ConnectionPointSelection = {
+      connectionType: dropped.data.type,
+      propertyType: dropped.data.propertyType,
+      property: dropped.data.property,
+      element: dropped.element,
+      parentKey: dropped.data.key === -1 ? "input" : dropped.data.key,
+    };
+    currentBop.solveConnection(thisPoint, droppedPoint);
+  };
 </script>
 
 <div class="relative">
   <div class="relative flex {containerOrder} justify-center items-center">
-    <Draggable dragElement={dotDrag} dragType="prop">
-      <div class="w-4 h-4 rounded flex justify-center items-center hover:bg-offWhite bg-transparent transition-all"> <!-- Clickable section -->
-        <Typedot bind:ref={dotDrag} size={2} type={getTypeDetails()}/>
+    <Draggable dragElement={dotDrag} dragType="{mode}" dragData="{{ type: mode, propertyType: getTypeDetails().type, property: parentPaths.join("."), key: moduleConfig.key }}">
+      <div bind:this={dotDrag} class="w-4 h-4 rounded flex justify-center items-center hover:bg-offWhite bg-transparent transition-all"> <!-- Clickable section -->
+        <Typedot size={2} type={getTypeDetails()}/>
       </div>
     </Draggable>
 
@@ -137,7 +185,7 @@
     {/if}
   </div>
 
-  <DropArea style="-translate-y-[0.1rem] top-0 absolute h-[calc(100%_+_0.2rem)] w-[calc(100%_+_4rem)] {dropAreaAnchoring} rounded" acceptTypes={acceptedTypes} onDropContent={() => { console.log("Dropped valid thing here :D"); }}/>
+  <DropArea style="-translate-y-[0.1rem] top-0 absolute h-[calc(100%_+_0.2rem)] w-[calc(100%_+_4rem)] {dropAreaAnchoring} rounded" acceptTypes={acceptedTypes} onDropContent={makeConnection}/>
 
   {#if deepOpen && isDeep}
     <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-1 min-w-[3.5rem]">
@@ -156,3 +204,7 @@
     </div>
   {/if}
 </div>
+
+{#if $dragging && (($draggingElement).element === dotDrag)}
+  <ConnectionPointDragTraces onGenerate={() => { sectionsMap.activeLinkingOrigin = dotDrag; }}/>
+{/if}

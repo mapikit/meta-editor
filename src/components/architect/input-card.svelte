@@ -9,6 +9,7 @@
   import CheckIcon from "../../icons/check-icon.svelte";
   import CancelIcon from "../../icons/cancel-icon.svelte";
   import { setContext } from "svelte";
+  import { updateTraces } from "./update-traces";
 
   export let configuration : ModuleCard;
   const storedDefinition = configuration.storedDefinition;
@@ -42,7 +43,7 @@
 
 </script>
 
-<MovableCard moduleConfig={configuration}>
+<MovableCard moduleConfig={configuration} onMove={updateTraces}>
   <div>
     {#if !editing}
       <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">

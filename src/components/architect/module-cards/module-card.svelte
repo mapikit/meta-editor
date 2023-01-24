@@ -1,21 +1,13 @@
 <script lang="ts">
-  import InputSection from "./input-section.svelte";
-  import OutputSection from "./output-section.svelte";
   import type { ModuleCard } from "../../../common/types/module-card";
-  import { FunctionsInfo } from "../helpers/functions-info";
-  import StaticCardBody from "./module-card-skeleton.svelte";
-  import { getAvailableKey } from "../helpers/get-available-key";
-  import { environment } from "../../../stores/environment";
-  import { Coordinate } from "../../../common/types/geometry";
   import MovableCard from "../helpers/movable-card.svelte";
   import type { Writable } from "svelte/store";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
-  import FunctionalKnob from "./functional-knob.svelte";
-  import ModularSection from "./modular-section.svelte";
   import type { DeleteModuleEvent } from "../../../common/types/events";
   import CardProperty from "./card-property.svelte";
   import { setContext } from "svelte";
+  import { updateTraces } from "../update-traces";
 
   export let moduleConfig : ModuleCard;
   export let bopModules : Writable<ModuleCard[]>;
@@ -47,7 +39,7 @@
 
 
 {#if cardInfo !== undefined}
-  <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion}>
+  <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion} onMove={updateTraces}>
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> F </div>
@@ -67,33 +59,6 @@
         </div>
       </div>
     </div>
-    <!-- <StaticCardBody definition={cardInfo} tooltipPosition="top" slot="content" parentSchema={moduleConfig.moduleType === "schemaFunction" ? moduleConfig.modulePackage : undefined}>
-      <span slot="functionalDep" class="functionalKnob">
-        <FunctionalKnob
-          bopModules={bopModules}
-          parentKey={moduleConfig.key}
-        />
-      </span>
-      <span slot="moduleNob" class="moduleNob">
-        <ModularSection
-          bopModules={bopModules}
-          parentKey={moduleConfig.key}
-          info={modularInfo}
-        />
-      </span>
-      <div slot="content" class="IODiv">
-        <div class="inputs">
-          {#each Object.keys(cardInfo.input) as key}
-            <InputSection bopModules={bopModules} bind:bopConstants name={key} parentKey={moduleConfig.key} info={cardInfo.input[key]}/>
-          {/each}
-        </div>
-        <div class="outputs">
-          {#each Object.keys(cardInfo.output) as key}
-            <OutputSection bopModules={bopModules} name={key} parentKey={moduleConfig.key} info={cardInfo.output[key]}/>
-          {/each}
-        </div>
-      </div>
-    </StaticCardBody> -->
   </MovableCard>
 {:else}
   <MovableCard moduleConfig={moduleConfig}>
