@@ -20,7 +20,7 @@ export const currentConfig = derived([currentConfigId, selectedSystem, available
 });
 
 export const schemas = derived(currentConfig, config => config.schemas);
-export const businessOperations = derived(currentConfig, config => config.businessOperations);;
+export const businessOperations = derived(currentConfig, config => config.businessOperations);
 export const protocols = derived(currentConfig, config => config.protocols);
 export const environmentVariables = derived(currentConfig, config => config.envs);
 

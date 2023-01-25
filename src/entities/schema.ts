@@ -48,6 +48,7 @@ export class Schema {
 
   public getCardInfo () : PropertyListEntry {
     return {
+      type: "Schema",
       id: get(this.id),
       name: this.name,
       locked: this.isLocked,

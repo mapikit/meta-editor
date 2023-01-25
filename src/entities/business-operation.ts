@@ -94,6 +94,7 @@ export class UIBusinessOperation {
 
   public getCardInfo () : PropertyListEntry {
     return {
+      type: "BOp",
       id: get(this.id),
       name: this.name,
       locked: this.isLocked,
@@ -272,6 +273,7 @@ export class UIBusinessOperation {
         .findIndex(dep => dep.targetPath === newDependency.targetPath);
 
       if(alreadyPresent !== -1) {
+        get(targetModule.dependencies).splice(alreadyPresent, 1);
         targetModule.dependencies.update((currentValue) => currentValue.splice(alreadyPresent, 1));
         target.element.dispatchEvent(new Event("removeTag"));
         sectionsMap.removeConnection(SectionsMap.getIdentifier(targetModule.key, newDependency.targetPath));

@@ -87,7 +87,7 @@
         <div class="mt-2 w-full">
           <p class="text-offWhite text-sm"> Db Protocol </p>
           <div class="mt-1">
-            <Selector bind:field={$dbprotocol} options={protocolsOptions} selectedLabel={selectedProtocolLabel} onChange={() => editted = true}/>
+            <Selector field={$dbprotocol} options={protocolsOptions} selectedLabel={selectedProtocolLabel} onChange={() => editted = true}/>
           </div>
         </div>
         <div class="flex flex-row justify-between items-center text-lg font-semibold mt-4"> <!-- Format Section -->

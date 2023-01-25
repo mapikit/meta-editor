@@ -106,6 +106,7 @@ export class Protocol {
 
   public getCardInfo () : PropertyListEntry {
     const result : PropertyListEntry = {
+      type: "Protocol",
       id: get(this.id),
       name: this.identifier,
       locked: this.isLocked,

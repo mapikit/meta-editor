@@ -31,7 +31,7 @@
   <div class="absolute left-3 text-sm">
     <ChevronIcon style="stroke-white transition-all {focusChevronClass} translate-y-1.5"/>
   </div>
-  <p class="text-center w-full text-sm"> {selectedLabel ?? field} </p>
+  <p class="text-center w-full text-sm"> {selectedLabel ?? field ?? ""} </p>
   {#if focused}
     <div class='bg-norbalt-200 shadow absolute mt-2 top-full w-full rounded text-sm overflow-hidden left-0'>
       {#each options as option }

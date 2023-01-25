@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Writable } from "svelte/store";
+  import { get, Writable } from "svelte/store";
   import type { DeleteModuleEvent } from "../../common/types/events";
   import type { ModuleCard } from "../../common/types/module-card";
   
@@ -20,9 +20,10 @@
     bopModules.update(modules => {
       // Remove Dependants
       modules.forEach(module => {
-        for(let i = module.dependencies.length-1; i >= 0; i--) {
-          if(module.dependencies[i].origin === key)
-          {module.dependencies.splice(i, 1);}
+        for(let i = get(module.dependencies).length-1; i >= 0; i--) {
+          if(get(module.dependencies)[i].origin === key) {
+            get(module.dependencies).splice(i, 1);
+          }
         }
       });
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { businessOperations, getConfigurationById, protocols, schemas } from "../../stores/configuration-store";
+  import { businessOperations, getBopById, getConfigurationById, getProtocolById, getSchemaById, protocols, schemas } from "../../stores/configuration-store";
   import ChevronIcon from "../../icons/chevron-icon.svelte";
   import SystemPropIcon from "../common/system-prop-icon.svelte";
   import type { Schema } from "../../entities/schema";
@@ -14,6 +14,8 @@
 	import type { Configuration } from "../../entities/configuration";
 	import { createBop, createProtocol, createSchema } from "./creation-functions";
 	import { deleteBop, deleteProtocol, deleteSchema } from "./deletion-functions";
+	import type { PropertyListEntry } from "../../common/types/property-list-entry";
+	import { storageManager } from "../../stores/storage-manager";
 
   let currentVersion : Configuration
 
@@ -56,6 +58,34 @@
   $: chevronStyle = collapsed ? "-rotate-90" : "";
   $: currentStyle = iconStyles[type];
 
+  function toggleItemFavorite (entry : PropertyListEntry) : void {
+    const versionId = get(currentVersion.id);
+
+    switch (entry.type) {
+      case "BOp":
+        const bopStore = getBopById(entry.id)
+        const bop = get(bopStore);
+        bop.isStarred.set(!get(bop.isStarred));
+        bopStore.set(bop)
+        storageManager.manager.updateBop(versionId, bop);
+        return;
+      case "Protocol":
+        const protocolStore = getProtocolById(entry.id)
+        const protocol = get(protocolStore);
+        protocol.isStarred.set(!get(protocol.isStarred));
+        protocolStore.set(protocol)
+        storageManager.manager.updateProtocol(versionId, protocol);
+        return;
+      case "Schema":
+        const schemaStore = getSchemaById(entry.id)
+        const schema = get(schemaStore);
+        schema.isStarred.set(!get(schema.isStarred));
+        schemaStore.set(schema)
+        storageManager.manager.updateSchema(versionId, schema);
+        return;
+    }
+  }
+
   const navigateEdit = (item) : () => void => {
     if (navigation.currentPath.includes(linkName)) {
       const pathParams = navigation.currentPathParams;
@@ -86,7 +116,7 @@
       <div class="bg-norbalt-200 w-80 min-w-[20rem] p-2 px-4 rounded ml-6 first:ml-0 last:mr-10">
         <div class="flex flex-row justify-between items-center">
           <p class="text-lg font-semibold"> {get(item.name)} </p>
-          <div > <StarIcon style="stroke-norbalt-100 fill-transparent" /> </div> <!-- Todo: call BE -->
+          <div > <StarIcon style="stroke-norbalt-100 fill-{get(item.starred) ? "white" : "transparent"}" on:click={() => toggleItemFavorite(item)} /> </div> <!-- Todo: call BE -->
         </div>
         <div>
           <p class="text-offWhite mt-3"> {get(item.description)} </p>
