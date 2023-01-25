@@ -13,7 +13,7 @@
 
   let selectedProject = $currentProject;
   let currentVersion = "";
-  let currentVersionId = ""
+  let currentVersionId = "";
 
   const unsub = navigation.currentPathParamsSubscribable.subscribe((params) => {
     currentVersion = get(getConfigurationById(params["configurationId"])
@@ -24,7 +24,7 @@
 
   onDestroy(unsub);
   onMount(() => {
-    const version = getConfigurationById(navigation.currentPathParams["configurationId"])
+    const version = getConfigurationById(navigation.currentPathParams["configurationId"]);
     currentVersion = get(version.version);
     currentVersionId = get(version.id);
   });

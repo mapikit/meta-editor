@@ -107,6 +107,14 @@ export class SectionsMap {
     this.connectModules(bopModules);
     this.solveDeepConnections();
   }
+
+  public registerConnectionPoint (mode : "output" | "input" | "functional", id : string, element : HTMLElement) : void {
+    this[mode][id] = element;
+  }
+
+  public unregisterConnectionPoint (mode : "output" | "input" | "functional", id : string) : void {
+    delete this[mode][id];
+  }
 }
 
 

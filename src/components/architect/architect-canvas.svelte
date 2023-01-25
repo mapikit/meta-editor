@@ -1,6 +1,6 @@
 <script lang="ts">
   import { environment } from "../../stores/environment";
-  import { onMount, getContext } from "svelte";
+  import { onMount, getContext, onDestroy } from "svelte";
   import { sectionsMap } from "./helpers/sections-map";
   import { get } from "svelte/store";
   import type { UIBusinessOperation } from "../../entities/business-operation";
@@ -9,6 +9,7 @@
   let canvas : HTMLCanvasElement;
   const currentBop = getContext<UIBusinessOperation>("currentBop");
   export let context : CanvasRenderingContext2D;
+  let sizeObserver : ResizeObserver;
 
   export function adjustCanvas () : void {
     const containerDimensions = canvas.parentElement.getBoundingClientRect();
@@ -34,12 +35,19 @@
       updateTraces();
     });
 
+    sizeObserver = new ResizeObserver(adjustCanvas);
+    sizeObserver.observe(canvas.parentElement);
+
     environment.subscribe(() => setTimeout(() => updateTraces(), 1));
     // Investigate and avoid this kind of repetition & timeout
     // Timeout Only: traces have "springness" (modules don't)
     // No Timeout: traces don't update correctly (obvious with scaling)
 
     adjustCanvas();
+  });
+
+  onDestroy(() => {
+    sizeObserver.disconnect();
   });
 </script>
 

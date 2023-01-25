@@ -27,20 +27,21 @@
   const context = getContext<ArchitectContext>("architectContext");
   let { configuration } = currentBop;
   let { dragging, draggingElement } = context;
+  const elementId = SectionsMap
+    .getIdentifier(moduleConfig.key === -1 ? "input" : moduleConfig.key, parentPaths.join("."), mode);
 
   let deepOpen = false;
   // If it is a deep type, should be albe to open and select deeper options
   // Is still selectable itself
 
   onMount(() => {
-    sectionsMap[mode][SectionsMap
-      .getIdentifier(moduleConfig.key === -1 ? "input" : moduleConfig.key, parentPaths.join("."), mode)] = dotDrag;
-  
+    sectionsMap.registerConnectionPoint(mode, elementId, dotDrag);
     sectionsMap.refreshConnections($configuration);
     updateTraces();
   });
 
   onDestroy(() => {
+    sectionsMap.unregisterConnectionPoint(mode, elementId);
     sectionsMap.refreshConnections($configuration);
     updateTraces();
   });

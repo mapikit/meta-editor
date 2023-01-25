@@ -9,7 +9,7 @@
   import { onMount } from "svelte";
   import ConfigurationEdit from "./configuration-edit.svelte";
   import ArchitectDataLoader from "../../../components/architect/architect-data-loader.svelte";
-	import { currentConfigId } from "../../../stores/configuration-store";
+  import { currentConfigId } from "../../../stores/configuration-store";
 
   onMount(() => {
     selectedSystem.set(navigation.currentPathParams["systemId"]);

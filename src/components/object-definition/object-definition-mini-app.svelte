@@ -116,7 +116,7 @@
 
   let unsubChange = () => {};
   let changeFunction = () => {};
-  onMount(() => { unsubChange = selectedData.subscribe(() => changeFunction()); changeFunction = onChange})
+  onMount(() => { unsubChange = selectedData.subscribe(() => changeFunction()); changeFunction = onChange; });
   // This "changeFunction" is required to prevent an update on right after the subscription
   onDestroy(() => {
     unsub();
