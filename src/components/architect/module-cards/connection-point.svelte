@@ -15,6 +15,7 @@
   import { SectionsMap, sectionsMap } from "../helpers/sections-map";
   import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
   import { updateTraces } from "../update-traces";
+  import { ModuleConnection } from "../helpers/module-connection";
 
   export let mode : "input" | "output";
   export let parentPaths : string[] = [];
@@ -136,6 +137,7 @@
       currentStep[previousPath[previousPath.length -1]][fieldName][availableKeyName]
         = { type, required: false };
 
+      console.log(updatedDefinition);
       return updatedDefinition;
     });
   };
@@ -152,14 +154,14 @@
   // eslint-disable-next-line max-lines-per-function
   const makeConnection = (dropped : DragElement<DragDataType>) : void => {
     const thisPoint : ConnectionPointSelection = {
-      connectionType: mode,
+      pointType: mode,
       propertyType: getTypeDetails().type,
       property: parentPaths.join("."),
       element: dotDrag,
       parentKey: moduleConfig.key === -1 ? "input" : moduleConfig.key,
     };
     const droppedPoint : ConnectionPointSelection = {
-      connectionType: dropped.data.type,
+      pointType: dropped.data.type,
       propertyType: dropped.data.propertyType,
       property: dropped.data.property,
       element: dropped.element,

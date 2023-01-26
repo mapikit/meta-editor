@@ -15,6 +15,7 @@
 
   $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
 
+  // eslint-disable-next-line max-lines-per-function
   const getCurrentType = () : string => {
     const finalPath = [...parentPaths.slice(0, parentPaths.length -1)];
     let tempData = $storedDefinition[mode];

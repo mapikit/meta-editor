@@ -17,7 +17,7 @@ export class SectionsMap {
   public hoveredFunctionalKnob : Array<string> = [];
 
   public static getIdentifier (
-    key : string | number, path : string, type ?: ConnectionPointSelection["connectionType"]) : string {
+    key : string | number, path : string, type ?: ConnectionPointSelection["pointType"]) : string {
     const typeStep = type === "output" ? "result." : type === "module" ? "module." : "";
     const isInput = key === "input";
 
@@ -27,7 +27,7 @@ export class SectionsMap {
   public addConnection (
     newDependency : Dependency,
     targetKey : number | "input",
-    outputType ?: ConnectionPointSelection["connectionType"],
+    outputType ?: ConnectionPointSelection["pointType"],
   ) : void {
     const outputPath = newDependency.originPath;
 

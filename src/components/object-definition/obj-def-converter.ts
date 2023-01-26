@@ -35,14 +35,14 @@ export const convertObjDefinitionToDefinitionData =
     };
 
     if (objDef[key]["type"] === "array") {
-      const arrayTypeConverted = convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {});
-      partialResult["subtype"] = {
-        subtype: arrayTypeConverted,
-        keyName: "Objects of Array",
-        type: "object",
-        value: {},
-        required: true,
-      };
+      partialResult["subtype"] = typeof objDef[key]["subtype"] === "string" ? objDef[key]["subtype"] :
+        {
+          subtype: convertObjDefinitionToDefinitionData(objDef[key]["subtype"], objValue[key] ?? {}),
+          keyName: "Objects of Array",
+          type: "object",
+          value: {},
+          required: true,
+        };
 
       partialResult.value = [];
       const valuesToBeAdded = objValue[key] ?? [];

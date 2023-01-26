@@ -239,27 +239,31 @@ export class UIBusinessOperation {
     });
   }
 
+  /** Creates a connection between any modules' props. This function already
+   * figures out which one is the origin and which is the target, and registers the connection
+   * into the renderer.
+   */
   // eslint-disable-next-line max-lines-per-function
   public solveConnection (
     currentConnectionPoint : ConnectionPointSelection,
     targetConnectionPoint : ConnectionPointSelection,
   ) : void {
     if(currentConnectionPoint === undefined) return;
-    if(currentConnectionPoint.connectionType === targetConnectionPoint.connectionType) return;
+    if(currentConnectionPoint.pointType === targetConnectionPoint.pointType) return;
 
-    const currentIsOutput = ["output", "module"].includes(currentConnectionPoint.connectionType);
+    const currentIsOutput = ["output", "module"].includes(currentConnectionPoint.pointType);
     const [origin, target] = currentIsOutput
       ? [currentConnectionPoint, targetConnectionPoint]
       : [targetConnectionPoint, currentConnectionPoint];
 
-    if(target.connectionType === "functional") return this.addFunctionalDependency(origin, target);
+    if(target.pointType === "functional") return this.addFunctionalDependency(origin, target);
 
     // eslint-disable-next-line max-lines-per-function
     this.configuration.update((modules) => {
       const targetModule = modules.find(module => module.key == target.parentKey);
 
       const firstPathStep = origin.parentKey === "input" ? ""
-        : origin.connectionType === "output" ? "result." : "module.";
+        : origin.pointType === "output" ? "result." : "module.";
 
       const newDependency : UICompliantDependency = {
         origin: origin.parentKey,
@@ -280,7 +284,7 @@ export class UIBusinessOperation {
       }
 
       targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
-      sectionsMap.addConnection(newDependency, target.parentKey, target.connectionType);
+      sectionsMap.addConnection(newDependency, target.parentKey, target.pointType);
 
       return modules;
     });
@@ -295,7 +299,7 @@ export class UIBusinessOperation {
   private addFunctionalDependency (
     origin : ConnectionPointSelection, target : ConnectionPointSelection) : void
   {
-    if(origin.connectionType !== "module") return window.alert("Functional Dependencies only connect to modules");
+    if(origin.pointType !== "module") return window.alert("Functional Dependencies only connect to modules");
 
     this.configuration.update(modules => {
       const targetModule = get(this.configuration).find(module => module.key == target.parentKey);

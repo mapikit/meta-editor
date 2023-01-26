@@ -16,12 +16,12 @@ export function solveConnection (
   bopModules : Writable<BopsConfigurationEntry[]>,
 ) : void {
   if(currentKnob === undefined) return;
-  if(currentKnob.connectionType === targetKnob.connectionType) return;
+  if(currentKnob.pointType === targetKnob.pointType) return;
 
-  const currentIsOutput = ["output", "module"].includes(currentKnob.connectionType);
+  const currentIsOutput = ["output", "module"].includes(currentKnob.pointType);
   const [origin, target] = currentIsOutput ? [currentKnob, targetKnob] : [targetKnob, currentKnob];
 
-  if(target.connectionType === "functional") return addFunctionalDependency(origin, target, bopModules);
+  if(target.pointType === "functional") return addFunctionalDependency(origin, target, bopModules);
 
   // eslint-disable-next-line max-lines-per-function
   bopModules.update((modules) => {
@@ -56,7 +56,7 @@ export function solveConnection (
 function addFunctionalDependency (
   origin : ConnectionPointSelection, target : ConnectionPointSelection, bopModules : Writable<BopsConfigurationEntry[]>) : void
 {
-  if(origin.connectionType !== "module") return window.alert("Functional Dependencies only connect to modules");
+  if(origin.pointType !== "module") return window.alert("Functional Dependencies only connect to modules");
 
   bopModules.update(modules => {
     const targetModule = get(bopModules).find(module => module.key == target.parentKey);

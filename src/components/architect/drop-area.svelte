@@ -9,6 +9,7 @@
   export let onDropContent : (droppedElement : DragElement) => void =
     (droppedElement : DragElement) : void => {};
   export let debug = false;
+  export let isActive = true;
 
   let isOverSelf = false;
   let dropEnabled = false;
@@ -16,6 +17,7 @@
   const context = getContext<ArchitectContext>("architectContext");
   const { mouseOverModule, draggingElement, dragging } = context;
   const mouseEnter = () : void => {
+    if (!isActive) return;
     mouseOverModule.set({ type: "drop_area", element });
     isOverSelf = true; ;
 
@@ -25,6 +27,7 @@
     }
   };
   const mouseLeave = () : void => {
+    if (!isActive) return;
     if ($mouseOverModule.element === element) {
       mouseOverModule.set(undefined);
     }
