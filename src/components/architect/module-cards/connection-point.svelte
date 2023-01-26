@@ -47,13 +47,18 @@
     updateTraces();
   });
 
+  // eslint-disable-next-line max-lines-per-function
   const getTypeDetails = () : TypeDefinition => {
     const partialDefinition = $storedDefinition[mode];
     const previousPath = parentPaths.slice(0, parentPaths.length -1);
 
     let tempData = partialDefinition;
     for (let path of previousPath) {
-      if (tempData[path]["type"] === "array") { tempData = tempData[path]["data"]; continue; }
+      if (tempData[path]["type"] === "array") {
+        tempData = tempData[path]["data"];
+        continue;
+      }
+
       tempData = tempData[path]["subtype"];
     }
 
@@ -126,16 +131,22 @@
 
       const indexingIfNotArray = isArray ? 0 : 1;
       const nameIfArray = isArray ? "" : "newProperty";
-      const type = isArray ? currentStep[previousPath[previousPath.length -1]]["subtype"] : "string";
+      let type = isArray ? currentStep[previousPath[previousPath.length -1]]["subtype"] : "string";
       let availableKeyName = (Object.keys(currentStep[previousPath[previousPath.length -1]][fieldName])
         .filter((name) => name.includes(nameIfArray)).length + indexingIfNotArray).toString();
+      let subtype;
+
+      if (typeof type === "object" && isArray) {
+        subtype = type;
+        type = "object";
+      }
 
       if (!isArray) {
         availableKeyName = nameIfArray + availableKeyName;
       }
 
       currentStep[previousPath[previousPath.length -1]][fieldName][availableKeyName]
-        = { type, required: false };
+        = { type, required: false, subtype };
 
       console.log(updatedDefinition);
       return updatedDefinition;

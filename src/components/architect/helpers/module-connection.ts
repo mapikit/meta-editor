@@ -1,11 +1,8 @@
 import type { ObjectDefinition } from "@meta-system/object-definition";
+import { get } from "svelte/store";
+import type { ConnectionPointVertex } from "./connection-vertex";
 
-/* eslint-disable max-classes-per-file */
-export type ConnectionPointVertex = {
-  propertyType : string;
-  propertyPath : string;
-  parentKey : number | "input";
-}
+type StrokeStyle = { stroke : string; dash : number[] };
 
 /**
  * This represents the connection between two properties of modules
@@ -14,6 +11,8 @@ export class ModuleConnection {
   public readonly connectionOrigin : ConnectionPointVertex;
   public readonly connectionTarget : ConnectionPointVertex;
   public readonly mode : "normal" | "functional" | "module";
+
+  public readonly connectionStokeStyle : StrokeStyle;
 
   public constructor (
     origin : ConnectionPointVertex,
@@ -24,14 +23,32 @@ export class ModuleConnection {
     this.connectionTarget = target;
     this.mode = mode;
 
-    if ((this.connectionOrigin.propertyPath || this.connectionTarget.propertyPath) && this.mode === "functional") {
+    if ((get(this.connectionOrigin.propertyPath)
+    || get(this.connectionTarget.propertyPath)) && this.mode === "functional") {
       throw Error("Functional Dependency created with paths - there was probably an error with the code");
     }
+
+    this.connectionStokeStyle = this.getStrokeStyle();
   };
+
+  public static get StrokeColors () : Record<ModuleConnection["mode"], string> {
+    return {
+      normal: "#dddddd",
+      functional: "#3ae6ec",
+      module: "#ff9c01",
+    };
+  };
+
+  private getStrokeStyle () : StrokeStyle {
+    return {
+      stroke: ModuleConnection.StrokeColors[this.mode],
+      dash: [],
+    };
+  }
 
   private generateId (vertex : "origin" | "target") : string {
     const usedVertex = vertex === "origin" ? this.connectionOrigin : this.connectionTarget;
-    const usedPath = this.mode === "functional" ? "" : `.${usedVertex.propertyPath}`;
+    const usedPath = this.mode === "functional" ? "" : `.${get(usedVertex.propertyPath)}`;
 
     return `${this.mode}.${usedVertex.parentKey}${usedPath}`;
   }
@@ -42,6 +59,10 @@ export class ModuleConnection {
 
   public get targetId () : string {
     return this.generateId("origin");
+  }
+
+  public get canBeDrawn () : boolean {
+    return (this.connectionOrigin.element && this.connectionTarget.element) !== undefined;
   }
 
   /** Corrects a path based on the presence of arrays in it */

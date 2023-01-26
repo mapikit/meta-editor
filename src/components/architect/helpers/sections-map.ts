@@ -3,8 +3,16 @@ import type { ConnectionPointSelection } from "src/stores/knob-selection-type";
 import { get } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
 
+// NEXT Refactor Tasks:
+// -> Stores all the vertices
+// -> When connectionPoint is mounted either create a vertex or get existing
+// -> Stores all the connections
+// -> Has a method to get the connections to be drawn in the screen
+// -----> Changes connection's stroke color if the optimal vertex is not
+//        available for connection (is under a collapsed parent)
+// -> Has a method to build the connections based off of the BopModules (refreshConnections)
+/**  */
 export class SectionsMap {
-  // TODO change these records to literal Maps
   public output : Record<string, HTMLSpanElement> =  {};
   public module = this.output;
   public input : Record<string, HTMLSpanElement> =  {};

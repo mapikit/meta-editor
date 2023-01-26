@@ -3,13 +3,10 @@ import { sectionsMap } from "./helpers/sections-map";
 import { environment, EnvType } from "../../stores/environment";
 import { get } from "svelte/store";
 
-
 export type ExtraTracingInfo = {
   cutting ?: MouseEvent;
   cursor ?: { x : number, y : number };
 }
-
-
 
 // eslint-disable-next-line max-lines-per-function
 export function updateTraces (extraInfo ?: ExtraTracingInfo) : Array<string> {

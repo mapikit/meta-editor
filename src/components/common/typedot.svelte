@@ -9,11 +9,10 @@
   $: dotShift = size === 2 ? "ml-1" : "ml-1.5";
   $: color = typeColors[type.type];
 
-  console.log("rendered with type: ", type.type, type["subtype"]);
 </script>
 
 <div class="rounded-full {dotSize} overflow-hidden" style="background-color: {color}">
-  {#if type.type === "array"}
-    <div class="{dotSize} {dotShift} " style="background-color: {typeColors[type["subtype"]]}"/>
+  {#if type.type === "array"} <!-- Subtype is an object for cases of arrays of objects -->
+    <div class="{dotSize} {dotShift} " style="background-color: {typeColors[type["subtype"]] ?? typeColors["object"]}"/>
   {/if}
 </div>
