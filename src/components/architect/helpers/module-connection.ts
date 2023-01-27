@@ -1,8 +1,15 @@
 import type { ObjectDefinition } from "@meta-system/object-definition";
+import type { CoordinateInfo } from "../../../common/types/geometry";
 import { get } from "svelte/store";
 import type { ConnectionPointVertex } from "./connection-vertex";
 
-type StrokeStyle = { stroke : string; dash : number[] };
+export type StrokeStyle = { stroke : string; dash : number[]; thickness ?: number };
+
+export type DrawableConnection = {
+  strokeStyle : StrokeStyle;
+  startCoords : CoordinateInfo;
+  endCoords : CoordinateInfo;
+}
 
 /**
  * This represents the connection between two properties of modules
@@ -11,8 +18,6 @@ export class ModuleConnection {
   public readonly connectionOrigin : ConnectionPointVertex;
   public readonly connectionTarget : ConnectionPointVertex;
   public readonly mode : "normal" | "functional" | "module";
-
-  public readonly connectionStokeStyle : StrokeStyle;
 
   public constructor (
     origin : ConnectionPointVertex,
@@ -28,7 +33,6 @@ export class ModuleConnection {
       throw Error("Functional Dependency created with paths - there was probably an error with the code");
     }
 
-    this.connectionStokeStyle = this.getStrokeStyle();
   };
 
   public static get StrokeColors () : Record<ModuleConnection["mode"], string> {
@@ -39,6 +43,18 @@ export class ModuleConnection {
     };
   };
 
+  public getDrawable (useFallBackOrigin ?: ConnectionPointVertex, useFallBackTarget ?: ConnectionPointVertex)
+    : DrawableConnection {
+    const origin = useFallBackOrigin ?? this.connectionOrigin;
+    const target = useFallBackTarget ?? this.connectionTarget;
+
+    return {
+      strokeStyle: this.getStrokeStyle(),
+      startCoords: origin.coordinates,
+      endCoords: target.coordinates,
+    };
+  }
+
   private getStrokeStyle () : StrokeStyle {
     return {
       stroke: ModuleConnection.StrokeColors[this.mode],
@@ -46,19 +62,13 @@ export class ModuleConnection {
     };
   }
 
-  private generateId (vertex : "origin" | "target") : string {
-    const usedVertex = vertex === "origin" ? this.connectionOrigin : this.connectionTarget;
-    const usedPath = this.mode === "functional" ? "" : `.${get(usedVertex.propertyPath)}`;
-
-    return `${this.mode}.${usedVertex.parentKey}${usedPath}`;
-  }
 
   public get originId () : string {
-    return this.generateId("origin");
+    return this.connectionOrigin.id;
   }
 
   public get targetId () : string {
-    return this.generateId("origin");
+    return this.connectionTarget.id;
   }
 
   public get canBeDrawn () : boolean {

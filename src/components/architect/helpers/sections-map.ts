@@ -1,7 +1,8 @@
 import type { Dependency } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import type { ConnectionPointSelection } from "src/stores/knob-selection-type";
 import { get } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
+import { ConnectionPointVertex, VertexType } from "./connection-vertex";
+import { DrawableConnection, ModuleConnection } from "./module-connection";
 
 // NEXT Refactor Tasks:
 // -> Stores all the vertices
@@ -10,94 +11,73 @@ import type { ModuleCard } from "../../../common/types/module-card";
 // -> Has a method to get the connections to be drawn in the screen
 // -----> Changes connection's stroke color if the optimal vertex is not
 //        available for connection (is under a collapsed parent)
+// -----> Changes connection's stroke thickness if it is a duplicate connection
+//        caused by collapsed children
 // -> Has a method to build the connections based off of the BopModules (refreshConnections)
 /**  */
-export class SectionsMap {
-  public output : Record<string, HTMLSpanElement> =  {};
-  public module = this.output;
-  public input : Record<string, HTMLSpanElement> =  {};
-  public functional : Record<string, HTMLSpanElement> = {};
+export class ConnectionsManager {
+  private readonly vertices = new Map<string, ConnectionPointVertex>();
+  private connections : ModuleConnection[] = [];
 
-  public connections : Record<string, string[]> = {};
-  public functionalConnections : Record<string, string[]> = {};
-
-  public activeLinkingOrigin : HTMLSpanElement = undefined;
-  public hoveredFunctionalKnob : Array<string> = [];
-
-  public static getIdentifier (
-    key : string | number, path : string, type ?: ConnectionPointSelection["pointType"]) : string {
-    const typeStep = type === "output" ? "result." : type === "module" ? "module." : "";
-    const isInput = key === "input";
-
-    return isInput ? `${key}.${path}` : `${key}.${typeStep}${path ?? ""}`;
+  /** Either creates a vertex or gets an existing one, depending if it is already registered */
+  public getVertex (id : string) : ConnectionPointVertex | undefined {
+    return this.vertices.get(id);
   }
 
-  public addConnection (
-    newDependency : Dependency,
-    targetKey : number | "input",
-    outputType ?: ConnectionPointSelection["pointType"],
-  ) : void {
-    const outputPath = newDependency.originPath;
-
-    let outputId = SectionsMap.getIdentifier(newDependency.origin, outputPath, outputType);
-    const targetId = SectionsMap.getIdentifier(targetKey, newDependency.targetPath);
-    if(outputPath === undefined) outputId = outputId + "module";
-    const isFunctional = newDependency.originPath == undefined && newDependency.targetPath == undefined;
-    const connections = isFunctional ? this.functionalConnections : this.connections;
-
-    if(connections[outputId] === undefined) connections[outputId] = [];
-    connections[outputId].push(targetId);
+  public registerVertex (connectionPoint : ConnectionPointVertex) : void {
+    this.vertices.set(connectionPoint.id, connectionPoint);
   }
 
-  public removeConnection (inputIdentifier : string) : void {
-    for(const outputId of Object.keys(this.connections)) {
-      const connectionIndex = this.connections[outputId].indexOf(inputIdentifier);
-      if (connectionIndex !== -1) {
-        this.connections[outputId].splice(connectionIndex, 1);
+  /** removes all modules that belongs to a module */
+  public unregisterVerticesFromModule (moduleKey : number | "input") : void {
+    const verticesToBeDeleted = [];
+
+    this.vertices.forEach((connectionPoint, id) => {
+      // moduleKey is the id ==== is a functionalOrigin vertex
+      if (id === moduleKey) { verticesToBeDeleted.push(id); return; }
+      if (
+        id.startsWith(`${connectionPoint.type}.${moduleKey}[`)
+        || id.startsWith(`${connectionPoint.type}.${moduleKey}.`)
+      ) {
+        verticesToBeDeleted.push(id);
         return;
       }
-    }
-  }
+    });
 
-  private connectModule (module : ModuleCard) : void {
-    for(const dependency of get(module.dependencies)) this.addConnection(dependency, module.key);
-  }
-
-  private connectModules (modules : ModuleCard[]) : void {
-
-    for(const module of modules) this.connectModule(module);
+    verticesToBeDeleted.forEach((verticesId) => { this.vertices.delete(verticesId); });
   }
 
   private isNill (value : unknown) : boolean { return value === undefined || value === null; }
 
+  /** Gets connections to be drawn on the screen */
+  public getVisibleConnections (additionalConnections : DrawableConnection[]) : DrawableConnection[] {
+
+  }
+
+  /** Evaluates if a connection is possible, and if it is not, it returns the next best connection */
   // eslint-disable-next-line max-lines-per-function
-  private solveDeepConnections () : void {
-    for(const output in this.connections) {
-      const outputSteps = output.split(".");
-      while(this.isNill(this.output[outputSteps.join(".")]) && outputSteps.length > 0) {
-        outputSteps.pop();
-      }
+  private solveDeepConnections (connection : ModuleConnection) : DrawableConnection {
+    if (connection.canBeDrawn) { return connection.getDrawable(); }
 
-      if(outputSteps.length === 0) delete this.connections[output];
-      else {
-        const correctedOutId = outputSteps.join(".");
-        if(output !== correctedOutId) {
-          this.connections[outputSteps.join(".")] =
-            [...this.connections[output], ...this.connections[outputSteps.join(".")] ?? []];
-          delete this.connections[output];
-        }
+    const origin = connection.connectionOrigin.isDrawable ?
+      undefined : this.findBestMatchingVertex(connection.originId);
+    const target = connection.connectionOrigin.isDrawable ?
+      undefined : this.findBestMatchingVertex(connection.targetId);
 
+    return connection.getDrawable(origin, target);
+  }
 
-        for(const input of this.connections[correctedOutId]) {
-          const inSteps = input.split(".");
-          while(this.isNill(this.input[inSteps.join(".")]) && inSteps.length > 0) inSteps.pop();
-          const inputIndex = this.connections[correctedOutId].indexOf(input);
-          if(inSteps.length === 0) this.connections[correctedOutId].splice(inputIndex, 1);
-          else this.connections[correctedOutId][inputIndex] = inSteps.join(".");
-        }
-        this.removeDuplicates(correctedOutId);
-      }
+  // TODO account for arrays as well
+  // TODO take into consideration the type of the vertex as well for smarter guesses
+  private findBestMatchingVertex (vertexId : string) : ConnectionPointVertex {
+    const vertexPathSteps = vertexId.split(".");
+    while(this.isNill(this.vertices.get(vertexPathSteps.join("."))?.element) && vertexPathSteps.length > 0) {
+      vertexPathSteps.pop();
     }
+
+    if (vertexPathSteps.length === 0) { throw Error("There should not have an impossible connection."); }
+
+    return this.vertices.get(vertexPathSteps.join("."));
   }
 
   private removeDuplicates (outputId : string) : void {
@@ -110,22 +90,60 @@ export class SectionsMap {
   }
 
   public refreshConnections (bopModules : ModuleCard[]) : void {
-    this.connections = {};
-    this.functionalConnections = {};
-    this.connectModules(bopModules);
-    this.solveDeepConnections();
+    this.connections = [];
+
+    bopModules.forEach((module) => {
+      const validDependencies = get(module.dependencies).filter((dependency) => {
+        !["constants", "constant", "variables", "variable"]
+          .includes(dependency.origin.toString());
+      });
+
+      validDependencies.forEach((dependency) => {
+        const connection = this.buildConnectionFromDependency(
+          dependency, module.key === -1 ? "input" : module.key);
+
+        this.connections.push(connection);
+      });
+    });
   }
 
-  public registerConnectionPoint (mode : "output" | "input" | "functional", id : string, element : HTMLElement) : void {
-    this[mode][id] = element;
+  /** May throw if there is no matching vertex */
+  // eslint-disable-next-line max-lines-per-function
+  private buildConnectionFromDependency (dependency : Dependency, targetmoduleIndex : "input" | number)
+    : ModuleConnection {
+    const connectionMode : ModuleConnection["mode"] = this.getDependencytype(dependency);
+
+    const originVertexType : VertexType = connectionMode === "functional"
+      ? "functionalOrigin" : connectionMode === "module"
+        ? "module" : "output";
+
+    const origin = this.findBestMatchingVertex(ConnectionPointVertex.generateId(
+      originVertexType,
+      dependency.origin as ("input" | number),
+      dependency.originPath,
+    ));
+
+    const targetVertexType : VertexType = connectionMode === "functional"
+      ? "functionalTarget" : "input";
+
+    const target = this.findBestMatchingVertex(ConnectionPointVertex.generateId(
+      targetVertexType,
+      targetmoduleIndex,
+      dependency.targetPath,
+    ));
+
+    return new ModuleConnection(origin, target, connectionMode);
   }
 
-  public unregisterConnectionPoint (mode : "output" | "input" | "functional", id : string) : void {
-    delete this[mode][id];
+
+  private getDependencytype (dependency : Dependency) : ModuleConnection["mode"] {
+    if (!dependency.originPath && !dependency.targetPath) return "functional";
+    if (dependency.originPath.startsWith("module.")) return "module";
+    return "normal";
   }
 }
 
 
-const sectionsMap = new SectionsMap();
+const sectionsMap = new ConnectionsManager();
 
 export { sectionsMap };

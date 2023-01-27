@@ -4,7 +4,7 @@ import { get, Writable } from "svelte/store";
 import type {
   BopsConfigurationEntry,
 } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { SectionsMap, sectionsMap } from "./sections-map";
+import { ConnectionsManager, sectionsMap } from "./sections-map";
 
 // TODO breakdown this function and overall rework
 // In the future this will likely be biggest function of the architect as it
@@ -39,7 +39,7 @@ export function solveConnection (
     if(alreadyPresent !== -1) {
       targetModule.dependencies.splice(alreadyPresent, 1);
       target.element.dispatchEvent(new Event("removeTag"));
-      sectionsMap.removeConnection(SectionsMap.getIdentifier(targetModule.key, newDependency.targetPath));
+      sectionsMap.removeConnection(ConnectionsManager.getIdentifier(targetModule.key, newDependency.targetPath));
     }
 
     targetModule.dependencies.push(newDependency);

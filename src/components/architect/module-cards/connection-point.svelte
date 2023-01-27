@@ -12,7 +12,7 @@
   import DropArea from "../drop-area.svelte";
   import type { ArchitectContext, DragElement } from "../../../entities/auxiliary-entities/architect-context";
   import type { ConnectionPointSelection } from "../../../stores/knob-selection-type";
-  import { SectionsMap, sectionsMap } from "../helpers/sections-map";
+  import { ConnectionsManager, sectionsMap } from "../helpers/sections-map";
   import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
   import { updateTraces } from "../update-traces";
   import { ModuleConnection } from "../helpers/module-connection";
@@ -28,7 +28,7 @@
   const context = getContext<ArchitectContext>("architectContext");
   let { configuration } = currentBop;
   let { dragging, draggingElement } = context;
-  const elementId = SectionsMap
+  const elementId = ConnectionsManager
     .getIdentifier(moduleConfig.key === -1 ? "input" : moduleConfig.key, parentPaths.join("."), mode);
 
   let deepOpen = false;
