@@ -108,4 +108,11 @@ export class ModuleCard {
       key: this.key,
     });
   }
+
+  /** We used -1 as the key for the input, but such thing does not exist
+   * in meta-system, so use this as a "translator"
+   */
+  public getBopTransformedKey () : number | "input" {
+    return this.key === -1 ? "input" : this.key;
+  }
 }

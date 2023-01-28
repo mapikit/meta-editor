@@ -1,7 +1,7 @@
 <script lang="ts">
   import { environment } from "../../stores/environment";
   import { onMount, getContext, onDestroy } from "svelte";
-  import { sectionsMap } from "./helpers/sections-map";
+  import { connectionsManager } from "./helpers/connections-manager";
   import { get } from "svelte/store";
   import type { UIBusinessOperation } from "../../entities/business-operation";
   import { updateTraces } from "./update-traces";
@@ -29,7 +29,7 @@
     $environment.canvasOffset = canvas.getBoundingClientRect();
 
     $environment.origin.moveTo(canvas.width/2, canvas.height/2);
-    sectionsMap.refreshConnections(get(currentBop.configuration));
+    connectionsManager.refreshConnections(get(currentBop.configuration));
 
     currentBop.configuration.subscribe(() => {
       updateTraces();

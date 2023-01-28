@@ -19,7 +19,7 @@ export class ConnectionsManager {
   private readonly vertices = new Map<string, ConnectionPointVertex>();
   private connections : ModuleConnection[] = [];
 
-  /** Either creates a vertex or gets an existing one, depending if it is already registered */
+  /** gets an existing vertex - If returns undefined, please register it using `.registerVertex()` */
   public getVertex (id : string) : ConnectionPointVertex | undefined {
     return this.vertices.get(id);
   }
@@ -50,8 +50,10 @@ export class ConnectionsManager {
   private isNill (value : unknown) : boolean { return value === undefined || value === null; }
 
   /** Gets connections to be drawn on the screen */
-  public getVisibleConnections (additionalConnections : DrawableConnection[]) : DrawableConnection[] {
-
+  public getVisibleConnections () : DrawableConnection[] {
+    return this.connections
+      .filter((connection) => connection.canBeDrawn)
+      .map((connection) => connection.getDrawable());
   }
 
   /** Evaluates if a connection is possible, and if it is not, it returns the next best connection */
@@ -75,7 +77,7 @@ export class ConnectionsManager {
       vertexPathSteps.pop();
     }
 
-    if (vertexPathSteps.length === 0) { throw Error("There should not have an impossible connection."); }
+    if (vertexPathSteps.length === 0) { return undefined; }
 
     return this.vertices.get(vertexPathSteps.join("."));
   }
@@ -89,12 +91,13 @@ export class ConnectionsManager {
     }
   }
 
+  // eslint-disable-next-line max-lines-per-function
   public refreshConnections (bopModules : ModuleCard[]) : void {
     this.connections = [];
 
     bopModules.forEach((module) => {
       const validDependencies = get(module.dependencies).filter((dependency) => {
-        !["constants", "constant", "variables", "variable"]
+        return !["constants", "constant", "variables", "variable"]
           .includes(dependency.origin.toString());
       });
 
@@ -105,9 +108,10 @@ export class ConnectionsManager {
         this.connections.push(connection);
       });
     });
+
+    console.log(this.getVisibleConnections());
   }
 
-  /** May throw if there is no matching vertex */
   // eslint-disable-next-line max-lines-per-function
   private buildConnectionFromDependency (dependency : Dependency, targetmoduleIndex : "input" | number)
     : ModuleConnection {
@@ -117,22 +121,40 @@ export class ConnectionsManager {
       ? "functionalOrigin" : connectionMode === "module"
         ? "module" : "output";
 
-    const origin = this.findBestMatchingVertex(ConnectionPointVertex.generateId(
+    const originId = ConnectionPointVertex.generateId(
       originVertexType,
       dependency.origin as ("input" | number),
-      dependency.originPath,
-    ));
+      this.normalizePathFromDependency(dependency.originPath, connectionMode),
+    );
+    let origin = this.findBestMatchingVertex(originId);
+
+    if (!origin) {
+      origin = this.preCreateVertex(originVertexType, dependency.origin as ("input" | number), originId);
+    }
 
     const targetVertexType : VertexType = connectionMode === "functional"
       ? "functionalTarget" : "input";
 
-    const target = this.findBestMatchingVertex(ConnectionPointVertex.generateId(
+    const targetId = ConnectionPointVertex.generateId(
       targetVertexType,
       targetmoduleIndex,
       dependency.targetPath,
-    ));
+    );
+    let target = this.findBestMatchingVertex(targetId);
+
+    if (!target) {
+      target = this.preCreateVertex(targetVertexType, targetmoduleIndex, targetId);
+    }
+
+    // console.log(`new connection from ${originId} to ${targetId}`);
 
     return new ModuleConnection(origin, target, connectionMode);
+  }
+
+  private preCreateVertex (type : VertexType, parentKey : "input" | number, path : string) : ConnectionPointVertex {
+    const result = ConnectionPointVertex.buildNew("string", path, parentKey, type);
+    this.registerVertex(result);
+    return result;
   }
 
 
@@ -141,9 +163,16 @@ export class ConnectionsManager {
     if (dependency.originPath.startsWith("module.")) return "module";
     return "normal";
   }
+
+  private normalizePathFromDependency (path : string, connectionMode : ModuleConnection["mode"]) : string {
+    if (connectionMode === "module" && path.startsWith("module.")) { return path.substring(7); }
+    if (connectionMode === "normal" && path.startsWith("result.")) { return path.substring(7); }
+
+    return path;
+  }
 }
 
 
-const sectionsMap = new ConnectionsManager();
+const connectionsManager = new ConnectionsManager();
 
-export { sectionsMap };
+export { connectionsManager };

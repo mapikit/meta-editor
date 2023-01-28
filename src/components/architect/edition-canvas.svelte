@@ -11,7 +11,7 @@
   import type { UIBusinessOperation } from "../../entities/business-operation";
   import { get } from "svelte/store";
   import type { ModuleCard } from "../../common/types/module-card";
-  import { sectionsMap } from "./helpers/sections-map";
+  import { connectionsManager } from "./helpers/connections-manager";
   import { History } from "../../common/helpers/generic-history";
   import ArchitectToolbar from "./architect-toolbar.svelte";
   import CurrentBopNametag from "./current-bop-nametag.svelte";
@@ -51,7 +51,7 @@
       modulesInConfig = config;
     });
 
-    sectionsMap.refreshConnections(get(currentBop.configuration));
+    connectionsManager.refreshConnections(get(currentBop.configuration));
   }
 
   onDestroy(() => configurationHistory.unsubscribe());
@@ -90,7 +90,7 @@
           }
 
           get(module.dependencies).splice(dependencyIndex, 1);
-          sectionsMap.refreshConnections(get(currentBop.configuration));
+          connectionsManager.refreshConnections(get(currentBop.configuration));
         }
 
         return config;

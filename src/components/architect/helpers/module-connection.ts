@@ -1,4 +1,3 @@
-import type { ObjectDefinition } from "@meta-system/object-definition";
 import type { CoordinateInfo } from "../../../common/types/geometry";
 import { get } from "svelte/store";
 import type { ConnectionPointVertex } from "./connection-vertex";
@@ -9,6 +8,8 @@ export type DrawableConnection = {
   strokeStyle : StrokeStyle;
   startCoords : CoordinateInfo;
   endCoords : CoordinateInfo;
+  startId ?: string;
+  endId ?: string;
 }
 
 /**
@@ -50,8 +51,8 @@ export class ModuleConnection {
 
     return {
       strokeStyle: this.getStrokeStyle(),
-      startCoords: origin.coordinates,
-      endCoords: target.coordinates,
+      startCoords: origin?.coordinates ?? { x: undefined, y: undefined },
+      endCoords: target?.coordinates ?? { x: undefined, y: undefined },
     };
   }
 
@@ -73,29 +74,5 @@ export class ModuleConnection {
 
   public get canBeDrawn () : boolean {
     return (this.connectionOrigin.element && this.connectionTarget.element) !== undefined;
-  }
-
-  /** Corrects a path based on the presence of arrays in it */
-  // eslint-disable-next-line max-lines-per-function
-  public static solvePropertyPath (definition : ObjectDefinition, path : string[]) : string {
-    let resultPath = "";
-
-    const partialDefinition = definition;
-    let isInArray = false;
-    let tempData = partialDefinition;
-    for (const step of path) {
-      if (tempData[step]["type"] === "array") {
-        resultPath += `.${step}`;
-        tempData = tempData[step]["data"];
-        isInArray = true;
-        continue;
-      }
-
-      resultPath += isInArray ? `[${step}]` : `.${step}`;
-      isInArray = false;
-      tempData = tempData[step]["subtype"];
-    }
-
-    return resultPath.charAt(0) === "." ? resultPath.substring(1) : resultPath;
   }
 };

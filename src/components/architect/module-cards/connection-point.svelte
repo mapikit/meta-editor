@@ -12,10 +12,10 @@
   import DropArea from "../drop-area.svelte";
   import type { ArchitectContext, DragElement } from "../../../entities/auxiliary-entities/architect-context";
   import type { ConnectionPointSelection } from "../../../stores/knob-selection-type";
-  import { ConnectionsManager, sectionsMap } from "../helpers/sections-map";
+  import { ConnectionsManager, connectionsManager } from "../helpers/connections-manager";
   import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
   import { updateTraces } from "../update-traces";
-  import { ModuleConnection } from "../helpers/module-connection";
+  import { ConnectionPointVertex } from "../helpers/connection-vertex";
 
   export let mode : "input" | "output";
   export let parentPaths : string[] = [];
@@ -28,23 +28,35 @@
   const context = getContext<ArchitectContext>("architectContext");
   let { configuration } = currentBop;
   let { dragging, draggingElement } = context;
-  const elementId = ConnectionsManager
-    .getIdentifier(moduleConfig.key === -1 ? "input" : moduleConfig.key, parentPaths.join("."), mode);
-
+  let connectionVertex : ConnectionPointVertex;
   let deepOpen = false;
   // If it is a deep type, should be albe to open and select deeper options
   // Is still selectable itself
 
+  // eslint-disable-next-line max-lines-per-function
   onMount(() => {
-    sectionsMap.registerConnectionPoint(mode, elementId, dotDrag);
-    sectionsMap.refreshConnections($configuration);
-    updateTraces();
+    const moduleKey = moduleConfig.getBopTransformedKey();
+    const solvedPath = ConnectionPointVertex.solvePropertyPath($storedDefinition[mode], parentPaths);
+
+    connectionVertex = connectionsManager
+      .getVertex(ConnectionPointVertex.generateId(mode, moduleKey, solvedPath));
+
+    if (connectionVertex === undefined) {
+      connectionVertex = ConnectionPointVertex
+        .buildNew(getTypeDetails().type, solvedPath, moduleKey, mode, dotDrag);
+
+      connectionsManager.registerVertex(connectionVertex);
+    }
+
+    connectionVertex.element = dotDrag;
+    connectionsManager.refreshConnections($configuration);
+    // updateTraces();
   });
 
   onDestroy(() => {
-    sectionsMap.unregisterConnectionPoint(mode, elementId);
-    sectionsMap.refreshConnections($configuration);
-    updateTraces();
+    connectionVertex.element = undefined;
+    connectionsManager.refreshConnections($configuration);
+    // updateTraces();
   });
 
   // eslint-disable-next-line max-lines-per-function
@@ -76,7 +88,7 @@
   const toggleDeep = (e : MouseEvent) : void => {
     e.stopPropagation();
     deepOpen = !deepOpen;
-    sectionsMap.refreshConnections($configuration);
+    connectionsManager.refreshConnections($configuration);
     updateTraces();
   };
 
@@ -220,5 +232,5 @@
 </div>
 
 {#if $dragging && (($draggingElement).element === dotDrag)}
-  <ConnectionPointDragTraces onGenerate={() => { sectionsMap.activeLinkingOrigin = dotDrag; }}/>
+  <ConnectionPointDragTraces onGenerate={() => { connectionsManager.activeLinkingOrigin = dotDrag; }}/>
 {/if}

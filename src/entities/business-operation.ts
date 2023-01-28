@@ -12,7 +12,7 @@ import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
 import type { Serialized } from "./serialized-type";
 import type { ConnectionPointSelection } from "../stores/knob-selection-type";
-import { ConnectionsManager, sectionsMap } from "../components/architect/helpers/sections-map";
+import { ConnectionsManager, connectionsManager } from "../components/architect/helpers/connections-manager";
 import { updateTraces } from "../components/architect/update-traces";
 // TODO The right thing here, since this is a high level class, is to receive this as a
 // property in the constructor instead of simply importing this.
@@ -280,11 +280,11 @@ export class UIBusinessOperation {
         get(targetModule.dependencies).splice(alreadyPresent, 1);
         targetModule.dependencies.update((currentValue) => currentValue.splice(alreadyPresent, 1));
         target.element.dispatchEvent(new Event("removeTag"));
-        sectionsMap.removeConnection(ConnectionsManager.getIdentifier(targetModule.key, newDependency.targetPath));
+        connectionsManager.removeConnection(ConnectionsManager.getIdentifier(targetModule.key, newDependency.targetPath));
       }
 
       targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
-      sectionsMap.addConnection(newDependency, target.parentKey, target.pointType);
+      connectionsManager.addConnection(newDependency, target.parentKey, target.pointType);
 
       return modules;
     });
