@@ -52,7 +52,9 @@ export class ConnectionsManager {
 
   /** Gets connections to be drawn on the screen */
   public getVisibleConnections () : DrawableConnection[] {
-    return this.connections
+    const removedDuplicates = this.filterDuplicates(this.connections);
+
+    return removedDuplicates
       .filter((connection) => connection.canBeDrawn)
       .map((connection) => connection.getDrawable());
   }
@@ -68,13 +70,28 @@ export class ConnectionsManager {
     return this.vertices.get(vertexPathSteps.join(""));
   }
 
-  private removeDuplicates (outputId : string) : void {
-    for(const input of this.connections[outputId]) {
-      while(this.connections[outputId].filter(inputId => inputId === input).length > 1) {
-        const inputIndex = this.connections[outputId].indexOf(input);
-        this.connections[outputId].splice(inputIndex, 1);
-      }
-    }
+  // eslint-disable-next-line max-lines-per-function
+  private filterDuplicates (connections : ModuleConnection[]) : ModuleConnection[] {
+    const processed = [];
+    const foundDuplicates = [];
+
+    connections.forEach((connection) => {
+      if (foundDuplicates.includes(connection)) { return; }
+
+      const otherConnections = connections.filter(el => el !== connection);
+      otherConnections.forEach((otherConnection) => {
+        const hasSameOrigin = connection.connectionOrigin.id === otherConnection.connectionOrigin.id;
+        const hasSameTarget = connection.connectionTarget.id === otherConnection.connectionTarget.id;
+        if (hasSameOrigin && hasSameTarget) {
+          foundDuplicates.push(otherConnection);
+          connection.setDuplicate();
+        }
+      });
+
+      processed.push(connection);
+    });
+
+    return processed;
   }
 
   // eslint-disable-next-line max-lines-per-function

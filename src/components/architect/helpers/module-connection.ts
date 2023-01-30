@@ -21,6 +21,7 @@ export class ModuleConnection {
   public readonly mode : "normal" | "functional" | "module";
   private optimalOriginId = "";
   private optimalTargetId = "";
+  private hasDuplicate = false;
 
   public constructor (
     origin : ConnectionPointVertex,
@@ -45,6 +46,10 @@ export class ModuleConnection {
   private isOptimal () : boolean {
     return this.optimalOriginId === this.connectionOrigin.id &&
       this.optimalTargetId === this.connectionTarget.id;
+  }
+
+  public setDuplicate () : void {
+    this.hasDuplicate = true;
   }
 
   public static get StrokeColors () : Record<ModuleConnection["mode"], string> {
@@ -72,6 +77,7 @@ export class ModuleConnection {
       stroke: !this.isOptimal() ?
         `${ModuleConnection.StrokeColors[this.mode]}60` : ModuleConnection.StrokeColors[this.mode],
       dash: [],
+      thickness: this.hasDuplicate ? 5 : 2,
     };
   }
 
