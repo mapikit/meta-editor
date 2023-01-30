@@ -167,15 +167,10 @@
 
   $: acceptedTypes = mode === "input" ? ["output", "constant"] : ["input"];
 
-  type DragDataType = {
-    type : "input" | "output" | "module" | "functional";
-    propertyType : string;
-    property : string;
-    key : number | "input";
-  }
-
   // eslint-disable-next-line max-lines-per-function
   const makeConnection = (dropped : DragElement<ConnectionPointVertex>) : void => {
+    console.log("conneting paths:", connectionVertex.id , dropped.data.id);
+
     currentBop.solveConnection(connectionVertex, dropped.data);
   };
 </script>

@@ -31,7 +31,7 @@
     initialPropName = propName;
   };
 
-  const updateName = (event) => {
+  const updateName = (event) : void => {
     dispatch("nameUpdate", { oldKey: initialPropName, newKey: event.target.value as string });
   };
 
@@ -56,6 +56,15 @@
     dispatch("delete-prop", propName);
   };
 
+  const preventDots = (node, propNameArg) => {
+    return {
+      update: (name) : void=> {
+        if (name.includes(".") || name.includes("[") || name.includes("]")) {
+          propName = name.substring(0, name.length -1);
+        }
+      },
+    };
+  };
 </script>
 
 <div class="bg-norbalt-200 rounded flex flex-row col-start-1 col-end-1 h-8 items-center w-full">
@@ -71,7 +80,9 @@
       <div class="flex-1 bg-norbalt-300 border rounded border-norbalt-100 h-6 mr-2 last:mr-0 px-2"> {initialPropName} </div>
     {:else}
       <div class="flex-1 mr-2 last:mr-0">
-        <input class="w-full bg-norbalt-300 border rounded border-norbalt-100 transition-all hover:border-offWhite focus:border-offWhite px-2 outline-none h-6" bind:value="{propName}" on:change="{updateName}"/>
+        <input
+        use:preventDots={propName}
+        class="w-full bg-norbalt-300 border rounded border-norbalt-100 transition-all hover:border-offWhite focus:border-offWhite px-2 outline-none h-6" bind:value="{propName}" on:change="{updateName}"/>
       </div>
     {/if}
     {#if level.canAddData()}

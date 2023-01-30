@@ -11,11 +11,9 @@ import { availableConfigurations, currentConfigId } from "../stores/configuratio
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
 import type { Serialized } from "./serialized-type";
-import { ConnectionsManager, connectionsManager } from "../components/architect/helpers/connections-manager";
+import { connectionsManager } from "../components/architect/helpers/connections-manager";
 import { updateTraces } from "../components/architect/update-traces";
 import type { ConnectionPointVertex } from "src/components/architect/helpers/connection-vertex";
-// TODO The right thing here, since this is a high level class, is to receive this as a
-// property in the constructor instead of simply importing this.
 
 export type BOpParameters = {
   id : string,
@@ -272,16 +270,16 @@ export class UIBusinessOperation {
         matchingType: (get(origin.propertyType) === get(target.propertyType)) || get(target.propertyType) === "any",
       };
 
-      const targetModuleDependencies = get(targetModule.dependencies);
-      const alreadyPresentDepIndex = targetModuleDependencies
-        .findIndex(dep => dep.targetPath === newDependency.targetPath);
-
-      if(alreadyPresentDepIndex !== -1) {
+      let conflictingIndex = targetModule.getConflictingDependencyIndex(newDependency.targetPath);
+      while (conflictingIndex !== -1) {
         targetModule.dependencies.update((currentValue) => {
-          currentValue.splice(alreadyPresentDepIndex, 1); return currentValue;});
+          currentValue.splice(conflictingIndex, 1); return currentValue;});
+        conflictingIndex = targetModule.getConflictingDependencyIndex(newDependency.targetPath);
       }
 
       targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
+
+      console.log(get(targetModule.dependencies));
 
       return modules;
     });

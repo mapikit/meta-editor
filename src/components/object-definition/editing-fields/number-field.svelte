@@ -5,7 +5,7 @@
 
   const preventLetters = (node, evaluationValue)  => {
     return {
-      update: (value) => { // Is executed if a change is detected in the field
+      update: (value : number) : void => { // Is executed if a change is detected in the field
         if (value === null) {
           propValue = latestValidValue;
           return;

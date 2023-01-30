@@ -3,6 +3,7 @@ import { get } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
 import { ConnectionPointVertex, VertexType } from "./connection-vertex";
 import { DrawableConnection, ModuleConnection } from "./module-connection";
+import { PathUtils } from "./path-utils";
 
 // NEXT Refactor Tasks:
 // -> Stores all the vertices
@@ -56,30 +57,15 @@ export class ConnectionsManager {
       .map((connection) => connection.getDrawable());
   }
 
-  /** Evaluates if a connection is possible, and if it is not, it returns the next best connection */
-  // eslint-disable-next-line max-lines-per-function
-  private solveDeepConnections (connection : ModuleConnection) : DrawableConnection {
-    if (connection.canBeDrawn) { return connection.getDrawable(); }
-
-    const origin = connection.connectionOrigin.isDrawable ?
-      undefined : this.findBestMatchingVertex(connection.originId);
-    const target = connection.connectionOrigin.isDrawable ?
-      undefined : this.findBestMatchingVertex(connection.targetId);
-
-    return connection.getDrawable(origin, target);
-  }
-
-  // TODO account for arrays as well
-  // TODO take into consideration the type of the vertex as well for smarter guesses
   private findBestMatchingVertex (vertexId : string) : ConnectionPointVertex {
-    const vertexPathSteps = vertexId.split(".");
-    while(this.isNill(this.vertices.get(vertexPathSteps.join("."))?.element) && vertexPathSteps.length > 0) {
+    const vertexPathSteps = PathUtils.getSteps(vertexId);
+    while(this.isNill(this.vertices.get(vertexPathSteps.join(""))?.element) && vertexPathSteps.length > 0) {
       vertexPathSteps.pop();
     }
 
     if (vertexPathSteps.length === 0) { return undefined; }
 
-    return this.vertices.get(vertexPathSteps.join("."));
+    return this.vertices.get(vertexPathSteps.join(""));
   }
 
   private removeDuplicates (outputId : string) : void {
@@ -108,15 +94,12 @@ export class ConnectionsManager {
         this.connections.push(connection);
       });
     });
-
-    console.log(this.getVisibleConnections());
   }
 
   // eslint-disable-next-line max-lines-per-function
   private buildConnectionFromDependency (dependency : Dependency, targetmoduleIndex : "input" | number)
     : ModuleConnection {
     const connectionMode : ModuleConnection["mode"] = this.getDependencytype(dependency);
-
     const originVertexType : VertexType = connectionMode === "functional"
       ? "functionalOrigin" : connectionMode === "module"
         ? "module" : "output";
@@ -146,9 +129,9 @@ export class ConnectionsManager {
       target = this.preCreateVertex(targetVertexType, targetmoduleIndex, targetId);
     }
 
-    // console.log(`new connection from ${originId} to ${targetId}`);
-
-    return new ModuleConnection(origin, target, connectionMode);
+    const result = new ModuleConnection(origin, target, connectionMode);
+    result.setOptimalConnectionIds(originId,targetId);
+    return result;
   }
 
   private preCreateVertex (type : VertexType, parentKey : "input" | number, path : string) : ConnectionPointVertex {

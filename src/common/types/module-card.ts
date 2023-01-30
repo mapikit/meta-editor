@@ -95,6 +95,16 @@ export class ModuleCard {
     }
   }
 
+  public getConflictingDependencyIndex (targetPath : string) : number {
+    const conflictingIndex = get(this.dependencies)
+      .findIndex(dep => {
+        console.log(dep.targetPath, targetPath, "<<<<<<<<<<");
+        return targetPath.includes(dep.targetPath) || dep.targetPath.includes(targetPath);
+      });
+
+    return conflictingIndex;
+  }
+
   public serialize () : Serialized<ModuleCard> {
     return ({
       id: this.id,

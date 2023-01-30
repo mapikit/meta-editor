@@ -53,7 +53,7 @@ export function updateTraces (additionalDrawables : DrawableConnection[] = []) :
     drawConnection(connection, canvasOffset, canvasContext, env));
 
   additionalDrawables.forEach((connection) => {
-    drawConnection(connection, canvasOffset, canvasContext, env);
+    drawStraight(connection, canvasOffset, canvasContext);
   });
 
   return [];
@@ -150,6 +150,24 @@ const drawConnection = (
     usedConnection.endCoords.x-60*env.scale, usedConnection.endCoords.y,
     usedConnection.endCoords.x, usedConnection.endCoords.y,
   );
+  canvasContext.stroke();
+};
+
+// eslint-disable-next-line max-lines-per-function
+const drawStraight = (
+  connection : DrawableConnection,
+  canvasOffset : DOMRect,
+  canvasContext : CanvasRenderingContext2D,
+// eslint-disable-next-line max-params
+) : void => {
+  const usedConnection = applyOffset(canvasOffset, connection);
+
+  canvasContext.setLineDash(connection.strokeStyle.dash);
+  canvasContext.strokeStyle = connection.strokeStyle.stroke;
+  canvasContext.lineWidth = connection.strokeStyle.thickness ?? 2;
+  canvasContext.beginPath();
+  canvasContext.moveTo(usedConnection.startCoords.x, usedConnection.startCoords.y);
+  canvasContext.lineTo(usedConnection.endCoords.x, usedConnection.endCoords.y);
   canvasContext.stroke();
 };
 

@@ -19,6 +19,8 @@ export class ModuleConnection {
   public readonly connectionOrigin : ConnectionPointVertex;
   public readonly connectionTarget : ConnectionPointVertex;
   public readonly mode : "normal" | "functional" | "module";
+  private optimalOriginId = "";
+  private optimalTargetId = "";
 
   public constructor (
     origin : ConnectionPointVertex,
@@ -33,8 +35,17 @@ export class ModuleConnection {
     || get(this.connectionTarget.propertyPath)) && this.mode === "functional") {
       throw Error("Functional Dependency created with paths - there was probably an error with the code");
     }
-
   };
+
+  public setOptimalConnectionIds (originId : string, targetId : string) : void {
+    this.optimalOriginId = originId;
+    this.optimalTargetId = targetId;
+  }
+
+  private isOptimal () : boolean {
+    return this.optimalOriginId === this.connectionOrigin.id &&
+      this.optimalTargetId === this.connectionTarget.id;
+  }
 
   public static get StrokeColors () : Record<ModuleConnection["mode"], string> {
     return {
@@ -58,7 +69,8 @@ export class ModuleConnection {
 
   private getStrokeStyle () : StrokeStyle {
     return {
-      stroke: ModuleConnection.StrokeColors[this.mode],
+      stroke: !this.isOptimal() ?
+        `${ModuleConnection.StrokeColors[this.mode]}60` : ModuleConnection.StrokeColors[this.mode],
       dash: [],
     };
   }
