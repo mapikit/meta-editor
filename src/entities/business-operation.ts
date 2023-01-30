@@ -11,9 +11,9 @@ import { availableConfigurations, currentConfigId } from "../stores/configuratio
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
 import type { Serialized } from "./serialized-type";
-import type { ConnectionPointSelection } from "../stores/knob-selection-type";
 import { ConnectionsManager, connectionsManager } from "../components/architect/helpers/connections-manager";
 import { updateTraces } from "../components/architect/update-traces";
+import type { ConnectionPointVertex } from "src/components/architect/helpers/connection-vertex";
 // TODO The right thing here, since this is a high level class, is to receive this as a
 // property in the constructor instead of simply importing this.
 
@@ -241,66 +241,63 @@ export class UIBusinessOperation {
 
   /** Creates a connection between any modules' props. This function already
    * figures out which one is the origin and which is the target, and registers the connection
-   * into the renderer.
+   * into the connections manager.
    */
   // eslint-disable-next-line max-lines-per-function
   public solveConnection (
-    currentConnectionPoint : ConnectionPointSelection,
-    targetConnectionPoint : ConnectionPointSelection,
+    currentConnectionPoint : ConnectionPointVertex,
+    targetConnectionPoint : ConnectionPointVertex,
   ) : void {
     if(currentConnectionPoint === undefined) return;
-    if(currentConnectionPoint.pointType === targetConnectionPoint.pointType) return;
+    if(currentConnectionPoint.type === targetConnectionPoint.type) return;
 
-    const currentIsOutput = ["output", "module"].includes(currentConnectionPoint.pointType);
+    const currentIsOutput = ["output", "module"].includes(currentConnectionPoint.type);
     const [origin, target] = currentIsOutput
       ? [currentConnectionPoint, targetConnectionPoint]
       : [targetConnectionPoint, currentConnectionPoint];
 
-    if(target.pointType === "functional") return this.addFunctionalDependency(origin, target);
+    if(target.type === "functionalTarget") return this.addFunctionalDependency(origin, target);
 
     // eslint-disable-next-line max-lines-per-function
     this.configuration.update((modules) => {
-      const targetModule = modules.find(module => module.key == target.parentKey);
+      const targetModule = modules.find(module => module.key === target.parentKey);
 
       const firstPathStep = origin.parentKey === "input" ? ""
-        : origin.pointType === "output" ? "result." : "module.";
+        : origin.type === "output" ? "result." : "module.";
 
       const newDependency : UICompliantDependency = {
         origin: origin.parentKey,
-        originPath: `${firstPathStep}${origin.property}`,
-        targetPath: target.property,
-        matchingType: (origin.propertyType === target.propertyType) || target.propertyType === "any",
+        originPath: `${firstPathStep}${get(origin.propertyPath)}`,
+        targetPath: get(target.propertyPath),
+        matchingType: (get(origin.propertyType) === get(target.propertyType)) || get(target.propertyType) === "any",
       };
 
       const targetModuleDependencies = get(targetModule.dependencies);
-      const alreadyPresent = targetModuleDependencies
+      const alreadyPresentDepIndex = targetModuleDependencies
         .findIndex(dep => dep.targetPath === newDependency.targetPath);
 
-      if(alreadyPresent !== -1) {
-        get(targetModule.dependencies).splice(alreadyPresent, 1);
-        targetModule.dependencies.update((currentValue) => currentValue.splice(alreadyPresent, 1));
-        target.element.dispatchEvent(new Event("removeTag"));
-        connectionsManager.removeConnection(ConnectionsManager.getIdentifier(targetModule.key, newDependency.targetPath));
+      if(alreadyPresentDepIndex !== -1) {
+        targetModule.dependencies.update((currentValue) => {
+          currentValue.splice(alreadyPresentDepIndex, 1); return currentValue;});
       }
 
       targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
-      connectionsManager.addConnection(newDependency, target.parentKey, target.pointType);
 
       return modules;
     });
 
+    connectionsManager.refreshConnections(get(this.configuration));
     updateTraces();
 
-    currentConnectionPoint.element.style.outline = "";
     return undefined;
   }
 
+  // TODO Add Constant/Variable Connections
+
   // eslint-disable-next-line max-lines-per-function
   private addFunctionalDependency (
-    origin : ConnectionPointSelection, target : ConnectionPointSelection) : void
+    origin : ConnectionPointVertex, target : ConnectionPointVertex) : void
   {
-    if(origin.pointType !== "module") return window.alert("Functional Dependencies only connect to modules");
-
     this.configuration.update(modules => {
       const targetModule = get(this.configuration).find(module => module.key == target.parentKey);
       const targetModuleDependencies = get(targetModule.dependencies);
@@ -308,7 +305,8 @@ export class UIBusinessOperation {
         return dependency.origin === origin.parentKey && dependency.targetPath === undefined;
       });
       if(alreadyPresent !== -1) {
-        targetModule.dependencies.update((currentValue) => currentValue.splice(alreadyPresent, 1));
+        targetModule.dependencies.update((currentValue) => {
+          currentValue.splice(alreadyPresent, 1); return currentValue; });
       }
 
       targetModule.dependencies

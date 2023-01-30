@@ -82,6 +82,7 @@ export class ModuleCard {
     this.modulePackage = parameters.modulePackage;
 
     this.serialize = this.serialize.bind(this);
+    this.getBopTransformedKey = this.getBopTransformedKey.bind(this);
 
     if (parameters.storedDefinition) {
       this.storedDefinition.set(parameters.storedDefinition);

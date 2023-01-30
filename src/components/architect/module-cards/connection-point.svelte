@@ -50,13 +50,13 @@
 
     connectionVertex.element = dotDrag;
     connectionsManager.refreshConnections($configuration);
-    // updateTraces();
+    updateTraces();
   });
 
   onDestroy(() => {
     connectionVertex.element = undefined;
     connectionsManager.refreshConnections($configuration);
-    // updateTraces();
+    updateTraces();
   });
 
   // eslint-disable-next-line max-lines-per-function
@@ -175,28 +175,14 @@
   }
 
   // eslint-disable-next-line max-lines-per-function
-  const makeConnection = (dropped : DragElement<DragDataType>) : void => {
-    const thisPoint : ConnectionPointSelection = {
-      pointType: mode,
-      propertyType: getTypeDetails().type,
-      property: parentPaths.join("."),
-      element: dotDrag,
-      parentKey: moduleConfig.key === -1 ? "input" : moduleConfig.key,
-    };
-    const droppedPoint : ConnectionPointSelection = {
-      pointType: dropped.data.type,
-      propertyType: dropped.data.propertyType,
-      property: dropped.data.property,
-      element: dropped.element,
-      parentKey: dropped.data.key === -1 ? "input" : dropped.data.key,
-    };
-    currentBop.solveConnection(thisPoint, droppedPoint);
+  const makeConnection = (dropped : DragElement<ConnectionPointVertex>) : void => {
+    currentBop.solveConnection(connectionVertex, dropped.data);
   };
 </script>
 
 <div class="relative">
   <div class="relative flex {containerOrder} justify-center items-center">
-    <Draggable dragElement={dotDrag} dragType="{mode}" dragData="{{ type: mode, propertyType: getTypeDetails().type, property: parentPaths.join("."), key: moduleConfig.key }}">
+    <Draggable dragElement={dotDrag} dragType="{mode}" dragData="{connectionVertex}">
       <div bind:this={dotDrag} class="w-4 h-4 rounded flex justify-center items-center hover:bg-offWhite bg-transparent transition-all"> <!-- Clickable section -->
         <Typedot size={2} type={getTypeDetails()}/>
       </div>
@@ -232,5 +218,5 @@
 </div>
 
 {#if $dragging && (($draggingElement).element === dotDrag)}
-  <ConnectionPointDragTraces onGenerate={() => { connectionsManager.activeLinkingOrigin = dotDrag; }}/>
+  <ConnectionPointDragTraces originVertex={connectionVertex}/>
 {/if}

@@ -31,9 +31,7 @@ function applyOffset (canvasDom : DOMRect, connection : DrawableConnection) : Dr
 };
 
 // eslint-disable-next-line max-lines-per-function
-export function updateTraces (additionalDrawables : DrawableConnection[]) : Array<string> {
-  console.log("i'm being called");
-
+export function updateTraces (additionalDrawables : DrawableConnection[] = []) : Array<string> {
   const env = get(environment);
   const canvasContext = env.canvasContext;
   const moduleDash = [10, 4, 2, 4].map(value => value*env.scale);
@@ -51,20 +49,11 @@ export function updateTraces (additionalDrawables : DrawableConnection[]) : Arra
   canvasContext.lineTo(canvasContext.canvas.width, env.origin.y);
   canvasContext.stroke();
 
-  connectionsManager.getVisibleConnections().forEach((connection) => {
-    const usedConnection = applyOffset(canvasOffset, connection);
+  connectionsManager.getVisibleConnections().forEach((connection) =>
+    drawConnection(connection, canvasOffset, canvasContext, env));
 
-    canvasContext.setLineDash(connection.strokeStyle.dash);
-    canvasContext.strokeStyle = connection.strokeStyle.stroke;
-    canvasContext.lineWidth = connection.strokeStyle.thickness ?? 2;
-    canvasContext.beginPath();
-    canvasContext.moveTo(usedConnection.startCoords.x, usedConnection.startCoords.y);
-    canvasContext.bezierCurveTo(
-      usedConnection.startCoords.x+60*env.scale, usedConnection.startCoords.y,
-      usedConnection.endCoords.x-60*env.scale, usedConnection.endCoords.y,
-      usedConnection.endCoords.x, usedConnection.endCoords.y,
-    );
-    canvasContext.stroke();
+  additionalDrawables.forEach((connection) => {
+    drawConnection(connection, canvasOffset, canvasContext, env);
   });
 
   return [];
@@ -140,6 +129,29 @@ export function updateTraces (additionalDrawables : DrawableConnection[]) : Arra
   // // console.log(linesToCut);
   // return linesToCut;
 }
+
+// eslint-disable-next-line max-lines-per-function
+const drawConnection = (
+  connection : DrawableConnection,
+  canvasOffset : DOMRect,
+  canvasContext : CanvasRenderingContext2D,
+  env : EnvType,
+// eslint-disable-next-line max-params
+) : void => {
+  const usedConnection = applyOffset(canvasOffset, connection);
+
+  canvasContext.setLineDash(connection.strokeStyle.dash);
+  canvasContext.strokeStyle = connection.strokeStyle.stroke;
+  canvasContext.lineWidth = connection.strokeStyle.thickness ?? 2;
+  canvasContext.beginPath();
+  canvasContext.moveTo(usedConnection.startCoords.x, usedConnection.startCoords.y);
+  canvasContext.bezierCurveTo(
+    usedConnection.startCoords.x+60*env.scale, usedConnection.startCoords.y,
+    usedConnection.endCoords.x-60*env.scale, usedConnection.endCoords.y,
+    usedConnection.endCoords.x, usedConnection.endCoords.y,
+  );
+  canvasContext.stroke();
+};
 
 // eslint-disable-next-line max-params, max-lines-per-function
 function drawFunctionalConnections (
