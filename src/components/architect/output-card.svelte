@@ -8,14 +8,15 @@
   import { EditorLevel, EditorLevels } from "../object-definition/obj-def-editor-types-and-helpers";
   import CheckIcon from "../../icons/check-icon.svelte";
   import CancelIcon from "../../icons/cancel-icon.svelte";
-  import { setContext } from "svelte";
-  import { updateTraces } from "./update-traces";
+  import { getContext, setContext } from "svelte";
+  import type { CanvasUtils } from "./canvas-utils";
 
   export let configuration : ModuleCard;
   const storedDefinition = configuration.storedDefinition;
   const formatStore = writable($storedDefinition.input ?? {});
   let previousValue = {};
   setContext("moduleConfig", configuration);
+  const canvasUtils = getContext<CanvasUtils>("canvasContext");
 
   $: inputValues = Object.keys($storedDefinition.input ?? {});
 
@@ -39,7 +40,7 @@
 
 </script>
 
-<MovableCard moduleConfig={configuration} onMove={updateTraces}>
+<MovableCard moduleConfig={configuration} onMove={canvasUtils.redrawConnections}>
   <div>
     {#if !editing}
       <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">

@@ -2,7 +2,6 @@
   import { getAvailableKey } from "../../helpers/get-available-key";
   import StoreInput from "./store-input.svelte";
   import StoreOutput from "./store-output.svelte";
-  import { environment } from "../../../../stores/environment";
   import type { ModuleType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import { Coordinate } from "../../../../common/types/geometry";
   import { get, Writable } from "svelte/store";
@@ -13,16 +12,14 @@
   import type { ArchitectContext } from "../../../../entities/auxiliary-entities/architect-context";
   import { getContext } from "svelte";
   import DraggingModule from "../../module-cards/dragging-module.svelte";
-	import ModuleCard from "../../module-cards/module-card.svelte";
-	import type { UIBusinessOperation } from "src/entities/business-operation";
-  ModuleCard
+  import type { UIBusinessOperation } from "src/entities/business-operation";
   export let module : StoreModuleInfo;
   export let moduleType : ModuleType;
   export let bopModules : Writable<ModuleCardType[]>;
 
   const context = getContext<ArchitectContext>("architectContext");
   const currentBop = getContext<UIBusinessOperation>("currentBop");
-  let { dragging, draggingElement } = context;
+  let { dragging, draggingElement, scale, originPos } = context;
 
   let ref : HTMLDivElement;
   let left = 0;
@@ -46,8 +43,8 @@
       modulePackage: getPackage(),
       moduleType: moduleType,
       position: new Coordinate(left, top)
-        .moveBy(-$environment.origin.x, -$environment.origin.y)
-        .scale(1/$environment.scale),
+        .moveBy(-$originPos.x, -$originPos.y)
+        .scale(1/$scale),
       bopId: get(currentBop.id),
     });
   };

@@ -52,10 +52,7 @@ export class ConnectionsManager {
 
   /** Gets connections to be drawn on the screen */
   public getVisibleConnections () : DrawableConnection[] {
-    const removedDuplicates = this.filterDuplicates(this.connections);
-
-    return removedDuplicates
-      .filter((connection) => connection.canBeDrawn)
+    return this.getFilteredConnections()
       .map((connection) => connection.getDrawable());
   }
 
@@ -69,6 +66,10 @@ export class ConnectionsManager {
 
     return this.vertices.get(vertexPathSteps.join(""));
   }
+
+  public getFilteredConnections () : ModuleConnection[] {
+    return this.filterDuplicates(this.connections).filter((connection) => connection.canBeDrawn);
+  };
 
   // eslint-disable-next-line max-lines-per-function
   private filterDuplicates (connections : ModuleConnection[]) : ModuleConnection[] {

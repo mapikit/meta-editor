@@ -11,9 +11,8 @@ import { availableConfigurations, currentConfigId } from "../stores/configuratio
 import type { PropertyListEntry } from "../common/types/property-list-entry";
 import { nanoid } from "nanoid";
 import type { Serialized } from "./serialized-type";
-import { connectionsManager } from "../components/architect/helpers/connections-manager";
-import { updateTraces } from "../components/architect/update-traces";
 import type { ConnectionPointVertex } from "src/components/architect/helpers/connection-vertex";
+import type { ModuleConnection } from "src/components/architect/helpers/module-connection";
 
 export type BOpParameters = {
   id : string,
@@ -279,13 +278,8 @@ export class UIBusinessOperation {
 
       targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
 
-      console.log(get(targetModule.dependencies));
-
       return modules;
     });
-
-    connectionsManager.refreshConnections(get(this.configuration));
-    updateTraces();
 
     return undefined;
   }
@@ -310,6 +304,25 @@ export class UIBusinessOperation {
       targetModule.dependencies
         .update((currentValue) => { currentValue.unshift({ origin: origin.parentKey }); return currentValue; });
       return modules;
+    });
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  public removeDependency (moduleConnection : ModuleConnection) : void {
+    const dependencyData = moduleConnection.getDependency();
+
+    const module = get(this.configuration)
+      .find((moduleCard) => dependencyData.targetModule === moduleCard.getBopTransformedKey());
+
+    module.dependencies.update((dependencies) => {
+      const dependencyIndex = dependencies
+        .findIndex((dependency) => dependency.origin === dependencyData.origin
+          && dependency.originPath === dependencyData.originPath
+          && dependency.targetPath === dependencyData.targetPath,
+        );
+
+      dependencies.splice(dependencyIndex, 1);
+      return dependencies;
     });
   }
 }

@@ -11,11 +11,10 @@
   import Draggable from "../draggable.svelte";
   import DropArea from "../drop-area.svelte";
   import type { ArchitectContext, DragElement } from "../../../entities/auxiliary-entities/architect-context";
-  import type { ConnectionPointSelection } from "../../../stores/knob-selection-type";
-  import { ConnectionsManager, connectionsManager } from "../helpers/connections-manager";
+  import { connectionsManager } from "../helpers/connections-manager";
   import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
-  import { updateTraces } from "../update-traces";
   import { ConnectionPointVertex } from "../helpers/connection-vertex";
+  import type { CanvasUtils } from "../canvas-utils";
 
   export let mode : "input" | "output";
   export let parentPaths : string[] = [];
@@ -26,6 +25,7 @@
 
   const currentBop = getContext<UIBusinessOperation>("currentBop");
   const context = getContext<ArchitectContext>("architectContext");
+  const canvasUtils = getContext<CanvasUtils>("canvasContext");
   let { configuration } = currentBop;
   let { dragging, draggingElement } = context;
   let connectionVertex : ConnectionPointVertex;
@@ -50,13 +50,13 @@
 
     connectionVertex.element = dotDrag;
     connectionsManager.refreshConnections($configuration);
-    updateTraces();
+    canvasUtils.redrawConnections();
   });
 
   onDestroy(() => {
     connectionVertex.element = undefined;
     connectionsManager.refreshConnections($configuration);
-    updateTraces();
+    canvasUtils.redrawConnections();
   });
 
   // eslint-disable-next-line max-lines-per-function
@@ -89,7 +89,7 @@
     e.stopPropagation();
     deepOpen = !deepOpen;
     connectionsManager.refreshConnections($configuration);
-    updateTraces();
+    canvasUtils.redrawConnections();
   };
 
   // eslint-disable-next-line max-lines-per-function
@@ -160,7 +160,6 @@
       currentStep[previousPath[previousPath.length -1]][fieldName][availableKeyName]
         = { type, required: false, subtype };
 
-      console.log(updatedDefinition);
       return updatedDefinition;
     });
   };
@@ -169,9 +168,9 @@
 
   // eslint-disable-next-line max-lines-per-function
   const makeConnection = (dropped : DragElement<ConnectionPointVertex>) : void => {
-    console.log("conneting paths:", connectionVertex.id , dropped.data.id);
-
     currentBop.solveConnection(connectionVertex, dropped.data);
+    connectionsManager.refreshConnections($configuration);
+    canvasUtils.redrawConnections();
   };
 </script>
 

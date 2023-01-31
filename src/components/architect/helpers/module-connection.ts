@@ -1,6 +1,7 @@
 import type { CoordinateInfo } from "../../../common/types/geometry";
 import { get } from "svelte/store";
 import type { ConnectionPointVertex } from "./connection-vertex";
+import type { UICompliantDependency } from "src/common/types/module-card";
 
 export type StrokeStyle = { stroke : string; dash : number[]; thickness ?: number };
 
@@ -81,6 +82,15 @@ export class ModuleConnection {
     };
   }
 
+  public getDependency () : UICompliantDependency & { targetModule : number | "input" } {
+    return {
+      matchingType: false,
+      origin: this.connectionOrigin.parentKey,
+      originPath: get(this.connectionOrigin.propertyPath),
+      targetPath: get(this.connectionTarget.propertyPath),
+      targetModule: this.connectionTarget.parentKey,
+    };
+  }
 
   public get originId () : string {
     return this.connectionOrigin.id;

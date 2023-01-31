@@ -40,14 +40,14 @@ export class ShortcutsController {
   public getShortcutEventHandler (event : KeyboardEvent) : void {
     if (!event.shiftKey && !event.altKey && !event.ctrlKey) {
       const handler = this.handlers.get(event.key);
-      handler ? handler() : (() => {})();
+      handler ? handler() : (() : void => {})();
       return;
     }
 
     // eslint-disable-next-line max-len
     const eventModifiersBind = `${event.key}+${Number(event.ctrlKey)}+${Number(event.altKey)}+${Number(event.shiftKey)}`;
     const handler = this.handlers.get(eventModifiersBind);
-    handler ? handler() : (() => {})();
+    handler ? handler() : (() : void => {})();
   }
 };
 

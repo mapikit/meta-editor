@@ -1,21 +1,18 @@
 <script lang="ts">
   import type { ModuleCard } from "../../../common/types/module-card";
   import MovableCard from "../helpers/movable-card.svelte";
-  import type { Writable } from "svelte/store";
-  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
   import type { DeleteModuleEvent } from "../../../common/types/events";
   import CardProperty from "./card-property.svelte";
-  import { setContext } from "svelte";
-  import { updateTraces } from "../update-traces";
+  import { getContext, setContext } from "svelte";
+  import type { CanvasUtils } from "../canvas-utils";
 
   export let moduleConfig : ModuleCard;
-  export let bopModules : Writable<ModuleCard[]>;
-  export let bopConstants : Writable<BopsConstant[]>;
   export let trash : HTMLDivElement;
   let functionalDepsOpen = false;
 
   const { storedDefinition } = moduleConfig;
+  const canvasUtils = getContext<CanvasUtils>("canvasContext");
 
   setContext("moduleConfig", moduleConfig);
   
@@ -39,7 +36,7 @@
 
 
 {#if cardInfo !== undefined}
-  <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion} onMove={updateTraces}>
+  <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion} onMove={canvasUtils.redrawConnections}>
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> F </div>

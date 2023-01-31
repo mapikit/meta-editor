@@ -1,14 +1,11 @@
 <script lang="ts">
 import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
 import { createEventDispatcher, getContext } from "svelte";
-
 import { Coordinate } from "../../../common/types/geometry";
-
 import type { ModuleCard } from "../../../common/types/module-card";
-import { environment } from "../../../stores/environment";
 
 let context = getContext<ArchitectContext>("architectContext");
-const { mousePos } = context;
+const { mousePos, scale, originPos } = context;
 
 type MovingPosision = {
   origin : Coordinate;
@@ -56,8 +53,8 @@ function moveCard (node : Node, mousePosition : {x : number; y : number}) {
       if(moving) {
         movingPos.delta
           .moveBy(
-            (updateMousePos.x - lastMousePosition.x)/$environment.scale,
-            (updateMousePos.y - lastMousePosition.y)/$environment.scale);
+            (updateMousePos.x - lastMousePosition.x)/$scale,
+            (updateMousePos.y - lastMousePosition.y)/$scale);
         lastMousePosition = updateMousePos;
         let newX =  movingPos.origin.x + movingPos.delta.x;
         let newY =  movingPos.origin.y + movingPos.delta.y;
@@ -80,10 +77,10 @@ $: posY = $position.y;
 
 <div use:moveCard={$mousePos} class="card {movingStyle}" bind:this={ref} on:mousedown={startMovement} on:mouseup={stopMovement}
   style="
-    left: {(posX+ $environment.origin.x)*$environment.scale}px; 
-    top: {(posY + $environment.origin.y)*$environment.scale}px; 
-    transform: scale({$environment.scale}) translateX(-50%) translateY(-50%);
-    transform-origin: {$environment.origin.x}px {$environment.origin.y}px;"
+    left: {(posX+ $originPos.x)*$scale}px; 
+    top: {(posY + $originPos.y)*$scale}px; 
+    transform: scale({$scale}) translateX(-50%) translateY(-50%);
+    transform-origin: {$originPos.x}px {$originPos.y}px;"
 >
   <slot/>
 </div>

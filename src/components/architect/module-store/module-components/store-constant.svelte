@@ -1,23 +1,18 @@
 <script lang="ts">
 import beautify from "json-beautify";
-import clone from "just-clone";
-import type { BopsConfigurationEntry, BopsConstant, Dependency }
+import type { BopsConstant }
   from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
 import { getContext } from "svelte";
-import type { Writable } from "svelte/store";
-import { getClosest } from "../../../../common/helpers/get-closest";
 import { typeColors } from "../../../../common/styles/type-colors";
-import { environment } from "../../../../stores/environment";
 import Draggable from "../../draggable.svelte";
 import DraggingStoreConstant from "./dragging-store-constant.svelte";
 
-export let bopModules : Writable<BopsConfigurationEntry[]>;
 export let constant : BopsConstant;
 const context = getContext<ArchitectContext>("architectContext");
 
 let ref : HTMLDivElement;
-let { mousePos, dragging, draggingElement } = context;
+let { dragging, draggingElement } = context;
 
 
 function getExtendedString (value : unknown) : string {
