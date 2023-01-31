@@ -101,13 +101,12 @@ export class CanvasUtils {
     connections.forEach((connection) => {
       if (!connection.canBeDrawn) { return; }
       const { startCoords, endCoords } = connection.getDrawable();
+      const startCoordsCp = { x: startCoords.x+60*this.readScale, y: startCoords.y };
+      const endCoordsCp = { x: endCoords.x-60*this.readScale, y: endCoords.y };
 
-      const nominator1 = (endCoords.x-startCoords.x)*(startCoords.y-cursorPosition.y+this.canvasDOMRect.y);
-      const nominator2 = (startCoords.x-cursorPosition.x+this.canvasDOMRect.x)*(endCoords.y - startCoords.y);
-      const denominator = Math.sqrt((endCoords.x-startCoords.x)**2 + (endCoords.y-startCoords.y)**2);
-      const dist = Math.abs(nominator1 - nominator2)/denominator;
+      const distance = getMinimumDistanceFromCurve(cursorPosition, startCoords, startCoordsCp, endCoordsCp, endCoords);
 
-      if(dist < 15) {
+      if (distance < 15) {
         result.push(connection);
       }
     });
@@ -115,3 +114,39 @@ export class CanvasUtils {
     return result;
   }
 }
+
+// Thanks Chat GPT
+const getBezierPoint = (t, startPoint, cp1, cp2, endPoint) : CoordinateInfo => {
+  // eslint-disable-next-line max-len
+  const x = (1 - t) * (1 - t) * (1 - t) * startPoint.x + 3 * (1 - t) * (1 - t) * t * cp1.x + 3 * (1 - t) * t * t * cp2.x + t * t * t * endPoint.x;
+  // eslint-disable-next-line max-len
+  const y = (1 - t) * (1 - t) * (1 - t) * startPoint.y + 3 * (1 - t) * (1 - t) * t * cp1.y + 3 * (1 - t) * t * t * cp2.y + t * t * t * endPoint.y;
+  return { x, y };
+};
+
+// Squared for efficiency reasons, no need to get the root right now
+const getDistance = (pointA : CoordinateInfo, pointB : CoordinateInfo) : number => {
+  const dx = pointB.x - pointA.x;
+  const dy = pointB.y - pointA.y;
+  return dx * dx + dy * dy;
+};
+
+// eslint-disable-next-line max-lines-per-function
+const getMinimumDistanceFromCurve = (
+  point : CoordinateInfo,
+  startPoint : CoordinateInfo,
+  controlPoint1 : CoordinateInfo,
+  controlPoint2 : CoordinateInfo,
+  endPoint : CoordinateInfo) : number => {
+  let minDist = Infinity;
+  for (let t = 0; t <= 1; t += 0.01) {
+    const p = getBezierPoint(t, startPoint, controlPoint1, controlPoint2, endPoint);
+    const dist = getDistance(point, p);
+    if (dist < minDist) {
+      minDist = dist;
+    }
+  }
+
+  const distance = Math.sqrt(minDist);
+  return distance;
+};
