@@ -120,7 +120,7 @@
     editing = false;
   };
 
-  const stopPropagation = (ev : MouseEvent) => {
+  const stopPropagation = (ev : Event) : void => {
     ev.stopPropagation();
   };
 
@@ -136,7 +136,7 @@
   <slot />
 </div>
 {:else}
-<div use:clickOutside on:outclick={confirmData} on:mousedown={stopPropagation} on:dblclick={stopPropagation} class="w-28 px-1 text-xs flex {containerOrder} flex-nowrap">
+<div use:clickOutside on:outclick={confirmData} on:mousedown={stopPropagation} on:keydown={stopPropagation} on:keyup={stopPropagation} on:dblclick={stopPropagation} class="w-28 px-1 text-xs flex {containerOrder} flex-nowrap">
   <StringField bind:propValue={newName} size={"small"}/>
   <div class="w-1"/>
   <TypeSelect bind:currentType={newType} bind:currentSubtype={newSubtype} size={"small"} omittedTypes={["object"]}/>

@@ -38,10 +38,15 @@
     editing = false;
   }
 
+  const stopPropagation = (e : Event) : void => {
+    e.stopPropagation();
+  };
+
+
 </script>
 
 <MovableCard moduleConfig={configuration} onMove={canvasUtils.redrawConnections}>
-  <div>
+  <div on:keydown={stopPropagation} on:keyup={stopPropagation}>
     {#if !editing}
       <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
         <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">

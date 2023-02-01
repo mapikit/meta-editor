@@ -83,10 +83,11 @@ export class ModuleConnection {
   }
 
   public getDependency () : UICompliantDependency & { targetModule : number | "input" } {
+    const originPathAdditionalStep = this.mode === "normal" ? "result." : this.mode === "module" ? "module." : "";
     return {
       matchingType: false,
       origin: this.connectionOrigin.parentKey,
-      originPath: get(this.connectionOrigin.propertyPath),
+      originPath: `${originPathAdditionalStep}${get(this.connectionOrigin.propertyPath)}`,
       targetPath: get(this.connectionTarget.propertyPath),
       targetModule: this.connectionTarget.parentKey,
     };

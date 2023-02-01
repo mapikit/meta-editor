@@ -5,14 +5,17 @@
   import type { UIBusinessOperation } from "../../entities/business-operation";
   import { connectionsManager } from "./helpers/connections-manager";
   import type { DrawableConnection } from "./helpers/module-connection";
+  import { clickOutside } from "./helpers/click-outside";
 
   const currentBop = getContext<UIBusinessOperation>("currentBop");
   const architectContext = getContext<ArchitectContext>("architectContext");
   const canvasContext = getContext<CanvasUtils>("canvasContext");
   const { mousePos } = architectContext;
+  const { configuration } = currentBop;
 
   $: inCuttingRange = $mousePos && canvasContext
     .getInCuttingRange(connectionsManager.getFilteredConnections(), $mousePos);
+  
 
   const styleDrawableStroke = (drawable : DrawableConnection) : DrawableConnection => {
     return { ...drawable,
@@ -31,4 +34,14 @@
     unsub();
     canvasContext.redrawConnections();
   });
+
+  const removeDepsCut = () : void => {
+    inCuttingRange.forEach((connection) => currentBop.removeDependency(connection));
+    connectionsManager.refreshConnections($configuration);
+    canvasContext.redrawConnections();
+  };
 </script>
+
+<div class="opacity-0 w-0 h-0" use:clickOutside on:outclick={removeDepsCut}>
+
+</div>
