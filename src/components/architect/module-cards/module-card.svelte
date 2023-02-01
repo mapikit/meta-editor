@@ -10,6 +10,9 @@
   import { ConnectionPointVertex } from "../helpers/connection-vertex";
   import { connectionsManager } from "../helpers/connections-manager";
   import type { UIBusinessOperation } from "src/entities/business-operation";
+  import Draggable from "../draggable.svelte";
+  import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
+	import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
 
   export let moduleConfig : ModuleCard;
   export let trash : HTMLDivElement;
@@ -20,7 +23,10 @@
   const { storedDefinition } = moduleConfig;
   const canvasUtils = getContext<CanvasUtils>("canvasContext");
   const currentBop = getContext<UIBusinessOperation>("currentBop");
+  const architectContext = getContext<ArchitectContext>("architectContext");
   const { configuration } = currentBop;
+  const { dragging, draggingElement } = architectContext;
+  let connectionVertex : ConnectionPointVertex;
 
   setContext("moduleConfig", moduleConfig);
 
@@ -28,7 +34,7 @@
     const moduleKey = moduleConfig.getBopTransformedKey();
     const solvedPath = "";
 
-    let connectionVertex = connectionsManager
+    connectionVertex = connectionsManager
       .getVertex(ConnectionPointVertex.generateId("module", moduleKey, solvedPath));
 
     if (connectionVertex === undefined) {
@@ -70,10 +76,12 @@
           on:click={() => { functionalDepsOpen = !functionalDepsOpen; }}
         > F </div>
         <div class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>
-        <div class="h-6 absolute w-6 bg-norbalt-200 rounded right-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"
+        <Draggable style="h-6 absolute w-6 right-1" dragElement={modularDepsButton} dragType={"output"} dragData={connectionVertex}>
+          <div class="h-6 absolute w-6 bg-norbalt-200 rounded text-center text-offWhite hover:bg-norbalt-100 transition-all"
           bind:this={modularDepsButton}
           on:click={() => { modularDepsOpen = !modularDepsOpen; }}
-        > > </div>
+          > > </div>
+        </Draggable>
       </div>
       <div class="text-sm text-white pb-3 pt-2">
         <div class="pr-6 flex flex-col items-start">
@@ -99,6 +107,10 @@
       our database for security reasons. 
     </div>
   </MovableCard>
+{/if}
+
+{#if $dragging && (($draggingElement).element === modularDepsButton)}
+  <ConnectionPointDragTraces originVertex={connectionVertex}/>
 {/if}
 
 
