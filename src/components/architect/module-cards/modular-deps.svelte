@@ -1,0 +1,14 @@
+<script lang="ts">
+  import ConnectionPoint from "./connection-point.svelte";
+
+  export let outputValues : string[] = [];
+</script>
+
+<div class="absolute left-[calc(100%_+_0.5rem)] top-0 bg-norbalt-200 px-2 py-1 rounded shadow text-sm">
+  {#each outputValues as key} 
+    <div class="flex flex-row w-[100%] justify-end mt-1 first:mt-0">
+      {key}
+      <ConnectionPoint mode="module" parentPaths={[key]}/>
+    </div>
+  {/each}
+</div>

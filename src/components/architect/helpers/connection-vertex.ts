@@ -47,6 +47,11 @@ export class ConnectionPointVertex {
   public static generateId (type : VertexType, parentKey : number | "input", path : string) : string {
     const usedPath = type === "functionalOrigin" ? "" : `.${path}`;
 
+    // for the root as the parent (modular or functional deps)
+    if (path === "") {
+      return `${type}.${parentKey}`;
+    }
+
     return `${type}.${parentKey}${usedPath}`;
   }
 

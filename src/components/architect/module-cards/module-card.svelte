@@ -4,17 +4,44 @@
   import type { TypeDefinitionDeep } from "@meta-system/object-definition/dist/src/object-definition-type";
   import type { DeleteModuleEvent } from "../../../common/types/events";
   import CardProperty from "./card-property.svelte";
-  import { getContext, setContext } from "svelte";
+  import { getContext, onMount, setContext } from "svelte";
   import type { CanvasUtils } from "../canvas-utils";
+  import ModularDeps from "./modular-deps.svelte";
+  import { ConnectionPointVertex } from "../helpers/connection-vertex";
+  import { connectionsManager } from "../helpers/connections-manager";
+  import type { UIBusinessOperation } from "src/entities/business-operation";
 
   export let moduleConfig : ModuleCard;
   export let trash : HTMLDivElement;
   let functionalDepsOpen = false;
+  let modularDepsOpen = false;
+  let modularDepsButton : HTMLDivElement;
 
   const { storedDefinition } = moduleConfig;
   const canvasUtils = getContext<CanvasUtils>("canvasContext");
+  const currentBop = getContext<UIBusinessOperation>("currentBop");
+  const { configuration } = currentBop;
 
   setContext("moduleConfig", moduleConfig);
+
+  onMount(() => {
+    const moduleKey = moduleConfig.getBopTransformedKey();
+    const solvedPath = "";
+
+    let connectionVertex = connectionsManager
+      .getVertex(ConnectionPointVertex.generateId("module", moduleKey, solvedPath));
+
+    if (connectionVertex === undefined) {
+      connectionVertex = ConnectionPointVertex
+        .buildNew("any", solvedPath, moduleKey, "module", modularDepsButton);
+
+      connectionsManager.registerVertex(connectionVertex);
+    }
+
+    connectionVertex.element = modularDepsButton;
+    connectionsManager.refreshConnections($configuration);
+    canvasUtils.redrawConnections();
+  });
   
   $: cardInfo = $storedDefinition;
   $: inputValues = Object.keys($storedDefinition.input);
@@ -39,9 +66,14 @@
   <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion} onMove={canvasUtils.redrawConnections}>
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
-        <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> F </div>
+        <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"
+          on:click={() => { functionalDepsOpen = !functionalDepsOpen; }}
+        > F </div>
         <div class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>
-        <div class="h-6 absolute w-6 bg-norbalt-200 rounded right-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"> > </div>
+        <div class="h-6 absolute w-6 bg-norbalt-200 rounded right-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"
+          bind:this={modularDepsButton}
+          on:click={() => { modularDepsOpen = !modularDepsOpen; }}
+        > > </div>
       </div>
       <div class="text-sm text-white pb-3 pt-2">
         <div class="pr-6 flex flex-col items-start">
@@ -55,6 +87,9 @@
           {/each}
         </div>
       </div>
+      {#if modularDepsOpen}
+        <ModularDeps outputValues={outputValues}/>
+      {/if}
     </div>
   </MovableCard>
 {:else}

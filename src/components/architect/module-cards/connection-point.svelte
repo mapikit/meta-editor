@@ -16,9 +16,10 @@
   import { ConnectionPointVertex } from "../helpers/connection-vertex";
   import type { CanvasUtils } from "../canvas-utils";
 
-  export let mode : "input" | "output";
+  export let mode : "input" | "output" | "module";
   export let parentPaths : string[] = [];
   let dotDrag : HTMLDivElement;
+  let usedMode = mode === "module" ? "output" : mode;
 
   let moduleConfig = getContext<ModuleCard>("moduleConfig");
   const { storedDefinition } = moduleConfig;
@@ -30,13 +31,12 @@
   let { dragging, draggingElement } = context;
   let connectionVertex : ConnectionPointVertex;
   let deepOpen = false;
-  // If it is a deep type, should be albe to open and select deeper options
-  // Is still selectable itself
 
   // eslint-disable-next-line max-lines-per-function
   onMount(() => {
+    usedMode = mode === "module" ? "output" : mode;
     const moduleKey = moduleConfig.getBopTransformedKey();
-    const solvedPath = ConnectionPointVertex.solvePropertyPath($storedDefinition[mode], parentPaths);
+    const solvedPath = ConnectionPointVertex.solvePropertyPath($storedDefinition[usedMode], parentPaths);
 
     connectionVertex = connectionsManager
       .getVertex(ConnectionPointVertex.generateId(mode, moduleKey, solvedPath));
@@ -61,7 +61,7 @@
 
   // eslint-disable-next-line max-lines-per-function
   const getTypeDetails = () : TypeDefinition => {
-    const partialDefinition = $storedDefinition[mode];
+    const partialDefinition = $storedDefinition[usedMode];
     const previousPath = parentPaths.slice(0, parentPaths.length -1);
 
     let tempData = partialDefinition;
@@ -78,10 +78,10 @@
   };
 
   $: isDeep = ["array", "object", "cloudedObject"].includes(getTypeDetails().type);
-  $: containerOrder = mode === "input" ? "flex-row-reverse" : "flex-row";
-  $: deepArrowRotate = mode === "input" ? "rotate-180" : "flex-row-reverse";
-  $: innerTypePosition = mode === "input" ? "-translate-x-[calc(100%_+_6px)]" : "translate-x-[6px] left-[100%]";
-  $: dropAreaAnchoring = mode === "input" ? "right-0" : "left-0";
+  $: containerOrder = usedMode === "input" ? "flex-row-reverse" : "flex-row";
+  $: deepArrowRotate = usedMode === "input" ? "rotate-180" : "flex-row-reverse";
+  $: innerTypePosition = usedMode === "input" ? "-translate-x-[calc(100%_+_6px)]" : "translate-x-[6px] left-[100%]";
+  $: dropAreaAnchoring = usedMode === "input" ? "right-0" : "left-0";
 
   let canEditType = ["array", "cloudedObject"].includes(getTypeDetails().type);
 
@@ -128,7 +128,7 @@
       let fieldName = isArray ? "data" : "subtype";
 
       const updatedDefinition = clone(value);
-      let currentStep = updatedDefinition[mode];
+      let currentStep = updatedDefinition[usedMode];
       const previousPath = parentPaths.slice(0, parentPaths.length);
 
       for (let path of previousPath) {
@@ -176,7 +176,7 @@
 
 <div class="relative">
   <div class="relative flex {containerOrder} justify-center items-center">
-    <Draggable dragElement={dotDrag} dragType="{mode}" dragData="{connectionVertex}">
+    <Draggable dragElement={dotDrag} dragType="{usedMode}" dragData="{connectionVertex}">
       <div bind:this={dotDrag} class="w-4 h-4 rounded flex justify-center items-center hover:bg-offWhite bg-transparent transition-all"> <!-- Clickable section -->
         <Typedot size={2} type={getTypeDetails()}/>
       </div>
@@ -196,7 +196,7 @@
   {#if deepOpen && isDeep}
     <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-1 min-w-[3.5rem]">
       {#each deepProperties as property}
-        <EditableProperty storedDefinition={storedDefinition} mode={mode} parentPaths={[...parentPaths, property.key]}>
+        <EditableProperty storedDefinition={storedDefinition} mode={usedMode} parentPaths={[...parentPaths, property.key]}>
           <svelte:self mode={mode} parentPaths={[...parentPaths, property.key]}/>
         </EditableProperty>
       {/each}
