@@ -248,7 +248,7 @@ export class UIBusinessOperation {
     if(currentConnectionPoint === undefined) return;
     if(currentConnectionPoint.type === targetConnectionPoint.type) return;
 
-    const currentIsOutput = ["output", "module"].includes(currentConnectionPoint.type);
+    const currentIsOutput = ["output", "module", "functionalOrigin"].includes(currentConnectionPoint.type);
     const [origin, target] = currentIsOutput
       ? [currentConnectionPoint, targetConnectionPoint]
       : [targetConnectionPoint, currentConnectionPoint];
@@ -295,6 +295,7 @@ export class UIBusinessOperation {
     origin : ConnectionPointVertex, target : ConnectionPointVertex) : void
   {
     this.configuration.update(modules => {
+      console.log("i'm adding shit here");
       const targetModule = get(this.configuration).find(module => module.key == target.parentKey);
       const targetModuleDependencies = get(targetModule.dependencies);
       const alreadyPresent = targetModuleDependencies.findIndex(dependency => {

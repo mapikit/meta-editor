@@ -7,18 +7,21 @@
   import { getContext, onMount, setContext } from "svelte";
   import type { CanvasUtils } from "../canvas-utils";
   import ModularDeps from "./modular-deps.svelte";
-  import { ConnectionPointVertex } from "../helpers/connection-vertex";
+  import { ConnectionPointVertex, VertexType } from "../helpers/connection-vertex";
   import { connectionsManager } from "../helpers/connections-manager";
   import type { UIBusinessOperation } from "src/entities/business-operation";
   import Draggable from "../draggable.svelte";
-  import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
+  import type { ArchitectContext, DragElement } from "src/entities/auxiliary-entities/architect-context";
   import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
   import { writable } from "svelte/store";
   import FunctionalDeps from "./functional-deps.svelte";
+  import DropArea from "../drop-area.svelte";
 
   export let moduleConfig : ModuleCard;
   export let trash : HTMLDivElement;
   let modularDepsButton : HTMLDivElement;
+  let titleElement : HTMLElement;
+  let funcDepsButton : HTMLDivElement;
 
   const { storedDefinition } = moduleConfig;
   const canvasUtils = getContext<CanvasUtils>("canvasContext");
@@ -27,6 +30,8 @@
   const { configuration } = currentBop;
   const { dragging, draggingElement } = architectContext;
   let connectionVertex : ConnectionPointVertex;
+  let funcOriginConnectionVertex : ConnectionPointVertex;
+  let funcTargetConnectionVertex : ConnectionPointVertex;
   const openSection = writable("output");
 
   setContext("openSection", openSection);
@@ -35,24 +40,31 @@
   $: functionalDepsOpen = $openSection === "function";
   $: modularDepsOpen = $openSection === "module";
 
-  // eslint-disable-next-line max-lines-per-function
-  onMount(() => {
+  const solveConnectionVertex = (path : string, element : HTMLElement, type : VertexType) : ConnectionPointVertex => {
     const moduleKey = moduleConfig.getBopTransformedKey();
-    const solvedPath = "";
 
-    connectionVertex = connectionsManager
-      .getVertex(ConnectionPointVertex.generateId("module", moduleKey, solvedPath));
+    let result = connectionsManager
+      .getVertex(ConnectionPointVertex.generateId(type, moduleKey, path));
 
-    if (connectionVertex === undefined) {
-      connectionVertex = ConnectionPointVertex
-        .buildNew("function", solvedPath, moduleKey, "module", modularDepsButton);
+    if (result === undefined) {
+      result = ConnectionPointVertex
+        .buildNew("function", path, moduleKey, type, element);
 
-      connectionsManager.registerVertex(connectionVertex);
+      connectionsManager.registerVertex(result);
     }
 
-    connectionVertex.element = modularDepsButton;
+    result.element = element;
     connectionsManager.refreshConnections($configuration);
     canvasUtils.redrawConnections();
+
+    return result;
+  };
+
+
+  onMount(() => {
+    connectionVertex = solveConnectionVertex("", modularDepsButton, "module");
+    funcOriginConnectionVertex = solveConnectionVertex("", titleElement, "functionalOrigin");
+    funcTargetConnectionVertex = solveConnectionVertex("", funcDepsButton, "functionalTarget");
   });
   
   $: cardInfo = $storedDefinition;
@@ -71,17 +83,26 @@
     type: "object",
     subtype: cardInfo.output,
   };
+
+  const connectFunctional = (element : DragElement<ConnectionPointVertex>) : void => {
+    console.log("a");
+    currentBop.solveConnection(funcOriginConnectionVertex, element.data);
+    connectionsManager.refreshConnections($configuration);
+    canvasUtils.redrawConnections();
+  };
 </script>
 
 
 {#if cardInfo !== undefined}
   <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion} onMove={canvasUtils.redrawConnections}>
+    <DropArea acceptTypes={["functional"]} onDropContent={connectFunctional} debug={true}/>
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"
           on:click={() => { openSection.set(functionalDepsOpen ? "NONE" : "function"); }}
+          bind:this={funcDepsButton}
         > F </div>
-        <div class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>
+        <div bind:this={titleElement} class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>
         <Draggable style="h-6 absolute w-6 right-1" dragElement={modularDepsButton} dragType={"output"} dragData={connectionVertex}>
           <div class="h-6 absolute w-6 bg-norbalt-200 rounded text-center text-offWhite hover:bg-norbalt-100 transition-all"
           bind:this={modularDepsButton}
@@ -105,7 +126,7 @@
         <ModularDeps outputValues={outputValues}/>
       {/if}
       {#if functionalDepsOpen}
-        <FunctionalDeps />
+        <FunctionalDeps rootConnectionVertex={funcTargetConnectionVertex}/>
       {/if}
     </div>
   </MovableCard>
