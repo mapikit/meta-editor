@@ -12,12 +12,13 @@
   import type { UIBusinessOperation } from "src/entities/business-operation";
   import Draggable from "../draggable.svelte";
   import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
-	import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
+  import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
+  import { getDeepStoreObject } from "../helpers/get-deep-store-obj";
+  import { writable } from "svelte/store";
 
   export let moduleConfig : ModuleCard;
   export let trash : HTMLDivElement;
   let functionalDepsOpen = false;
-  let modularDepsOpen = false;
   let modularDepsButton : HTMLDivElement;
 
   const { storedDefinition } = moduleConfig;
@@ -27,9 +28,14 @@
   const { configuration } = currentBop;
   const { dragging, draggingElement } = architectContext;
   let connectionVertex : ConnectionPointVertex;
+  const openSection = writable("output");
 
   setContext("moduleConfig", moduleConfig);
+  setContext("openSection", openSection);
 
+  $: modularDepsOpen = $openSection === "module";
+
+  // eslint-disable-next-line max-lines-per-function
   onMount(() => {
     const moduleKey = moduleConfig.getBopTransformedKey();
     const solvedPath = "";
@@ -39,14 +45,17 @@
 
     if (connectionVertex === undefined) {
       connectionVertex = ConnectionPointVertex
-        .buildNew("any", solvedPath, moduleKey, "module", modularDepsButton);
+        .buildNew("function", solvedPath, moduleKey, "module", modularDepsButton);
 
       connectionsManager.registerVertex(connectionVertex);
+      console.log(`Vertex Registered ${connectionVertex.id}`, connectionVertex);
     }
 
     connectionVertex.element = modularDepsButton;
     connectionsManager.refreshConnections($configuration);
     canvasUtils.redrawConnections();
+    console.log(getDeepStoreObject(connectionsManager
+      .getVertex(ConnectionPointVertex.generateId("module", moduleKey, solvedPath))));
   });
   
   $: cardInfo = $storedDefinition;
@@ -73,13 +82,13 @@
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"
-          on:click={() => { functionalDepsOpen = !functionalDepsOpen; }}
+          on:click={() => { functionalDepsOpen = !functionalDepsOpen; openSection.set("functional"); }}
         > F </div>
         <div class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>
         <Draggable style="h-6 absolute w-6 right-1" dragElement={modularDepsButton} dragType={"output"} dragData={connectionVertex}>
           <div class="h-6 absolute w-6 bg-norbalt-200 rounded text-center text-offWhite hover:bg-norbalt-100 transition-all"
           bind:this={modularDepsButton}
-          on:click={() => { modularDepsOpen = !modularDepsOpen; }}
+          on:click={() => { openSection.set(modularDepsOpen ? "NONE" : "module"); }}
           > > </div>
         </Draggable>
       </div>
@@ -95,7 +104,7 @@
           {/each}
         </div>
       </div>
-      {#if modularDepsOpen}
+      {#if modularDepsOpen && $openSection === "module"}
         <ModularDeps outputValues={outputValues}/>
       {/if}
     </div>

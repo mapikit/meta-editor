@@ -2,6 +2,7 @@ import type { Dependency } from "meta-system/dist/src/configuration/business-ope
 import { get } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
 import { ConnectionPointVertex, VertexType } from "./connection-vertex";
+import { getDeepStoreObject } from "./get-deep-store-obj";
 import { DrawableConnection, ModuleConnection } from "./module-connection";
 import { PathUtils } from "./path-utils";
 
@@ -68,7 +69,9 @@ export class ConnectionsManager {
   }
 
   public getFilteredConnections () : ModuleConnection[] {
-    return this.filterDuplicates(this.connections).filter((connection) => connection.canBeDrawn);
+    return this.filterDuplicates(this.connections).filter((connection) => {
+      return connection.canBeDrawn;
+    });
   };
 
   // eslint-disable-next-line max-lines-per-function
@@ -127,6 +130,7 @@ export class ConnectionsManager {
       dependency.origin as ("input" | number),
       this.normalizePathFromDependency(dependency.originPath, connectionMode),
     );
+
     let origin = this.findBestMatchingVertex(originId);
 
     if (!origin) {
@@ -161,12 +165,12 @@ export class ConnectionsManager {
 
   private getDependencytype (dependency : Dependency) : ModuleConnection["mode"] {
     if (!dependency.originPath && !dependency.targetPath) return "functional";
-    if (dependency.originPath.startsWith("module.")) return "module";
+    if (dependency.originPath.startsWith("module.") || dependency.originPath === "module") return "module";
     return "normal";
   }
 
   private normalizePathFromDependency (path : string, connectionMode : ModuleConnection["mode"]) : string {
-    if (connectionMode === "module" && path.startsWith("module.")) { return path.substring(7); }
+    if (connectionMode === "module" && path.startsWith("module.") || path === "module") { return path.substring(7); }
     if (connectionMode === "normal" && path.startsWith("result.")) { return path.substring(7); }
 
     return path;

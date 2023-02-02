@@ -262,9 +262,13 @@ export class UIBusinessOperation {
       const firstPathStep = origin.parentKey === "input" ? ""
         : origin.type === "output" ? "result." : "module.";
 
+      // if it is root modular dependency
+      const originPath = get(origin.propertyPath) === "" && firstPathStep !== "" ? "module"
+        : `${firstPathStep}${get(origin.propertyPath)}`;
+
       const newDependency : UICompliantDependency = {
         origin: origin.parentKey,
-        originPath: `${firstPathStep}${get(origin.propertyPath)}`,
+        originPath,
         targetPath: get(target.propertyPath),
         matchingType: (get(origin.propertyType) === get(target.propertyType)) || get(target.propertyType) === "any",
       };
@@ -279,7 +283,7 @@ export class UIBusinessOperation {
       targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
 
       return modules;
-    });
+    }); 
 
     return undefined;
   }

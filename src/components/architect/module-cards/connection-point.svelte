@@ -15,6 +15,7 @@
   import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
   import { ConnectionPointVertex } from "../helpers/connection-vertex";
   import type { CanvasUtils } from "../canvas-utils";
+  import type { Writable } from "svelte/store";
 
   export let mode : "input" | "output" | "module";
   export let parentPaths : string[] = [];
@@ -27,10 +28,10 @@
   const currentBop = getContext<UIBusinessOperation>("currentBop");
   const context = getContext<ArchitectContext>("architectContext");
   const canvasUtils = getContext<CanvasUtils>("canvasContext");
+  const openSection = getContext<Writable<string>>("openSection");
   let { configuration } = currentBop;
   let { dragging, draggingElement } = context;
   let connectionVertex : ConnectionPointVertex;
-  let deepOpen = false;
 
   // eslint-disable-next-line max-lines-per-function
   onMount(() => {
@@ -82,6 +83,7 @@
   $: deepArrowRotate = usedMode === "input" ? "rotate-180" : "flex-row-reverse";
   $: innerTypePosition = usedMode === "input" ? "-translate-x-[calc(100%_+_6px)]" : "translate-x-[6px] left-[100%]";
   $: dropAreaAnchoring = usedMode === "input" ? "right-0" : "left-0";
+  $: deepOpen = $openSection !== mode ? false : deepOpen;
 
   let canEditType = ["array", "cloudedObject"].includes(getTypeDetails().type);
 
@@ -90,6 +92,8 @@
     deepOpen = !deepOpen;
     connectionsManager.refreshConnections($configuration);
     canvasUtils.redrawConnections();
+
+    if (deepOpen) { openSection.set(mode); }
   };
 
   // eslint-disable-next-line max-lines-per-function
@@ -125,6 +129,7 @@
 
     // eslint-disable-next-line max-lines-per-function
     storedDefinition.update((value) => {
+      console.log("should add a new prop", value[usedMode]);
       let fieldName = isArray ? "data" : "subtype";
 
       const updatedDefinition = clone(value);
@@ -137,15 +142,30 @@
         currentStep = currentStep[path][complimentaryPathName];
       };
 
-      if (!currentStep[previousPath[previousPath.length -1]][fieldName]) {
+      let currentLevelObject = currentStep[previousPath[previousPath.length -1]][fieldName];
+
+      if (!currentLevelObject) {
         currentStep[previousPath[previousPath.length -1]][fieldName] = {};
+        currentLevelObject = currentStep[previousPath[previousPath.length -1]][fieldName];
       }
 
       const indexingIfNotArray = isArray ? 0 : 1;
       const nameIfArray = isArray ? "" : "newProperty";
       let type = isArray ? currentStep[previousPath[previousPath.length -1]]["subtype"] : "string";
-      let availableKeyName = (Object.keys(currentStep[previousPath[previousPath.length -1]][fieldName])
-        .filter((name) => name.includes(nameIfArray)).length + indexingIfNotArray).toString();
+      let availableKeyName = "";
+
+      let currentAvailableIndex = indexingIfNotArray;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const _key of (Object.keys(currentLevelObject))) {
+        const attemptedKey = nameIfArray + currentAvailableIndex;
+        if (!currentLevelObject[attemptedKey]) {
+          availableKeyName = attemptedKey;
+          break;
+        }
+
+        currentAvailableIndex ++;
+      }
+
       let subtype;
 
       if (typeof type === "object" && isArray) {
@@ -153,12 +173,10 @@
         type = "object";
       }
 
-      if (!isArray) {
-        availableKeyName = nameIfArray + availableKeyName;
-      }
-
-      currentStep[previousPath[previousPath.length -1]][fieldName][availableKeyName]
+      currentLevelObject[availableKeyName]
         = { type, required: false, subtype };
+
+      console.log("FINAL VALUE", updatedDefinition[usedMode], nameIfArray, availableKeyName);
 
       return updatedDefinition;
     });
