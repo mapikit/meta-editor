@@ -5,7 +5,9 @@
   import clone from "just-clone";
   import TypeSelect from "../../../components/object-definition/type-select.svelte";
   import { onDestroy } from "svelte";
-  import { renameObjKey } from "../../../common/helpers/renameObjectKey";
+  import { omitObjKey, renameObjKey } from "../../../common/helpers/renameObjectKey";
+  import CrossIcon from "../../../icons/cross-icon.svelte";
+  import type { ObjectDefinition } from "@meta-system/object-definition";
 
   let editing = false;
   export let storedDefinition : ModuleCard["storedDefinition"];
@@ -17,6 +19,13 @@
 
   // eslint-disable-next-line max-lines-per-function
   const getCurrentType = () : string => {
+    let tempData = getParentDefinition();
+    if (!tempData) { return "string"; };
+
+    return tempData[currentName].type;
+  };
+
+  const getParentDefinition = () : ObjectDefinition => {
     const finalPath = [...parentPaths.slice(0, parentPaths.length -1)];
     let tempData = $storedDefinition[mode];
     for (let path of finalPath) {
@@ -32,9 +41,7 @@
       tempData = tempData[path]["subtype"];
     }
 
-    if (!tempData) { return "string"; };
-
-    return tempData[currentName].type;
+    return tempData;
   };
 
   let currentName = parentPaths[parentPaths.length -1];
@@ -45,6 +52,8 @@
 
   let initialSubtype = newSubtype;
   
+  $: isLastArrayItem = $storedDefinition && isItemOfArray && getParentDefinition()[Number(currentName) + 1] === undefined;
+
   const startEditing = (ev : MouseEvent) : void => {
     ev.stopPropagation();
 
@@ -68,6 +77,7 @@
       tempData = tempData[path]["subtype"];
     }
 
+    if (!tempData[currentName]) { return; } // when the prop was removed
     if (currentName === newName && tempData[currentName].type === currentType) { return; }
 
     currentName = newName;
@@ -120,6 +130,32 @@
     editing = false;
   };
 
+  // eslint-disable-next-line max-lines-per-function
+  const removeProp = () : void => {
+    const finalPath = [...parentPaths.slice(0, parentPaths.length -1)];
+
+    // eslint-disable-next-line max-lines-per-function
+    storedDefinition.update((currentValue) => {
+      const clonedValue = clone(currentValue);
+      let tempData : any = clonedValue[mode];
+      let lastComplimentary = "";
+      for (let path of finalPath) {
+        let complimentaryPathName = tempData[path].type === "array" ? "data" : "subtype";
+        if (path === finalPath[finalPath.length -1]) {
+          tempData = tempData[path];
+          lastComplimentary = complimentaryPathName;
+          break;
+        };
+
+        tempData = tempData[path][complimentaryPathName];
+      }
+
+      tempData[lastComplimentary] = omitObjKey(currentName, tempData[lastComplimentary]);
+
+      return clonedValue;
+    });
+  };
+
   const stopPropagation = (ev : Event) : void => {
     ev.stopPropagation();
   };
@@ -128,15 +164,23 @@
 </script>
 
 {#if !editing}
-<div class="flex {containerOrder} px-1 justify-end mt-0.5 first:mt-0 text-xs"
+<div class="flex {containerOrder} px-1 justify-end mt-0.5 first:mt-0 text-xs items-center"
   on:dblclick={startEditing}
 >
+  {#if isLastArrayItem}
+    <div on:click={removeProp} class="w-4 h-full stroke-offWhite flex justify-center items-center cursor-pointer p-1">
+      <CrossIcon style="stroke-inherit w-1.5 h-1.5" />
+    </div>
+  {/if}
   <div class="whitespace-nowrap"> {currentName} </div>
   <div class="w-2"/>
   <slot />
 </div>
 {:else}
-<div use:clickOutside on:outclick={confirmData} on:mousedown={stopPropagation} on:keydown={stopPropagation} on:keyup={stopPropagation} on:dblclick={stopPropagation} class="w-28 px-1 text-xs flex {containerOrder} flex-nowrap">
+<div use:clickOutside on:outclick={confirmData} on:mousedown={stopPropagation} on:keydown={stopPropagation} on:keyup={stopPropagation} on:dblclick={stopPropagation} class="w-28 px-1 text-xs flex {containerOrder} items-center flex-nowrap">
+  <div on:click={removeProp} class="w-3 h-full stroke-offWhite flex justify-center items-center cursor-pointer">
+    <CrossIcon style="stroke-inherit w-1.5 h-1.5" />
+  </div>
   <StringField bind:propValue={newName} size={"small"}/>
   <div class="w-1"/>
   <TypeSelect bind:currentType={newType} bind:currentSubtype={newSubtype} size={"small"} omittedTypes={["object"]}/>

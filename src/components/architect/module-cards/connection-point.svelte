@@ -129,7 +129,6 @@
 
     // eslint-disable-next-line max-lines-per-function
     storedDefinition.update((value) => {
-      console.log("should add a new prop", value[usedMode]);
       let fieldName = isArray ? "data" : "subtype";
 
       const updatedDefinition = clone(value);
@@ -173,10 +172,8 @@
         type = "object";
       }
 
-      currentLevelObject[availableKeyName]
+      currentLevelObject[isArray ? currentAvailableIndex : availableKeyName]
         = { type, required: false, subtype };
-
-      console.log("FINAL VALUE", updatedDefinition[usedMode], nameIfArray, availableKeyName);
 
       return updatedDefinition;
     });
@@ -214,9 +211,11 @@
   {#if deepOpen && isDeep}
     <div class="absolute bg-norbalt-200 shadow rounded {innerTypePosition} py-1 flex flex-col justify-end -top-1 min-w-[3.5rem]">
       {#each deepProperties as property}
+        {#key [...parentPaths, property.key].join("")}
         <EditableProperty storedDefinition={storedDefinition} mode={usedMode} parentPaths={[...parentPaths, property.key]}>
           <svelte:self mode={mode} parentPaths={[...parentPaths, property.key]}/>
         </EditableProperty>
+        {/key}
       {/each}
       {#if canEditType}
         <div class="border cursor-pointer rounded border-norbalt-100 hover:border-offWhite stroke-norbalt-100 hover:stroke-offWhite transition-all p-1 mx-1 flex justify-center items-center mt-1.5 first:mt-0"

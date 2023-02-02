@@ -14,9 +14,12 @@
   export let configuration : ModuleCard;
   const storedDefinition = configuration.storedDefinition;
   const formatStore = writable($storedDefinition.input ?? {});
+  const canvasUtils = getContext<CanvasUtils>("canvasContext");
+  const openSection = writable("output");
+
   let previousValue = {};
   setContext("moduleConfig", configuration);
-  const canvasUtils = getContext<CanvasUtils>("canvasContext");
+  setContext("openSection", openSection);
 
   $: inputValues = Object.keys($storedDefinition.input ?? {});
 

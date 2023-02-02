@@ -30,8 +30,8 @@
   let connectionVertex : ConnectionPointVertex;
   const openSection = writable("output");
 
-  setContext("moduleConfig", moduleConfig);
   setContext("openSection", openSection);
+  setContext("moduleConfig", moduleConfig);
 
   $: modularDepsOpen = $openSection === "module";
 
@@ -48,14 +48,11 @@
         .buildNew("function", solvedPath, moduleKey, "module", modularDepsButton);
 
       connectionsManager.registerVertex(connectionVertex);
-      console.log(`Vertex Registered ${connectionVertex.id}`, connectionVertex);
     }
 
     connectionVertex.element = modularDepsButton;
     connectionsManager.refreshConnections($configuration);
     canvasUtils.redrawConnections();
-    console.log(getDeepStoreObject(connectionsManager
-      .getVertex(ConnectionPointVertex.generateId("module", moduleKey, solvedPath))));
   });
   
   $: cardInfo = $storedDefinition;
