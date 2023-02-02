@@ -32,11 +32,6 @@ export class ModuleConnection {
     this.connectionOrigin = origin;
     this.connectionTarget = target;
     this.mode = mode;
-
-    if ((get(this.connectionOrigin.propertyPath)
-    || get(this.connectionTarget.propertyPath)) && this.mode === "functional") {
-      throw Error("Functional Dependency created with paths - there was probably an error with the code");
-    }
   };
 
   public setOptimalConnectionIds (originId : string, targetId : string) : void {
@@ -84,6 +79,7 @@ export class ModuleConnection {
 
   public getDependency () : UICompliantDependency & { targetModule : number | "input" } {
     const originPathAdditionalStep = this.mode === "normal" ? "result." : this.mode === "module" ? "module." : "";
+
     return {
       matchingType: false,
       origin: this.connectionOrigin.parentKey,

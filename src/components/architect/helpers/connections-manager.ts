@@ -2,7 +2,6 @@ import type { Dependency } from "meta-system/dist/src/configuration/business-ope
 import { get } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
 import { ConnectionPointVertex, VertexType } from "./connection-vertex";
-import { getDeepStoreObject } from "./get-deep-store-obj";
 import { DrawableConnection, ModuleConnection } from "./module-connection";
 import { PathUtils } from "./path-utils";
 
@@ -173,7 +172,7 @@ export class ConnectionsManager {
     if (connectionMode === "module" && path.startsWith("module.") || path === "module") { return path.substring(7); }
     if (connectionMode === "normal" && path.startsWith("result.")) { return path.substring(7); }
 
-    return path;
+    return undefined;
   }
 }
 
