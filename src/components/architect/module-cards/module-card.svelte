@@ -13,12 +13,11 @@
   import Draggable from "../draggable.svelte";
   import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
   import ConnectionPointDragTraces from "./connection-point-drag-traces.svelte";
-  import { getDeepStoreObject } from "../helpers/get-deep-store-obj";
   import { writable } from "svelte/store";
+  import FunctionalDeps from "./functional-deps.svelte";
 
   export let moduleConfig : ModuleCard;
   export let trash : HTMLDivElement;
-  let functionalDepsOpen = false;
   let modularDepsButton : HTMLDivElement;
 
   const { storedDefinition } = moduleConfig;
@@ -33,6 +32,7 @@
   setContext("openSection", openSection);
   setContext("moduleConfig", moduleConfig);
 
+  $: functionalDepsOpen = $openSection === "function";
   $: modularDepsOpen = $openSection === "module";
 
   // eslint-disable-next-line max-lines-per-function
@@ -79,7 +79,7 @@
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"
-          on:click={() => { functionalDepsOpen = !functionalDepsOpen; openSection.set("functional"); }}
+          on:click={() => { openSection.set(functionalDepsOpen ? "NONE" : "function"); }}
         > F </div>
         <div class="text-sm text-offWhite px-9"> {moduleConfig.moduleName} </div>
         <Draggable style="h-6 absolute w-6 right-1" dragElement={modularDepsButton} dragType={"output"} dragData={connectionVertex}>
@@ -101,8 +101,11 @@
           {/each}
         </div>
       </div>
-      {#if modularDepsOpen && $openSection === "module"}
+      {#if modularDepsOpen}
         <ModularDeps outputValues={outputValues}/>
+      {/if}
+      {#if functionalDepsOpen}
+        <FunctionalDeps />
       {/if}
     </div>
   </MovableCard>

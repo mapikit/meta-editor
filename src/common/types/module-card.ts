@@ -126,4 +126,8 @@ export class ModuleCard {
   public getBopTransformedKey () : number | "input" {
     return this.key === -1 ? "input" : this.key;
   }
+
+  public getFunctionalDependencies () : UICompliantDependency[] {
+    return get(this.dependencies).filter((dep) => dep.originPath === undefined && dep.targetPath === undefined);
+  };
 }
