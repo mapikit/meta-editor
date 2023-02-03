@@ -68,6 +68,19 @@
     canvasUtils.redrawConnections();
   });
 
+  const reorderDependency = (currentIndex : number, targetIndex : number) : void => {
+    moduleConfig.reorderDependency(currentIndex, targetIndex);
+    connectionsManager.refreshConnections($configuration);
+    canvasUtils.redrawConnections();
+  };
+
+  $: arrowUpClass = current === 0 ?
+    "stroke-norbalt-100 cursor-not-allowed" :
+    "cursor-pointer stroke-offWhite hover:stroke-white hover:bg-norbalt-100";
+
+  $: arrowDownClass = current === amount -1 ?
+    "stroke-norbalt-100 cursor-not-allowed" :
+    "cursor-pointer stroke-offWhite hover:stroke-white hover:bg-norbalt-100";
 </script>
 <div class="text-xs mt-1.5 ">
   {#if !dependency}
@@ -89,11 +102,15 @@
           {currentBop.getModuleByKey(dependency.origin).moduleName}
         </div>
       </div>
-      <div class="rounded stroke-offWhite hover:stroke-white ml-1 h-3 w-4 flex justify-center items-center cursor-pointer bg-transparent hover:bg-norbalt-100">
-        <ChevronIcon style="stroke-inherit transition-all rotate-0 w-1.5 h-1.5 mt-0.5" />
-      </div>
-      <div class="rounded stroke-offWhite hover:stroke-white ml-1 h-3 w-4 flex justify-center items-center cursor-pointer bg-transparent hover:bg-norbalt-100">
+      <div class="rounded ml-0.5 h-3 w-4 flex justify-center items-center bg-transparent {arrowUpClass}"
+        on:click={() => {if (current === 0) {return;} reorderDependency(current, current-1);}}
+      >
         <ChevronIcon style="stroke-inherit transition-all rotate-180 w-1.5 h-1.5" />
+      </div>
+      <div class="rounded ml-1 h-3 w-4 flex justify-center items-center bg-transparent {arrowDownClass}"
+        on:click={() => {if (current === amount -1) {return;} reorderDependency(current, current+1);}}
+      >
+        <ChevronIcon style="stroke-inherit transition-all rotate-0 w-1.5 h-1.5 mt-0.5" />
       </div>
     </div>
   {/if}

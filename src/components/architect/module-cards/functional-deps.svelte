@@ -21,7 +21,7 @@
 <div class="absolute right-[calc(100%_+_0.5rem)] top-0 bg-norbalt-200 px-1.5 pb-1.5 rounded shadow">
   {#key Symbol(JSON.stringify(functionalDeps))} <!-- Ensures things updates together with deps -->
     {#each functionalDeps as dependency, index}
-      <FunctionalDep dependency={dependency} current={index}, amount={functionalDeps.length}/>
+      <FunctionalDep dependency={dependency} current={index} amount={functionalDeps.length}/>
     {/each}
     <FunctionalDep />
   {/key}

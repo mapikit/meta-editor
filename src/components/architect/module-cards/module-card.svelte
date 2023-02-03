@@ -86,7 +86,6 @@
   };
 
   const connectFunctional = (element : DragElement<ConnectionPointVertex>) : void => {
-    console.log(getDeepStoreObject(element.data));
     currentBop.solveConnection(funcOriginConnectionVertex, element.data);
     connectionsManager.refreshConnections($configuration);
     canvasUtils.redrawConnections();
@@ -107,7 +106,7 @@
         <Draggable style="h-6 absolute w-6 right-1" dragElement={modularDepsButton} dragType={"output"} dragData={connectionVertex}>
           <div class="h-6 absolute w-6 bg-norbalt-200 rounded text-center text-offWhite hover:bg-norbalt-100 transition-all"
           bind:this={modularDepsButton}
-          on:click={() => { openSection.set(modularDepsOpen ? "NONE" : "module"); console.log("aaaaaaaaaaaa", modularDepsOpen);}}
+          on:click={() => { openSection.set(modularDepsOpen ? "NONE" : "module");}}
           > > </div>
         </Draggable>
       </div>

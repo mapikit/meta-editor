@@ -26,6 +26,5 @@
 
 {#if selectedComponent !== undefined}
   <svelte:component this={selectedComponent} bind:propValue={propValue} updateFunction={updateFunction} bind:subtype={subtype}
-    on:click="{() => { console.log(subtype); }}"
   />
 {/if}

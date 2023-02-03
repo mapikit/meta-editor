@@ -85,6 +85,7 @@ export class ModuleCard {
     this.getBopTransformedKey = this.getBopTransformedKey.bind(this);
     this.getConflictingDependencyIndex = this.getConflictingDependencyIndex.bind(this);
     this.getFunctionalDependencies = this.getFunctionalDependencies.bind(this);
+    this.reorderDependency = this.reorderDependency.bind(this);
 
     if (parameters.storedDefinition) {
       this.storedDefinition.set(parameters.storedDefinition);
@@ -131,4 +132,18 @@ export class ModuleCard {
   public getFunctionalDependencies () : UICompliantDependency[] {
     return get(this.dependencies).filter((dep) => dep.originPath === undefined && dep.targetPath === undefined);
   };
+
+  public reorderDependency (depPosition : number, targetPosition : number) : void {
+    this.dependencies.update((currentValue) => {
+      const currentItem = currentValue[depPosition];
+      currentValue.splice(depPosition, 1);
+
+      const result = [
+        ...currentValue.slice(0, targetPosition),
+        currentItem,
+        ...currentValue.slice(targetPosition, currentValue.length)];
+
+      return result;
+    });
+  }
 }
