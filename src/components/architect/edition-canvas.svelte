@@ -8,7 +8,7 @@
   import InputCard from "./input-card.svelte";
   import OutputCard from "./output-card.svelte";
   import type { UIBusinessOperation } from "../../entities/business-operation";
-  import { get } from "svelte/store";
+  import { get, writable } from "svelte/store";
   import type { ModuleCard } from "../../common/types/module-card";
   import { connectionsManager } from "./helpers/connections-manager";
   import { History } from "../../common/helpers/generic-history";
@@ -95,24 +95,29 @@
   function handleMouseMove (event : MouseEvent) : void {
     editingContext.mousePos.set({ x: event.clientX, y: event.clientY });
 
-    if(editingContext.isPanning) {
+    if(editingContext.isPanning && event.buttons === 1) {
+      panningActive.set(true);
       editingContext.originPos.update(origin => {
         origin.moveBy(event.movementX, event.movementY);
         return origin;
       });
-    } else if(editingContext.isCutting) {
-      // TODO cut
+
+      return;
     }
+
+    panningActive.set(false);
   }
 
+  $: panningActive = writable(false);
   $: scale = editingContext.scale;
   $: originPos = editingContext.originPos;
 
   function handleMouseWheel (e : WheelEvent) : void {
     if(e.deltaY > 0) editingContext.scale.set($scale / 1.1) ;
     else if(e.deltaY < 0) editingContext.scale.set($scale * 1.1);
+
     originPos.set($originPos.moveBy(
-      ...$originPos.newPointer(new Coordinate(e.x, e.y)).scale(-0.1*Math.sign(e.deltaY)).decompose(),
+      ...$originPos.newPointer(new Coordinate(e.x, e.y)).scale(-0.1*Math.sign(e.deltaY * -1)).decompose(),
     ));
   }
 
@@ -122,10 +127,11 @@
     if ($dragging) return "cursor-grabbing";
     if ($mouseOverDraggable) return "cursor-grab";
     if (editingContext.isCutting) return "cursor-crosshair";
-    if (editingContext.isPanning) return "cursor-grab";
+    if (editingContext.isPanning && !$panningActive) return "cursor-grab";
+    if (editingContext.isPanning && $panningActive) return "cursor-grabbing";
   };
 
-  $: cursorStyle = getCursorStyle($dragging, $mouseOverDraggable, $currentMode);
+  $: cursorStyle = getCursorStyle($dragging, $mouseOverDraggable, $currentMode, $panningActive);
   let { mousePos, draggingElement, dragging, mouseOverModule } = editingContext;
 
   $: pos = $mousePos;
@@ -168,6 +174,7 @@ on:mousemove={handleMouseMove}
   <div class="absolute bottom-0">
     {$dragging } : { $draggingElement?.type }
     OverModule: {$mouseOverModule?.type }
+    {panningActive};
   </div>
   <div class="modulesArea" 
     on:mousedown={startMovement}

@@ -21,7 +21,6 @@
     mouseOverModule.set({ type: "drop_area", element });
     isOverSelf = true; ;
 
-    const isAccepted = acceptTypes.includes(($draggingElement)?.type);
     if (isAccepted) {
       dropEnabled = true;
     }
@@ -39,7 +38,6 @@
   const drop = (e : MouseEvent) : void => {
     if (e.button === 1) { return; }
 
-    const isAccepted = acceptTypes.includes(($draggingElement)?.type);
     if (isAccepted) {
       onDropContent($draggingElement);
       dropEnabled = false;
@@ -48,7 +46,8 @@
     return;
   };
 
-  $: clickThrough = $dragging ? "" : "pointer-events-none";
+  $: isAccepted = $draggingElement && acceptTypes.includes(($draggingElement)?.type);
+  $: clickThrough = $dragging && isAccepted ? "" : "pointer-events-none";
   $: debugStyle = debug ? "border border-roseRed" : "";
   $: validOverStyle = dropEnabled && $dragging ? "backdrop-brightness-[2]" : "";
 </script>

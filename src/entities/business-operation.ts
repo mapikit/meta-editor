@@ -295,7 +295,6 @@ export class UIBusinessOperation {
     origin : ConnectionPointVertex, target : ConnectionPointVertex) : void
   {
     this.configuration.update(modules => {
-      console.log("i'm adding shit here");
       const targetModule = get(this.configuration).find(module => module.key == target.parentKey);
       const targetModuleDependencies = get(targetModule.dependencies);
       const alreadyPresent = targetModuleDependencies.findIndex(dependency => {
@@ -310,6 +309,10 @@ export class UIBusinessOperation {
         .update((currentValue) => { currentValue.unshift({ origin: origin.parentKey }); return currentValue; });
       return modules;
     });
+  }
+
+  public getModuleByKey (key : number) : ModuleCard {
+    return get(this.configuration).find((module) => module.key === key);
   }
 
   // eslint-disable-next-line max-lines-per-function

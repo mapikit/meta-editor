@@ -45,14 +45,14 @@ export class ConnectionPointVertex {
 
   // The functional origin is just the moduleKey, but the functional target is under the list;
   public static generateId (type : VertexType, parentKey : number | "input", path : string) : string {
-    const usedPath = type === "functionalOrigin" || type === "functionalTarget" ? "" : `.${path}`;
+    // const usedPath = type === "functionalOrigin" || type === "functionalTarget" ? "" : `.${path}`;
 
     // for the root as the parent (modular or functional deps)
-    if (path === "") {
+    if (path === "" || path === undefined) {
       return `${type}.${parentKey}`;
     }
 
-    return `${type}.${parentKey}${usedPath}`;
+    return `${type}.${parentKey}.${path}`;
   }
 
   /** Corrects a path based on the presence of arrays in it */

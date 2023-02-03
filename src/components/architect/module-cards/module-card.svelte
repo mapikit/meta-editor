@@ -16,6 +16,7 @@
   import { writable } from "svelte/store";
   import FunctionalDeps from "./functional-deps.svelte";
   import DropArea from "../drop-area.svelte";
+  import { getDeepStoreObject } from "../helpers/get-deep-store-obj";
 
   export let moduleConfig : ModuleCard;
   export let trash : HTMLDivElement;
@@ -63,7 +64,7 @@
 
   onMount(() => {
     connectionVertex = solveConnectionVertex("", modularDepsButton, "module");
-    funcOriginConnectionVertex = solveConnectionVertex("", titleElement, "functionalOrigin");
+    funcOriginConnectionVertex = solveConnectionVertex("", modularDepsButton, "functionalOrigin");
     funcTargetConnectionVertex = solveConnectionVertex("", funcDepsButton, "functionalTarget");
   });
   
@@ -85,7 +86,7 @@
   };
 
   const connectFunctional = (element : DragElement<ConnectionPointVertex>) : void => {
-    console.log("a");
+    console.log(getDeepStoreObject(element.data));
     currentBop.solveConnection(funcOriginConnectionVertex, element.data);
     connectionsManager.refreshConnections($configuration);
     canvasUtils.redrawConnections();
@@ -95,7 +96,7 @@
 
 {#if cardInfo !== undefined}
   <MovableCard moduleConfig={moduleConfig} on:movementStopped={attemptDeletion} onMove={canvasUtils.redrawConnections}>
-    <DropArea acceptTypes={["functional"]} onDropContent={connectFunctional} debug={true}/>
+    <DropArea acceptTypes={["functional"]} onDropContent={connectFunctional} style="absolute z-10 rounded"/>
     <div class="select-none min-w-[120px] bg-norbalt-350 rounded shadow-light">
       <div class="relative w-full h-8 rounded-t bg-norbalt-200 flex justify-center items-center">
         <div class="h-6 absolute w-6 bg-norbalt-200 rounded left-1 text-center text-offWhite hover:bg-norbalt-100 transition-all"
@@ -106,7 +107,7 @@
         <Draggable style="h-6 absolute w-6 right-1" dragElement={modularDepsButton} dragType={"output"} dragData={connectionVertex}>
           <div class="h-6 absolute w-6 bg-norbalt-200 rounded text-center text-offWhite hover:bg-norbalt-100 transition-all"
           bind:this={modularDepsButton}
-          on:click={() => { openSection.set(modularDepsOpen ? "NONE" : "module"); }}
+          on:click={() => { openSection.set(modularDepsOpen ? "NONE" : "module"); console.log("aaaaaaaaaaaa", modularDepsOpen);}}
           > > </div>
         </Draggable>
       </div>
@@ -126,7 +127,7 @@
         <ModularDeps outputValues={outputValues}/>
       {/if}
       {#if functionalDepsOpen}
-        <FunctionalDeps rootConnectionVertex={funcTargetConnectionVertex}/>
+        <FunctionalDeps/>
       {/if}
     </div>
   </MovableCard>
@@ -142,57 +143,3 @@
 {#if $dragging && (($draggingElement).element === modularDepsButton)}
   <ConnectionPointDragTraces originVertex={connectionVertex}/>
 {/if}
-
-
-
-
-
-
-<style lang="scss">
-  .functionalKnob {
-    position: absolute;
-    left: 0;
-  }
-
-  .IODiv {
-    display: grid;
-    position: relative;
-    align-items: center;
-  }
-  
-  .inputs {
-    grid-column: 1;
-    padding-right: 6px;
-  }
-
-  .undefinedModule {
-    background-color: rgb(114, 1, 1);
-    padding: 5px 5px 5px 5px;
-    max-width: 300px;
-    text-align: center;
-    z-index: 3;
-  }
-
-  // .divider {
-  //   position: absolute;
-  //   width: 2px;
-  //   height: 80%;
-  //   left: calc(50% - 1px);
-  //   top: 10%;
-  //   background-color: #222222;
-  // }
-
-  .moduleNob {
-    position: absolute;
-    right: 0;
-    top: -3px;
-    text-align: right;
-    z-index: 1;
-  }
-
-  .outputs {
-    text-align: right;
-    grid-column: 2;
-    padding-left: 6px;
-  }
-</style>

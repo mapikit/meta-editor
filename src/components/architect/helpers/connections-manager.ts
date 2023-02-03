@@ -2,6 +2,7 @@ import type { Dependency } from "meta-system/dist/src/configuration/business-ope
 import { get } from "svelte/store";
 import type { ModuleCard } from "../../../common/types/module-card";
 import { ConnectionPointVertex, VertexType } from "./connection-vertex";
+import { getDeepStoreObject } from "./get-deep-store-obj";
 import { DrawableConnection, ModuleConnection } from "./module-connection";
 import { PathUtils } from "./path-utils";
 
@@ -53,7 +54,9 @@ export class ConnectionsManager {
   /** Gets connections to be drawn on the screen */
   public getVisibleConnections () : DrawableConnection[] {
     return this.getFilteredConnections()
-      .map((connection) => connection.getDrawable());
+      .map((connection) => {
+        return connection.getDrawable();
+      });
   }
 
   private findBestMatchingVertex (vertexId : string) : ConnectionPointVertex {
@@ -142,7 +145,7 @@ export class ConnectionsManager {
     const targetId = ConnectionPointVertex.generateId(
       targetVertexType,
       targetmoduleIndex,
-      dependency.targetPath,
+      targetVertexType === "functionalTarget" ? dependency.origin.toString() : dependency.targetPath,
     );
     let target = this.findBestMatchingVertex(targetId);
 
@@ -151,7 +154,7 @@ export class ConnectionsManager {
     }
 
     const result = new ModuleConnection(origin, target, connectionMode);
-    result.setOptimalConnectionIds(originId,targetId);
+    result.setOptimalConnectionIds(originId, targetId);
     return result;
   }
 

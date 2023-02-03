@@ -79,12 +79,16 @@ export class ModuleConnection {
 
   public getDependency () : UICompliantDependency & { targetModule : number | "input" } {
     const originPathAdditionalStep = this.mode === "normal" ? "result." : this.mode === "module" ? "module." : "";
+    const originPath = `${originPathAdditionalStep}${get(this.connectionOrigin.propertyPath)}` === "" ?
+      undefined : `${originPathAdditionalStep}${get(this.connectionOrigin.propertyPath)}`;
+    const targetPath = this.mode === "functional" ? undefined : get(this.connectionTarget.propertyPath) === "" ?
+      undefined : get(this.connectionTarget.propertyPath);
 
     return {
       matchingType: false,
       origin: this.connectionOrigin.parentKey,
-      originPath: `${originPathAdditionalStep}${get(this.connectionOrigin.propertyPath)}`,
-      targetPath: get(this.connectionTarget.propertyPath),
+      originPath,
+      targetPath,
       targetModule: this.connectionTarget.parentKey,
     };
   }

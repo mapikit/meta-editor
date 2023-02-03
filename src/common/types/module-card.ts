@@ -84,6 +84,7 @@ export class ModuleCard {
     this.serialize = this.serialize.bind(this);
     this.getBopTransformedKey = this.getBopTransformedKey.bind(this);
     this.getConflictingDependencyIndex = this.getConflictingDependencyIndex.bind(this);
+    this.getFunctionalDependencies = this.getFunctionalDependencies.bind(this);
 
     if (parameters.storedDefinition) {
       this.storedDefinition.set(parameters.storedDefinition);
@@ -99,7 +100,7 @@ export class ModuleCard {
   public getConflictingDependencyIndex (targetPath : string) : number {
     const conflictingIndex = get(this.dependencies)
       .findIndex(dep => {
-        return targetPath.includes(dep.targetPath) || dep.targetPath.includes(targetPath);
+        return targetPath.includes(dep.targetPath) || dep?.targetPath?.includes(targetPath);
       });
 
     return conflictingIndex;
