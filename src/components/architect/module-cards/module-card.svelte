@@ -16,7 +16,6 @@
   import { writable } from "svelte/store";
   import FunctionalDeps from "./functional-deps.svelte";
   import DropArea from "../drop-area.svelte";
-  import { getDeepStoreObject } from "../helpers/get-deep-store-obj";
 
   export let moduleConfig : ModuleCard;
   export let trash : HTMLDivElement;

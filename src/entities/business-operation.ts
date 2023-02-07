@@ -283,7 +283,7 @@ export class UIBusinessOperation {
       targetModule.dependencies.update((currentValue) => { currentValue.push(newDependency); return currentValue; });
 
       return modules;
-    }); 
+    });
 
     return undefined;
   }
