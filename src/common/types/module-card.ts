@@ -146,4 +146,8 @@ export class ModuleCard {
       return result;
     });
   }
+
+  public getDependencyAtPath (path : string) : UICompliantDependency {
+    return get(this.dependencies).find((dependency) => dependency.targetPath === path);
+  };
 }

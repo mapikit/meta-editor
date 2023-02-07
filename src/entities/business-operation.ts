@@ -13,6 +13,7 @@ import { nanoid } from "nanoid";
 import type { Serialized } from "./serialized-type";
 import type { ConnectionPointVertex } from "src/components/architect/helpers/connection-vertex";
 import type { ModuleConnection } from "src/components/architect/helpers/module-connection";
+import { getDeepStoreObject } from "../components/architect/helpers/get-deep-store-obj";
 
 export type BOpParameters = {
   id : string,
@@ -288,7 +289,36 @@ export class UIBusinessOperation {
     return undefined;
   }
 
-  // TODO Add Constant/Variable Connections
+  // eslint-disable-next-line max-lines-per-function
+  public setStaticConnection (
+    moduleKey : number,
+    targetPath : string,
+    staticConnectionData : BopsConstant | BopsVariable,
+  ) : void {
+    // eslint-disable-next-line max-lines-per-function
+    this.configuration.update((modules) => {
+      const targetModule = modules.find((module) => module.key === moduleKey);
+
+      let conflictingIndex = targetModule.getConflictingDependencyIndex(targetPath);
+      while (conflictingIndex !== -1) {
+        targetModule.dependencies.update((currentValue) => {
+          currentValue.splice(conflictingIndex, 1); return currentValue;});
+        conflictingIndex = targetModule.getConflictingDependencyIndex(targetPath);
+      }
+
+      targetModule.dependencies.update((deps) => {
+        const dependencyValue : UICompliantDependency = {
+          origin: staticConnectionData["value"] !== undefined ? "constant" : "variable",
+          originPath: staticConnectionData.name,
+          targetPath,
+        };
+        deps.push(dependencyValue);
+        return deps;
+      });
+
+      return modules;
+    });
+  }
 
   // eslint-disable-next-line max-lines-per-function
   private addFunctionalDependency (

@@ -16,6 +16,8 @@
   import { ConnectionPointVertex } from "../helpers/connection-vertex";
   import type { CanvasUtils } from "../canvas-utils";
   import type { Writable } from "svelte/store";
+  import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
+  import PlacedConstant from "./placed-constant.svelte";
 
   export let mode : "input" | "output" | "module";
   export let parentPaths : string[] = [];
@@ -23,7 +25,7 @@
   let usedMode = mode === "module" ? "output" : mode;
 
   let moduleConfig = getContext<ModuleCard>("moduleConfig");
-  const { storedDefinition } = moduleConfig;
+  const { storedDefinition, dependencies } = moduleConfig;
 
   const currentBop = getContext<UIBusinessOperation>("currentBop");
   const context = getContext<ArchitectContext>("architectContext");
@@ -179,11 +181,27 @@
     });
   };
 
-  $: acceptedTypes = mode === "input" ? ["output", "constant"] : ["input"];
+  $: acceptedTypes = mode === "input" ? ["output", "constant", "variable"] : ["input"];
+  $: currentDependency = $dependencies && moduleConfig.getDependencyAtPath(
+    ConnectionPointVertex.solvePropertyPath($storedDefinition[usedMode], parentPaths));
+  $: isStaticValue = ["constant", "variable"].includes(currentDependency?.origin as string ?? "");
 
   // eslint-disable-next-line max-lines-per-function
-  const makeConnection = (dropped : DragElement<ConnectionPointVertex>) : void => {
-    currentBop.solveConnection(connectionVertex, dropped.data);
+  const makeConnection = (dropped : DragElement<ConnectionPointVertex | BopsConstant>) : void => {
+    if (dropped.type === "constant" || dropped.type === "variable") {
+      return makeConstantConnection(dropped as DragElement<BopsConstant>);
+    };
+
+    const vertexDropped = dropped as DragElement<ConnectionPointVertex>;
+    currentBop.solveConnection(connectionVertex, vertexDropped.data);
+    connectionsManager.refreshConnections($configuration);
+    canvasUtils.redrawConnections();
+  };
+
+  const makeConstantConnection = (dropped : DragElement<BopsConstant>) : void => {
+    const solvedPath = ConnectionPointVertex.solvePropertyPath($storedDefinition[usedMode], parentPaths);
+
+    currentBop.setStaticConnection(moduleConfig.key, solvedPath, dropped.data);
     connectionsManager.refreshConnections($configuration);
     canvasUtils.redrawConnections();
   };
@@ -206,6 +224,9 @@
     {/if}
   </div>
 
+  {#if isStaticValue}
+    <PlacedConstant constantName={currentDependency.originPath}/>
+  {/if}
   <DropArea style="-translate-y-[0.1rem] top-0 absolute h-[calc(100%_+_0.2rem)] w-[calc(100%_+_4rem)] {dropAreaAnchoring} rounded" acceptTypes={acceptedTypes} onDropContent={makeConnection}/>
 
   {#if deepOpen && isDeep}

@@ -21,7 +21,7 @@ function getExtendedString (value : unknown) : string {
 }
 
 </script>
-<Draggable style="mt-1 h-7 flex flex-row w-full transition-all" dragElement={ref} dragType={"constant"}>
+<Draggable dragData={constant} style="mt-1 h-7 flex flex-row w-full transition-all" dragElement={ref} dragType={"constant"}>
 <div bind:this={ref}>
   <div class="bg-norbalt-350 total h-full max-w-full rounded-md select-none relative pr-6 pl-2 constant-nip">
     <div class="name">{constant.name}: </div>
