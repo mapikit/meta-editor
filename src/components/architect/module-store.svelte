@@ -15,6 +15,7 @@
   import { getContext } from "svelte";
   import StoreModal from "./module-store/store-modal.svelte";
   import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
+	import VariableStore from "./module-store/stores/variable-store .svelte";
   
   export let currentBop : UIBusinessOperation;
   type PossibleStores = "internal" | "external" | "schema" | "bops" | "protocols" | "constants" | "variables";
@@ -89,8 +90,8 @@
       {#if $selectedStore === "external"} <ExternalStore bind:storeLocked={internalLock} bind:search modules={getExternalModules()} bopModules={currentBop.configuration}/> {/if}
       {#if $selectedStore === "bops"} <BopsStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
       {#if $selectedStore === "schema"} <SchemaStore bind:storeLocked={internalLock} bind:search bopModules={currentBop.configuration} /> {/if}
-      {#if $selectedStore === "constants"} <ConstantStore bopModules={currentBop.configuration} bopConstants={currentBop.constants} /> {/if}
-      {#if $selectedStore === "variables"} <div></div> {/if}
+      {#if $selectedStore === "constants"} <ConstantStore /> {/if}
+      {#if $selectedStore === "variables"} <VariableStore /> {/if}
       {#if $selectedStore === "protocols"} <ProtocolsFunctionsStore bind:storeLocked={internalLock} bind:search modules={getProtocolModules($protocols)} /> {/if}
     </div>
   </div>

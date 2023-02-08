@@ -18,6 +18,7 @@
   import type { Writable } from "svelte/store";
   import type { BopsConstant } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
   import PlacedConstant from "./placed-constant.svelte";
+  import PlacedVariable from "./placed-variable.svelte";
 
   export let mode : "input" | "output" | "module";
   export let parentPaths : string[] = [];
@@ -185,6 +186,7 @@
   $: currentDependency = $dependencies && moduleConfig.getDependencyAtPath(
     ConnectionPointVertex.solvePropertyPath($storedDefinition[usedMode], parentPaths));
   $: isStaticValue = ["constant", "variable"].includes(currentDependency?.origin as string ?? "");
+  $: isConstantValue = (currentDependency?.origin as string ?? "") === "constant";
 
   // eslint-disable-next-line max-lines-per-function
   const makeConnection = (dropped : DragElement<ConnectionPointVertex | BopsConstant>) : void => {
@@ -225,7 +227,11 @@
   </div>
 
   {#if isStaticValue}
-    <PlacedConstant constantName={currentDependency.originPath} path={[...parentPaths].join(".")}/>
+    {#if isConstantValue}
+      <PlacedConstant constantName={currentDependency.originPath} path={[...parentPaths].join(".")}/>
+    {:else}
+      <PlacedVariable constantName={currentDependency.originPath} path={[...parentPaths].join(".")}/>
+    {/if}
   {/if}
   <DropArea style="-translate-y-[0.1rem] top-0 absolute h-[calc(100%_+_0.2rem)] w-[calc(100%_+_4rem)] {dropAreaAnchoring} rounded" acceptTypes={acceptedTypes} onDropContent={makeConnection}/>
 
