@@ -225,7 +225,7 @@
   </div>
 
   {#if isStaticValue}
-    <PlacedConstant constantName={currentDependency.originPath}/>
+    <PlacedConstant constantName={currentDependency.originPath} path={[...parentPaths].join(".")}/>
   {/if}
   <DropArea style="-translate-y-[0.1rem] top-0 absolute h-[calc(100%_+_0.2rem)] w-[calc(100%_+_4rem)] {dropAreaAnchoring} rounded" acceptTypes={acceptedTypes} onDropContent={makeConnection}/>
 
