@@ -17,7 +17,7 @@
   let isOverElement = false;
 
   $: constantData = $constants.find((value) => value.name === constantName);
-  $: valueDisplay = typeof constantData.value === "object" ? "object" : constantData.value.toString();
+  $: valueDisplay = typeof constantData?.value === "object" ? "object" : constantData?.value.toString();
   $: color = typeColors[constantData?.type];
   $: isCutting = $currentMode && context.isCutting;
   $: opacity = isCutting && isOverElement ? "opacity-25" : "opacity-0";
@@ -53,7 +53,7 @@
     <Typedot size={2} type={{ type: constantData?.type ?? "string" }}/>
   </div>
   <div class="mr-1 whitespace-nowrap">
-    {constantName} -- {path}
+    {constantName}
   </div>
   <div class="w-[2px] h-[60%] bg-norbalt-100 rounded mr-1"/>
   <div style="color: {color};">

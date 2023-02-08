@@ -3,6 +3,8 @@ import beautify from "json-beautify";
 import type { BopsConstant }
   from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import type { ArchitectContext } from "src/entities/auxiliary-entities/architect-context";
+import type { UIBusinessOperation } from "src/entities/business-operation";
+import CrossIcon from "../../../../icons/cross-icon.svelte";
 import { getContext } from "svelte";
 import { typeColors } from "../../../../common/styles/type-colors";
 import Draggable from "../../draggable.svelte";
@@ -10,26 +12,42 @@ import DraggingStoreConstant from "./dragging-store-constant.svelte";
 
 export let constant : BopsConstant;
 const context = getContext<ArchitectContext>("architectContext");
+const currentBop = getContext<UIBusinessOperation>("currentBop");
 
 let ref : HTMLDivElement;
 let { dragging, draggingElement } = context;
-
+let isHoveringDelete = false;
 
 function getExtendedString (value : unknown) : string {
   if(typeof value === "object") return beautify(value, null, 1);
   return value.toString();
 }
 
+const removeConst = () : void => {
+  currentBop.removeConstant(constant.name);
+};
+
+const toggleHover = () : void => {
+  isHoveringDelete = !isHoveringDelete;
+};
+
+$: hoverStyle = isHoveringDelete ? "stroke-white" : "stroke-transparent";
+
 </script>
-<Draggable dragData={constant} style="mt-1 h-7 flex flex-row w-full transition-all" dragElement={ref} dragType={"constant"}>
-<div bind:this={ref}>
-  <div class="bg-norbalt-350 total h-full max-w-full rounded-md select-none relative pr-6 pl-2 constant-nip">
-    <div class="name">{constant.name}: </div>
-    <abbr title={getExtendedString(constant.value)} class="text" style="color: {typeColors[constant.type]};">{constant.value}</abbr>
-    <div class="indicator" style="color: {typeColors[constant.type]};">  ●</div>
+<div class="mt-1 h-7 flex flex-row w-full transition-all" on:mouseenter={toggleHover} on:mouseleave={toggleHover}>
+  <Draggable dragData={constant} style="h-7 flex flex-row w-full transition-all" dragElement={ref} dragType={"constant"}>
+  <div bind:this={ref}>
+    <div class="bg-norbalt-350 total h-full max-w-full rounded-md select-none relative pr-6 pl-2 constant-nip">
+      <div class="name">{constant.name}: </div>
+      <abbr title={getExtendedString(constant.value)} class="text" style="color: {typeColors[constant.type]};">{constant.value}</abbr>
+      <div class="indicator" style="color: {typeColors[constant.type]};">  ●</div>
+    </div>
   </div>
+  <div class="h-full mt-1 ml-2 w-4 flex justify-center items-center cursor-pointer {hoverStyle} hover:stroke-roseRed transition-all" on:click={removeConst}>
+    <CrossIcon style="stroke-inherit w-2 h-2"/>
+  </div>
+  </Draggable>
 </div>
-</Draggable>
 {#if $dragging && (($draggingElement).element === ref)}
   <DraggingStoreConstant constantName={constant.name}/>
 {/if}

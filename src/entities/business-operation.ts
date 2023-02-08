@@ -363,4 +363,42 @@ export class UIBusinessOperation {
       return dependencies;
     });
   }
+
+  public removeStaticDependency (type : "constant" | "variable", name : string) : void {
+    get(this.configuration).forEach((module) => {
+      const index = get(module.dependencies).findIndex((dep) => dep.originPath === name && dep.origin === type);
+      if (index === -1) { return; }
+
+      module.dependencies.update((deps) => {
+        deps.splice(index, 1);
+        return deps;
+      });
+    });
+  }
+
+  public removeConstant (name : string) : void {
+    const index = get(this.constants).findIndex((constEl) => constEl.name === name);
+    if (index === -1) { return; }
+
+    this.constants.update((consts) => {
+      consts.splice(index,1);
+
+      return consts;
+    });
+
+    this.removeStaticDependency("constant", name);
+  }
+
+  public removeVariable (name : string) : void {
+    const index = get(this.variables).findIndex((varsEl) => varsEl.name === name);
+    if (index === -1) { return; }
+
+    this.variables.update((consts) => {
+      consts.splice(index,1);
+
+      return consts;
+    });
+
+    this.removeStaticDependency("variable", name);
+  }
 }
