@@ -1,0 +1,26 @@
+{
+    "projectName": "test-project",
+    "description": "No description",
+    "createdAt": "2023-03-26T22:27:21.137Z",
+    "updatedAt": "2024-01-31T23:59:06.241Z",
+    "versions": [
+        {
+            "version": "0.1.1",
+            "path": "./versions/0.1.1",
+            "createdAt": "2023-03-26T22:27:21.137Z",
+            "updatedAt": "2023-03-26T22:27:21.137Z"
+        },
+        {
+            "version": "0.1.4",
+            "path": "versions/0.1.4",
+            "createdAt": "2023-03-26T22:27:21.137Z",
+            "updatedAt": "2023-03-26T22:27:21.137Z"
+        },
+        {
+            "version": "0.1.5",
+            "path": "versions/0.1.5",
+            "createdAt": "2023-03-26T22:27:21.137Z",
+            "updatedAt": "2023-03-26T22:27:21.137Z"
+        }
+    ]
+}
