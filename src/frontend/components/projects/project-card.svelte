@@ -6,12 +6,19 @@
 	import Cube from "./buttons/cube.svelte";
 	import Squares from "./buttons/squares.svelte";
 	import Archive from "./buttons/archive.svelte";
+    import EditableTextField from "../common/active-editable-text-field.svelte";
+    import VersionsDropdown from "./versions-dropdown.svelte";
 
     export let project : Project;
 
+    const editingName = writable(false);
+    const projectName = writable(project.projectName);
+
     let expanded = false;
-    let versionsList = project.listVersions();
-    let latestVersion = versionsList.sort((versionA, versionB) => versionB.localeCompare(versionA))[0]
+    let latestVersion = project.versions.sort((a,b) => 
+        b.createdAt.localeCompare(a.createdAt) || // Sort by date
+        b.version.localeCompare(a.version) // If dates are equal, sort by version
+    )[0];
 
     let configs : Writable<SystemConfigurationStore[]> = writable([]);
 
@@ -25,11 +32,6 @@
             ))
         }
     )
-
-    // configs.subscribe(_configs => {
-    //     versionsList = project.listVersions();
-    //     latestVersion = versionsList.sort((versionA, versionB) => versionB.localeCompare(versionA))[0]
-    // })
 
     function editVersion (version : SystemConfigurationStore) : void {
         console.log("Should go to version, for now just logs:", version);
@@ -63,18 +65,19 @@
     }
 
     function editName() : void {
-        console.log("Toggle name edition")
+        editingName.set(!$editingName);
     }
 </script>
 
 <div aria-hidden="true" class="card" on:click={() => expanded = !expanded}>
-    <div class="name">{project.projectName}<img class="pencil" aria-hidden="true" on:click={editName} alt="Edit" src="src/frontend/components/projects/pencil.svg" /></div>
-    <div class="versionsInfo">{project.versions.length} Versions</div>
+    <div class="name"><EditableTextField  editing={editingName} text={projectName} onFinishEdit={() => console.log("Save")}/><img class="pencil" aria-hidden="true" on:click={editName} alt="Edit" src="src/frontend/components/projects/pencil.svg" /></div>
+    <div class="versionsInfo">{project.versions.length} Versions <VersionsDropdown versionsInfos={project.versions}/></div>
     <div class="updateInfo">Edited {getRelevantUpdateInfo()}</div>
     <div class="buttons">
-        <span><Cube/></span>
-        <span class="left-button"><Squares/></span>
-        <span class="right-button"><Archive/></span>
+        <span><Cube version={latestVersion}/></span>
+        <span class="left-button"><Squares version={latestVersion}/></span>
+        <span class="right-button"><Archive version={latestVersion}/></span> 
+        <!-- Above should be changed to project -->
     </div>
 </div>
 
@@ -86,6 +89,7 @@
         margin-left: 17pt;
         margin-right: 17pt;
         width: 100%;
+        height: 32pt;
     }
 
     .left-button {
@@ -102,7 +106,7 @@
         flex-wrap: wrap;
         margin: 20px;
         border-radius: 8pt;
-        background-color: #21264a;
+        background: linear-gradient(to bottom, rgba(21, 21, 55, 1) 0%,rgba(33, 38, 74, 1) 100%);
         width: 200pt;
         height: fit-content;
         padding-bottom: 10pt;
@@ -122,13 +126,14 @@
     .name {
         width: 100%;
         margin-top: 6pt;
-        margin-left: 17pt;
+        margin-left: 13pt;
         height: fit-content;
         font-size: 16pt;
         font-weight: 600;
     }
 
     .versionsInfo {
+        position: relative;
         margin-left: 17pt;
         color: rgba(166, 168, 192, 0.54375);
         height: fit-content;
