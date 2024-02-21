@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
+    import AddItem from "../../../icons/new-icons/add-item.svelte";
     export let version : ProjectVersionInfo;
 
     function duplicateVersion () {
@@ -8,12 +9,20 @@
 </script>
 
 <span class="background" on:click={duplicateVersion} aria-hidden="true">
-<img aria-hidden="true" class="squares" src="src/frontend/components/projects/squares.svg" alt="squares"/>
+<!-- <img aria-hidden="true" class="squares" src="src/frontend/components/projects/squares.svg" alt="squares"/> -->
+    <span class="squares"><AddItem/></span>
 </span>
 
 <style lang="scss">
     .squares {
-        filter: opacity(0.54375) invert(81%) sepia(18%) saturate(284%) hue-rotate(198deg) brightness(83%) contrast(82%);        // stroke: red;
+        stroke-width: 1.3;
+        stroke: rgba(166, 168, 192, 0.54375);;
+        width: 100%;
+        height: 100%;
+    }
+
+    .squares:hover {
+        stroke: rgb(207, 207, 1);
     }
 
     .background {

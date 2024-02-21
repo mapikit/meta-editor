@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
+    import Trash from "../../../icons/new-icons/trash.svelte";
     export let version : ProjectVersionInfo;
 
     function deleteVersion () {
@@ -8,16 +9,20 @@
 </script>
 
 <span class="background" on:click={deleteVersion} aria-hidden="true">
-<img aria-hidden="true" class="trash" src="src/frontend/components/projects/trash.svg" alt="trash"/>
+<!-- <img aria-hidden="true" class="trash" src="src/frontend/components/projects/trash.svg" alt="trash"/> -->
+<span class="trash"><Trash/></span>
 </span>
 
 <style lang="scss">
     .trash {
+        stroke-width: 1.5;
+        stroke: rgba(166, 168, 192, 0.54375);;
+        width: 100%;
         height: 100%;
-        filter: opacity(0.54375) invert(81%) sepia(18%) saturate(284%) hue-rotate(198deg) brightness(83%) contrast(82%);        // stroke: red;
+        transform: translateY(1pt);
     }
 
-    .trash:hover { filter: invert(55%) sepia(51%) saturate(5164%) hue-rotate(319deg) brightness(106%) contrast(95%); }
+    .trash:hover { stroke: rgba(249, 88, 121, 1); }
 
     .background {
         display: inline-flex;
