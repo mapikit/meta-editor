@@ -1,25 +1,27 @@
 <script lang="ts">
-    import { ProjectVersionInfo } from "../../../common/types/project-config-type";
+    import { Project } from "../../../entities/models/project";
     import PassiveEditableTextField from "../common/passive-editable-text-field.svelte";
     import Archive from "./buttons/archive.svelte";
-    import Cube from "./buttons/cube.svelte";
-    import Squares from "./buttons/squares.svelte";
+    import Cube from "./buttons/edit.svelte";
+    import Squares from "./buttons/duplicate.svelte";
+    import { clickOutside } from "../../lib/click-outside-directive";
+    import { CaretDown } from "phosphor-svelte";
 
-    export let versionsInfos : ProjectVersionInfo[] = []
+
+
+    export let parentProject : Project;
     let expanded = false;
-
 </script>
 
-<span aria-hidden="true" class="chevron" on:click={()=>expanded=!expanded}>
-v
+<span aria-hidden="true" class="chevron" on:click={()=>{ expanded=!expanded; }}><CaretDown />
 </span>
 {#if expanded}
-<div class="dropdown">
-    {#each versionsInfos as version}
+<div class="dropdown" use:clickOutside on:click_outside={() => expanded = false}>
+    {#each parentProject.versions as version}
         <div class="version"> <PassiveEditableTextField bind:text={version.version} onFinishEdit={() => console.log("Done editing")}/><span class="buttons">
             <span><Cube version={version}/></span>
-            <span><Squares version={version}/></span>
-            <span><Archive version={version}/></span>
+            <span><Squares version={version} parentProject={parentProject}/></span>
+            <span><Archive version={version} parentProject={parentProject}/></span>
         </span></div><br>
     {/each}
 </div>
@@ -45,14 +47,15 @@ v
     .version {
         align-items: center;
         padding: 2pt;
-        display: flex;
         display: inline-flex;
         width: 100%;
     }
 
     .chevron {
         cursor: pointer;
+        display: inline;
         user-select: none;
+        transform: translateY(25%);
     }
 
     .buttons {
