@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "compile-electron": "tsc && renamer --force --find .js --replace .mjs ./dist/electron/preload*",
-    "run-electron":"electron .",
+    "run-electron": "electron .",
     "start-electron": "run-s compile-electron run-electron",
     "build-electron": "run-s build start-electron",
     "dev-electron": "run-p dev start-electron",
@@ -31,6 +31,7 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-svelte": "^2.34.0",
     "npm-run-all": "^4.1.5",
+    "phosphor-svelte": "^1.4.2",
     "postcss": "^8.4.31",
     "renamer": "^4.0.0",
     "svelte": "^4.2.2",
