@@ -1,14 +1,20 @@
 <script lang="ts">
     import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
+    import { FileSystemController } from "../../../../entities/controllers/file-system-controller";
+    import { Project } from "../../../../entities/models/project";
     import Trash from "../../../icons/new-icons/trash.svelte";
     export let version : ProjectVersionInfo;
-
-    function deleteVersion () {
-        console.log("Should delete version", version.version);
+    export let parentProject : Project;
+    
+    
+    function deleteVersionOrProject () : void {
+        // TODO Alert before deletion
+        if(!version) FileSystemController.removeProject(parentProject);
+        else FileSystemController.removeConfiguration(parentProject, version);
     }
 </script>
 
-<span class="background" on:click={deleteVersion} aria-hidden="true">
+<span class="background" on:click={deleteVersionOrProject} aria-hidden="true">
 <!-- <img aria-hidden="true" class="trash" src="src/frontend/components/projects/trash.svg" alt="trash"/> -->
 <span class="trash"><Trash/></span>
 </span>
@@ -27,7 +33,7 @@
     .background {
         display: inline-flex;
         background-color: #151537;
-        border-radius: 8pt;
+        border-radius: 4pt;
         align-items: center;
         justify-content: center;
         height: 100%;

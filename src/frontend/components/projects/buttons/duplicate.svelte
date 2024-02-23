@@ -1,15 +1,18 @@
 <script lang="ts">
-    import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
+    import { ProjectConfigType, ProjectVersionInfo } from "../../../../common/types/project-config-type";
+    import { FileSystemController } from "../../../../entities/controllers/file-system-controller";
+    import { Project } from "../../../../entities/models/project";
     import AddItem from "../../../icons/new-icons/add-item.svelte";
     export let version : ProjectVersionInfo;
+    export let parentProject : Project;
 
-    function duplicateVersion () {
-        console.log("Should duplicate version", version.version);
+    function duplicateVersion () : void {
+        FileSystemController.duplicateConfiguration(version, parentProject);
+        //TODO update after duplication
     }
 </script>
 
 <span class="background" on:click={duplicateVersion} aria-hidden="true">
-<!-- <img aria-hidden="true" class="squares" src="src/frontend/components/projects/squares.svg" alt="squares"/> -->
     <span class="squares"><AddItem/></span>
 </span>
 
@@ -28,7 +31,7 @@
     .background {
         display: inline-flex;
         background-color: #151537;
-        border-radius: 8pt;
+        border-radius: 4pt;
         align-items: center;
         justify-content: center;
         height: 100%;

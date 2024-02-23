@@ -3,8 +3,8 @@
     import Edit from "../../../icons/new-icons/edit.svelte";
     export let version : ProjectVersionInfo;
 
-    function editVersion () {
-        console.log("Should edit version", version.version);
+    function editVersion () : void {
+        console.log("Should go to version, for now just logs:", version);
     }
 </script>
 <div class="background" on:click={editVersion} aria-hidden="true">
@@ -25,7 +25,7 @@
     .background {
         display: inline-flex;
         background-color: #151537;
-        border-radius: 8pt;
+        border-radius: 4pt;
         align-items: center;
         justify-content: center;
         height: 100%;
