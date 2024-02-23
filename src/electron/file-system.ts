@@ -83,7 +83,7 @@ export class ElectronFileSystem {
       const relativePath = path.relative(projectDirPath, versionPath);
       const date = new Date().toISOString();
 
-      projectConfig.versions.push({ createdAt: date, updatedAt: date,
+      projectConfig.versions.unshift({ createdAt: date, updatedAt: date,
         version: version,
         path: relativePath,
       });
@@ -151,5 +151,11 @@ export class ElectronFileSystem {
     const projectConfigPath = this.getProjectConfigPath(projectInfo.projectName);
     projectInfo.versions = projectInfo.versions.filter(_version => _version.version !== version);
     this.saveFileData(projectConfigPath, projectInfo);
+  }
+
+  @expose
+  static deleteProject (projectInfo : ProjectConfigType) : void {
+    const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
+    fs.rmSync(path.join(projectDirPath), { recursive: true });
   }
 }

@@ -5,6 +5,7 @@ import { SystemConfiguration } from "../models/system-configuration";
 import projectsStore from "../stores/projects-store.js";
 import { SystemConfigurationStore, systemConfigurationsStore } from "../stores/system-configurations-store.js";
 import { MetaEditorInfoType } from "../../common/types/meta-editor-info.js";
+import { ProjectVersionInfo } from "../../common/types/project-config-type.js";
 
 export class FileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
@@ -77,12 +78,13 @@ export class FileSystemController {
     for(const project of availableProjects) await this.loadProjectAndVersions(project);
   }
 
-  public static async duplicateConfiguration (current : SystemConfiguration, parentProject : Project) : Promise<void> {
+  public static async duplicateConfiguration (current : ProjectVersionInfo, parentProject : Project) : Promise<void> {
     const registeredVersions = parentProject.listVersions();
+    const config = await this.fileApi.getVersion(parentProject.projectName, current.version);
     const highestVersion = registeredVersions.sort((versionA, versionB) => versionB.localeCompare(versionA))[0];
     const newVersion = this.getNewVersion(highestVersion);
     const newConfigEntity =
-      new SystemConfiguration({ ...current.duplicate, version: newVersion }, parentProject.identifier);
+      new SystemConfiguration({ ...config, version: newVersion }, parentProject.identifier);
     await this.saveConfiguration(parentProject, newConfigEntity);
   }
 
@@ -101,7 +103,7 @@ export class FileSystemController {
     systemConfigurationsStore.items.update(items => {
       const itemIndex = items.findIndex(item => item.identifier === version.identifier);
       if(itemIndex > -1) items[itemIndex] = new SystemConfigurationStore(version);
-      else items.push(new SystemConfigurationStore(version));
+      else items.unshift(new SystemConfigurationStore(version));
       return items;
     });
 
@@ -114,9 +116,11 @@ export class FileSystemController {
   }
 
 
-  public static async removeConfiguration (parentProject : Project, version : SystemConfiguration) : Promise<void> {
+  // eslint-disable-next-line max-lines-per-function
+  public static async removeConfiguration (parentProject : Project, version : ProjectVersionInfo) : Promise<void> {
     systemConfigurationsStore.items.update(items => {
-      const itemIndex = items.findIndex(item => item.identifier === version.identifier);
+      const projectConfigs = items.filter(item => get(item.projectId) === parentProject.identifier);
+      const itemIndex = projectConfigs.findIndex(item => get(item.version) === version.version);
       items.splice(itemIndex, 1);
       return items;
     });
@@ -130,5 +134,17 @@ export class FileSystemController {
 
     await this.saveProject(parentProject);
     await this.fileApi.deleteVersion(parentProject.toJson(), version.version);
+  }
+
+  public static async removeProject (project : Project) : Promise<void> {
+    systemConfigurationsStore.items.update(items => {
+      return items.filter(item => get(item.projectId) !== project.identifier);
+    });
+
+    projectsStore.items.update(projects => {
+      return projects.filter(_project => _project.identifier !== project.identifier);
+    });
+
+    await this.fileApi.deleteProject(project.toJson());
   }
 }
