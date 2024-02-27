@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ProjectConfigType, ProjectVersionInfo } from "../../../../common/types/project-config-type";
+    import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
     import { FileSystemController } from "../../../../entities/controllers/file-system-controller";
     import { Project } from "../../../../entities/models/project";
     import AddItem from "../../../icons/new-icons/add-item.svelte";
@@ -7,7 +7,7 @@
     export let parentProject : Project;
 
     function duplicateVersion () : void {
-        FileSystemController.duplicateConfiguration(version, parentProject);
+        FileSystemController.create.duplicateConfiguration(version, parentProject);
         //TODO update after duplication
     }
 </script>

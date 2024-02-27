@@ -34,6 +34,9 @@ export class ElectronFileSystem {
   private static get savaDataPath () : string { return path.join(this.appPath, "save-data"); }
   private static get projectsDirPath () : string { return path.join(this.savaDataPath, "projects"); }
   private static get userConfigPath () : string { return path.join(this.savaDataPath, "user-config.json"); }
+  private static get projectArchivePath () : string { return path.join(this.appPath, "archive/projects/"); }
+  private static get versionArchivePath () : string { return path.join(this.appPath, "archive/versions/"); }
+
 
   private static getProjectDirPath (projectName : string) : string {
     return path.join(this.projectsDirPath, projectName);
@@ -87,7 +90,7 @@ export class ElectronFileSystem {
         version: version,
         path: relativePath,
       });
-      versionInfoIndex = projectConfig.versions.length - 1;
+      versionInfoIndex = 0;
     }
 
     return projectConfig.versions[versionInfoIndex].path;
@@ -142,7 +145,9 @@ export class ElectronFileSystem {
     return JSON.parse(fs.readFileSync(versionPath).toString());
   }
 
+
   @expose
+  // TODO change to delete from archive
   static deleteVersion (projectInfo : ProjectConfigType, version : string) : void {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     const versionDir = this.decideVersionDir(projectInfo, version);
@@ -154,8 +159,30 @@ export class ElectronFileSystem {
   }
 
   @expose
+  // TODO change to delete from archive
   static deleteProject (projectInfo : ProjectConfigType) : void {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     fs.rmSync(path.join(projectDirPath), { recursive: true });
+  }
+
+  @expose
+  static achieveProject (projectInfo : ProjectConfigType) : void {
+    const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
+    const archive = path.join(this.projectArchivePath, projectInfo.projectName);
+    fs.mkdirSync(archive, { recursive: true });
+    fs.renameSync(projectDirPath, archive);
+  }
+
+  @expose
+  static achieveVersion (projectInfo : ProjectConfigType, version : string) : void {
+    const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
+    const versionDir = this.decideVersionDir(projectInfo, version);
+    const archive = path.join(this.versionArchivePath, projectInfo.projectName, version);
+    fs.mkdirSync(archive, { recursive: true });
+    fs.renameSync(path.join(projectDirPath, versionDir), archive);
+
+    const projectConfigPath = this.getProjectConfigPath(projectInfo.projectName);
+    projectInfo.versions = projectInfo.versions.filter(_version => _version.version !== version);
+    this.saveFileData(projectConfigPath, projectInfo);
   }
 }
