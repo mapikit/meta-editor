@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "compile-electron": "tsc && renamer --force --find .js --replace .mjs ./dist/electron/preload*",
-    "run-electron":"electron .",
+    "run-electron": "electron .",
     "start-electron": "run-s compile-electron run-electron",
     "build-electron": "run-s build start-electron",
     "dev-electron": "run-p dev start-electron",

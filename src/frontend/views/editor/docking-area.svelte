@@ -2,7 +2,7 @@
 	import { setContext } from "svelte";
 	import { exported } from "../../../entities/stores/dock-subdivision-store";
 	import DockingSubdivision from "./docking-subdivision.svelte";
-	import DraggedDockedView from "./dragged-docked-view.svelte";
+	import DraggedDockedView from "./dragged-docked-panel.svelte";
 	import { DockCursorMutations } from "../../../entities/mutations/dock-cursor-mutations";
 	import dockCursor from "../../../entities/stores/dock-cursor-store";
 

@@ -4,14 +4,26 @@
 	import { CursorMutations } from "../entities/mutations/cursor-mutations";
 	import { SystemConfigurationController } from "../entities/controllers/system-configuration-controller";
 	import { DockController } from "../entities/controllers/dock-controller";
+  import { GenericLayoutStateMutations } from "../entities/mutations/layout-state-mutations";
+  import genericLayoutStateStore from "../entities/stores/generic-layout-state-store";
+  import Loading from "./views/generic/loading.svelte";
 
   onMount(() => {
+    GenericLayoutStateMutations.reset();
+    GenericLayoutStateMutations.setLoading();
     SystemConfigurationController.TESTAddAndLoadConfiguration();
     DockController.bootDefault();
+    GenericLayoutStateMutations.setDone();
   });
+
+  const { loading, ready } = genericLayoutStateStore;
 </script>
 
-<DockingArea />
+{#if !$ready || $loading}
+  <Loading />
+{:else}
+  <DockingArea />
+{/if}
 
 <svelte:body on:mousemove={CursorMutations.positionEventHandler}/>
 <svelte:head>

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Draggable from "../../components/drag-n-drop/draggable.svelte";
-  import DropdownViewSelector from "./dropdown-view-selector.svelte";
+  import DropdownViewSelector from "./dropdown-panel-selector.svelte";
   import { DockMutations } from "../../../entities/mutations/dock-mutations";
 	import { SubdivisionStore } from "../../../entities/stores/dock-subdivision-store";
-	import DockViewContent from "./dockable-view-types/docked-view-content.svelte";
+	import DockViewContent from "./dockable-panel-types/docked-panel-content.svelte";
 
   // This is the holder for views in dock.
   // This contains the logic for changing the view type
