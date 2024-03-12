@@ -1,19 +1,19 @@
 import { TypedKeys } from "../../common/types/typed-keys";
 import { EditorEntityValue } from "./editor-entity-value";
 
-export type DockViewType = "Addon Configure" | "Addons Browse" | "Addons Timeline"
+export type DockPanelType = "Addon Configure" | "Addons Browse" | "Addons Timeline"
 | "Addons" | "BOps Flow" | "Business Operations" | "Modules Store" | "Overview"
 | "Schema Details" | "Configure Schema" | "Schemas" | "Environment Variables";
 
-export class DockViewContent<T extends EditorEntityValue> {
-  public readonly viewType : DockViewType;
-  public readonly entityViewData : T;
-  public readonly type : DockViewType;
+export class DockPanelContent<T extends EditorEntityValue> {
+  public readonly panelType : DockPanelType;
+  public readonly entityPanelData : T;
+  public readonly type : DockPanelType;
   private readonly key : TypedKeys<T, string>;
   private ommitKeyInTitle : boolean;
 
-  public constructor (key : TypedKeys<T, string>, type : DockViewType, entityData ?: T) {
-    this.entityViewData = entityData;
+  public constructor (key : TypedKeys<T, string>, type : DockPanelType, entityData ?: T) {
+    this.entityPanelData = entityData;
     this.key = key;
     this.type = type;
 
@@ -25,6 +25,6 @@ export class DockViewContent<T extends EditorEntityValue> {
   public get title () : string {
     if (this.ommitKeyInTitle) return String(this.type);
 
-    return `${this.type}: ${this.entityViewData[this.key]}`;
+    return `${this.type}: ${this.entityPanelData[this.key]}`;
   }
 }

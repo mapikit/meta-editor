@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { SystemConfiguration } from "../models/system-configuration";
 import { SystemConfigurationMutations } from "../mutations/system-configuration-mutations";
-import { ViewMutations } from "../mutations/view-mutations";
+import { PanelsMutations } from "../mutations/panels-mutations";
 import { systemConfigurationsStore } from "../stores/system-configurations-store";
 
 export class SystemConfigurationController {
@@ -9,7 +9,7 @@ export class SystemConfigurationController {
     const configuration = systemConfigurationsStore.getItemById(configurationId);
 
     SystemConfigurationMutations.loadConfiguration(configurationId);
-    ViewMutations.SetAvailableViewsByLoadingConfiguration(configuration.toEntity());
+    PanelsMutations.SetAvailableViewsByLoadingConfiguration(configuration.toEntity());
   }
 
   public static TESTAddAndLoadConfiguration () : void {

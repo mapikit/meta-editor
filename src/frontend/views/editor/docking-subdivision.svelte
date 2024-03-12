@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { SubdivisionStore, DropPosition } from "../../../entities/stores/dock-subdivision-store";
-	import DockedView from "./docked-view.svelte";
+	import DockedView from "./docked-panel.svelte";
 	import DockControlArea from "./dock-control-area.svelte";
 	import DockingDropArea from "./docking-drop-area.svelte";
 	import { getContext, onDestroy } from "svelte";

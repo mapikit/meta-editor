@@ -4,7 +4,7 @@
 import { nanoid } from "nanoid";
 import { Readable, Writable, derived, get, readable, writable } from "svelte/store";
 import { DockMutations } from "../mutations/dock-mutations";
-import { ViewStore } from "./view-store";
+import { PanelsStore } from "./panels-store";
 import { EditorEntityValue } from "src/entities/models/editor-entity-value";
 
 type DropAreaRules = {
@@ -20,7 +20,7 @@ export class SubdivisionStore {
   public readonly _id = nanoid();
   public readonly ratio : Writable<number> = writable(1);
   public readonly children : Writable<SubdivisionStore[]> = writable([]);
-  public readonly view : Writable<ViewStore<EditorEntityValue>> = writable(null);
+  public readonly view : Writable<PanelsStore<EditorEntityValue>> = writable(null);
   public readonly direction : Writable<"horizontal" | "vertical" | null> = writable(null);
   public readonly parent : Writable<SubdivisionStore | null> = writable(null);
   public readonly dimension : Writable<number> = writable(0);
@@ -37,7 +37,7 @@ export class SubdivisionStore {
   public constructor (opts : { parent ?: SubdivisionStore }) {
     if (opts.parent) DockMutations.setParent(this, opts.parent);
 
-    this.view.set(new ViewStore("", { identifier: this._id }));
+    this.view.set(new PanelsStore("", { identifier: this._id }));
   }
 
   public getFirstAndLastObservables () : { isFirst : Readable<boolean>, isLast : Readable<boolean> } {

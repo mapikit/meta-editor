@@ -17,16 +17,16 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
     this.projectId = projectId;
   }
 
-  identifier : string = nanoid();
-  name : string;
-  version : string;
-  envs ?: EnvironmentVariableEntity[];
-  schemas : SchemaType[];
-  businessOperations : BusinessOperationType[];
-  addons : Addon[];
-  projectId : string;
-  createdAt : Date;
-  updatedAt : Date;
+  public identifier : string = nanoid();
+  public name : string;
+  public version : string;
+  public envs ?: EnvironmentVariableEntity[];
+  public schemas : SchemaType[];
+  public businessOperations : BusinessOperationType[];
+  public addons : Addon[];
+  public projectId : string;
+  public createdAt : Date;
+  public updatedAt : Date;
 
   public toJson () : ConfigurationType {
     return {

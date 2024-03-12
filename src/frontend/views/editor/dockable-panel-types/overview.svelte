@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { SystemConfiguration } from "src/entities/models/system-configuration";
-	import { ViewStore } from "src/entities/stores/view-store";
+	import { PanelsStore } from "src/entities/stores/panels-store";
 
-  export let content : ViewStore<SystemConfiguration>;
+  export let content : PanelsStore<SystemConfiguration>;
 
-  let systemData = content.entityViewData;
+  let systemData = content.entityPanelData;
   let { name, version } = $systemData;
 </script>
 
