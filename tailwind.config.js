@@ -18,7 +18,7 @@ module.exports = {
     },
     colors: {
       white: "#ececfe",
-      offWhite: "#9ba2bc8c",
+      offWhite: "#a6a8c08c",
       roseRed: {
         light: "#ea6e91",
         lighter: "#f6b0c3",
@@ -58,12 +58,12 @@ module.exports = {
       bops: "#fde084",
       protocol: "#ff5c8e",
       norbalt: {
-        100: "#485a8f",
-        200: "#233058",
-        300: "#192341",
+        100: "#454c7c",
+        200: "#323862",
+        300: "#21264a",
         350: "#ff00f4",
-        400: "#12172e",
-        500: "#0c1022"
+        400: "#151537",
+        500: "#10102e"
       },
       transparent: "#00000000"
     }

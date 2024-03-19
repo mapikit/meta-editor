@@ -39,7 +39,7 @@
       <button class="ml-2" on:click={() => { DockMutations.divide(parent, id); }} >
         {"[+]"}
       </button>
-      
+
       <button class="ml-2" on:click={() => { DockMutations.exclude(parent, id); }} >
         {"[delete]"}
       </button>
