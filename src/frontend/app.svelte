@@ -8,6 +8,8 @@
   import genericLayoutStateStore from "../entities/stores/generic-layout-state-store";
   import Loading from "./views/generic/loading.svelte";
   import Layout from "./layout.svelte";
+  import { Route, Switch, navigation } from "./lib/navigation";
+  import Hub from "./views/hub.svelte";
 
   onMount(() => {
     GenericLayoutStateMutations.reset();
@@ -24,7 +26,14 @@
   <Loading />
 {:else}
   <Layout>
-    <DockingArea />
+    <Switch basePath="/">
+      <Route path="/">
+        <Hub />
+      </Route>
+      <Route path="/editor">
+        <DockingArea />
+      </Route>
+    </Switch>
   </Layout>
 {/if}
 
