@@ -31,7 +31,7 @@
   let size;
 
   $: {
-    size = mode === "tall" ? "w-1.5 h-full" : "h-1.5 w-full";
+    size = mode === "tall" ? "w-2 h-full" : "h-2 w-full";
   }
 
   const onDrop = (dragged : SubdivisionStore) : void => {

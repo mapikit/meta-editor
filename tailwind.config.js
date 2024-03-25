@@ -17,8 +17,8 @@ module.exports = {
       titles: ['Livvic', 'sans-serif']
     },
     colors: {
-      white: "#f4f7f7",
-      offWhite: "#9191a1",
+      white: "#ececfe",
+      offWhite: "#a6a8c08c",
       roseRed: {
         light: "#ea6e91",
         lighter: "#f6b0c3",
@@ -58,12 +58,12 @@ module.exports = {
       bops: "#fde084",
       protocol: "#ff5c8e",
       norbalt: {
-        100: "#3a394f",
-        200: "#222234",
-        300: "#181828",
-        350: "#101020",
-        400: "#0f0e1d",
-        500: "#080714"
+        100: "#454c7c",
+        200: "#323862",
+        300: "#21264a",
+        350: "#ff00f4",
+        400: "#151537",
+        500: "#10102e"
       },
       transparent: "#00000000"
     }

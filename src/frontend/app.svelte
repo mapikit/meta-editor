@@ -7,6 +7,9 @@
   import { GenericLayoutStateMutations } from "../entities/mutations/layout-state-mutations";
   import genericLayoutStateStore from "../entities/stores/generic-layout-state-store";
   import Loading from "./views/generic/loading.svelte";
+  import Layout from "./layout.svelte";
+  import { Route, Switch, navigation } from "./lib/navigation";
+  import Hub from "./views/hub.svelte";
 
   onMount(() => {
     GenericLayoutStateMutations.reset();
@@ -22,7 +25,16 @@
 {#if !$ready || $loading}
   <Loading />
 {:else}
-  <DockingArea />
+  <Layout>
+    <Switch basePath="/">
+      <Route path="/">
+        <Hub />
+      </Route>
+      <Route path="/editor">
+        <DockingArea />
+      </Route>
+    </Switch>
+  </Layout>
 {/if}
 
 <svelte:body on:mousemove={CursorMutations.positionEventHandler}/>

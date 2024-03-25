@@ -22,7 +22,7 @@
   }
 </script>
 
-<div class="relative rounded-lg overflow-hidden bg-norbalt-400 w-full h-full select-none shadow-contrast"
+<div class="relative rounded-lg overflow-hidden bg-gradient-to-tr from-norbalt-300 to-norbalt-400 w-full h-full select-none shadow-contrast"
   bind:this={draggedView}
 >
   <Draggable
@@ -33,10 +33,9 @@
     dragData={currentElement}
     minimumDragDistance={3}
   >
-    <header class="w-full h-9 bg-norbalt-300 px-1 py-1 flex flex-row items-center">
+    <header class="w-full h-9 px-1 py-1 flex flex-row items-center">
       <!-- Selects the view Type -->
-      <DropdownViewSelector selectedView={$view}/>
-      <span class="text-offWhite ml-2 whitespace-nowrap"> {$title} </span>
+      <span class="text-offWhite whitespace-nowrap"> {$title} </span>
       <button class="ml-2" on:click={() => { DockMutations.divide(parent, id); }} >
         {"[+]"}
       </button>
@@ -44,9 +43,12 @@
       <button class="ml-2" on:click={() => { DockMutations.exclude(parent, id); }} >
         {"[delete]"}
       </button>
+      <div class="flex flex-row justify-end flex-1">
+        <DropdownViewSelector selectedView={$view}/>
+      </div>
     </header>
   </Draggable>
-  <section class="flex-1 w-full bg-norbalt-400 p-2 h-full flex flex-col justify-center items-center">
+  <section class="flex-1 w-full p-2 h-full flex flex-col justify-center items-center">
     <DockViewContent viewContent={$view}/>
   </section>
 </div>

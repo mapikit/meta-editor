@@ -7,5 +7,11 @@
 </script>
 
 <div>
-{($systemData.value.length).toString()}
+<!-- {($systemData.value.length).toString()} -->
+  {#each $systemData.value as schema }
+    <p> {schema.name} </p>
+  {/each}
+  <div class="w-full p-1">
+
+  </div>
 </div>

@@ -24,7 +24,7 @@
 
 </script>
 
-<main class="p-1.5 h-full w-full overflow-hidden">
+<main class="p-2 h-full w-full overflow-hidden">
   <DockingSubdivision subdivision={mainSubdivision}/>
 </main>
 

@@ -19,7 +19,13 @@ export class SystemConfigurationController {
     stubConfig.envs = [];
     stubConfig.name = "my Test Config";
     stubConfig.projectId = nanoid();
-    stubConfig.schemas = [];
+    stubConfig.schemas = [
+      {
+        "format": {},
+        "identifier": nanoid(),
+        "name": "My Schema",
+      },
+    ];
     stubConfig.version = "0.0.1";
 
     SystemConfigurationMutations.addConfiguration(stubConfig);
