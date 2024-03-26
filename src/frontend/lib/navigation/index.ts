@@ -112,7 +112,7 @@ class Navigation {
   }
 
   public static getNavigator () : Navigation {
-    return new Navigation("/");
+    return new Navigation("/editor");
   }
 
   /** Only works if the path was registered */

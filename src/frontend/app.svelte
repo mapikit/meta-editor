@@ -8,7 +8,7 @@
   import genericLayoutStateStore from "../entities/stores/generic-layout-state-store";
   import Loading from "./views/generic/loading.svelte";
   import Layout from "./layout.svelte";
-  import { Route, Switch, navigation } from "./lib/navigation";
+  import { Route, Switch } from "./lib/navigation";
   import Hub from "./views/hub.svelte";
 
   onMount(() => {

@@ -4,6 +4,7 @@
   import { DockMutations } from "../../../entities/mutations/dock-mutations";
 	import { SubdivisionStore } from "../../../entities/stores/dock-subdivision-store";
 	import DockViewContent from "./dockable-panel-types/docked-panel-content.svelte";
+  import PanelHeader from "./dockable-panel-types/panel-header.svelte";
 
   // This is the holder for views in dock.
   // This contains the logic for changing the view type
@@ -33,20 +34,7 @@
     dragData={currentElement}
     minimumDragDistance={3}
   >
-    <header class="w-full h-9 px-1 py-1 flex flex-row items-center">
-      <!-- Selects the view Type -->
-      <span class="text-offWhite whitespace-nowrap"> {$title} </span>
-      <button class="ml-2" on:click={() => { DockMutations.divide(parent, id); }} >
-        {"[+]"}
-      </button>
-
-      <button class="ml-2" on:click={() => { DockMutations.exclude(parent, id); }} >
-        {"[delete]"}
-      </button>
-      <div class="flex flex-row justify-end flex-1">
-        <DropdownViewSelector selectedView={$view}/>
-      </div>
-    </header>
+    <PanelHeader parent={parent} currentElement={currentElement}/>
   </Draggable>
   <section class="flex-1 w-full p-2 h-full flex flex-col justify-center items-center">
     <DockViewContent viewContent={$view}/>
