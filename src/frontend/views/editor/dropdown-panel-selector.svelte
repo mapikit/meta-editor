@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Selector from "../../components/selector/selector.svelte";
+	import Selector from "../../components/dropdown/selector.svelte";
   import { PanelsStore, availablePanels } from "../../../entities/stores/panels-store";
 	import { PanelsMutations } from "../../../entities/mutations/panels-mutations";
 	import { DockPanelContent } from "../../../entities/models/view-related/dock-panel-content";
