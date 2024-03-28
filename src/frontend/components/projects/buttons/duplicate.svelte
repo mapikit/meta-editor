@@ -2,33 +2,31 @@
     import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
     import { FileSystemController } from "../../../../entities/controllers/file-system-controller";
     import { Project } from "../../../../entities/models/project";
-    import Trash from "../../../icons/new-icons/trash.svelte";
+    import AddItem from "../../../icons/new-icons/add-item.svelte";
     export let version : ProjectVersionInfo;
     export let parentProject : Project;
-    
-    
-    function deleteVersionOrProject () : void {
-        // TODO Alert before deletion
-        if(!version) FileSystemController.archive.project(parentProject);
-        else FileSystemController.archive.configuration(parentProject, version);
+
+    function duplicateVersion () : void {
+        FileSystemController.create.duplicateConfiguration(version, parentProject);
+        //TODO update after duplication
     }
 </script>
 
-<span class="background" on:click={deleteVersionOrProject} aria-hidden="true">
-<!-- <img aria-hidden="true" class="trash" src="src/frontend/components/projects/trash.svg" alt="trash"/> -->
-<span class="trash"><Trash/></span>
+<span class="background" on:click={duplicateVersion} aria-hidden="true">
+    <span class="squares"><AddItem/></span>
 </span>
 
 <style lang="scss">
-    .trash {
-        stroke-width: 1.5;
+    .squares {
+        stroke-width: 1.3;
         stroke: rgba(166, 168, 192, 0.54375);;
         width: 100%;
         height: 100%;
-        transform: translateY(1pt);
     }
 
-    .trash:hover { stroke: rgba(249, 88, 121, 1); }
+    .squares:hover {
+        stroke: rgb(207, 207, 1);
+    }
 
     .background {
         display: inline-flex;

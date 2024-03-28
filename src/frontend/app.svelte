@@ -10,6 +10,7 @@
   import Layout from "./layout.svelte";
   import { Route, Switch, navigation } from "./lib/navigation";
   import Hub from "./views/hub.svelte";
+    import Projects from "./views/projects.svelte";
 
   onMount(() => {
     GenericLayoutStateMutations.reset();
@@ -32,6 +33,9 @@
       </Route>
       <Route path="/editor">
         <DockingArea />
+      </Route>
+      <Route path="/projects">
+        <Projects />
       </Route>
     </Switch>
   </Layout>
