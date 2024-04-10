@@ -11,14 +11,16 @@
     }
 </script>
 
-<div class="hub">
-<div class="hubContent">
-<span class="icon"><MetaSystemIcon/></span>
-<div class="projects">
-    <div class="projectsHeader">
-        <div class="title">Recent Projects</div><span aria-hidden="true" class="allProjectsButton" on:click={navigateToProjects}>Open All Projects > </span>
+<div class="pt-6 w-full h-full bg-gradient-to-b from-norbalt-600 to-norbalt-400">
+<div class="grid flex-wrap w-5/6 mx-auto self-center">
+<span class="justify-center stroke-2 h-60 pb-10"><MetaSystemIcon/></span>
+<div>
+    <div class="inline-flex w-full">
+        <div class="text-3xl font-semibold text-white">Recent Projects</div>
+        <span aria-hidden="true" 
+        class="bg-norbalt-400 rounded font-bold p-2 text-base text-w text-offWhite mr-0 ml-auto hover:bg-norbalt-300 select-none cursor-pointer" on:click={navigateToProjects}>Open All Projects > </span>
     </div>
-    <div class="projectsCardsSection">
+    <div class="flex flex-nowrap w-full py-4 space-x-4">
         {#await FileSystemController.load.projects()}
         Loading Recent Projects...
         {:then _result}
@@ -28,82 +30,11 @@
         {/await}
     </div>
 </div>
-<div class="plugins">
-    <div class="title">Browse Plugins</div>
-    <div class="pluginsCardsSection">
+<div>
+    <div class="text-3xl font-semibold text-white">Browse Plugins</div>
+    <div class="text-offWhite">
         Coming Soon...
     </div>
 </div>
 </div>
 </div>
-
-<style lang="scss">
-    .hub {
-        padding-top: 6%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, rgba(12, 12, 38, 1) 0%,rgba(21, 21, 55, 1) 100%);
-    }
-
-    .hubContent {
-        margin-left: 15%;
-        margin-right: 15%;
-        display: grid;
-        flex-wrap: wrap;
-        width: 70%;
-    }
-
-    .projectsHeader {
-        display: inline-flex;
-        width: 100%;
-    }
-
-    .allProjectsButton{
-        background-color: #21264a;
-        border-radius: 4pt;
-        padding: 6pt;
-        font-size: 12pt;
-        font-weight: 700;
-        color: rgba(166, 168, 192, 0.54375);
-        user-select: none;
-        margin-right: 0;
-        margin-left: auto;
-    }
-
-    .allProjectsButton:hover {
-        background-color: rgba(166, 168, 192, 0.24375);
-    }
-
-    .icon {
-        justify-self: center;
-        stroke-width: 1.5;
-        height: 153pt;
-        padding-bottom: 7%;
-    }
-    
-    .title {
-        font-size: 24px;
-        color: rgba(236, 236, 254, 1);
-        font-style: normal;
-        font-size: 24px;
-        font-weight: 600;
-        line-height: 1.2;
-        letter-spacing: 0px;
-    }
-
-    .projectsCardsSection {
-        display: flex;
-        flex-wrap: nowrap;
-        width: 100%;
-        padding-bottom: 17pt;
-        padding-top: 7pt;
-    }
-
-    .projectsCardsSection :global(.card):not(:first-child) {
-        margin-left: 10pt;
-    }
-
-    .pluginsCardsSection {
-        color: rgba(166, 168, 192, 0.54375);
-    }
-</style> 
