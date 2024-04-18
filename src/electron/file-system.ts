@@ -166,7 +166,7 @@ export class ElectronFileSystem {
   }
 
   @expose
-  static async achieveProject (projectInfo : ProjectConfigType) : Promise<void> {
+  static async archiveProject (projectInfo : ProjectConfigType) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     const archive = path.join(this.projectArchivePath, projectInfo.projectName);
     fs.mkdirSync(archive, { recursive: true });
@@ -174,7 +174,7 @@ export class ElectronFileSystem {
   }
 
   @expose
-  static async achieveVersion (projectInfo : ProjectConfigType, version : string) : Promise<void> {
+  static async archiveVersion (projectInfo : ProjectConfigType, version : string) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     const versionDir = this.decideVersionDir(projectInfo, version);
     const archive = path.join(this.versionArchivePath, projectInfo.projectName, version);
