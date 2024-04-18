@@ -84,7 +84,7 @@ export class FSVersionsFunctions {
   }
 
   // Update Functions
-  public static async duplicateConfiguration (current : ProjectVersionInfo, parentProject : Project) : Promise<void> {
+  public static async duplicate (current : ProjectVersionInfo, parentProject : Project) : Promise<void> {
     const registeredVersions = parentProject.listVersions();
     const config = await this.fileApi.getVersion(parentProject.projectName, current.version);
     const highestVersion = registeredVersions.sort((versionA, versionB) => versionB.localeCompare(versionA))[0];

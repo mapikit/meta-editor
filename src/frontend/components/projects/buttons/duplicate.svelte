@@ -7,7 +7,7 @@
     export let parentProject : Project;
 
     function duplicateVersion () : void {
-        FileSystemController.create.duplicateConfiguration(version, parentProject);
+        FileSystemController.versions.duplicate(version, parentProject);
         //TODO update after duplication
     }
 </script>

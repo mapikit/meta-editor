@@ -9,8 +9,8 @@
     
     function deleteVersionOrProject () : void {
         // TODO Alert before deletion
-        if(!version) FileSystemController.archive.project(parentProject);
-        else FileSystemController.archive.configuration(parentProject, version);
+        if(!version) FileSystemController.projects.archive(parentProject);
+        else FileSystemController.versions.archive(parentProject, version);
     }
 </script>
 

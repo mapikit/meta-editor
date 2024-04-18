@@ -8,24 +8,16 @@
     const projects = projectsStore.items;
 </script>
 
-<div class="projectsView">
-<span class="title">Your Projects</span><CreateButton/><ImportButton/><br>
-    {#await FileSystemController.load.projects()}
+<div>
+<span class="text-4xl font-semibold pl-6">Your Projects</span><CreateButton/><ImportButton/><br>
+    {#await FileSystemController.projects.loadAll()}
         Loading Projects...
     {:then result}
-        <div class="projectsContainer">
+        <div class="flex flex-wrap">
             {#each $projects as project}
                     <ProjectCard project={project}/>
                 {/each}
         </div>
     {/await}
 </div>
-
-<style lang="scss">
-    .title {
-        font-size: 24pt;
-        font-weight: 600;
-        padding-left: 17pt;
-    }
-</style>
 

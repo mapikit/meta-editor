@@ -21,7 +21,7 @@
         class="bg-norbalt-400 rounded font-bold p-2 text-base text-w text-offWhite mr-0 ml-auto hover:bg-norbalt-300 select-none cursor-pointer" on:click={navigateToProjects}>Open All Projects > </span>
     </div>
     <div class="flex flex-nowrap w-full py-4 space-x-4">
-        {#await FileSystemController.load.projects()}
+        {#await FileSystemController.projects.loadAll()}
         Loading Recent Projects...
         {:then _result}
             {#each get(projectsStore.items) as project}

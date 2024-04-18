@@ -26,50 +26,8 @@
     }
 </script>
 
-<div aria-hidden="true" class="card">
-    <div class="name">{project.projectName}</div>
-    <div class="versionsInfo">{project.versions.length} Versions</div>
-    <div class="updateInfo">Edited {getRelevantUpdateInfo()}</div>
+<div aria-hidden="true" class="flex flex-wrap rounded-md bg-norbalt-300 w-64 h-fit pb-4">
+    <div class="w-full mt-2 ml-5 h-fit text-xl font-bold">{project.projectName}</div>
+    <div class="relative inline-flex ml-5 text-offWhite h-fit">{project.versions.length} Versions</div>
+    <div class="mt-6 w-full h-fit mx-5 bg-norbalt-400 rounded-md pl-2 text-offWhite">Edited {getRelevantUpdateInfo()}</div>
 </div>
-
-
-<style lang="scss">
-    .card {
-        display: flex;
-        flex-wrap: wrap;
-        border-radius: 8pt;
-        background-color: #21264aFF;
-        width: 200pt;
-        height: fit-content;
-        padding-bottom: 10pt;
-    }
-
-    .name {
-        width: 100%;
-        margin-top: 6pt;
-        margin-left: 13pt;
-        height: fit-content;
-        font-size: 16pt;
-        font-weight: 600;
-    }
-
-    .versionsInfo {
-        position: relative;
-        display: inline-flex;
-        margin-left: 17pt;
-        color: rgba(166, 168, 192, 0.54375);
-        height: fit-content;
-    }
-
-    .updateInfo {
-        margin-top: 16pt;
-        width: 100%;
-        height: fit-content;
-        margin-left: 17pt;
-        margin-right: 17pt;
-        background-color: #151537;
-        border-radius: 4pt;
-        padding-left: 6pt;
-        color: rgba(166, 168, 192, 0.54375);
-    }
-</style>
