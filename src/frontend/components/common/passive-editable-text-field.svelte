@@ -33,17 +33,6 @@
 
 </script>
 
-<span class="outer">
-        <input bind:value={text} type="text" class="field" on:keydown={handleKey} on:focusout={confirmEdition} bind:this={field}/>
+<span>
+        <input bind:value={text} type="text" class="inline-flex bg-norbalt-500 w-full rounded-md pl-2" on:keydown={handleKey} on:focusout={confirmEdition} bind:this={field}/>
 </span>
-
-<style lang="scss">
-    .field {
-        display: inline-flex;
-        background-color: #151537;
-        width: 100%;
-        border-radius: 4pt;
-        padding-left: 4pt;
-    }
-
-</style>

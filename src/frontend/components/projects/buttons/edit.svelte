@@ -7,31 +7,7 @@
         console.log("Should go to version, for now just logs:", version);
     }
 </script>
-<div class="background" on:click={editVersion} aria-hidden="true">
+<div class="inline-flex bg-norbalt-400 rounded-md h-full p-1 aspect-square" on:click={editVersion} aria-hidden="true">
 <!-- <img aria-hidden="true" class="cube" src="src/frontend/components/projects/cube.svg" alt="package"/> -->
-<span class="cube"><Edit/></span>
+<span class="stroke-offWhite stroke w-full h-full hover:stroke-brightGreen"><Edit/></span>
 </div>
-<style lang="scss">
-    .cube {
-        stroke-width: 1.3;
-        stroke: rgba(166, 168, 192, 0.54375);
-        width: 100%;
-        height: 100%;
-    }
-
-    .cube:hover { stroke: rgba(60, 246, 145, 1); }
-
-
-    .background {
-        display: inline-flex;
-        background-color: #151537;
-        border-radius: 4pt;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        padding: 4pt;
-        aspect-ratio: 1 / 1;
-    }
-
-
-</style>

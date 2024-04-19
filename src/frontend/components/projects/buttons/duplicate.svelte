@@ -12,30 +12,6 @@
     }
 </script>
 
-<span class="background" on:click={duplicateVersion} aria-hidden="true">
-    <span class="squares"><AddItem/></span>
+<span class="inline-flex bg-norbalt-400 rounded-md h-full p-1 aspect-square" on:click={duplicateVersion} aria-hidden="true">
+    <span class="stroke-offWhite stroke w-full h-full hover:stroke-ochreYellow"><AddItem/></span>
 </span>
-
-<style lang="scss">
-    .squares {
-        stroke-width: 1.3;
-        stroke: rgba(166, 168, 192, 0.54375);;
-        width: 100%;
-        height: 100%;
-    }
-
-    .squares:hover {
-        stroke: rgb(207, 207, 1);
-    }
-
-    .background {
-        display: inline-flex;
-        background-color: #151537;
-        border-radius: 4pt;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        padding: 4pt;
-        aspect-ratio: 1 / 1;
-    }
-</style>

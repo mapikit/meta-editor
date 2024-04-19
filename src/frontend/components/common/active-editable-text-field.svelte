@@ -38,18 +38,8 @@
 
 <span class="default" style="padding-left: {$editing ? "0pt" : "4pt"};">
     {#if $editing}
-        <input bind:value={$text} type="text" class="editingStyle" size="{$text.length}" on:keydown={handleKey} use:init/>
+        <input bind:value={$text} type="text" class="inline-flex bg-norbalt-500 rounded-md pl-2" size="{$text.length}" on:keydown={handleKey} use:init/>
     {:else}
         {$text}
     {/if}
 </span>
-
-<style lang="scss">
-    .editingStyle {
-        display: inline-flex;
-        background-color: #151537;
-        border-radius: 4pt;
-        padding-left: 4pt;
-    }
-
-</style>
