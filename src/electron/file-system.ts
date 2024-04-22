@@ -191,7 +191,7 @@ export class ElectronFileSystem {
   static async moveDir (src : string, target : string) : Promise<void> {
     try { fs.renameSync(src, target); }
     catch(error) {
-      if(error.code === "ENOTEMPTY") {
+      if(error.code === "ENOTEMPTY") { //If unable to move due to directory not being empty
         const innerPaths = fs.readdirSync(src);
         for(const innerPath of innerPaths) await this.moveDir(path.join(src, innerPath), path.join(target, innerPath));
         await this.moveDir(src, target);
