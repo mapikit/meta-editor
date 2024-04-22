@@ -55,7 +55,8 @@ export class ElectronFileSystem {
   }
 
   @expose
-  static saveVersion (project : ProjectConfigType, config : ConfigurationType, editor : MetaEditorInfoType) : void {
+  static async saveVersion (project : ProjectConfigType, config : ConfigurationType, editor : MetaEditorInfoType) 
+    : Promise<void> {
     const projectDir = this.getProjectDirPath(project.projectName);
     const proposedVersionDir = this.decideVersionDir(project, config.version);
     const versionPath = path.isAbsolute(proposedVersionDir) ?
@@ -64,11 +65,11 @@ export class ElectronFileSystem {
 
     this.saveFileData(this.getProjectConfigPath(project.projectName), project);
     this.saveFileData(versionPath, config);
-    this.saveMetaEditorInfo(versionDir, editor);
+    await this.saveMetaEditorInfo(versionDir, editor);
   }
 
   @expose
-  static saveMetaEditorInfo (versionDirPath : string, metaEditorInfo : MetaEditorInfoType) : void {
+  static async saveMetaEditorInfo (versionDirPath : string, metaEditorInfo : MetaEditorInfoType) : Promise<void> {
     const metaEditorInfoDir = path.join(versionDirPath, ".meta-editor");
     fs.mkdirSync(metaEditorInfoDir, { recursive: true });
 
@@ -104,41 +105,41 @@ export class ElectronFileSystem {
   }
 
   @expose
-  static saveUserInfo (userConfig : UserConfigType) : void {
+  static async saveUserInfo (userConfig : UserConfigType) : Promise<void> {
     this.saveFileData(this.userConfigPath, userConfig);
   }
 
   @expose
-  static saveProjectInfo (project : ProjectConfigType) : void {
+  static async saveProjectInfo (project : ProjectConfigType) : Promise<void> {
     const projectConfig = this.getProjectConfigPath(project.projectName);
 
     this.saveFileData(projectConfig, project);
   }
 
   @expose
-  static getUserConfig () : UserConfigType {
+  static async getUserConfig () : Promise<UserConfigType> {
     const userConfigPath = this.userConfigPath;
     if(!fs.existsSync(userConfigPath)) return undefined;
     return JSON.parse(fs.readFileSync(this.userConfigPath).toString());
   }
 
   @expose
-  static getAvailableProjects () : string[] {
+  static async getAvailableProjects () : Promise<string[]> {
     const projectsPath = this.projectsDirPath;
     if(!fs.existsSync(projectsPath)) return [];
     return fs.readdirSync(this.projectsDirPath);
   }
 
   @expose
-  static getProjectInfo (projectName : string) : ProjectConfigType {
+  static async getProjectInfo (projectName : string) : Promise<ProjectConfigType> {
     const projectPath = this.getProjectConfigPath(projectName);
     if(!fs.existsSync(projectPath)) return undefined;
     return JSON.parse(fs.readFileSync(projectPath).toString());
   }
 
   @expose
-  static getVersion (projectName : string, version : string) : ConfigurationType {
-    const prj = this.getProjectInfo(projectName);
+  static async getVersion (projectName : string, version : string) : Promise<ConfigurationType> {
+    const prj = await this.getProjectInfo(projectName);
     this.decideVersionDir(prj, version);
     const versionPath = this.getVersionConfigPath(projectName, version);
     if(!fs.existsSync(versionPath)) return undefined;
@@ -148,7 +149,7 @@ export class ElectronFileSystem {
 
   @expose
   // TODO change to delete from archive
-  static deleteVersion (projectInfo : ProjectConfigType, version : string) : void {
+  static async deleteVersion (projectInfo : ProjectConfigType, version : string) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     const versionDir = this.decideVersionDir(projectInfo, version);
     fs.rmSync(path.join(projectDirPath, versionDir), { recursive: true });
@@ -160,7 +161,7 @@ export class ElectronFileSystem {
 
   @expose
   // TODO change to delete from archive
-  static deleteProject (projectInfo : ProjectConfigType) : void {
+  static async deleteProject (projectInfo : ProjectConfigType) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     fs.rmSync(path.join(projectDirPath), { recursive: true });
   }
