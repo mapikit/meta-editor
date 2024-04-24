@@ -9,20 +9,20 @@
 
 
     function getRelevantUpdateInfo () : string {
-        const values = {
-            year: 31556952000,
-            month: 2629746000,
-            day: 86400000,
-            hour: 3600000,
-            minute: 60000,
-        }
+      const values = {
+        year: 31556952000,
+        month: 2629746000,
+        day: 86400000,
+        hour: 3600000,
+        minute: 60000,
+      };
 
-        const value = new Date().valueOf()-project.updatedAt.valueOf();
-        for(const key in values) {
-            let div =  value / values[key];
-            if( div > 1) return `${Math.floor(div)} ${key}${div >= 2 ? "s" : ""} ago` 
-        }
-        return "moments ago";
+      const value = new Date().valueOf()-project.updatedAt.valueOf();
+      for(const key in values) {
+        let div =  value / values[key];
+        if(div > 1) return `${Math.floor(div)} ${key}${div >= 2 ? "s" : ""} ago`;
+      }
+      return "moments ago";
     }
 </script>
 

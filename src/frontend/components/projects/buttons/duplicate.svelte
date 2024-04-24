@@ -7,8 +7,8 @@
     export let parentProject : Project;
 
     function duplicateVersion () : void {
-        FileSystemController.versions.duplicate(version, parentProject);
-        //TODO update after duplication
+      FileSystemController.versionsController.duplicate(version, parentProject);
+      //TODO update after duplication
     }
 </script>
 

@@ -5,12 +5,12 @@
     import Trash from "../../../icons/new-icons/trash.svelte";
     export let version : ProjectVersionInfo;
     export let parentProject : Project;
-    
-    
+
+
     function deleteVersionOrProject () : void {
-        // TODO Alert before deletion
-        if(!version) FileSystemController.projects.archive(parentProject);
-        else FileSystemController.versions.archive(parentProject, version);
+      // TODO Alert before deletion
+      if(!version) FileSystemController.projectsController.archive(parentProject);
+      else FileSystemController.versionsController.archive(parentProject, version);
     }
 </script>
 

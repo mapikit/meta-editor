@@ -1,6 +1,6 @@
 <script lang="ts">
-function createProject() : void {
-    console.log("Should create a project")
+function createProject () : void {
+  console.log("Should create a project");
 }
 </script>
 

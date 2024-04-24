@@ -18,7 +18,7 @@ export class PanelsMutations {
     };
 
     const createIdentifierToValue = <T extends object>(value : T) : {value : T} & EditorEntityValue => {
-      console.log(value, '<<<<<<<<<<<<<<<<<');
+      console.log(value, "<<<<<<<<<<<<<<<<<");
       return { identifier: nanoid(), value };
     };
 

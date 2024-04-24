@@ -4,7 +4,7 @@
     export let version : ProjectVersionInfo;
 
     function editVersion () : void {
-        console.log("Should go to version, for now just logs:", version);
+      console.log("Should go to version, for now just logs:", version);
     }
 </script>
 <div class="inline-flex bg-norbalt-400 rounded-md h-full p-1 aspect-square" on:click={editVersion} aria-hidden="true">

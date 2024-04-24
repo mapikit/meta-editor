@@ -7,7 +7,7 @@
     import { navigation } from "../lib/navigation";
 
     function navigateToProjects () {
-        navigation.navigateTo("/projects")
+      navigation.navigateTo("/projects");
     }
 </script>
 
@@ -17,11 +17,11 @@
 <div>
     <div class="inline-flex w-full">
         <div class="text-3xl font-semibold text-white">Recent Projects</div>
-        <span aria-hidden="true" 
+        <span aria-hidden="true"
         class="bg-norbalt-400 rounded font-bold p-2 text-base text-w text-offWhite mr-0 ml-auto hover:bg-norbalt-300 select-none cursor-pointer" on:click={navigateToProjects}>Open All Projects > </span>
     </div>
     <div class="flex flex-nowrap w-full py-4 space-x-4">
-        {#await FileSystemController.projects.loadAll()}
+        {#await FileSystemController.projectsController.loadAll()}
         Loading Recent Projects...
         {:then _result}
             {#each get(projectsStore.items) as project}

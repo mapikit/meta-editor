@@ -10,7 +10,7 @@
 
 <div>
 <span class="text-4xl font-semibold pl-6">Your Projects</span><CreateButton/><ImportButton/><br>
-    {#await FileSystemController.projects.loadAll()}
+    {#await FileSystemController.projectsController.loadAll()}
         Loading Projects...
     {:then result}
         <div class="flex flex-wrap">
