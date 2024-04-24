@@ -3,9 +3,9 @@ import { InjectedWindow } from "../../../common/types/injected-window";
 import { Project } from "../../models/project";
 import projectsStore from "../../stores/projects-store";
 import { systemConfigurationsStore } from "../../stores/system-configurations-store";
-import { FSVersionsFunctions } from "./versions";
+import { VersionsFileSystemController } from "./versions";
 
-export class FSProjectFunctions {
+export class ProjectsFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
 
   // Archive functions
@@ -43,7 +43,7 @@ export class FSProjectFunctions {
   }
 
   // Load Functions
-  public static async load (projectName : string) : Promise<Project> {
+  public static async load (projectName : string) : Promise<void> {
     const project = await this.import(projectName);
     projectsStore.items.update(items => {
       const index = items.findIndex(item => item.projectName === projectName);
@@ -51,12 +51,12 @@ export class FSProjectFunctions {
       else items.push(project);
       return items;
     });
-    return project;
   }
 
   public static async loadWithVersions (projectName : string) : Promise<void> {
-    const project = await this.load(projectName);
-    await FSVersionsFunctions.loadByProject(project);
+    await this.load(projectName);
+    const project = get(projectsStore.items).find(_project => _project.projectName === projectName);
+    await VersionsFileSystemController.loadByProject(project);
   }
 
   public static async loadAll () : Promise<void> {

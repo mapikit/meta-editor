@@ -55,7 +55,7 @@ export class ElectronFileSystem {
   }
 
   @expose
-  static async saveVersion (project : ProjectConfigType, config : ConfigurationType, editor : MetaEditorInfoType) 
+  static async saveVersion (project : ProjectConfigType, config : ConfigurationType, editor : MetaEditorInfoType)
     : Promise<void> {
     const projectDir = this.getProjectDirPath(project.projectName);
     const proposedVersionDir = this.decideVersionDir(project, config.version);

@@ -6,9 +6,9 @@ import { SystemConfigurationStore, systemConfigurationsStore } from "../../store
 import { InjectedWindow } from "../../../common/types/injected-window";
 import { SystemConfiguration } from "../../models/system-configuration";
 import { MetaEditorInfoType } from "../../../common/types/meta-editor-info";
-import { FSProjectFunctions } from "./projects";
+import { ProjectsFileSystemController } from "./projects";
 
-export class FSVersionsFunctions {
+export class VersionsFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
 
   // eslint-disable-next-line max-lines-per-function
@@ -27,7 +27,7 @@ export class FSVersionsFunctions {
       return projects;
     });
 
-    await FSProjectFunctions.update(parentProject);
+    await ProjectsFileSystemController.update(parentProject);
     await this.fileApi.archiveVersion(parentProject.toJson(), version.version);
   }
 
@@ -47,7 +47,7 @@ export class FSVersionsFunctions {
       return projects;
     });
 
-    await FSProjectFunctions.update(parentProject);
+    await ProjectsFileSystemController.update(parentProject);
     await this.fileApi.deleteVersion(parentProject.toJson(), version.version);
   }
 
@@ -114,6 +114,6 @@ export class FSVersionsFunctions {
     });
 
     // Reloads project with new paths
-    await FSProjectFunctions.load(parentProject.projectName);
+    await ProjectsFileSystemController.load(parentProject.projectName);
   }
 }
