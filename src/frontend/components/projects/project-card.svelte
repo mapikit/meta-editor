@@ -4,7 +4,7 @@
 	import Cube from "./buttons/edit.svelte";
 	import Squares from "./buttons/duplicate.svelte";
 	import Archive from "./buttons/archive.svelte";
-    import EditableTextField from "../common/active-editable-text-field.svelte";
+    import EditableTextField from "../text-fields/active-editable-text-field.svelte";
     import VersionsDropdown from "./versions-dropdown.svelte";
     import { Pencil } from "phosphor-svelte";
 

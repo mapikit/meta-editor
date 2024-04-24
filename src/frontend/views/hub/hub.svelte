@@ -1,10 +1,10 @@
 <script lang="ts">
     import { get } from "svelte/store";
-    import { FileSystemController } from "../../entities/controllers/file-system-controller";
-    import projectsStore from "../../entities/stores/projects-store";
-    import ProjectPreviewCard from "../components/hub/project-preview-card.svelte";
-    import MetaSystemIcon from "../components/hub/meta-system-icon.svelte";
-    import { navigation } from "../lib/navigation";
+    import { FileSystemController } from "../../../entities/controllers/file-system-controller";
+    import projectsStore from "../../../entities/stores/projects-store";
+    import ProjectPreviewCard from "./project-preview-card.svelte";
+    import MetaSystemIcon from "../../icons/meta-system-icon.svelte";
+    import { navigation } from "../../lib/navigation";
 
     function navigateToProjects () {
       navigation.navigateTo("/projects");

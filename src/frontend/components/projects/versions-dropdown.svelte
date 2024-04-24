@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Project } from "../../../entities/models/project";
-    import PassiveEditableTextField from "../common/passive-editable-text-field.svelte";
+    import PassiveEditableTextField from "../text-fields/passive-editable-text-field.svelte";
     import Archive from "./buttons/archive.svelte";
     import Cube from "./buttons/edit.svelte";
     import Squares from "./buttons/duplicate.svelte";

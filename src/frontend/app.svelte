@@ -9,7 +9,7 @@
   import Loading from "./views/generic/loading.svelte";
   import Layout from "./layout.svelte";
   import { Route, Switch, navigation } from "./lib/navigation";
-  import Hub from "./views/hub.svelte";
+  import Hub from "./views/hub/hub.svelte";
     import Projects from "./views/projects.svelte";
 
   onMount(() => {
