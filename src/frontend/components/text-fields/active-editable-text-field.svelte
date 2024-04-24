@@ -19,7 +19,7 @@
       }
     });
 
-    function handleKey (e : KeyboardEvent) {
+    function handleKey (e : KeyboardEvent) : void {
       switch(e.key ?? e.code) {
         case "Escape":
           doneFlag = false;
@@ -33,13 +33,13 @@
       }
     }
 
-    function init (element : HTMLElement) { element.focus(); }
+    function init (element : HTMLElement) : void { element.focus(); }
 </script>
 
-<span style="padding-left: {$editing ? "0pt" : "4pt"};">
+<div style="padding-left: {$editing ? "0pt" : "4pt"};">
     {#if $editing}
         <input bind:value={$text} type="text" class="inline-flex bg-norbalt-500 rounded-md pl-2" size="{$text.length}" on:keydown={handleKey} use:init/>
     {:else}
         {$text}
     {/if}
-</span>
+</div>

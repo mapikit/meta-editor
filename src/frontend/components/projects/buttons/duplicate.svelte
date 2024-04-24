@@ -6,12 +6,13 @@
     export let version : ProjectVersionInfo;
     export let parentProject : Project;
 
-    function duplicateVersion () : void {
-      FileSystemController.versionsController.duplicate(version, parentProject);
+    async function duplicateVersion () : Promise<void> {
+      await FileSystemController.versionsController.duplicate(version, parentProject);
       //TODO update after duplication
     }
 </script>
 
-<span class="inline-flex bg-norbalt-400 rounded-md h-full p-1 aspect-square" on:click={duplicateVersion} aria-hidden="true">
+<div class="inline-flex bg-norbalt-400 rounded-md h-full p-1 aspect-square" aria-hidden="true"
+  on:click={duplicateVersion}>
     <span class="stroke-offWhite stroke w-full h-full hover:stroke-ochreYellow"><AddItem/></span>
-</span>
+</div>

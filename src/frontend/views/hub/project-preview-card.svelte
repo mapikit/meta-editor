@@ -1,28 +1,13 @@
 <script lang="ts">
-	import { writable } from "svelte/store";
+  import { 
+    formatDistance } from "date-fns";
 	import { Project } from "../../../entities/models/project.js";
 
     export let project : Project;
 
-    const editingName = writable(false);
-    const projectName = writable(project.projectName);
-
-
     function getRelevantUpdateInfo () : string {
-      const values = {
-        year: 31556952000,
-        month: 2629746000,
-        day: 86400000,
-        hour: 3600000,
-        minute: 60000,
-      };
-
-      const value = new Date().valueOf()-project.updatedAt.valueOf();
-      for(const key in values) {
-        let div =  value / values[key];
-        if(div > 1) return `${Math.floor(div)} ${key}${div >= 2 ? "s" : ""} ago`;
-      }
-      return "moments ago";
+      const now = new Date();
+      return formatDistance(project.updatedAt, now, { addSuffix: true });
     }
 </script>
 
