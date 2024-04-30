@@ -6,7 +6,7 @@
     import MetaSystemIcon from "../../icons/meta-system-icon.svelte";
     import { navigation } from "../../lib/navigation";
 
-    function navigateToProjects () {
+    function navigateToProjects () : void {
       navigation.navigateTo("/projects");
     }
 </script>
@@ -23,7 +23,7 @@
     <div class="flex flex-nowrap w-full py-4 space-x-4">
         {#await FileSystemController.projectsController.loadAll()}
         Loading Recent Projects...
-        {:then _result}
+        {:then}
             {#each get(projectsStore.items) as project}
                 <ProjectPreviewCard project={project}/>
             {/each}

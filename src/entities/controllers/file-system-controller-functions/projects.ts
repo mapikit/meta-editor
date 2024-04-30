@@ -36,7 +36,7 @@ export class ProjectsFileSystemController {
 
   public static getList = this.fileApi.getAvailableProjects;
 
-  private static async import (projectName : string) : Promise<Project> {
+  private static async readProjectFile (projectName : string) : Promise<Project> {
     const projectInfo = await this.fileApi.getProjectInfo(projectName);
     if(!projectInfo) throw Error("No config file found for project: " + projectName);
     return new Project(projectInfo);
@@ -44,7 +44,7 @@ export class ProjectsFileSystemController {
 
   // Load Functions
   public static async load (projectName : string) : Promise<void> {
-    const project = await this.import(projectName);
+    const project = await this.readProjectFile(projectName);
     projectsStore.items.update(items => {
       const index = items.findIndex(item => item.projectName === projectName);
       if(index !== -1) items[index] = project;

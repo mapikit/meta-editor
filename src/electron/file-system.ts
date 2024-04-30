@@ -63,15 +63,15 @@ export class ElectronFileSystem {
       proposedVersionDir : path.join(projectDir, proposedVersionDir, "config.json");
     const versionDir = path.parse(versionPath).dir;
 
-    this.saveFileData(this.getProjectConfigPath(project.projectName), project);
-    this.saveFileData(versionPath, config);
+    await this.saveFileData(this.getProjectConfigPath(project.projectName), project);
+    await this.saveFileData(versionPath, config);
     await this.saveMetaEditorInfo(versionDir, editor);
   }
 
   @expose
   static async saveMetaEditorInfo (versionDirPath : string, metaEditorInfo : MetaEditorInfoType) : Promise<void> {
     const metaEditorInfoDir = path.join(versionDirPath, ".meta-editor");
-    fs.mkdirSync(metaEditorInfoDir, { recursive: true });
+    await this.createDir(metaEditorInfoDir);
 
     for(const key of Object.keys(metaEditorInfo)) {
       const propertyPath = path.join(metaEditorInfoDir, key+".json");
@@ -97,23 +97,23 @@ export class ElectronFileSystem {
     return projectConfig.versions[versionInfoIndex].path;
   }
 
-  private static saveFileData (filePath : string, data : string | object) : void {
+  private static async saveFileData (filePath : string, data : string | object) : Promise<void> {
     const dir = path.parse(filePath).dir;
-    fs.mkdirSync(dir, { recursive: true });
+    await this.createDir(dir);
     fs.writeFileSync(filePath, typeof data === "string" ?
       data : JSON.stringify(data, undefined, 4));
   }
 
   @expose
   static async saveUserInfo (userConfig : UserConfigType) : Promise<void> {
-    this.saveFileData(this.userConfigPath, userConfig);
+    await this.saveFileData(this.userConfigPath, userConfig);
   }
 
   @expose
   static async saveProjectInfo (project : ProjectConfigType) : Promise<void> {
     const projectConfig = this.getProjectConfigPath(project.projectName);
 
-    this.saveFileData(projectConfig, project);
+    await this.saveFileData(projectConfig, project);
   }
 
   @expose
@@ -156,7 +156,7 @@ export class ElectronFileSystem {
 
     const projectConfigPath = this.getProjectConfigPath(projectInfo.projectName);
     projectInfo.versions = projectInfo.versions.filter(_version => _version.version !== version);
-    this.saveFileData(projectConfigPath, projectInfo);
+    await this.saveFileData(projectConfigPath, projectInfo);
   }
 
   @expose
@@ -170,7 +170,7 @@ export class ElectronFileSystem {
   static async archiveProject (projectInfo : ProjectConfigType) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     const archive = path.join(this.projectArchivePath, projectInfo.projectName);
-    fs.mkdirSync(archive, { recursive: true });
+    await this.createDir(archive);
     await this.moveDir(projectDirPath, archive);
   }
 
@@ -179,16 +179,16 @@ export class ElectronFileSystem {
     const projectDirPath = this.getProjectDirPath(projectInfo.projectName);
     const versionDir = this.decideVersionDir(projectInfo, version);
     const archive = path.join(this.versionArchivePath, projectInfo.projectName, version);
-    fs.mkdirSync(archive, { recursive: true });
+    await this.createDir(archive);
     await this.moveDir(path.join(projectDirPath, versionDir), archive);
 
     const projectConfigPath = this.getProjectConfigPath(projectInfo.projectName);
     projectInfo.versions = projectInfo.versions.filter(_version => _version.version !== version);
-    this.saveFileData(projectConfigPath, projectInfo);
+    await this.saveFileData(projectConfigPath, projectInfo);
   }
 
 
-  static async moveDir (src : string, target : string) : Promise<void> {
+  private static async moveDir (src : string, target : string) : Promise<void> {
     try { fs.renameSync(src, target); }
     catch(error) {
       if(error.code === "ENOTEMPTY") { //If unable to move due to directory not being empty
@@ -197,5 +197,17 @@ export class ElectronFileSystem {
         await this.moveDir(src, target);
       }
     }
+  }
+
+  private static async createDir (dirPath : string) : Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      fs.mkdir(dirPath, async (error) => {
+        if(!error) resolve();
+        else if(error.code === "ENOENT") { // If previous path does not exit
+          await this.createDir(path.dirname(dirPath)); // Create previous path (recursive)
+          this.createDir(dirPath).then(resolve).catch(reject); // Then create final path
+        } else reject(error);
+      });
+    });
   }
 }

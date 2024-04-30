@@ -51,13 +51,14 @@ export class VersionsFileSystemController {
     await this.fileApi.deleteVersion(parentProject.toJson(), version.version);
   }
 
-  private static async import (parentProject : Project, version : string) : Promise<SystemConfiguration> {
+  private static async readConfigurationFile (parentProject : Project, version : string)
+    : Promise<SystemConfiguration> {
     const versionInfo = await this.fileApi.getVersion(parentProject.projectName, version);
     return new SystemConfiguration(versionInfo, parentProject.identifier);
   }
 
   public static async load (parentProject : Project,  versionString : string) : Promise<void> {
-    const version = await this.import(parentProject, versionString);
+    const version = await this.readConfigurationFile(parentProject, versionString);
     systemConfigurationsStore.items.update(items => {
       const index = items.findIndex(item =>
         get(item.version) === versionString && get(item.projectId) === parentProject.identifier);
@@ -72,7 +73,7 @@ export class VersionsFileSystemController {
     const versionsStrings = project.listVersions();
     const versions : Array<SystemConfigurationStore> = [];
     for(const version of versionsStrings) {
-      const versionInfo = await this.import(project, version);
+      const versionInfo = await this.readConfigurationFile(project, version);
       versions.push(new SystemConfigurationStore(versionInfo));
     }
     systemConfigurationsStore.items.update(items => {
@@ -91,7 +92,7 @@ export class VersionsFileSystemController {
     const newVersion = this.getNewVersion(highestVersion);
     const newConfigEntity =
           new SystemConfiguration({ ...config, version: newVersion }, parentProject.identifier);
-    await this.configuration(parentProject, newConfigEntity);
+    await this.update(parentProject, newConfigEntity);
   }
 
   private static getNewVersion (version : string) : string {
@@ -104,7 +105,7 @@ export class VersionsFileSystemController {
     return versionSections.join(".");
   }
 
-  public static async configuration (parentProject : Project, version : SystemConfiguration) : Promise<void> {
+  public static async update (parentProject : Project, version : SystemConfiguration) : Promise<void> {
     await this.fileApi.saveVersion(parentProject.toJson(), version.toJson(), {} as MetaEditorInfoType);
     systemConfigurationsStore.items.update(items => {
       const itemIndex = items.findIndex(item => item.identifier === version.identifier);
