@@ -6,7 +6,7 @@
 
 
   export let style = "fill-white";
-  
+
   function saveBop () {
     const params = navigation.currentPathParams;
     const versionId = params.configurationId;

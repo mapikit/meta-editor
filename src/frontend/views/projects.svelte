@@ -4,47 +4,20 @@
 	import projectsStore from "../../entities/stores/projects-store.js";
 	import CreateButton from "../components/projects/create-button.svelte";
 	import ImportButton from "../components/projects/import-button.svelte";
-    // windowWasInjected(window);
-    // let projects : Writable<Array<ProjectConfigType>> = writable([]);
-    // window.fileApi.getAvailableProjects().then(avProjs => {
-    //     avProjs.forEach(async projName => {
-    //         console.log(projName);
-    //         windowWasInjected(window);
-    //         const prj = await window.fileApi.getProjectInfo(projName);
-    //         console.log(prj);
-    //         $projects.push(prj);
-    //         console.log($projects);
-    //     });
-    // })
 
     const projects = projectsStore.items;
 </script>
 
-<div class="projectsView">
-<span class="title">Your Projects</span><CreateButton/><ImportButton/><br>
-    {#await FileSystemController.loadAllProjects()}
+<div>
+<span class="text-4xl font-semibold pl-6">Your Projects</span><CreateButton/><ImportButton/><br>
+    {#await FileSystemController.projectsController.loadAll()}
         Loading Projects...
     {:then result}
-        <div class="projectsContainer">
+        <div class="flex flex-wrap">
             {#each $projects as project}
                     <ProjectCard project={project}/>
                 {/each}
         </div>
     {/await}
 </div>
-
-<style lang="scss">
-    .title {
-        font-size: 24pt;
-        font-weight: 600;
-        padding-left: 17pt;
-    }
-
-    .projectsContainer {
-    }
-
-    .projectsView {
-    }
-
-</style>
 

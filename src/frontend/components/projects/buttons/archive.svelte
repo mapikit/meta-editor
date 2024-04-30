@@ -1,22 +1,20 @@
-<span class="background">
-<img aria-hidden="true" class="trash" src="src/frontend/components/projects/trash.svg" alt="trash"/>
+<script lang="ts">
+    import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
+    import { FileSystemController } from "../../../../entities/controllers/file-system-controller";
+    import { Project } from "../../../../entities/models/project";
+    import Trash from "../../../icons/new-icons/trash.svelte";
+    export let version : ProjectVersionInfo;
+    export let parentProject : Project;
+
+
+    function deleteVersionOrProject () : void {
+      // TODO Alert before deletion
+      if(!version) FileSystemController.projectsController.archive(parentProject);
+      else FileSystemController.versionsController.archive(parentProject, version);
+    }
+</script>
+
+<span class="inline-flex bg-norbalt-400 rounded-md h-full p-1 aspect-square" on:click={deleteVersionOrProject} aria-hidden="true">
+<!-- <img aria-hidden="true" class="trash" src="src/frontend/components/projects/trash.svg" alt="trash"/> -->
+<span class="stroke-offWhite stroke w-full h-full translate-y-0.5 hover:stroke-roseRed"><Trash/></span>
 </span>
-
-<style lang="scss">
-    .trash {
-        height: 23pt;
-        filter: opacity(0.54375) invert(81%) sepia(18%) saturate(284%) hue-rotate(198deg) brightness(83%) contrast(82%);        // stroke: red;
-    }
-
-    .trash:hover { filter: invert(55%) sepia(51%) saturate(5164%) hue-rotate(319deg) brightness(106%) contrast(95%); }
-
-    .background {
-        display: flex;
-        background-color: #151537;
-        border-radius: 8pt;
-        width: 32pt;
-        height: 32pt;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
