@@ -10,12 +10,12 @@
   import Layout from "./layout.svelte";
   import { Route, Switch, navigation } from "./lib/navigation";
   import Hub from "./views/hub/hub.svelte";
-    import Projects from "./views/projects.svelte";
-  import { EditorMetadataController } from "../entities/controllers/editor-metadata-controller";
+  import Projects from "./views/projects.svelte";
+  import { EditorMetadataMutations } from "../entities/mutations/editor-metadata-mutations";
 
   const spawn = () : void => {
     loading.set(true);
-    EditorMetadataController.createMetadata()
+    EditorMetadataMutations.loadData()
       .then(() => {
         loading.set(false);
       })
