@@ -11,8 +11,21 @@
   import { Route, Switch, navigation } from "./lib/navigation";
   import Hub from "./views/hub/hub.svelte";
     import Projects from "./views/projects.svelte";
+  import { EditorMetadataController } from "../entities/controllers/editor-metadata-controller";
+
+  const spawn = () : void => {
+    loading.set(true);
+    EditorMetadataController.createMetadata()
+      .then(() => {
+        loading.set(false);
+      })
+      .catch(() => {
+        console.error("failed to boot");
+      });
+  };
 
   onMount(() => {
+    spawn();
     GenericLayoutStateMutations.reset();
     GenericLayoutStateMutations.setLoading();
     SystemConfigurationController.TESTAddAndLoadConfiguration();

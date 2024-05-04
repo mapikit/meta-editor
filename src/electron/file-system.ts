@@ -3,10 +3,12 @@ const { app } = electron;
 import path from "path";
 import fs from "fs";
 import type { MetaEditorInfoType } from "../common/types/meta-editor-info";
-import type { UserConfigType } from "src/common/types/user-config";
+import type { UserConfigType } from "../common/types/user-config";
 import type { ProjectConfigType } from "../common/types/project-config-type";
 import type { ConfigurationType } from "meta-system";
 import { nanoid } from "nanoid";
+import { Serializable } from "../common/types/serializable";
+import { SerializableEditorMetadata } from "../common/types/serialized-editor-metadata";
 
 /**
  * Exposes a method to the electron renderer. Will be available through window.fileApi
@@ -110,6 +112,11 @@ export class ElectronFileSystem {
       data : JSON.stringify(data, undefined, 4));
   }
 
+  private static async getFileData<T> (filePath : string) : Promise<Serializable<T>> {
+    const fileContents = await fs.promises.readFile(filePath);
+    return JSON.parse(fileContents.toString()) as Serializable<T>;
+  }
+
   @expose
   static async saveUserInfo (userConfig : UserConfigType) : Promise<void> {
     await this.saveFileData(this.userConfigPath, userConfig);
@@ -193,8 +200,19 @@ export class ElectronFileSystem {
     await this.saveFileData(projectConfigPath, projectInfo);
   }
 
-  static async fetchEditorMetadata () : Promise<void> {
+  // static async fetchEditorMetadata () : Promise<SerializableEditorMetadata> {
+  //   const metadataPath = path.join(this.editorMetadataConfigPath);
+    
+    
+  // }
 
+  /** Used for the first load - or when editor is reset */
+  static async createEditorMetadata () : Promise<void> {
+    const newEmptySerializable : SerializableEditorMetadata = {
+      availableProjectsIds: [],
+    };
+
+    await this.saveFileData(this.editorMetadataConfigPath, newEmptySerializable);
   }
 
   private static async moveDir (src : string, target : string) : Promise<void> {
