@@ -3,18 +3,17 @@ const { app } = electron;
 import path from "path";
 import fs from "fs";
 import type { MetaEditorInfoType } from "../common/types/meta-editor-info";
-import type { UserConfigType } from "../common/types/user-config";
-import type { ProjectConfigType } from "../common/types/project-config-type";
+import type { UserConfigType } from "../common/types/serializables/user-config";
+import type { ProjectConfigType } from "../common/types/serializables/project-config-type";
 import type { ConfigurationType } from "meta-system";
 import { nanoid } from "nanoid";
 import { Serializable } from "../common/types/serializable";
-import { SerializableEditorMetadata } from "../common/types/serialized-editor-metadata";
+import { SerializableEditorMetadata } from "../common/types/serializables/serialized-editor-metadata";
 
 /**
  * Exposes a method to the electron renderer. Will be available through window.fileApi
  *
- * Simply add `@expose` above the method name.
- *
+ * Simply add `@exposeInWindow` above the method name.
  *
  * Ex:
  * @expose
@@ -22,7 +21,7 @@ import { SerializableEditorMetadata } from "../common/types/serialized-editor-me
  * public static myMethod (args : any) : void {}
  * ```
  */
-function expose (target : unknown, key : string) : void {
+function exposeInWindow (target : unknown, key : string) : void {
   target["exposed"] = target["exposed"] ? [...target["exposed"], key] : [key];
 }
 
@@ -58,7 +57,7 @@ export class ElectronFileSystem {
     return path.join(this.getVersionDirPath(projectIdentifier, version), "config.json");
   }
 
-  @expose
+  @exposeInWindow
   static async saveVersion (project : ProjectConfigType, config : ConfigurationType, editor : MetaEditorInfoType)
     : Promise<void> {
     const projectDir = this.getProjectDirPath(project.identifier);
@@ -72,7 +71,7 @@ export class ElectronFileSystem {
     await this.saveMetaEditorInfo(versionDir, editor);
   }
 
-  @expose
+  @exposeInWindow
   static async saveMetaEditorInfo (versionDirPath : string, metaEditorInfo : MetaEditorInfoType) : Promise<void> {
     const metaEditorInfoDir = path.join(versionDirPath, ".meta-editor");
     await this.createDir(metaEditorInfoDir);
@@ -117,40 +116,40 @@ export class ElectronFileSystem {
     return JSON.parse(fileContents.toString()) as Serializable<T>;
   }
 
-  @expose
+  @exposeInWindow
   static async saveUserInfo (userConfig : UserConfigType) : Promise<void> {
     await this.saveFileData(this.userConfigPath, userConfig);
   }
 
-  @expose
+  @exposeInWindow
   static async saveProjectInfo (project : ProjectConfigType) : Promise<void> {
     const projectConfig = this.getProjectConfigPath(project.identifier);
 
     await this.saveFileData(projectConfig, project);
   }
 
-  @expose
+  @exposeInWindow
   static async getUserConfig () : Promise<UserConfigType> {
     const userConfigPath = this.userConfigPath;
     if(!fs.existsSync(userConfigPath)) return undefined;
     return JSON.parse(fs.readFileSync(this.userConfigPath).toString());
   }
 
-  @expose
+  @exposeInWindow
   static async getAvailableProjects () : Promise<string[]> {
     const projectsPath = this.projectsDirPath;
     if(!fs.existsSync(projectsPath)) return [];
     return fs.readdirSync(this.projectsDirPath);
   }
 
-  @expose
+  @exposeInWindow
   static async getProjectInfo (projectIdentifier : string) : Promise<ProjectConfigType> {
     const projectPath = this.getProjectConfigPath(projectIdentifier);
     if(!fs.existsSync(projectPath)) return undefined;
     return JSON.parse(fs.readFileSync(projectPath).toString());
   }
 
-  @expose
+  @exposeInWindow
   static async getVersion (projectIdentifier : string, version : string) : Promise<ConfigurationType> {
     const prj = await this.getProjectInfo(projectIdentifier);
     this.decideVersionDir(prj, version);
@@ -160,7 +159,7 @@ export class ElectronFileSystem {
   }
 
 
-  @expose
+  @exposeInWindow
   // TODO change to delete from archive
   static async deleteVersion (projectInfo : ProjectConfigType, version : string) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.identifier);
@@ -172,14 +171,14 @@ export class ElectronFileSystem {
     await this.saveFileData(projectConfigPath, projectInfo);
   }
 
-  @expose
+  @exposeInWindow
   // TODO change to delete from archive
   static async deleteProject (projectInfo : ProjectConfigType) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.identifier);
     fs.rmSync(path.join(projectDirPath), { recursive: true });
   }
 
-  @expose
+  @exposeInWindow
   static async archiveProject (projectInfo : ProjectConfigType) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.identifier);
     const archive = path.join(this.projectArchivePath, projectInfo.identifier);
@@ -187,7 +186,7 @@ export class ElectronFileSystem {
     await this.moveDir(projectDirPath, archive);
   }
 
-  @expose
+  @exposeInWindow
   static async archiveVersion (projectInfo : ProjectConfigType, version : string) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.identifier);
     const versionDir = this.decideVersionDir(projectInfo, version);
@@ -200,19 +199,27 @@ export class ElectronFileSystem {
     await this.saveFileData(projectConfigPath, projectInfo);
   }
 
-  // static async fetchEditorMetadata () : Promise<SerializableEditorMetadata> {
-  //   const metadataPath = path.join(this.editorMetadataConfigPath);
-    
-    
-  // }
+  @exposeInWindow
+  static async fetchEditorMetadata () : Promise<SerializableEditorMetadata> {
+    const result = await this.getFileData<SerializableEditorMetadata>(this.editorMetadataConfigPath)
+      .catch(() => undefined);
+
+    if (result) {
+      return result;
+    }
+
+    await this.createEditorMetadata();
+    return this.getFileData<SerializableEditorMetadata>(this.editorMetadataConfigPath);
+  }
 
   /** Used for the first load - or when editor is reset */
+  @exposeInWindow
   static async createEditorMetadata () : Promise<void> {
     const newEmptySerializable : SerializableEditorMetadata = {
       availableProjectsIds: [],
     };
 
-    await this.saveFileData(this.editorMetadataConfigPath, newEmptySerializable);
+    return this.saveFileData(this.editorMetadataConfigPath, newEmptySerializable);
   }
 
   private static async moveDir (src : string, target : string) : Promise<void> {
@@ -226,13 +233,15 @@ export class ElectronFileSystem {
     }
   }
 
-  private static async createDir (dirPath : string) : Promise<void> {
+  private static async createDir (dirPath : string, optimistic : boolean = true) : Promise<void> {
     return new Promise<void>((resolve, reject) => {
       fs.mkdir(dirPath, async (error) => {
         if(!error) resolve();
         else if(error.code === "ENOENT") { // If previous path does not exit
           await this.createDir(path.dirname(dirPath)); // Create previous path (recursive)
           this.createDir(dirPath).then(resolve).catch(reject); // Then create final path
+        } else if(error.code === "EEXIST" && optimistic) { // Directory already exists and that's ok :)
+          resolve();
         } else reject(error);
       });
     });

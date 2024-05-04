@@ -1,4 +1,4 @@
-import { SerializableEditorMetadata } from "../../common/types/serialized-editor-metadata";
+import { SerializableEditorMetadata } from "../../common/types/serializables/serialized-editor-metadata";
 import { Project } from "./project";
 
 // This is singleton :)

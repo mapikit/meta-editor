@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { ProjectVersionInfo } from "../../../common/types/project-config-type";
+import { ProjectVersionInfo } from "../../../common/types/serializables/project-config-type";
 import { Project } from "../../models/project";
 import projectsStore from "../../stores/projects-store";
 import { SystemConfigurationStore, systemConfigurationsStore } from "../../stores/system-configurations-store";

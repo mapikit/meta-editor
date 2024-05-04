@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { EditorEntityValue } from "./editor-entity-value";
 import { valid } from "semver";
-import { ProjectConfigType, ProjectVersionInfo } from "../../common/types/project-config-type.js";
+import { ProjectConfigType, ProjectVersionInfo } from "../../common/types/serializables/project-config-type.js";
 
 export class Project implements EditorEntityValue {
   public projectName : string;

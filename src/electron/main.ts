@@ -49,13 +49,13 @@ export default class Main {
 
   private static createIPCHandlers () : void {
     for(const method of ElectronFileSystem["exposed"]) {
-      console.log("Importing handler...");
       ipcMain.handle(method, (_event, ...args) => {
-        console.log(_event, "0000");
         const execution = ElectronFileSystem[method](...args);
         if (execution instanceof Promise) {
           execution.catch(err => console.error(err));
         }
+
+        return execution;
       });
     }
   }
