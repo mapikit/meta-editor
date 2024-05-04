@@ -17,6 +17,7 @@ export class Project implements EditorEntityValue {
     this.createdAt = projectInfo?.createdAt ? new Date(projectInfo.createdAt) : new Date();
     this.updatedAt = projectInfo?.updatedAt ? new Date(projectInfo.updatedAt) : new Date();
     this.versions = projectInfo?.versions ?? [];
+    this.identifier = projectInfo.identifier;
   }
 
   public listVersions () : string[] {
@@ -47,6 +48,7 @@ export class Project implements EditorEntityValue {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
       versions: this.versions,
+      identifier: this.identifier,
     };
   }
 }

@@ -53,7 +53,7 @@ export class VersionsFileSystemController {
 
   private static async readConfigurationFile (parentProject : Project, version : string)
     : Promise<SystemConfiguration> {
-    const versionInfo = await this.fileApi.getVersion(parentProject.projectName, version);
+    const versionInfo = await this.fileApi.getVersion(parentProject.identifier, version);
     return new SystemConfiguration(versionInfo, parentProject.identifier);
   }
 
@@ -87,7 +87,7 @@ export class VersionsFileSystemController {
   // Update Functions
   public static async duplicate (current : ProjectVersionInfo, parentProject : Project) : Promise<void> {
     const registeredVersions = parentProject.listVersions();
-    const config = await this.fileApi.getVersion(parentProject.projectName, current.version);
+    const config = await this.fileApi.getVersion(parentProject.identifier, current.version);
     const highestVersion = registeredVersions.sort((versionA, versionB) => versionB.localeCompare(versionA))[0];
     const newVersion = this.getNewVersion(highestVersion);
     const newConfigEntity =
@@ -115,6 +115,6 @@ export class VersionsFileSystemController {
     });
 
     // Reloads project with new paths
-    await ProjectsFileSystemController.load(parentProject.projectName);
+    await ProjectsFileSystemController.load(parentProject.identifier);
   }
 }

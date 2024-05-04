@@ -36,32 +36,33 @@ export class ProjectsFileSystemController {
 
   public static getList = this.fileApi.getAvailableProjects;
 
-  private static async readProjectFile (projectName : string) : Promise<Project> {
-    const projectInfo = await this.fileApi.getProjectInfo(projectName);
-    if(!projectInfo) throw Error("No config file found for project: " + projectName);
+  private static async readProjectFile (projectIdentifier : string) : Promise<Project> {
+    const projectInfo = await this.fileApi.getProjectInfo(projectIdentifier);
+    if(!projectInfo) throw Error("No config file found for project: " + projectIdentifier);
     return new Project(projectInfo);
   }
 
   // Load Functions
-  public static async load (projectName : string) : Promise<void> {
-    const project = await this.readProjectFile(projectName);
+  public static async load (projectIdentifier : string) : Promise<void> {
+    const project = await this.readProjectFile(projectIdentifier);
     projectsStore.items.update(items => {
-      const index = items.findIndex(item => item.projectName === projectName);
+      const index = items.findIndex(item => item.identifier === projectIdentifier);
       if(index !== -1) items[index] = project;
       else items.push(project);
       return items;
     });
   }
 
-  public static async loadWithVersions (projectName : string) : Promise<void> {
-    await this.load(projectName);
-    const project = get(projectsStore.items).find(_project => _project.projectName === projectName);
+  public static async loadWithVersions (projectIdentifier : string) : Promise<void> {
+    await this.load(projectIdentifier);
+    const project = get(projectsStore.items).find(_project => _project.identifier === projectIdentifier);
     await VersionsFileSystemController.loadByProject(project);
   }
 
   public static async loadAll () : Promise<void> {
     const availableProjects = await this.getList();
-    for(const project of availableProjects) await this.load(project);
+
+    for(const projectId of availableProjects) await this.load(projectId);
   }
 
   public static async loadAllWithVersions () : Promise<void> {

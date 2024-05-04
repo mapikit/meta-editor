@@ -6,7 +6,7 @@ export type ModifiedWindowType = Window & typeof globalThis & {
   fileApi : {
     saveUserInfo : (userConfig : UserConfigType) => Promise<void>;
     saveMetaEditorInfo : (versionDirPath : string, metaEditorInfo : MetaEditorInfoType) => Promise<void>;
-    saveVersion : (projectName : string, config : ConfigurationType, metaEditorInfo : MetaEditorInfoType)
+    saveVersion : (projectIdentifier : string, config : ConfigurationType, metaEditorInfo : MetaEditorInfoType)
     => Promise<void>;
   }
 }
