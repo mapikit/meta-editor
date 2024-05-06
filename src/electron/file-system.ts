@@ -136,13 +136,6 @@ export class ElectronFileSystem {
   }
 
   @exposeInWindow
-  static async getAvailableProjects () : Promise<string[]> {
-    const projectsPath = this.projectsDirPath;
-    if(!fs.existsSync(projectsPath)) return [];
-    return fs.readdirSync(this.projectsDirPath);
-  }
-
-  @exposeInWindow
   static async getProjectInfo (projectIdentifier : string) : Promise<ProjectConfigType> {
     const projectPath = this.getProjectConfigPath(projectIdentifier);
     if(!fs.existsSync(projectPath)) return undefined;

@@ -43,6 +43,10 @@ export default class Main {
     // in dev, target the host and port of the local rollup web server
     // in production, use the statically build version of our application
 
+    if (mode !== "production") {
+      Main.mainWindow.webContents.openDevTools();
+    }
+
     void Main.mainWindow.loadURL(url);
     Main.mainWindow.on("closed", Main.onClose);
   }
@@ -65,5 +69,6 @@ export default class Main {
     Main.application = app;
     Main.application.on("window-all-closed", Main.onWindowAllClosed);
     Main.application.on("ready", Main.onReady);
+
   }
 }

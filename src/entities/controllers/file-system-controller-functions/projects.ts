@@ -4,6 +4,8 @@ import { Project } from "../../models/project";
 import projectsStore from "../../stores/projects-store";
 import { systemConfigurationsStore } from "../../stores/system-configurations-store";
 import { VersionsFileSystemController } from "./versions";
+import { EditorMetadataMutations } from "../../mutations/editor-metadata-mutations";
+import { editorMetadataStoreSingleton } from "../../stores/editor-metadata-store";
 
 export class ProjectsFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
@@ -34,7 +36,10 @@ export class ProjectsFileSystemController {
     await this.fileApi.deleteProject(project.toJson());
   }
 
-  public static getList = this.fileApi.getAvailableProjects;
+  public static async getList () : Promise<string[]> {
+    await EditorMetadataMutations.loadData();
+    return get(editorMetadataStoreSingleton.data).availableProjectsIds;
+  }
 
   private static async readProjectFile (projectIdentifier : string) : Promise<Project> {
     const projectInfo = await this.fileApi.getProjectInfo(projectIdentifier);
