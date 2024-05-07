@@ -4,6 +4,8 @@ import { Project } from "../../models/project";
 import projectsStore from "../../stores/projects-store";
 import { systemConfigurationsStore } from "../../stores/system-configurations-store";
 import { VersionsFileSystemController } from "./versions";
+import { EditorMetadataMutations } from "../../mutations/editor-metadata-mutations";
+import { editorMetadataStoreSingleton } from "../../stores/editor-metadata-store";
 
 export class ProjectsFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
@@ -34,34 +36,38 @@ export class ProjectsFileSystemController {
     await this.fileApi.deleteProject(project.toJson());
   }
 
-  public static getList = this.fileApi.getAvailableProjects;
+  public static async getList () : Promise<string[]> {
+    await EditorMetadataMutations.loadData();
+    return get(editorMetadataStoreSingleton.data).availableProjectsIds;
+  }
 
-  private static async readProjectFile (projectName : string) : Promise<Project> {
-    const projectInfo = await this.fileApi.getProjectInfo(projectName);
-    if(!projectInfo) throw Error("No config file found for project: " + projectName);
+  private static async readProjectFile (projectIdentifier : string) : Promise<Project> {
+    const projectInfo = await this.fileApi.getProjectInfo(projectIdentifier);
+    if(!projectInfo) throw Error("No config file found for project: " + projectIdentifier);
     return new Project(projectInfo);
   }
 
   // Load Functions
-  public static async load (projectName : string) : Promise<void> {
-    const project = await this.readProjectFile(projectName);
+  public static async load (projectIdentifier : string) : Promise<void> {
+    const project = await this.readProjectFile(projectIdentifier);
     projectsStore.items.update(items => {
-      const index = items.findIndex(item => item.projectName === projectName);
+      const index = items.findIndex(item => item.identifier === projectIdentifier);
       if(index !== -1) items[index] = project;
       else items.push(project);
       return items;
     });
   }
 
-  public static async loadWithVersions (projectName : string) : Promise<void> {
-    await this.load(projectName);
-    const project = get(projectsStore.items).find(_project => _project.projectName === projectName);
+  public static async loadWithVersions (projectIdentifier : string) : Promise<void> {
+    await this.load(projectIdentifier);
+    const project = get(projectsStore.items).find(_project => _project.identifier === projectIdentifier);
     await VersionsFileSystemController.loadByProject(project);
   }
 
   public static async loadAll () : Promise<void> {
     const availableProjects = await this.getList();
-    for(const project of availableProjects) await this.load(project);
+
+    for(const projectId of availableProjects) await this.load(projectId);
   }
 
   public static async loadAllWithVersions () : Promise<void> {

@@ -43,13 +43,24 @@ export default class Main {
     // in dev, target the host and port of the local rollup web server
     // in production, use the statically build version of our application
 
+    if (mode !== "production") {
+      Main.mainWindow.webContents.openDevTools();
+    }
+
     void Main.mainWindow.loadURL(url);
     Main.mainWindow.on("closed", Main.onClose);
   }
 
   private static createIPCHandlers () : void {
     for(const method of ElectronFileSystem["exposed"]) {
-      ipcMain.handle(method, (_event, ...args) => ElectronFileSystem[method](...args));
+      ipcMain.handle(method, (_event, ...args) => {
+        const execution = ElectronFileSystem[method](...args);
+        if (execution instanceof Promise) {
+          execution.catch(err => console.error(err));
+        }
+
+        return execution;
+      });
     }
   }
 
@@ -58,5 +69,6 @@ export default class Main {
     Main.application = app;
     Main.application.on("window-all-closed", Main.onWindowAllClosed);
     Main.application.on("ready", Main.onReady);
+
   }
 }

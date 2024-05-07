@@ -18,7 +18,6 @@ export class PanelsMutations {
     };
 
     const createIdentifierToValue = <T extends object>(value : T) : {value : T} & EditorEntityValue => {
-      console.log(value, "<<<<<<<<<<<<<<<<<");
       return { identifier: nanoid(), value };
     };
 
@@ -35,7 +34,8 @@ export class PanelsMutations {
         [new DockPanelContent("identifier", "Schemas", createIdentifierToValue(configuration.schemas))],
         [new DockPanelContent("identifier", "Business Operations",
           createIdentifierToValue(configuration.businessOperations))],
-        [new DockPanelContent("identifier", "Environment Variables", createIdentifierToValue(configuration.envs ?? []))],
+        [new DockPanelContent("identifier", "Environment Variables",
+          createIdentifierToValue(configuration.envs ?? []))],
       );
     });
   }

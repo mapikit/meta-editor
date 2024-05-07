@@ -10,9 +10,22 @@
   import Layout from "./layout.svelte";
   import { Route, Switch, navigation } from "./lib/navigation";
   import Hub from "./views/hub/hub.svelte";
-    import Projects from "./views/projects.svelte";
+  import Projects from "./views/projects.svelte";
+  import { EditorMetadataMutations } from "../entities/mutations/editor-metadata-mutations";
+
+  const spawn = () : void => {
+    loading.set(true);
+    EditorMetadataMutations.loadData()
+      .then(() => {
+        loading.set(false);
+      })
+      .catch(() => {
+        console.error("failed to boot");
+      });
+  };
 
   onMount(() => {
+    spawn();
     GenericLayoutStateMutations.reset();
     GenericLayoutStateMutations.setLoading();
     SystemConfigurationController.TESTAddAndLoadConfiguration();
