@@ -16,4 +16,24 @@ export class ProjectsMutations {
       return current;
     });
   }
+
+  public static updateLoadedProject (project : Project) : void {
+    if (this.projectIsLoaded(project.identifier)) { return; }
+
+    projectsStore.items.update((current) => {
+      const projectIndex = current.findIndex(_project => _project.identifier === project.identifier);
+      current[projectIndex] = project;
+      return current;
+    });
+  }
+
+  public static projectIsLoaded (projectId : string) : boolean {
+    return projectsStore.hasItem(projectId);
+  }
+
+  public static removeProject (projectId : string) : void {
+    projectsStore.items.update(projects => {
+      return projects.filter(_project => _project.identifier !== projectId);
+    });
+  }
 }

@@ -1,3 +1,4 @@
+import { get } from "svelte/store";
 import { SystemConfiguration } from "../models/system-configuration";
 import { SystemConfigurationStore, systemConfigurationsStore } from "../stores/system-configurations-store";
 
@@ -13,6 +14,12 @@ export class SystemConfigurationMutations {
       current.push(new SystemConfigurationStore(configuration));
 
       return current;
+    });
+  }
+
+  public static removeConfigurationsByProjectId (projectId : string) : void {
+    systemConfigurationsStore.items.update(configurations => {
+      return configurations.filter(config => get(config.projectId) !== projectId);
     });
   }
 }
