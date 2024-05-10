@@ -6,6 +6,7 @@
   import MetaSystemIcon from "../../icons/meta-system-icon.svelte";
   import { navigation } from "../../lib/navigation";
     import { getTailwindColor } from "../../../common/tailwind-configuration-accessor";
+  import TextButton from "../../components/text-button.svelte";
 
   function navigateToProjects () : void {
     navigation.navigateTo("/projects");
@@ -14,16 +15,14 @@
 
 <div class="pt-24 w-full h-full overflow-y-scroll flex-col bg-global-bg-gradient flex items-center">
 <div class="flex flex-col flex-wrap w-full max-w-6xl px-8 pb-14 self-center">
-<span class="justify-center stroke-2 h-60 pb-10"><MetaSystemIcon color={getTailwindColor("norbalt", 300)}
+<span class="justify-center stroke-2 h-48 pb-10"><MetaSystemIcon color={getTailwindColor("norbalt", 300)}
   width={1.3}/></span>
 <div>
-  <div class="inline-flex w-full">
-      <div class="text-3xl font-semibold text-white">Recent Projects</div>
-      <span aria-hidden="true"
-      class="bg-norbalt-400 rounded font-bold p-2 text-base text-w text-offWhite mr-0 ml-auto
-      hover:bg-norbalt-300 select-none cursor-pointer" on:click={navigateToProjects}>Open All Projects > </span>
+  <div class="flex w-full justify-start items-center">
+      <div class="text-3xl font-semibold text-white font-[Livvic]">Recent Projects</div>
+      <TextButton text={"Open Project List"} clickFunction={navigateToProjects}/>
   </div>
-  <div class="flex flex-nowrap w-full py-4 space-x-4">
+  <div class="flex flex-nowrap w-full py-5 space-x-4">
       {#await FileSystemController.projectsController.loadAll()}
       Loading Recent Projects...
       {:then}
@@ -34,7 +33,7 @@
   </div>
 </div>
 <div>
-  <div class="text-3xl font-semibold text-white">Browse Plugins</div>
+  <div class="text-3xl mt-5 font-semibold text-white font-[Livvic]">Browse Plugins</div>
   <div class="text-offWhite">
       Coming Soon...
   </div>
