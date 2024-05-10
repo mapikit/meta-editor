@@ -12,8 +12,8 @@
   }
 </script>
 
-<div class="pt-6 w-full h-full flex-col bg-global-bg-gradient flex items-center">
-<div class="flex flex-col flex-wrap w-full max-w-6xl px-8 self-center">
+<div class="pt-24 w-full h-full overflow-y-scroll flex-col bg-global-bg-gradient flex items-center">
+<div class="flex flex-col flex-wrap w-full max-w-6xl px-8 pb-14 self-center">
 <span class="justify-center stroke-2 h-60 pb-10"><MetaSystemIcon color={getTailwindColor("norbalt", 300)}
   width={1.3}/></span>
 <div>
