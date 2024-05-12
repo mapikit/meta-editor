@@ -1,11 +1,12 @@
 <script lang="ts">
   import MetaSystemIcon from "./icons/meta-system-icon.svelte";
+  import { navigation } from "./lib/navigation";
 </script>
 
 <section class="w-full top-0 bg-norbalt-400 h-12 flex items-center p-1 fixed"> <!-- HEADER (TOPBAR) -->
-  <div class="w-10 h-12"> <!-- Icon holder-->
+  <button class="w-10 h-12" on:click={() => navigation.navigateTo('/')}> <!-- Icon holder-->
     <MetaSystemIcon width={1.8} />
-  </div>
+  </button>
 </section>
 
 <aside class="bg-norbalt-400 h-[calc(100%_-_48px)] w-12 fixed left-0 top-12"> <!-- Sidebar (Selector) -->
