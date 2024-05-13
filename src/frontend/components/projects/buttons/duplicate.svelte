@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
-    import { FileSystemController } from "../../../../entities/controllers/file-system-controller";
+    import { ProjectVersionInfo } from "../../../../common/types/serializables/project-config-type";
+    import { SystemConfigurationController } from "../../../../entities/controllers/system-configuration-controller";
     import { Project } from "../../../../entities/models/project";
     import AddItem from "../../../icons/new-icons/add-item.svelte";
     export let version : ProjectVersionInfo;
     export let parentProject : Project;
 
     async function duplicateVersion () : Promise<void> {
-      await FileSystemController.versionsController.duplicate(version, parentProject);
+      await SystemConfigurationController.duplicateConfiguration(parentProject, version.identifier);
       //TODO update after duplication
     }
 </script>

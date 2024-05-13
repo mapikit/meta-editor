@@ -16,7 +16,7 @@ export class SystemConfigurationController {
     PanelsMutations.SetAvailableViewsByLoadingConfiguration(configuration.toEntity());
   }
 
-  public async loadConfiguration (parentProject : Project, configId : string) : Promise<void> {
+  public static async loadConfiguration (parentProject : Project, configId : string) : Promise<void> {
     return ConfigurationFileSystemController.readConfigurationFile(parentProject, configId).then(config => {
       if(SystemConfigurationMutations.configIsLoaded(configId)) {
         SystemConfigurationMutations.updateConfiguration(config);
@@ -24,7 +24,7 @@ export class SystemConfigurationController {
     });
   }
 
-  public async update (parentProject : Project, configuration : SystemConfiguration) : Promise<void> {
+  public static async update (parentProject : Project, configuration : SystemConfiguration) : Promise<void> {
     return ConfigurationFileSystemController.update(parentProject, configuration).then(() => {
       ProjectsController.loadProject(parentProject.identifier).then(() => {
         SystemConfigurationMutations.updateConfiguration(configuration);
@@ -32,15 +32,15 @@ export class SystemConfigurationController {
     }).catch(error => { console.error("Error while updating configuration", error); });
   }
 
-  public async archive (parentProject : Project, configurationId : string) : Promise<void> {
+  public static async archive (parentProject : Project, configurationId : string) : Promise<void> {
     SystemConfigurationMutations.removeConfiguration(configurationId);
     parentProject.removeVersionById(configurationId);
     ProjectsMutations.updateLoadedProject(parentProject);
     const versionInfo = parentProject.versions.find(version => version.identifier == configurationId);
-    return ConfigurationFileSystemController.archive(parentProject, versionInfo);
+    return ConfigurationFileSystemController.archiveConfiguration(parentProject, versionInfo);
   }
 
-  public async duplicateConfiguration (parentProject : Project, configId : string) : Promise<void> {
+  public static async duplicateConfiguration (parentProject : Project, configId : string) : Promise<void> {
     const versionInfo = parentProject.versions.find(version => version.identifier === configId);
     return ConfigurationFileSystemController.duplicate(versionInfo, parentProject);
   }

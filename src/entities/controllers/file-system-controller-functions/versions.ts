@@ -9,7 +9,7 @@ export class ConfigurationFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
 
   // eslint-disable-next-line max-lines-per-function
-  public static async archive (parentProject : Project, version : ProjectVersionInfo) : Promise<void> {
+  public static async archiveConfiguration (parentProject : Project, version : ProjectVersionInfo) : Promise<void> {
     await ProjectsFileSystemController.update(parentProject);
     await this.fileApi.archiveVersion(parentProject.toJson(), version.version);
   }

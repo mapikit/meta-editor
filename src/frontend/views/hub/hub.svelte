@@ -1,12 +1,12 @@
 <script lang="ts">
   import { get } from "svelte/store";
-  import { FileSystemController } from "../../../entities/controllers/file-system-controller";
   import projectsStore from "../../../entities/stores/projects-store";
   import ProjectPreviewCard from "./project-preview-card.svelte";
   import MetaSystemIcon from "../../icons/meta-system-icon.svelte";
   import { navigation } from "../../lib/navigation";
     import { getTailwindColor } from "../../../common/tailwind-configuration-accessor";
   import TextButton from "../../components/text-button.svelte";
+  import { ProjectsController } from "src/entities/controllers/projects-controller";
 
   function navigateToProjects () : void {
     navigation.navigateTo("/projects");
@@ -23,7 +23,7 @@
       <TextButton text={"Open Project List"} clickFunction={navigateToProjects}/>
   </div>
   <div class="flex flex-nowrap w-full py-5 space-x-4">
-      {#await FileSystemController.projectsController.loadAll()}
+      {#await ProjectsController.loadAllProjects()}
       Loading Recent Projects...
       {:then}
           {#each get(projectsStore.items) as project}

@@ -1,16 +1,17 @@
 <script lang="ts">
-    import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
-    import { FileSystemController } from "../../../../entities/controllers/file-system-controller";
+    import { ProjectVersionInfo } from "../../../../common/types/serializables/project-config-type";
+    import { ConfigurationFileSystemController } from "../../../../entities/controllers/file-system-controller-functions/versions";
+    import { ProjectsController } from "../../../../entities/controllers/projects-controller";
     import { Project } from "../../../../entities/models/project";
     import Trash from "../../../icons/new-icons/trash.svelte";
     export let version : ProjectVersionInfo;
     export let parentProject : Project;
 
 
-    function deleteVersionOrProject () : void {
-      // TODO Alert before deletion
-      if(!version) FileSystemController.projectsController.archive(parentProject);
-      else FileSystemController.versionsController.archive(parentProject, version);
+    async function deleteVersionOrProject () : Promise<void> {
+      // TODO Alert before archive
+      if(!version) await ProjectsController.archiveProject(parentProject);
+      else await ConfigurationFileSystemController.archiveConfiguration(parentProject, version);
     }
 </script>
 
