@@ -50,4 +50,10 @@ export class ProjectsController {
       });
     }).catch(error => console.error("Error while archiving project", error));
   }
+
+  public static async update (project : Project) : Promise<void> {
+    return ProjectsFileSystemController.update(project).then(() => {
+      ProjectsMutations.updateLoadedProject(project);
+    }).catch(error => console.error("Unable to update project", error));
+  }
 }
