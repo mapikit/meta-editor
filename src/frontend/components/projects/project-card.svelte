@@ -41,7 +41,7 @@
     }
 </script>
 
-<div aria-hidden="true" class="flex flex-wrap m-6 rounded-md bg-gradient-to-b from-norbalt-400 to-norbalt-300 w-64 h-fit pb-3">
+<div aria-hidden="true" class="flex flex-wrap m-3 first rounded-md bg-gradient-to-b from-norbalt-400 to-norbalt-300 w-64 h-fit pb-3">
     <div class="inline-flex w-full mt-2 ml-3 h-fit text-xl font-semibold">
         <EditableTextField  editing={editingName} text={projectName} onSubmit={() => console.log("Save")}/>
         <span class="ml-1 mt-1 hover:text-offWhite" on:click={editName} aria-hidden="true"><Pencil/></span>

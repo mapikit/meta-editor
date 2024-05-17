@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { SystemConfiguration } from "src/entities/models/system-configuration";
-	import { PanelsStore } from "src/entities/stores/panels-store";
+	import { SystemConfiguration } from "../../../../entities/models/system-configuration";
+	import { PanelsStore } from "../../../../entities/stores/panels-store";
 
   export let content : PanelsStore<SystemConfiguration>;
 

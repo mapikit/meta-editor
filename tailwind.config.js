@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
     "./index.html",
     "./src/**/*.{svelte,js,ts}",
@@ -7,14 +7,18 @@ module.exports = {
   theme: {
     extend: {
       boxShadow: {
-        DEFAULT: '0 6px 6px -2px rgb(0 0 0 / 0.4);',
-        light: '0 3px 6px -2px rgb(0 0 0 / 0.24);',
-        contrast: '0 3px 5px -1px rgb(0 0 0 / 0.5);'
-      }
+        DEFAULT: "0 6px 6px -2px rgb(0 0 0 / 0.4);",
+        light: "0 3px 6px -2px rgb(0 0 0 / 0.24);",
+        contrast: "0 3px 5px -1px rgb(0 0 0 / 0.5);",
+      },
+      backgroundImage: {
+        "global-bg-gradient": "linear-gradient(172deg, rgba(12, 12, 38, 1) 0%,rgba(21, 21, 55, 1) 100%)",
+        "card-gradient": "linear-gradient(12deg, rgba(23, 24, 59, 1) 0%,rgba(33, 38, 74, 1) 90%)",
+      },
     },
     fontFamily: {
-      sans: ['Dosis', 'sans-serif'],
-      titles: ['Livvic', 'sans-serif']
+      sans: ["Dosis", "sans-serif"],
+      titles: ["Livvic", "sans-serif"],
     },
     colors: {
       white: "#ececfe",
@@ -63,10 +67,10 @@ module.exports = {
         300: "#21264a",
         350: "#ff00f4",
         400: "#151537",
-        500: "#10102e"
+        500: "#10102e",
       },
-      transparent: "#00000000"
-    }
+      transparent: "#00000000",
+    },
   },
   plugins: [],
-}
+};

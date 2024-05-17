@@ -2,7 +2,7 @@
 	import { Readable, get } from "svelte/store";
 	import DropArea from "../../components/drag-n-drop/drop-area.svelte";
   import { SubdivisionStore } from "../../../entities/stores/dock-subdivision-store";
-	import { DragElement } from "src/frontend/components/drag-n-drop/default-drag-context";
+	import { DragElement } from "../../components/drag-n-drop/default-drag-context";
 
   export let position : "top" | "bottom" | "left" | "right" | "horizontal" | "vertical" = "left";
   export let parent : SubdivisionStore;
