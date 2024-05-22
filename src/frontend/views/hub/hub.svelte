@@ -14,7 +14,7 @@
 </script>
 
 <div class="pt-24 w-full h-full overflow-y-scroll flex-col bg-global-bg-gradient flex items-center">
-<div class="flex flex-col flex-wrap w-full max-w-6xl px-8 pb-14 self-center">
+<div class="flex flex-col flex-wrap w-full max-w-7xl px-8 pb-14 self-center">
 <span class="justify-center stroke-2 h-48 pb-10"><MetaSystemIcon color={getTailwindColor("norbalt", 300)}
   width={1.3}/></span>
 <div>

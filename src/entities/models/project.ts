@@ -51,4 +51,15 @@ export class Project implements EditorEntityValue {
       identifier: this.identifier,
     };
   }
+
+  static newEmpty () : Project {
+    return new Project({
+      projectName: "new Project",
+      description: "project description",
+      identifier: nanoid(),
+      versions: [],
+      createdAt: new Date(Date.now()).toISOString(),
+      updatedAt: new Date(Date.now()).toISOString(),
+    });
+  }
 }
