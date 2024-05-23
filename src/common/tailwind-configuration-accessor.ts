@@ -1,5 +1,5 @@
 import resolveConfig from "tailwindcss/resolveConfig";
-import twConfig from "../../tailwind.config";
+import twConfig from "../data/tailwind-config";
 
 const tailwindData = resolveConfig(twConfig);
 

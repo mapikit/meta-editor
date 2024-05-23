@@ -27,6 +27,6 @@
     	"emitDecoratorMetadata": true
 
 	},
-	"include": ["src/**/*.ts", "src/**/*.svelte"],
+	"include": ["src/**/*.ts", "src/**/*.svelte", "src/**/*.js"],
 	"exclude": ["src/frontend/old/**"]
 }
