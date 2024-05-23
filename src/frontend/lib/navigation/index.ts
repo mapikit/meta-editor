@@ -105,6 +105,7 @@ class Navigation {
 
   public navigateTo (path : string) : void {
     this._pathSvelteStore.set(path);
+    console.log("Navigated to", path);
   }
 
   public goBack () : void {

@@ -5,16 +5,16 @@ import { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-t
 import { EnvironmentVariableEntity } from "meta-system/dist/src/entities/system-context";
 import { nanoid } from "nanoid";
 import { EditorEntityValue } from "./editor-entity-value";
+import { ProjectVersionInfo } from "src/common/types/serializables/project-config-type";
 
 export class SystemConfiguration implements ConfigurationType, EditorEntityValue {
-  constructor (configInfo ?: Partial<ConfigurationType & { identifier : string }>, projectId ?: string) {
-    this.identifier = configInfo?.identifier ?? this.identifier;
+  constructor (configInfo ?: ConfigurationType, projectId ?: string) {
     this.name = configInfo?.name;
     this.version = configInfo?.version;
-    this.envs = configInfo?.envs?.map(env => ({ ...env, identifier: nanoid() }));
-    this.schemas = configInfo?.schemas;
-    this.businessOperations = configInfo?.businessOperations;
-    this.addons = configInfo?.addons;
+    this.envs = configInfo?.envs?.map(env => ({ ...env, identifier: nanoid() })) ?? [];
+    this.schemas = configInfo?.schemas ?? [];
+    this.businessOperations = configInfo?.businessOperations ?? [];
+    this.addons = configInfo?.addons ?? [];
     this.projectId = projectId;
   }
 
@@ -26,8 +26,8 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
   public businessOperations : BusinessOperationType[];
   public addons : Addon[];
   public projectId : string;
-  public createdAt : Date;
-  public updatedAt : Date;
+  public createdAt : Date = new Date(Date.now());
+  public updatedAt : Date = new Date(Date.now());
 
   public toJson () : ConfigurationType {
     return {
@@ -40,6 +40,16 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
     };
   }
 
+  public toVersionInfo () : ProjectVersionInfo {
+    return {
+      identifier: this.identifier,
+      version: this.version,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+      path: `./versions/${this.version}`,
+    };
+  }
+
   public get duplicate () : ConfigurationType {
     return {
       name: this.name,
@@ -49,6 +59,17 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
       envs: this.envs,
       addons: this.addons,
     };
+  }
+
+  public static newEmpty () : SystemConfiguration {
+    return new SystemConfiguration({
+      name: "New Version Name",
+      version: "0.0.1",
+      businessOperations: [],
+      schemas: [],
+      addons: [],
+      envs: [],
+    });
   }
 }
 

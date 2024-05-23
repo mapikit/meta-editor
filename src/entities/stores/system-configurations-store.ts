@@ -57,6 +57,7 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
   // TODO verify this typing
   public toJson : never;
   public duplicate : never;
+  public toVersionInfo : never;
 }
 
 export const systemConfigurationsStore = new SelectedGenericStore<SystemConfigurationStore>();

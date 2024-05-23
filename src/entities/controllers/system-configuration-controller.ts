@@ -2,18 +2,40 @@ import { nanoid } from "nanoid";
 import { SystemConfiguration } from "../models/system-configuration";
 import { SystemConfigurationMutations } from "../mutations/system-configuration-mutations";
 import { PanelsMutations } from "../mutations/panels-mutations";
-import { systemConfigurationsStore } from "../stores/system-configurations-store";
 import { ConfigurationFileSystemController } from "./file-system-controller-functions/versions";
 import { Project } from "../models/project";
 import { ProjectsController } from "./projects-controller";
 import { ProjectsMutations } from "../mutations/projects-mutations";
 import { getNextVersion } from "../../electron/helpers/get-next-version";
+import { SystemConfigurationStore, systemConfigurationsStore } from "../stores/system-configurations-store";
+import { projectsStore } from "../stores/projects-store";
+import { get } from "svelte/store";
+import { ProjectsFileSystemController } from "./file-system-controller-functions/projects";
 
 export class SystemConfigurationController {
+  /** Creates a new empty configuration at the currently open project */
+  public static async createNewEmptyConfiguration () : Promise<SystemConfiguration> {
+    const newConfig = SystemConfiguration.newEmpty();
+    const currentProject = get(projectsStore.currentlyOpenItems);
+    newConfig.projectId = currentProject.identifier;
+    currentProject.versions.update(c => c.concat([newConfig.toVersionInfo()]));
+    systemConfigurationsStore.items.update((current) => {
+      current.push(new SystemConfigurationStore(newConfig));
+      return current;
+    });
+
+    const projectEntity = currentProject.toEntity();
+    await ConfigurationFileSystemController.update(projectEntity, newConfig);
+    await ProjectsFileSystemController.update(projectEntity);
+
+    return newConfig;
+  }
+
   public static loadConfigurationIntoView (configurationId : string) : void {
     const configuration = systemConfigurationsStore.getItemById(configurationId);
 
     SystemConfigurationMutations.openConfiguration(configurationId);
+    console.log(get(systemConfigurationsStore.items), configurationId);
     PanelsMutations.SetAvailableViewsByLoadingConfiguration(configuration.toEntity());
   }
 
@@ -42,11 +64,10 @@ export class SystemConfigurationController {
   }
 
   public static async duplicateConfiguration (parentProject : Project, configId : string) : Promise<void> {
-    const configInfo = parentProject.versions.find(version => version.identifier === configId);
+    const configInfo = await ConfigurationFileSystemController.readConfigurationFile(parentProject, configId);
     const newConfigEntity = new SystemConfiguration({
       ...configInfo,
       version: getNextVersion(parentProject.versions.map(version => version.version)),
-      identifier: nanoid(),
     }, parentProject.identifier);
 
     return ConfigurationFileSystemController.update(parentProject, newConfigEntity).then(async () => {
