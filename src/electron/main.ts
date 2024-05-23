@@ -27,14 +27,13 @@ export default class Main {
     const __dirname = path.dirname(__filename);
 
     Main.mainWindow = new Main.BrowserWindow({
-      width: 800,
+      width: 1200,
       height: 600,
       webPreferences: {
         preload: path.join(__dirname, "preload.mjs"),
         sandbox: false,
       },
     });
-
 
     const mode = process.env.NODE_ENV;
 

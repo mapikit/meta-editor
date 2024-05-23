@@ -8,7 +8,7 @@ import type { ProjectConfigType } from "../common/types/serializables/project-co
 import type { ConfigurationType } from "meta-system";
 import { nanoid } from "nanoid";
 import { Serializable } from "../common/types/serializable";
-import { SerializableEditorMetadata } from "../common/types/serializables/serialized-editor-metadata";
+import type { SerializableEditorMetadata } from "../common/types/serializables/serialized-editor-metadata";
 
 /**
  * Exposes a method to the electron renderer. Will be available through window.fileApi
@@ -203,6 +203,11 @@ export class ElectronFileSystem {
 
     await this.createEditorMetadata();
     return this.getFileData<SerializableEditorMetadata>(this.editorMetadataConfigPath);
+  }
+
+  @exposeInWindow
+  static async saveEditorMetadata (data : SerializableEditorMetadata) : Promise<void> {
+    return this.saveFileData(this.editorMetadataConfigPath, data);
   }
 
   /** Used for the first load - or when editor is reset */

@@ -17,4 +17,8 @@ export class EditorMetadata {
 
     return result;
   }
+
+  public toSerializable () : SerializableEditorMetadata {
+    return  { availableProjectsIds: this.availableProjectsIds };
+  }
 }
