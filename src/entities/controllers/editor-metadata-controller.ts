@@ -17,7 +17,6 @@ export class EditorMetadataController {
 
   public static async saveCurrentMetadata () : Promise<void> {
     const currentData = get(editorMetadataStoreSingleton.data);
-    console.log(this.fileApi);
     await this.fileApi.saveEditorMetadata(currentData.toSerializable());
   }
 }
