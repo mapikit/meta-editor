@@ -1,4 +1,5 @@
 <script lang="ts">
+  import NotificationStack from "./components/notifications/notification-stack.svelte";
   import MetaSystemIcon from "./icons/meta-system-icon.svelte";
   import { navigation } from "./lib/navigation";
 </script>
@@ -17,3 +18,5 @@
 <div class="mt-12 ml-12 w-[calc(100%_-_48px)] h-[calc(100%_-_48px)] z-0 fixed">
   <slot></slot> <!-- content -->
 </div>
+
+<NotificationStack />

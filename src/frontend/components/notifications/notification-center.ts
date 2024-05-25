@@ -1,16 +1,18 @@
 // eslint-disable-next-line max-classes-per-file
+import { nanoid } from "nanoid";
 import { Writable, get, writable } from "svelte/store";
 
 type NotificationTypes = "warn" | "info" | "error" | "debug";
 
-class NotificationAction {
+export class NotificationAction {
   public constructor (
     public call : () => void,
     public text : string,
   ) {}
 }
 
-class NotificationData {
+export class NotificationData {
+  public readonly identifier : string = nanoid();
   public buttonActions : NotificationAction[] = [];
   // eslint-disable-next-line max-params
   public constructor (
@@ -42,6 +44,12 @@ class NotificationCenter {
 
   public notify (notification : NotificationData) : void {
     this.currentlyVisibleNotifications.update(current => current.concat([notification]));
+  }
+
+  public dismiss (notification : NotificationData) : void {
+    this.currentlyVisibleNotifications.update(current =>
+      current.filter((n) => n !== notification),
+    );
   }
 }
 
