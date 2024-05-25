@@ -21,6 +21,30 @@ export class NotificationData {
     public description : string,
     public durationMs ?: number,
   ) {}
+
+  private timer : ReturnType<typeof setTimeout> = null;
+  public ticking : Writable<boolean> = writable(false);
+  public finished : Writable<boolean> = writable(false);
+
+  private coyoteTime : number = 500;
+  public startTimer () : void {
+    if (!this.durationMs || this.durationMs === 0) return;
+
+    setTimeout(() => {
+      this.ticking.set(true);
+    }, this.coyoteTime);
+
+    this.timer = setTimeout(() => {
+      notificationManager.dismiss(this);
+      this.finished.set(true);
+      this.ticking.set(false);
+    }, this.durationMs + this.coyoteTime);
+  }
+
+  public stop () : void {
+    clearTimeout(this.timer);
+    this.ticking.set(false);
+  }
 }
 
 class NotificationCenter {
@@ -50,6 +74,8 @@ class NotificationCenter {
     this.currentlyVisibleNotifications.update(current =>
       current.filter((n) => n !== notification),
     );
+
+    this.dismissedNotifications.update(current => current.concat([notification]));
   }
 }
 
