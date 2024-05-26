@@ -5,7 +5,7 @@
   import TextButton from "../text-button.svelte";
   import NotificationCard from "./notification-card.svelte";
 
-  let open = true;
+  let open = false;
   let { hasPending, pendingNotifications, dismissedNotifications, dismissAll, clearAll } = notificationManager;
 </script>
 
