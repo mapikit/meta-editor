@@ -14,6 +14,7 @@ export default {
       backgroundImage: {
         "global-bg-gradient": "linear-gradient(172deg, rgba(12, 12, 38, 1) 0%,rgba(21, 21, 55, 1) 100%)",
         "card-gradient": "linear-gradient(12deg, rgba(23, 24, 59, 1) 0%,rgba(33, 38, 74, 1) 90%)",
+        "sidebar-gradient": "linear-gradient(90deg, rgba(23, 24, 59, 1) 0%,rgba(33, 38, 74, 1) 480%)",
       },
     },
     fontFamily: {
