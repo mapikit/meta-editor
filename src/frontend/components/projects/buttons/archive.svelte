@@ -1,7 +1,7 @@
 <script lang="ts">
     import { ProjectVersionInfo } from "../../../../common/types/serializables/project-config-type";
-    import { ConfigurationFileSystemController } from "../../../../entities/controllers/file-system-controller-functions/versions";
     import { ProjectsController } from "../../../../entities/controllers/projects-controller";
+    import { SystemConfigurationController } from "../../../../entities/controllers/system-configuration-controller";
     import { Project } from "../../../../entities/models/project";
     import Trash from "../../../icons/new-icons/trash.svelte";
     export let version : ProjectVersionInfo;
@@ -11,7 +11,7 @@
     async function deleteVersionOrProject () : Promise<void> {
       // TODO Alert before archive
       if(!version) await ProjectsController.archiveProject(parentProject);
-      else await ConfigurationFileSystemController.archiveConfiguration(parentProject, version);
+      else await SystemConfigurationController.archive(parentProject, version.identifier);
     }
 </script>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { get } from "svelte/store";
-  import projectsStore from "../../../entities/stores/projects-store";
+  import { projectsStore } from "../../../entities/stores/projects-store";
   import ProjectPreviewCard from "./project-preview-card.svelte";
   import MetaSystemIcon from "../../icons/meta-system-icon.svelte";
   import { navigation } from "../../lib/navigation";
