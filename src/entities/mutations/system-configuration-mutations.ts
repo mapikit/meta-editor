@@ -14,7 +14,6 @@ export class SystemConfigurationMutations {
 
     systemConfigurationsStore.items.update((current) => {
       current.push(new SystemConfigurationStore(configuration));
-
       return current;
     });
   }
@@ -26,6 +25,12 @@ export class SystemConfigurationMutations {
       configs[configIndex] = new SystemConfigurationStore(configuration);
       return configs;
     });
+  }
+
+  public static getConfigInfo (configId : string) : SystemConfiguration {
+    const configInfo = get(systemConfigurationsStore.items).find(config => config.identifier === configId);
+    if(!configInfo) console.error("No config found with id", configId);
+    return configInfo.toEntity();
   }
 
   public static configIsLoaded (configId : string) : boolean {

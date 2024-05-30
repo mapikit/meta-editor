@@ -7,6 +7,7 @@ import { ConfigurationFileSystemController } from "./file-system-controller-func
 import { Project } from "../models/project";
 import { ProjectsController } from "./projects-controller";
 import { ProjectsMutations } from "../mutations/projects-mutations";
+import { getNextVersion } from "../../electron/helpers/get-next-version";
 
 export class SystemConfigurationController {
   public static loadConfigurationIntoView (configurationId : string) : void {
@@ -33,16 +34,24 @@ export class SystemConfigurationController {
   }
 
   public static async archive (parentProject : Project, configurationId : string) : Promise<void> {
-    SystemConfigurationMutations.removeConfiguration(configurationId);
-    parentProject.removeVersionById(configurationId);
-    ProjectsMutations.updateLoadedProject(parentProject);
     const versionInfo = parentProject.versions.find(version => version.identifier == configurationId);
-    return ConfigurationFileSystemController.archiveConfiguration(parentProject, versionInfo);
+    return ConfigurationFileSystemController.archiveConfiguration(parentProject, versionInfo).then(() => {
+      SystemConfigurationMutations.removeConfiguration(configurationId);
+      ProjectsMutations.updateLoadedProject(parentProject);
+    });
   }
 
   public static async duplicateConfiguration (parentProject : Project, configId : string) : Promise<void> {
-    const versionInfo = parentProject.versions.find(version => version.identifier === configId);
-    return ConfigurationFileSystemController.duplicate(versionInfo, parentProject);
+    const configInfo = parentProject.versions.find(version => version.identifier === configId);
+    const newConfigEntity = new SystemConfiguration({
+      ...configInfo,
+      version: getNextVersion(parentProject.versions.map(version => version.version)),
+      identifier: nanoid(),
+    }, parentProject.identifier);
+
+    return ConfigurationFileSystemController.update(parentProject, newConfigEntity).then(async () => {
+      await ProjectsController.loadProject(parentProject.identifier);
+    });
   }
 
   public static TESTAddAndLoadConfiguration () : void {
