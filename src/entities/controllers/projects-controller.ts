@@ -20,7 +20,7 @@ export class ProjectsController {
     await EditorMetadataController.saveCurrentMetadata();
   }
 
-  static async selectProject (project : ProjectStore) : Promise<void> {
+  static async selectProject (project : Project) : Promise<void> {
     ProjectsMutations.openProject(project.identifier);
     const configurations = await ConfigurationFileSystemController.loadAllFromProject(project);
     SystemConfigurationMutations.setAvailableConfigurations(configurations);

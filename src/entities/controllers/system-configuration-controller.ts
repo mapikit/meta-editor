@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import { SystemConfiguration } from "../models/system-configuration";
 import { SystemConfigurationMutations } from "../mutations/system-configuration-mutations";
 import { PanelsMutations } from "../mutations/panels-mutations";
@@ -8,16 +7,13 @@ import { ProjectsController } from "./projects-controller";
 import { ProjectsMutations } from "../mutations/projects-mutations";
 import { getNextVersion } from "../../electron/helpers/get-next-version";
 import { SystemConfigurationStore, systemConfigurationsStore } from "../stores/system-configurations-store";
-import { projectsStore } from "../stores/projects-store";
-import { get } from "svelte/store";
 import { ProjectsFileSystemController } from "./file-system-controller-functions/projects";
 
 export class SystemConfigurationController {
   /** Creates a new empty configuration at the currently open project */
   public static async createNewEmptyConfiguration () : Promise<SystemConfiguration> {
-    const newConfig = SystemConfiguration.newEmpty();
-    const currentProject = get(projectsStore.currentlyOpenItems);
-    newConfig.projectId = currentProject.identifier;
+    const currentProject = ProjectsMutations.getCurrentlySelected();
+    const newConfig = SystemConfiguration.newEmpty(currentProject.identifier);
     currentProject.versions.update(c => c.concat([newConfig.toVersionInfo()]));
     systemConfigurationsStore.items.update((current) => {
       current.push(new SystemConfigurationStore(newConfig));
@@ -35,7 +31,6 @@ export class SystemConfigurationController {
     const configuration = systemConfigurationsStore.getItemById(configurationId);
 
     SystemConfigurationMutations.openConfiguration(configurationId);
-    console.log(get(systemConfigurationsStore.items), configurationId);
     PanelsMutations.SetAvailableViewsByLoadingConfiguration(configuration.toEntity());
   }
 
@@ -73,25 +68,5 @@ export class SystemConfigurationController {
     return ConfigurationFileSystemController.update(parentProject, newConfigEntity).then(async () => {
       await ProjectsController.loadProject(parentProject.identifier);
     });
-  }
-
-  public static TESTAddAndLoadConfiguration () : void {
-    const stubConfig = new SystemConfiguration();
-    stubConfig.addons = [];
-    stubConfig.businessOperations = [];
-    stubConfig.envs = [];
-    stubConfig.name = "my Test Config";
-    stubConfig.projectId = nanoid();
-    stubConfig.schemas = [
-      {
-        "format": {},
-        "identifier": nanoid(),
-        "name": "My Schema",
-      },
-    ];
-    stubConfig.version = "0.0.1";
-
-    SystemConfigurationMutations.addConfiguration(stubConfig);
-    SystemConfigurationController.loadConfigurationIntoView(stubConfig.identifier);
   }
 }

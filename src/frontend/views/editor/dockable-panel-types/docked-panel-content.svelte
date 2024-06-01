@@ -7,7 +7,6 @@
   export let viewContent : PanelsStore<any>;
 
   const { panelType: viewType } = viewContent;
-  console.log($viewType);
 </script>
 
 {#if $viewType === "Configure Schema"}

@@ -4,7 +4,6 @@ import { InjectedWindow } from "../../../common/types/injected-window";
 import { SystemConfiguration } from "../../models/system-configuration";
 import { MetaEditorInfoType } from "../../../common/types/meta-editor-info";
 import { ProjectsFileSystemController } from "./projects";
-import { ProjectStore } from "src/entities/stores/projects-store";
 
 export class ConfigurationFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
@@ -26,11 +25,11 @@ export class ConfigurationFileSystemController {
     await this.fileApi.saveVersion(parentProject.toJson(), version.toJson(), {} as MetaEditorInfoType);
   }
 
-  public static async loadAllFromProject (parentProject : ProjectStore) : Promise<SystemConfiguration[]> {
-    const versions = parentProject.toEntity().listVersions();
+  public static async loadAllFromProject (parentProject : Project) : Promise<SystemConfiguration[]> {
+    const versions = parentProject.versions.map(v => v.identifier);
     const allConfigurationsPromise = versions.map(v => this.fileApi.getVersion(parentProject.identifier, v));
 
     const allConfigurations = await Promise.all(allConfigurationsPromise);
-    return allConfigurations.map(c => new SystemConfiguration(c));
+    return allConfigurations.map(c => new SystemConfiguration(c, parentProject.identifier));
   }
 }

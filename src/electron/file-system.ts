@@ -10,6 +10,7 @@ import { nanoid } from "nanoid";
 import { Serializable } from "../common/types/serializable";
 import type { SerializableEditorMetadata } from "../common/types/serializables/serialized-editor-metadata";
 import { getNextVersion } from "./helpers/get-next-version.js";
+import type { EntityValue } from "meta-system/dist/src/entities/meta-entity";
 
 /**
  * Exposes a method to the electron renderer. Will be available through window.fileApi
@@ -59,10 +60,13 @@ export class ElectronFileSystem {
   }
 
   @exposeInWindow
-  static async saveVersion (project : ProjectConfigType, config : ConfigurationType, editor : MetaEditorInfoType)
-    : Promise<void> {
+  static async saveVersion (
+    project : ProjectConfigType,
+    config : EntityValue<ConfigurationType>,
+    editor : MetaEditorInfoType,
+  ) : Promise<void> {
     const projectDir = this.getProjectDirPath(project.identifier);
-    const proposedVersionDir = this.decideVersionDir(project, config["identifier"]);
+    const proposedVersionDir = this.decideVersionDir(project, config.identifier);
     const versionPath = path.isAbsolute(proposedVersionDir) ?
       proposedVersionDir : path.join(projectDir, proposedVersionDir, "config.json");
     const versionDir = path.parse(versionPath).dir;
@@ -88,22 +92,17 @@ export class ElectronFileSystem {
     : string {
     let versionInfoIndex = projectConfig.versions.findIndex(_version => _version.identifier === versionId);
     if(versionInfoIndex === -1) {
-      const newId = nanoid();
-      const projectDirPath = this.getProjectDirPath(projectConfig.identifier);
-      const versionPath = this.getVersionDirPath(projectConfig.identifier, newId);
-      const relativePath = path.relative(projectDirPath, versionPath);
       const date = new Date().toISOString();
 
       projectConfig.versions.unshift({
         createdAt: date, updatedAt: date,
         version: getNextVersion(projectConfig.versions.map(version => version.version)),
-        path: relativePath,
         identifier: nanoid(),
       });
       versionInfoIndex = 0;
     }
 
-    return projectConfig.versions[versionInfoIndex].path;
+    return `./versions/${projectConfig.versions[versionInfoIndex].identifier}`;
   }
 
   private static async saveFileData (filePath : string, data : string | object) : Promise<void> {
@@ -152,7 +151,7 @@ export class ElectronFileSystem {
   }
 
   @exposeInWindow
-  static async getVersion (projectIdentifier : string, versionId : string) : Promise<ConfigurationType> {
+  static async getVersion (projectIdentifier : string, versionId : string) : Promise<EntityValue<ConfigurationType>> {
     const prj = await this.getProjectInfo(projectIdentifier);
     this.decideVersionDir(prj, versionId);
     const versionPath = this.getVersionConfigPath(projectIdentifier, versionId);

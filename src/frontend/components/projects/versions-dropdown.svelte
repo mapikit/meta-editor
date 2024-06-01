@@ -5,9 +5,9 @@
     import Squares from "./buttons/duplicate.svelte";
     import { clickOutside } from "../../lib/click-outside-directive";
     import { CaretDown } from "phosphor-svelte";
-    import { ProjectStore } from "../../../entities/stores/projects-store";
+    import { Project } from "../../../entities/stores/projects-store";
 
-    export let parentProject : ProjectStore;
+    export let parentProject : Project;
     let versionsStore = parentProject.versions;
     let expanded = false;
 </script>

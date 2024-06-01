@@ -2,7 +2,6 @@
 	import { onMount } from "svelte";
 	import DockingArea from "./views/editor/editor.svelte";
 	import { CursorMutations } from "../entities/mutations/cursor-mutations";
-	import { SystemConfigurationController } from "../entities/controllers/system-configuration-controller";
 	import { DockController } from "../entities/controllers/dock-controller";
   import { GenericLayoutStateMutations } from "../entities/mutations/layout-state-mutations";
   import genericLayoutStateStore from "../entities/stores/generic-layout-state-store";
@@ -29,7 +28,6 @@
     spawn();
     GenericLayoutStateMutations.reset();
     GenericLayoutStateMutations.setLoading();
-    SystemConfigurationController.TESTAddAndLoadConfiguration();
     DockController.bootDefault();
     GenericLayoutStateMutations.setDone();
   });
