@@ -7,10 +7,11 @@ import { nanoid } from "nanoid";
 import { EditorEntityValue } from "./editor-entity-value";
 
 export class SystemConfiguration implements ConfigurationType, EditorEntityValue {
-  constructor (configInfo ?: Partial<ConfigurationType>, projectId ?: string) {
+  constructor (configInfo ?: Partial<ConfigurationType & { identifier : string }>, projectId ?: string) {
+    this.identifier = configInfo?.identifier ?? this.identifier;
     this.name = configInfo?.name;
     this.version = configInfo?.version;
-    this.envs = configInfo?.envs.map(env => ({ ...env, identifier: nanoid() }));
+    this.envs = configInfo?.envs?.map(env => ({ ...env, identifier: nanoid() }));
     this.schemas = configInfo?.schemas;
     this.businessOperations = configInfo?.businessOperations;
     this.addons = configInfo?.addons;

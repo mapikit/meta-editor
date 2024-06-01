@@ -9,6 +9,7 @@ import type { ConfigurationType } from "meta-system";
 import { nanoid } from "nanoid";
 import { Serializable } from "../common/types/serializable";
 import type { SerializableEditorMetadata } from "../common/types/serializables/serialized-editor-metadata";
+import { getNextVersion } from "./helpers/get-next-version.js";
 
 /**
  * Exposes a method to the electron renderer. Will be available through window.fileApi
@@ -49,19 +50,19 @@ export class ElectronFileSystem {
     return path.join(this.getProjectDirPath(projectIdentifier), "project-config.json");
   }
 
-  private static getVersionDirPath (projectIdentifier : string, version : string) : string {
-    return path.join(this.getProjectDirPath(projectIdentifier), "versions", version);
+  private static getVersionDirPath (projectIdentifier : string, versionId : string) : string {
+    return path.join(this.getProjectDirPath(projectIdentifier), "versions", versionId);
   }
 
-  private static getVersionConfigPath (projectIdentifier : string, version : string) : string {
-    return path.join(this.getVersionDirPath(projectIdentifier, version), "config.json");
+  private static getVersionConfigPath (projectIdentifier : string, versionId : string) : string {
+    return path.join(this.getVersionDirPath(projectIdentifier, versionId), "config.json");
   }
 
   @exposeInWindow
   static async saveVersion (project : ProjectConfigType, config : ConfigurationType, editor : MetaEditorInfoType)
     : Promise<void> {
     const projectDir = this.getProjectDirPath(project.identifier);
-    const proposedVersionDir = this.decideVersionDir(project, config.version);
+    const proposedVersionDir = this.decideVersionDir(project, config["identifier"]);
     const versionPath = path.isAbsolute(proposedVersionDir) ?
       proposedVersionDir : path.join(projectDir, proposedVersionDir, "config.json");
     const versionDir = path.parse(versionPath).dir;
@@ -83,18 +84,19 @@ export class ElectronFileSystem {
   }
 
   // eslint-disable-next-line max-lines-per-function
-  private static decideVersionDir (projectConfig : ProjectConfigType, version : string)
+  private static decideVersionDir (projectConfig : ProjectConfigType, versionId : string)
     : string {
-    let versionInfoIndex = projectConfig.versions.findIndex(_version => _version.version === version);
+    let versionInfoIndex = projectConfig.versions.findIndex(_version => _version.identifier === versionId);
     if(versionInfoIndex === -1) {
+      const newId = nanoid();
       const projectDirPath = this.getProjectDirPath(projectConfig.identifier);
-      const versionPath = this.getVersionDirPath(projectConfig.identifier, version);
+      const versionPath = this.getVersionDirPath(projectConfig.identifier, newId);
       const relativePath = path.relative(projectDirPath, versionPath);
       const date = new Date().toISOString();
 
       projectConfig.versions.unshift({
         createdAt: date, updatedAt: date,
-        version: version,
+        version: getNextVersion(projectConfig.versions.map(version => version.version)),
         path: relativePath,
         identifier: nanoid(),
       });
@@ -107,8 +109,15 @@ export class ElectronFileSystem {
   private static async saveFileData (filePath : string, data : string | object) : Promise<void> {
     const dir = path.parse(filePath).dir;
     await this.createDir(dir);
-    fs.writeFileSync(filePath, typeof data === "string" ?
-      data : JSON.stringify(data, undefined, 4));
+    return new Promise<void>((resolve, reject) => {
+      const _data = typeof data === "string" ? data : JSON.stringify(data, undefined, 4);
+      fs.writeFile(filePath, _data, (error) => {
+        if(error) {
+          console.error("Error while writing file", filePath, error);
+          reject(error);
+        } else resolve();
+      });
+    });
   }
 
   private static async getFileData<T> (filePath : string) : Promise<Serializable<T>> {
@@ -143,10 +152,10 @@ export class ElectronFileSystem {
   }
 
   @exposeInWindow
-  static async getVersion (projectIdentifier : string, version : string) : Promise<ConfigurationType> {
+  static async getVersion (projectIdentifier : string, versionId : string) : Promise<ConfigurationType> {
     const prj = await this.getProjectInfo(projectIdentifier);
-    this.decideVersionDir(prj, version);
-    const versionPath = this.getVersionConfigPath(projectIdentifier, version);
+    this.decideVersionDir(prj, versionId);
+    const versionPath = this.getVersionConfigPath(projectIdentifier, versionId);
     if(!fs.existsSync(versionPath)) return undefined;
     return JSON.parse(fs.readFileSync(versionPath).toString());
   }
@@ -154,14 +163,10 @@ export class ElectronFileSystem {
 
   @exposeInWindow
   // TODO change to delete from archive
-  static async deleteVersion (projectInfo : ProjectConfigType, version : string) : Promise<void> {
+  static async deleteVersion (projectInfo : ProjectConfigType, versionId : string) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.identifier);
-    const versionDir = this.decideVersionDir(projectInfo, version);
+    const versionDir = this.decideVersionDir(projectInfo, versionId);
     fs.rmSync(path.join(projectDirPath, versionDir), { recursive: true });
-
-    const projectConfigPath = this.getProjectConfigPath(projectInfo.identifier);
-    projectInfo.versions = projectInfo.versions.filter(_version => _version.version !== version);
-    await this.saveFileData(projectConfigPath, projectInfo);
   }
 
   @exposeInWindow
@@ -180,16 +185,12 @@ export class ElectronFileSystem {
   }
 
   @exposeInWindow
-  static async archiveVersion (projectInfo : ProjectConfigType, version : string) : Promise<void> {
+  static async archiveVersion (projectInfo : ProjectConfigType, versionId : string) : Promise<void> {
     const projectDirPath = this.getProjectDirPath(projectInfo.identifier);
-    const versionDir = this.decideVersionDir(projectInfo, version);
-    const archive = path.join(this.versionArchivePath, projectInfo.identifier, version);
+    const versionDir = this.decideVersionDir(projectInfo, versionId);
+    const archive = path.join(this.versionArchivePath, projectInfo.identifier, versionId);
     await this.createDir(archive);
     await this.moveDir(path.join(projectDirPath, versionDir), archive);
-
-    const projectConfigPath = this.getProjectConfigPath(projectInfo.identifier);
-    projectInfo.versions = projectInfo.versions.filter(_version => _version.version !== version);
-    await this.saveFileData(projectConfigPath, projectInfo);
   }
 
   @exposeInWindow

@@ -33,6 +33,11 @@ export class Project implements EditorEntityValue {
     if(index !== -1) this.versions.splice(index, 1);
   }
 
+  public removeVersionById (versionId : string) : void {
+    const index = this.versions.findIndex(_version => _version.identifier === versionId);
+    if(index !== -1) this.versions.splice(index, 1);
+  }
+
   public setVersion (version : ProjectVersionInfo) : void {
     this.versions.push(version);
   }

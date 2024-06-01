@@ -49,6 +49,7 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
     result.projectId = get(this.projectId);
     result.createdAt = get(this.createdAt);
     result.updatedAt = get(this.updatedAt);
+    result.identifier = this.identifier;
 
     return result;
   }

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import ProjectCard from "../components/projects/project-card.svelte";
-	import { FileSystemController } from "../../entities/controllers/file-system-controller.js";
-	import projectsStore from "../../entities/stores/projects-store.js";
   import MetaSystemIcon from "../icons/meta-system-icon.svelte";
   import TextButton from "../components/text-button.svelte";
   import { navigation } from "../lib/navigation";
   import { ProjectsController } from "../../entities/controllers/projects-controller";
+  import { projectsStore } from "../../entities/stores/projects-store";
 
   const projects = projectsStore.items;
 </script>
@@ -20,12 +19,12 @@
       <TextButton text="Create" clickFunction={ProjectsController.createNewProject}/>
       <TextButton text="Import From Folder" lessMargin clickFunction={() => {}}/>
    </div>
-    {#await FileSystemController.projectsController.loadAll()}
+    {#await ProjectsController.loadAllProjects()}
     Loading Projects...
     {:then result}
     <div class="flex flex-wrap -ml-3 mt-2">
       {#each $projects as project}
-       <ProjectCard project={project}/>
+        <ProjectCard project={project}/>
       {/each}
     </div>
     {/await}
