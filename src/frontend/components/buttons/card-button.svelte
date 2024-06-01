@@ -3,6 +3,7 @@
   export let clickFunction : () => void;
   export let hoverColor : "yellow" | "blue" | "green" | "red" | "default" = "default";
   let clazz : string = "w-full h-full";
+  export let noOutline : boolean = false;
 
   export { clazz as class };
 
@@ -17,11 +18,13 @@
       ? "hover:outline-royalBlue" : hoverColor === "green"
         ? "hover:outline-brightGreen" : hoverColor === "red"
           ? "hover:outline-roseRed" : "hover:outline-norbalt-100";
+
+  let outlineStyle = "outline outline-2 outline-norbalt-200 " + hoverOutlineColor;
 </script>
 
-<button class="bg-norbalt-400 ochre {clazz} rounded transition-all
+<button class="bg-norbalt-400 ochre rounded transition-all
  text-offWhite {color} flex justify-center items-center text-lg
- outline outline-2 outline-norbalt-200 {hoverOutlineColor}"
+ {noOutline ? "outline-none" : outlineStyle} {clazz}"
 on:click={clickFunction}>
   <slot>
 

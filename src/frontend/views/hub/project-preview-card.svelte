@@ -55,7 +55,7 @@
     <button on:click={goToLatestVersion}
       class="inline-flex items-center rounded right-2 top-2
       bg-norbalt-400 px-2 text-offWhite hover:text-white transition-all
-      {hovered ? "opacity-100" : "opacity-5"}"
+      {hovered ? "opacity-100" : "opacity-0"}"
       >
       {quickEditButtonText}
       <ArrowRight class="ml-2" />

@@ -22,7 +22,7 @@
     {#await ProjectsController.loadAllProjects()}
     Loading Projects...
     {:then result}
-    <div class="flex flex-wrap py-5">
+    <div class="flex flex-wrap py-5 -ml-6 -mt-6 pointer-events-none">
       {#each $projects as project}
         <ProjectCard project={project}/>
       {/each}

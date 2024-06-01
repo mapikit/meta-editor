@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       boxShadow: {
-        DEFAULT: "0 6px 6px -2px rgb(0 0 0 / 0.4);",
+        DEFAULT: "0 4px 19px -8px rgb(3 3 12 / 0.31);",
         light: "0 3px 6px -2px rgb(0 0 0 / 0.24);",
         contrast: "0 3px 5px -1px rgb(0 0 0 / 0.5);",
       },
