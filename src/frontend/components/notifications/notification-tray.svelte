@@ -2,7 +2,7 @@
   import { BellSimple } from "phosphor-svelte";
   import { notificationManager } from "./notification-center";
   import { slide } from "svelte/transition";
-  import TextButton from "../text-button.svelte";
+  import TextButton from "../buttons/text-button.svelte";
   import NotificationCard from "./notification-card.svelte";
 
   let open = false;

@@ -5,7 +5,7 @@
   import MetaSystemIcon from "../../icons/meta-system-icon.svelte";
   import { navigation } from "../../lib/navigation";
   import { getTailwindColor } from "../../../common/tailwind-configuration-accessor";
-  import TextButton from "../../components/text-button.svelte";
+  import TextButton from "../../components/buttons/text-button.svelte";
   import { ProjectsController } from "../../../entities/controllers/projects-controller";
 
   function navigateToProjects () : void {

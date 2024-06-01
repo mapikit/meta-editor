@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ProjectVersionInfo } from "../../../../common/types/project-config-type";
+  import { ProjectVersionInfo } from "../../../../common/types/serializables/project-config-type";
     import Edit from "../../../icons/new-icons/edit.svelte";
     export let version : ProjectVersionInfo;
 
