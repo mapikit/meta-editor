@@ -4,16 +4,15 @@ import { systemConfigurationsStore } from "../stores/system-configurations-store
 import { ProjectsFileSystemController } from "./file-system-controller-functions/projects";
 import { ProjectsMutations } from "../mutations/projects-mutations";
 import { SystemConfigurationMutations } from "../mutations/system-configuration-mutations";
-import projectsStore from "../stores/projects-store";
+import { ProjectStore, projectsStore } from "../stores/projects-store";
 import { EditorMetadataController } from "./editor-metadata-controller";
-import { FileSystemController } from "./file-system-controller";
 
 export class ProjectsController {
   static async createNewProject () : Promise<void> {
     const newProject = Project.newEmpty();
-    await FileSystemController.projectsController.update(newProject);
+    await ProjectsFileSystemController.update(newProject);
     projectsStore.items.update((projects) => {
-      projects.push(newProject);
+      projects.push(new ProjectStore(newProject));
       return projects;
     });
     await EditorMetadataController.appendProjectIdentifier(newProject.identifier);

@@ -6,7 +6,7 @@
   import { navigation } from "../../lib/navigation";
     import { getTailwindColor } from "../../../common/tailwind-configuration-accessor";
   import TextButton from "../../components/text-button.svelte";
-  import { ProjectsController } from "src/entities/controllers/projects-controller";
+  import { ProjectsController } from "../../../entities/controllers/projects-controller";
 
   function navigateToProjects () : void {
     navigation.navigateTo("/projects");

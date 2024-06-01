@@ -33,8 +33,7 @@ export class ProjectStore implements StoreEntityModel<Project> {
       projectName: get(this.projectName),
       updatedAt: get(this.updatedAt).toISOString(),
       versions: get(this.versions),
-    },
-    );
+    });
 
     return result;
   }
