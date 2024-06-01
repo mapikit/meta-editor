@@ -6,6 +6,7 @@ import { ProjectsMutations } from "../mutations/projects-mutations";
 import { SystemConfigurationMutations } from "../mutations/system-configuration-mutations";
 import { ProjectStore, projectsStore } from "../stores/projects-store";
 import { EditorMetadataController } from "./editor-metadata-controller";
+import { ConfigurationFileSystemController } from "./file-system-controller-functions/versions";
 
 export class ProjectsController {
   static async createNewProject () : Promise<void> {
@@ -19,7 +20,14 @@ export class ProjectsController {
     await EditorMetadataController.saveCurrentMetadata();
   }
 
-  static async saveProject (project : Project) : Promise<void> {
+  static async selectProject (project : Project) : Promise<void> {
+    ProjectsMutations.openProject(project.identifier);
+    const configurations = await ConfigurationFileSystemController.loadAllFromProject(project);
+    SystemConfigurationMutations.setAvailableConfigurations(configurations);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static async saveProject (_project : Project) : Promise<void> {
   }
 
   static async deleteProject (project : Project) : Promise<void> {

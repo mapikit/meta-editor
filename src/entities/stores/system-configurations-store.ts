@@ -38,7 +38,7 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
   }
 
   public toEntity () : SystemConfiguration {
-    const result = new SystemConfiguration();
+    const result = SystemConfiguration.newEmpty(get(this.projectId));
 
     result.name = get(this.name);
     result.version = get(this.version);
@@ -57,6 +57,7 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
   // TODO verify this typing
   public toJson : never;
   public duplicate : never;
+  public toVersionInfo : never;
 }
 
 export const systemConfigurationsStore = new SelectedGenericStore<SystemConfigurationStore>();

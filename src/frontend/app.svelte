@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import DockingArea from "./views/editor/docking-area.svelte";
+	import DockingArea from "./views/editor/editor.svelte";
 	import { CursorMutations } from "../entities/mutations/cursor-mutations";
-	import { SystemConfigurationController } from "../entities/controllers/system-configuration-controller";
 	import { DockController } from "../entities/controllers/dock-controller";
   import { GenericLayoutStateMutations } from "../entities/mutations/layout-state-mutations";
   import genericLayoutStateStore from "../entities/stores/generic-layout-state-store";
@@ -12,6 +11,7 @@
   import Hub from "./views/hub/hub.svelte";
   import Projects from "./views/projects.svelte";
   import { EditorMetadataMutations } from "../entities/mutations/editor-metadata-mutations";
+  import Editor from "./views/editor/editor.svelte";
 
   const spawn = () : void => {
     loading.set(true);
@@ -28,7 +28,6 @@
     spawn();
     GenericLayoutStateMutations.reset();
     GenericLayoutStateMutations.setLoading();
-    SystemConfigurationController.TESTAddAndLoadConfiguration();
     DockController.bootDefault();
     GenericLayoutStateMutations.setDone();
   });
@@ -49,6 +48,9 @@
       </Route>
       <Route path="/projects">
         <Projects />
+      </Route>
+      <Route path="/projects/:identifier/versions/:version_identifier">
+        <Editor />
       </Route>
     </Switch>
   </Layout>

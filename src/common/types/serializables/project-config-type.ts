@@ -11,7 +11,6 @@ export type ProjectConfigType = {
 export type ProjectVersionInfo = {
   identifier : string;
   version : string;
-  path : string;
   updatedAt : string;
   createdAt : string;
 };

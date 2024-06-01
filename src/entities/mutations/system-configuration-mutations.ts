@@ -48,4 +48,9 @@ export class SystemConfigurationMutations {
       return configurations.filter(config => config.identifier !== configId);
     });
   }
+
+  public static setAvailableConfigurations (configurations : SystemConfiguration[]) : void {
+    systemConfigurationsStore.items.set(configurations.map(cf => new SystemConfigurationStore(cf)));
+    systemConfigurationsStore.currentlyOpenItemId.set(null);
+  }
 }

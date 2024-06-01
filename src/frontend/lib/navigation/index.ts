@@ -49,8 +49,6 @@ class Navigation {
 
   public registerPath (path : string) : void {
     this._registeredPaths.add(this.normalizePath(path));
-    console.log(`Registered Path ${this.normalizePath(path)}`);
-
     this._pathSvelteStore.update((value) => value);
   }
 

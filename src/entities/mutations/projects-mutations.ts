@@ -1,3 +1,4 @@
+import { get } from "svelte/store";
 import { Project } from "../models/project";
 import { ProjectStore, projectsStore } from "../stores/projects-store";
 
@@ -27,6 +28,10 @@ export class ProjectsMutations {
       }
       return current;
     });
+  }
+
+  public static getCurrentlySelected () : ProjectStore {
+    return get(projectsStore.currentlyOpenItems);
   }
 
   public static projectIsLoaded (projectId : string) : boolean {

@@ -24,4 +24,12 @@ export class ConfigurationFileSystemController {
   public static async update (parentProject : Project, version : SystemConfiguration) : Promise<void> {
     await this.fileApi.saveVersion(parentProject.toJson(), version.toJson(), {} as MetaEditorInfoType);
   }
+
+  public static async loadAllFromProject (parentProject : Project) : Promise<SystemConfiguration[]> {
+    const versions = parentProject.versions.map(v => v.identifier);
+    const allConfigurationsPromise = versions.map(v => this.fileApi.getVersion(parentProject.identifier, v));
+
+    const allConfigurations = await Promise.all(allConfigurationsPromise);
+    return allConfigurations.map(c => new SystemConfiguration(c, parentProject.identifier));
+  }
 }
