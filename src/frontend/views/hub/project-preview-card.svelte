@@ -22,7 +22,7 @@
   }
 
   const goToLatestVersion = async () : Promise<void> => {
-    ProjectsController.selectProject(project);
+    await ProjectsController.selectProject(projectStore);
     let latestVersionId = project.getLatestVersionIdentifier();
     if (latestVersionId === undefined) {
       latestVersionId = (await SystemConfigurationController.createNewEmptyConfiguration()).identifier;
