@@ -5,8 +5,19 @@
   import { ProjectsController } from "../../../entities/controllers/projects-controller";
   import { projectsStore } from "../../../entities/stores/projects-store";
   import ProjectCard from "./project-card.svelte";
+  import { writable } from "svelte/store";
+  import { setContext } from "svelte";
 
   const projects = projectsStore.items;
+
+  const scrollAmount = writable(0);
+  let scrollingListElement : HTMLElement;
+
+  const compensateScroll = () : void => {
+    scrollAmount.set(scrollingListElement.scrollTop);
+  };
+
+  setContext("scroll-compensation", scrollAmount);
 </script>
 
 <section class="max-w-7xl w-full px-8 flex flex-col max-h-full"> <!-- Content container-->
@@ -21,7 +32,10 @@
   {#await ProjectsController.loadAllProjects()}
   Loading Projects...
   {:then result}
-  <div class="overflow-x-scroll mt-6">
+  <div class="overflow-y-scroll mt-6"
+    on:scroll={compensateScroll}
+    bind:this={scrollingListElement}
+  >
     <div class="flex flex-wrap py-5 -ml-6 -mt-11 pointer-events-none">
       {#each $projects as project (project.identifier)}
       <ProjectCard project={project}/>

@@ -80,8 +80,11 @@ export class SystemConfigurationController {
     const newConfigEntity = new SystemConfiguration({
       ...configInfo,
       version: getNextVersion(parentProject.versions.map(version => version.version)),
+      name: `${configInfo.name} (new)`,
     }, parentProject.identifier);
 
+    parentProject.addVersion(newConfigEntity.toVersionInfo());
+    await ProjectsFileSystemController.update(parentProject);
     return ConfigurationFileSystemController.update(parentProject, newConfigEntity).then(async () => {
       await ProjectsController.loadProject(parentProject.identifier);
     });
