@@ -60,7 +60,9 @@ export class SystemConfigurationController {
     const configuration = await ConfigurationFileSystemController
       .readConfigurationFile(project, versionInfo.identifier);
     configuration.version =  versionInfo.version;
+    configuration.name = versionInfo.name;
     configuration.updatedAt = new Date(Date.now());
+    versionInfo.updatedAt = configuration.updatedAt.toISOString();
 
     await ConfigurationFileSystemController.update(project, configuration);
   }

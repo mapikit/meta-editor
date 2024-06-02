@@ -47,6 +47,7 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
     return {
       identifier: this.identifier,
       version: this.version,
+      name: this.name,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };

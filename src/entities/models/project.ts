@@ -77,6 +77,7 @@ export class Project implements EditorEntityValue {
       updatedAt: now,
       createdAt: now,
       version,
+      name: "New Version Name",
       identifier: nanoid(),
     };
   }

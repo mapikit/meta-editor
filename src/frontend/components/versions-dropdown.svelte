@@ -1,6 +1,6 @@
 <script lang="ts">
   import { clickOutside } from "../lib/click-outside-directive";
-  import { CaretDown, Archive, TreeStructure, CopySimple, PlusSquare } from "phosphor-svelte";
+  import { CaretDown, Archive, TreeStructure, CopySimple, PlusSquare, ArrowSquareUp } from "phosphor-svelte";
   import { ProjectStore } from "../../entities/stores/projects-store";
   import EditableTextField from "./text-fields/editable-text-field.svelte";
   import { fly } from "svelte/transition";
@@ -10,7 +10,7 @@
   import { navigation } from "../lib/navigation";
 
   export let parentProject : ProjectStore;
-  let expanded = false;
+  let expanded = true;
   let { versions } = parentProject;
 
   let project = parentProject.toEntity();
@@ -52,8 +52,8 @@
       {/if}
       {#each $versions as version}
       <div class="items-center p-1 inline-flex w-fit">
-        <EditableTextField class="w-14 h-7"
-        bind:text={version.version}
+        <EditableTextField class="w-14 h-7 rounded-none rounded-l"
+        bind:text={version.name}
         onFinishEdit={async () => {
           await SystemConfigurationController.updateFromVersionInfo(parentProject.toEntity(), version);
           const now = new Date(Date.now());
@@ -61,12 +61,14 @@
           version.updatedAt = now.toISOString();
           await ProjectsController.update(parentProject.toEntity());
         }}/>
+        <span class="border-norbalt-400 border-2 rounded-r
+          pl-1.5 pr-2 whitespace-nowrap select-none cursor-default"> @ {version.version} </span>
         <div class="inline-flex h-7 space-x-1.5 ml-4">
           <CardButton class="w-7" hoverColor="green" noOutline
           clickFunction={async () => { await navigateToVersion(version.identifier); }}>
             <TreeStructure class="w-5 h-5" />
           </CardButton>
-          <CardButton class="w-7" hoverColor="yellow" noOutline> <CopySimple class="w-6 h-6" /> </CardButton>
+          <CardButton class="w-7" hoverColor="blue" noOutline> <ArrowSquareUp class="w-6 h-6" /> </CardButton>
           <CardButton class="w-7" hoverColor="red" noOutline> <Archive class="w-6 h-6" /> </CardButton>
           </div>
       </div>
