@@ -21,7 +21,6 @@
   $: {
     if (refElement) mainSubdivision.setElement(refElement);
   }
-
 </script>
 
 <main class="p-2 h-full w-full overflow-hidden">

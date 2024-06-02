@@ -7,11 +7,6 @@ import { SystemConfigurationMutations } from "../mutations/system-configuration-
 import { ProjectStore, projectsStore } from "../stores/projects-store";
 import { EditorMetadataController } from "./editor-metadata-controller";
 import { ConfigurationFileSystemController } from "./file-system-controller-functions/versions";
-import {
-  NotificationAction,
-  NotificationData,
-  notificationManager,
-} from "../../frontend/components/notifications/notification-center";
 import { SystemConfigurationController } from "./system-configuration-controller";
 
 export class ProjectsController {

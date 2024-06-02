@@ -37,24 +37,21 @@ body #svelte {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 4px;
+  height: 4px;
+  margin: 1px;
 }
  
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #00000000;
-  margin-right: 2px;
-  width: 6px;
+  width: 2px;
+  height: 2px;
   border-radius: 5px;
 }
  
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #919191;
+  background: #454c7c;
   border-radius: 5px;
-}
- 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #f4f7f7;
+  cursor: scroll;
 }

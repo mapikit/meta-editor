@@ -36,7 +36,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="relative flex flex-col rounded-lg
-  bg-card-gradient w-64 h-fit pb-4 pt-3 px-5 hover:brightness-125 transition-all duration-150
+  bg-card-gradient w-64 min-w-[16rem] h-fit pb-4 pt-3 px-5 hover:brightness-125 transition-all duration-150
   outline-2 outline-transparent outline hover:outline-norbalt-200 hover:delay-0 delay-200"
   on:mouseenter={() => {
     hovered = true;
