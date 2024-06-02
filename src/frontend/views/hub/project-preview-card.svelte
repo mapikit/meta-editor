@@ -30,7 +30,7 @@
 
 
     SystemConfigurationController.loadConfigurationIntoView(latestVersionId);
-    navigation.navigateTo(`/projects/${projectStore.identifier}/versions/${latestVersionId}`);
+    navigation.navigateTo(project.getVersionNavigationPath(latestVersionId));
   };
 </script>
 

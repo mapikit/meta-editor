@@ -7,6 +7,12 @@ import { SystemConfigurationMutations } from "../mutations/system-configuration-
 import { ProjectStore, projectsStore } from "../stores/projects-store";
 import { EditorMetadataController } from "./editor-metadata-controller";
 import { ConfigurationFileSystemController } from "./file-system-controller-functions/versions";
+import {
+  NotificationAction,
+  NotificationData,
+  notificationManager,
+} from "../../frontend/components/notifications/notification-center";
+import { SystemConfigurationController } from "./system-configuration-controller";
 
 export class ProjectsController {
   static async createNewProject () : Promise<void> {
@@ -62,5 +68,17 @@ export class ProjectsController {
     return ProjectsFileSystemController.update(project).then(() => {
       ProjectsMutations.updateLoadedProject(project);
     }).catch(error => console.error("Unable to update project", error));
+  }
+
+  public static async editLatestVersion (project : Project) : Promise<void> {
+    await this.selectProject(project);
+    const latestVersion = project.getLatestVersionIdentifier();
+    if (!latestVersion) {
+
+      return;
+    }
+
+    await SystemConfigurationController.loadConfiguration(project, latestVersion);
+    await SystemConfigurationController.loadConfigurationIntoView(latestVersion);
   }
 }

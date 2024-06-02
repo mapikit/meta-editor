@@ -52,6 +52,10 @@ export class Project implements EditorEntityValue {
     return result[0]?.identifier;
   }
 
+  public getVersionNavigationPath (version : string) : string {
+    return `/projects/${this.identifier}/versions/${version}`;
+  }
+
   public toJson () : ProjectConfigType {
     return {
       projectName: this.projectName,
