@@ -5,6 +5,8 @@
   import EditableTextField from "./text-fields/editable-text-field.svelte";
   import { fly } from "svelte/transition";
   import CardButton from "./buttons/card-button.svelte";
+  import { ProjectsController } from "../../entities/controllers/projects-controller";
+  import { SystemConfigurationController } from "../../entities/controllers/system-configuration-controller";
 
   export let parentProject : ProjectStore;
   let versionsStore = parentProject.versions;
@@ -29,7 +31,11 @@
       {#if $versionsStore.length === 0}
         <div class="flex flex-col items-center">
           <span class="text-offWhite text-lg"> Empty Project. </span>
-          <CardButton class="px-2 mt-2" hoverColor="green" noOutline>
+          <CardButton class="px-2 mt-2" hoverColor="green" noOutline
+            clickFunction={async () => {
+              await ProjectsController.createNewNextVersion(parentProject.toEntity());
+            }}
+          >
             Create a version <PlusSquare class="ml-2"/>
           </CardButton>
         </div>
@@ -38,7 +44,13 @@
       <div class="items-center p-1 inline-flex w-fit">
         <EditableTextField class="w-14 h-7"
         bind:text={version.version}
-        onFinishEdit={() => console.log("Done editing")}/>
+        onFinishEdit={async () => {
+          await SystemConfigurationController.updateFromVersionInfo(parentProject.toEntity(), version);
+          const now = new Date(Date.now());
+          parentProject.updatedAt.set(now);
+          version.updatedAt = now.toISOString();
+          await ProjectsController.update(parentProject.toEntity());
+        }}/>
         <div class="inline-flex h-7 space-x-1.5 ml-4">
           <CardButton class="w-7" hoverColor="green" noOutline> <TreeStructure class="w-5 h-5" /> </CardButton>
           <CardButton class="w-7" hoverColor="yellow" noOutline> <CopySimple class="w-6 h-6" /> </CardButton>

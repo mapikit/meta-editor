@@ -9,7 +9,7 @@ import type { ConfigurationType } from "meta-system";
 import { nanoid } from "nanoid";
 import { Serializable } from "../common/types/serializable";
 import type { SerializableEditorMetadata } from "../common/types/serializables/serialized-editor-metadata";
-import { getNextVersion } from "./helpers/get-next-version.js";
+import { getNextVersion } from "../common/helpers/get-next-version.js";
 import type { EntityValue } from "meta-system/dist/src/entities/meta-entity";
 
 /**

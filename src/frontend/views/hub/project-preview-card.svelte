@@ -25,7 +25,7 @@
     await ProjectsController.selectProject(project);
     let latestVersionId = project.getLatestVersionIdentifier();
     if (latestVersionId === undefined) {
-      latestVersionId = (await SystemConfigurationController.createNewEmptyConfiguration()).identifier;
+      latestVersionId = (await SystemConfigurationController.createNewEmptyConfiguration(project)).identifier;
     }
 
 

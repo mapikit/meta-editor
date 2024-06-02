@@ -10,10 +10,16 @@
 
   export let project : ProjectStore;
 
-  const projectName = project.projectName;
+  const { projectName, updatedAt } = project;
 
   function getRelevantUpdateInfo () : string {
-    return formatDistance(get(project.updatedAt), new Date(Date.now()), { addSuffix: true });
+    return formatDistance(get(updatedAt), new Date(Date.now()), { addSuffix: true });
+  }
+
+  let updatedString : string = getRelevantUpdateInfo();
+
+  $: {
+    updatedString = $updatedAt && getRelevantUpdateInfo();
   }
 </script>
 
@@ -26,7 +32,7 @@
   />
   <VersionsDropdown bind:parentProject={project}/>
   <div class="inline-flex items-center mt-2 px-2 h-fit w-fit bg-norbalt-400 rounded pl-2 text-offWhite">
-    Edited {getRelevantUpdateInfo()} <Clock class="ml-1" />
+    Edited {updatedString} <Clock class="ml-1" />
   </div>
   <ProjectCardActions project={project}/>
 </div>

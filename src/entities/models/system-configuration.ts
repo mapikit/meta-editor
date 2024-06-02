@@ -63,10 +63,10 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
     };
   }
 
-  public static newEmpty (projectId : string) : SystemConfiguration {
+  public static newEmpty (projectId : string, version ?: string) : SystemConfiguration {
     return new SystemConfiguration({
       name: "New Version Name",
-      version: "0.0.1",
+      version: version ?? "0.0.1",
       businessOperations: [],
       schemas: [],
       addons: [],

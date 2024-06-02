@@ -18,16 +18,11 @@ export class ProjectsMutations {
     });
   }
 
-  public static updateLoadedProject (project : Project) : void {
+  public static updateFromEntity (project : Project) : void {
     if (!this.projectIsLoaded(project.identifier)) { return; }
 
-    projectsStore.items.update((current) => {
-      const toUpdate = current.find(_project => _project.identifier === project.identifier);
-      for(const key  of Object.keys(project)) {
-        if(toUpdate[key]["update"]) toUpdate[key].update(() => project[key]);
-      }
-      return current;
-    });
+    const projectStore = projectsStore.getItemById(project.identifier);
+    projectStore.update(project);
   }
 
   public static getCurrentlySelected () : ProjectStore {

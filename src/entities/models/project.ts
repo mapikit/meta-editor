@@ -38,7 +38,7 @@ export class Project implements EditorEntityValue {
     if(index !== -1) this.versions.splice(index, 1);
   }
 
-  public setVersion (version : ProjectVersionInfo) : void {
+  public addVersion (version : ProjectVersionInfo) : void {
     this.versions.push(version);
   }
 
@@ -56,6 +56,10 @@ export class Project implements EditorEntityValue {
     return `/projects/${this.identifier}/versions/${version}`;
   }
 
+  public static getFirstVersionNumber () : string {
+    return "0.0.1";
+  }
+
   public toJson () : ProjectConfigType {
     return {
       projectName: this.projectName,
@@ -64,6 +68,16 @@ export class Project implements EditorEntityValue {
       updatedAt: this.updatedAt.toISOString(),
       versions: this.versions,
       identifier: this.identifier,
+    };
+  }
+
+  static newEmptyVersionInfo (version : string) : ProjectVersionInfo {
+    const now = new Date(Date.now()).toISOString();
+    return {
+      updatedAt: now,
+      createdAt: now,
+      version,
+      identifier: nanoid(),
     };
   }
 

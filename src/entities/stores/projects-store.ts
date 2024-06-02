@@ -38,12 +38,20 @@ export class ProjectStore implements StoreEntityModel<Project> {
     return result;
   }
 
+  /** updates from entity */
+  public update (entity : Project) : void {
+    this.description.set(entity.description);
+    this.projectName.set(entity.projectName);
+    this.versions.set(entity.versions);
+    this.updatedAt.set(entity.updatedAt);
+  }
+
   listVersions : never;
   hasVersion : never;
   isVersionValid : never;
   removeVersion : never;
   removeVersionById : never;
-  setVersion : never;
+  addVersion : never;
   toJson : never;
   getLatestVersionIdentifier : never;
   getVersionNavigationPath : never;

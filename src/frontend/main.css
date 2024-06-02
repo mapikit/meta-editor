@@ -40,6 +40,7 @@ body #svelte {
   width: 4px;
   height: 4px;
   margin: 1px;
+  background: transparent;
 }
  
 /* Track */
@@ -49,6 +50,10 @@ body #svelte {
   border-radius: 5px;
 }
  
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: #454c7c;

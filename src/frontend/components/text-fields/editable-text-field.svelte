@@ -31,6 +31,7 @@
     }
     previousText = text;
     onFinishEdit();
+    field.blur();
   }
 
   let field : HTMLInputElement;

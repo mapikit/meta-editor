@@ -27,8 +27,8 @@ export class ProjectsController {
     SystemConfigurationMutations.setAvailableConfigurations(configurations);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  static async saveProject (_project : Project) : Promise<void> {
+  static async createNewNextVersion (project : Project) : Promise<void> {
+    await SystemConfigurationController.createNewEmptyConfiguration(project);
   }
 
   static async deleteProject (project : Project) : Promise<void> {
@@ -40,7 +40,7 @@ export class ProjectsController {
 
   static async loadProject (projectId : string) : Promise<void> {
     const projectInfo = await ProjectsFileSystemController.readProjectFile(projectId);
-    if(ProjectsMutations.projectIsLoaded(projectId)) ProjectsMutations.updateLoadedProject(projectInfo);
+    if(ProjectsMutations.projectIsLoaded(projectId)) ProjectsMutations.updateFromEntity(projectInfo);
     else ProjectsMutations.addProjectToList(projectInfo);
   }
 
@@ -60,8 +60,9 @@ export class ProjectsController {
   }
 
   public static async update (project : Project) : Promise<void> {
+    project.updatedAt = new Date(Date.now());
     return ProjectsFileSystemController.update(project).then(() => {
-      ProjectsMutations.updateLoadedProject(project);
+      ProjectsMutations.updateFromEntity(project);
     }).catch(error => console.error("Unable to update project", error));
   }
 

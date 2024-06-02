@@ -5,25 +5,31 @@ import { ConfigurationFileSystemController } from "./file-system-controller-func
 import { Project } from "../models/project";
 import { ProjectsController } from "./projects-controller";
 import { ProjectsMutations } from "../mutations/projects-mutations";
-import { getNextVersion } from "../../electron/helpers/get-next-version";
+import { getNextVersion } from "../../common/helpers/get-next-version";
 import { SystemConfigurationStore, systemConfigurationsStore } from "../stores/system-configurations-store";
 import { ProjectsFileSystemController } from "./file-system-controller-functions/projects";
+import { ProjectVersionInfo } from "../../common/types/serializables/project-config-type";
 
 export class SystemConfigurationController {
-  /** Creates a new empty configuration at the currently open project */
-  public static async createNewEmptyConfiguration () : Promise<SystemConfiguration> {
-    const currentProject = ProjectsMutations.getCurrentlySelected();
-    const newConfig = SystemConfiguration.newEmpty(currentProject.identifier);
-    currentProject.versions.update(c => c.concat([newConfig.toVersionInfo()]));
+  /** Creates a new empty configuration, also updating the project accordingly.
+   * If the project is provided, it will use it, otherwise, will use the currently open one.
+   * The version of the new configuration is set by the next SEMVER version for the project.
+   */
+  public static async createNewEmptyConfiguration (usedProject : Project) : Promise<SystemConfiguration> {
+    const project = usedProject ? usedProject : ProjectsMutations.getCurrentlySelected().toEntity();
+    const newConfig = SystemConfiguration.newEmpty(project.identifier, getNextVersion(project.listVersions()));
+    project.addVersion(newConfig.toVersionInfo());
     systemConfigurationsStore.items.update((current) => {
       current.push(new SystemConfigurationStore(newConfig));
       return current;
     });
 
-    const projectEntity = currentProject.toEntity();
-    await ConfigurationFileSystemController.update(projectEntity, newConfig);
-    await ProjectsFileSystemController.update(projectEntity);
+    const now = new Date(Date.now());
+    project.updatedAt = now;
+    await ConfigurationFileSystemController.update(project, newConfig);
+    await ProjectsFileSystemController.update(project);
 
+    ProjectsMutations.syncWithEntity(project);
     return newConfig;
   }
 
@@ -50,11 +56,20 @@ export class SystemConfigurationController {
     }).catch(error => { console.error("Error while updating configuration", error); });
   }
 
+  public static async updateFromVersionInfo (project : Project, versionInfo : ProjectVersionInfo) : Promise<void> {
+    const configuration = await ConfigurationFileSystemController
+      .readConfigurationFile(project, versionInfo.identifier);
+    configuration.version =  versionInfo.version;
+    configuration.updatedAt = new Date(Date.now());
+
+    await ConfigurationFileSystemController.update(project, configuration);
+  }
+
   public static async archive (parentProject : Project, configurationId : string) : Promise<void> {
     const versionInfo = parentProject.versions.find(version => version.identifier == configurationId);
     return ConfigurationFileSystemController.archiveConfiguration(parentProject, versionInfo).then(() => {
       SystemConfigurationMutations.removeConfiguration(configurationId);
-      ProjectsMutations.updateLoadedProject(parentProject);
+      ProjectsMutations.updateFromEntity(parentProject);
     });
   }
 
