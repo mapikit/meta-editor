@@ -1,14 +1,15 @@
-import { EditorMetadataController } from "../controllers/editor-metadata-controller";
-import { ProjectsController } from "../controllers/projects-controller";
+import { EditorMetadata } from "../models/editor-metadata";
 import { editorMetadataStoreSingleton } from "../stores/editor-metadata-store";
 
 export class EditorMetadataMutations {
-  public static async loadData () : Promise<void> {
-    const metadata = await EditorMetadataController.loadMetadata();
+  public static setData (metadata : EditorMetadata) : void {
     editorMetadataStoreSingleton.data.set(metadata);
+  }
 
-    metadata.availableProjectsIds.forEach(async (projectId) => {
-      await ProjectsController.loadProject(projectId);
+  public static removeProject (projectId : string) : void {
+    editorMetadataStoreSingleton.data.update(current => {
+      current.availableProjectsIds = current.availableProjectsIds.filter(p => p !== projectId);
+      return current;
     });
   }
 }

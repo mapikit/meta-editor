@@ -23,7 +23,7 @@
   {:then result}
   <div class="overflow-x-scroll mt-6">
     <div class="flex flex-wrap py-5 -ml-6 -mt-11 pointer-events-none">
-      {#each $projects as project}
+      {#each $projects as project (project.identifier)}
       <ProjectCard project={project}/>
       {/each}
     </div>

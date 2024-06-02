@@ -29,7 +29,7 @@ export class SystemConfigurationController {
     await ConfigurationFileSystemController.update(project, newConfig);
     await ProjectsFileSystemController.update(project);
 
-    ProjectsMutations.syncWithEntity(project);
+    ProjectsMutations.updateFromEntity(project);
     return newConfig;
   }
 

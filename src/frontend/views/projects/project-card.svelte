@@ -24,7 +24,7 @@
 </script>
 
 <div aria-hidden="true" class="relative flex flex-col rounded-lg
-  bg-card-gradient w-64 h-fit pb-4 pt-3 px-5 ml-6 mt-6
+  bg-card-gradient w-72 h-fit pb-4 pt-3 px-5 ml-6 mt-6
   outline-2 outline-transparent outline pointer-events-auto">
   <EditableToggleTextField text={projectName}
     onSubmit={async () => { await ProjectsController.update(project.toEntity()); }}

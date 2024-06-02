@@ -7,11 +7,21 @@
   import CardButton from "./buttons/card-button.svelte";
   import { ProjectsController } from "../../entities/controllers/projects-controller";
   import { SystemConfigurationController } from "../../entities/controllers/system-configuration-controller";
+  import { navigation } from "../lib/navigation";
 
   export let parentProject : ProjectStore;
-  let versionsStore = parentProject.versions;
   let expanded = false;
   let { versions } = parentProject;
+
+  let project = parentProject.toEntity();
+
+
+  const navigateToVersion = async (versionId : string) : Promise<void> => {
+    await ProjectsController.selectProject(project);
+    await SystemConfigurationController.loadConfiguration(project, versionId);
+    SystemConfigurationController.loadConfigurationIntoView(versionId);
+    navigation.navigateTo(project.getVersionNavigationPath(versionId));
+  };
 </script>
 
 <div class="relative text-offWhite h-fit w-fit"
@@ -28,7 +38,7 @@
     border-2 bg-norbalt-300 z-40 w-max shadow"
     transition:fly={{ x:0, y: -25, duration: 260 }}
     >
-      {#if $versionsStore.length === 0}
+      {#if $versions.length === 0}
         <div class="flex flex-col items-center">
           <span class="text-offWhite text-lg"> Empty Project. </span>
           <CardButton class="px-2 mt-2" hoverColor="green" noOutline
@@ -40,7 +50,7 @@
           </CardButton>
         </div>
       {/if}
-      {#each $versionsStore as version}
+      {#each $versions as version}
       <div class="items-center p-1 inline-flex w-fit">
         <EditableTextField class="w-14 h-7"
         bind:text={version.version}
@@ -52,7 +62,10 @@
           await ProjectsController.update(parentProject.toEntity());
         }}/>
         <div class="inline-flex h-7 space-x-1.5 ml-4">
-          <CardButton class="w-7" hoverColor="green" noOutline> <TreeStructure class="w-5 h-5" /> </CardButton>
+          <CardButton class="w-7" hoverColor="green" noOutline
+          clickFunction={async () => { await navigateToVersion(version.identifier); }}>
+            <TreeStructure class="w-5 h-5" />
+          </CardButton>
           <CardButton class="w-7" hoverColor="yellow" noOutline> <CopySimple class="w-6 h-6" /> </CardButton>
           <CardButton class="w-7" hoverColor="red" noOutline> <Archive class="w-6 h-6" /> </CardButton>
           </div>

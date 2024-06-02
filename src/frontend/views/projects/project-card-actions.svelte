@@ -20,7 +20,7 @@
         "It's not possible to edit the latest version because the project is empty.", false, 8500);
       const createFirstVersion = new NotificationAction(async () => {
         await ProjectsController.selectProject(entity);
-        await SystemConfigurationController.createNewEmptyConfiguration();
+        await SystemConfigurationController.createNewEmptyConfiguration(project.toEntity());
         notificationManager.dismissVisible(notification);
       }, "Create New Version");
 
@@ -31,6 +31,26 @@
 
     await ProjectsController.editLatestVersion(entity);
     navigation.navigateTo(entity.getVersionNavigationPath(entity.getLatestVersionIdentifier()));
+  };
+
+  // eslint-disable-next-line max-lines-per-function
+  const archiveProject = () : void => {
+    const entity = project.toEntity();
+    const notification = new NotificationData("warn", `Archiving project "${entity.projectName}"`,
+      "Are you sure you want to archive this project?", false, 10000,
+    );
+    const confirm = new NotificationAction(async () => {
+      await ProjectsController.archiveProject(project.toEntity());
+      notificationManager.dismissVisible(notification);
+    }, "Yes, archive the project");
+    const deny = new NotificationAction(() => {
+      notificationManager.dismissVisible(notification);
+    }, "Keep Project");
+
+    notification.buttonActions.push(confirm);
+    notification.buttonActions.push(deny);
+
+    notificationManager.notify(notification);
   };
 </script>
 
@@ -44,7 +64,7 @@
       <CopySimple class="w-7 h-7"/>
     </CardButton>
   </div>
-  <CardButton hoverColor={"red"} class="w-9 h-9">
+  <CardButton hoverColor={"red"} class="w-9 h-9" clickFunction={archiveProject}>
     <Archive class="w-7 h-7"/>
   </CardButton>
 </div>

@@ -8,6 +8,7 @@ import { ProjectStore, projectsStore } from "../stores/projects-store";
 import { EditorMetadataController } from "./editor-metadata-controller";
 import { ConfigurationFileSystemController } from "./file-system-controller-functions/versions";
 import { SystemConfigurationController } from "./system-configuration-controller";
+import { EditorMetadataMutations } from "../mutations/editor-metadata-mutations";
 
 export class ProjectsController {
   static async createNewProject () : Promise<void> {
@@ -50,13 +51,14 @@ export class ProjectsController {
   }
 
   public static async archiveProject (project : Project) : Promise<void> {
-    return ProjectsFileSystemController.archive(project).then(() => {
-      ProjectsMutations.removeProject(project.identifier);
+    await ProjectsFileSystemController.archive(project);
+    ProjectsMutations.removeProject(project.identifier);
+    systemConfigurationsStore.items.update(items => {
+      return items.filter(item => get(item.projectId) !== project.identifier);
+    });
 
-      systemConfigurationsStore.items.update(items => {
-        return items.filter(item => get(item.projectId) !== project.identifier);
-      });
-    }).catch(error => console.error("Error while archiving project", error));
+    EditorMetadataMutations.removeProject(project.identifier);
+    await EditorMetadataController.saveCurrentMetadata();
   }
 
   public static async update (project : Project) : Promise<void> {
