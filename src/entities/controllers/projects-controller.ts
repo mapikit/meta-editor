@@ -7,6 +7,8 @@ import { SystemConfigurationMutations } from "../mutations/system-configuration-
 import { ProjectStore, projectsStore } from "../stores/projects-store";
 import { EditorMetadataController } from "./editor-metadata-controller";
 import { ConfigurationFileSystemController } from "./file-system-controller-functions/versions";
+import { SystemConfigurationController } from "./system-configuration-controller";
+import { EditorMetadataMutations } from "../mutations/editor-metadata-mutations";
 
 export class ProjectsController {
   static async createNewProject () : Promise<void> {
@@ -26,8 +28,8 @@ export class ProjectsController {
     SystemConfigurationMutations.setAvailableConfigurations(configurations);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  static async saveProject (_project : Project) : Promise<void> {
+  static async createNewNextVersion (project : Project) : Promise<void> {
+    await SystemConfigurationController.createNewEmptyConfiguration(project);
   }
 
   static async deleteProject (project : Project) : Promise<void> {
@@ -39,7 +41,7 @@ export class ProjectsController {
 
   static async loadProject (projectId : string) : Promise<void> {
     const projectInfo = await ProjectsFileSystemController.readProjectFile(projectId);
-    if(ProjectsMutations.projectIsLoaded(projectId)) ProjectsMutations.updateLoadedProject(projectInfo);
+    if(ProjectsMutations.projectIsLoaded(projectId)) ProjectsMutations.updateFromEntity(projectInfo);
     else ProjectsMutations.addProjectToList(projectInfo);
   }
 
@@ -49,18 +51,48 @@ export class ProjectsController {
   }
 
   public static async archiveProject (project : Project) : Promise<void> {
-    return ProjectsFileSystemController.archive(project).then(() => {
-      ProjectsMutations.removeProject(project.identifier);
+    await ProjectsFileSystemController.archive(project);
+    ProjectsMutations.removeProject(project.identifier);
+    systemConfigurationsStore.items.update(items => {
+      return items.filter(item => get(item.projectId) !== project.identifier);
+    });
 
-      systemConfigurationsStore.items.update(items => {
-        return items.filter(item => get(item.projectId) !== project.identifier);
-      });
-    }).catch(error => console.error("Error while archiving project", error));
+    EditorMetadataMutations.removeProject(project.identifier);
+    await EditorMetadataController.saveCurrentMetadata();
   }
 
-  public static async update (project : Project) : Promise<void> {
+  public static async save (project : Project) : Promise<void> {
+    project.updatedAt = new Date(Date.now());
     return ProjectsFileSystemController.update(project).then(() => {
-      ProjectsMutations.updateLoadedProject(project);
+      ProjectsMutations.updateFromEntity(project);
     }).catch(error => console.error("Unable to update project", error));
+  }
+
+  public static async editLatestVersion (project : Project) : Promise<void> {
+    await this.selectProject(project);
+    const latestVersion = project.getLatestVersionIdentifier();
+    if (!latestVersion) {
+
+      return;
+    }
+
+    await SystemConfigurationController.loadConfiguration(project, latestVersion);
+    await SystemConfigurationController.loadConfigurationIntoView(latestVersion);
+  }
+
+  public static async cloneProject (project : Project) : Promise<void> {
+    const cloned = project.cloneToNew();
+    await ProjectsController.save(cloned);
+    await ProjectsController.loadProject(cloned.identifier);
+    await EditorMetadataController.appendProjectIdentifier(cloned.identifier);
+
+    const originalVersions = await ConfigurationFileSystemController.loadAllFromProject(project);
+    const newConfigurations = cloned.rerollVersionsIds(originalVersions);
+
+    const configSaveProcess = newConfigurations.map(async (configuration) => {
+      return SystemConfigurationController.save(cloned, configuration);
+    });
+
+    await Promise.all(configSaveProcess);
   }
 }

@@ -7,15 +7,15 @@
   import genericLayoutStateStore from "../entities/stores/generic-layout-state-store";
   import Loading from "./views/generic/loading.svelte";
   import Layout from "./layout.svelte";
-  import { Route, Switch, navigation } from "./lib/navigation";
+  import { Route, Switch } from "./lib/navigation";
   import Hub from "./views/hub/hub.svelte";
   import Projects from "./views/projects/projects.svelte";
-  import { EditorMetadataMutations } from "../entities/mutations/editor-metadata-mutations";
   import Editor from "./views/editor/editor.svelte";
+  import { EditorMetadataController } from "../entities/controllers/editor-metadata-controller";
 
   const spawn = () : void => {
     loading.set(true);
-    EditorMetadataMutations.loadData()
+    EditorMetadataController.loadMetadata()
       .then(() => {
         loading.set(false);
       })

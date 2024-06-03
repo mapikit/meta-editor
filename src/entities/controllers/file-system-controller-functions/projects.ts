@@ -1,8 +1,8 @@
 import { InjectedWindow } from "../../../common/types/injected-window";
 import { Project } from "../../models/project";
-import { EditorMetadataMutations } from "../../mutations/editor-metadata-mutations";
 import { editorMetadataStoreSingleton } from "../../stores/editor-metadata-store";
 import { get } from "svelte/store";
+import { EditorMetadataController } from "../editor-metadata-controller";
 
 export class ProjectsFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
@@ -18,7 +18,7 @@ export class ProjectsFileSystemController {
   }
 
   public static async getList () : Promise<string[]> {
-    await EditorMetadataMutations.loadData();
+    await EditorMetadataController.loadMetadata();
     return get(editorMetadataStoreSingleton.data).availableProjectsIds;
   }
 

@@ -1,22 +1,28 @@
 import { get } from "svelte/store";
-import { InjectedWindow } from "../../common/types/injected-window";
 import { EditorMetadata } from "../models/editor-metadata";
 import { editorMetadataStoreSingleton } from "../stores/editor-metadata-store";
+import { EditorMetadataMutations } from "../mutations/editor-metadata-mutations";
+import { ProjectsController } from "./projects-controller";
+import { EditorMetadataFileSystemController } from "./file-system-controller-functions/editor-metadata";
 
 export class EditorMetadataController {
-  private static fileApi = (window as InjectedWindow).fileApi;
+  public static async loadMetadata () : Promise<void> {
+    const editorData = await EditorMetadataFileSystemController.getMetadata();
+    const metadata = EditorMetadata.fromSerializable(editorData);
+    EditorMetadataMutations.setData(metadata);
 
-  public static async loadMetadata () : Promise<EditorMetadata> {
-    const editorData = await this.fileApi.fetchEditorMetadata();
-    return EditorMetadata.fromSerializable(editorData);
+    metadata.availableProjectsIds.forEach(async (projectId) => {
+      await ProjectsController.loadProject(projectId);
+    });
   }
 
   public static async appendProjectIdentifier (identifier : string) : Promise<void> {
     editorMetadataStoreSingleton.data.update((v) => { v.availableProjectsIds.push(identifier); return v; });
+    await EditorMetadataController.saveCurrentMetadata();
   }
 
   public static async saveCurrentMetadata () : Promise<void> {
     const currentData = get(editorMetadataStoreSingleton.data);
-    await this.fileApi.saveEditorMetadata(currentData.toSerializable());
+    await EditorMetadataFileSystemController.saveMetadata(currentData);
   }
 }

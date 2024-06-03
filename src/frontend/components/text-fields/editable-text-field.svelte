@@ -4,7 +4,7 @@
 
   let previousText : string = text;
   let blockFlag = false;
-  let clazz : string = "";
+  let clazz : string = "w-full";
   export { clazz as class };
 
   function handleKey (e : KeyboardEvent) : void {
@@ -31,12 +31,13 @@
     }
     previousText = text;
     onFinishEdit();
+    field.blur();
   }
 
   let field : HTMLInputElement;
 </script>
 
-<input type="text" class="bg-norbalt-400 w-full rounded px-2
+<input type="text" class="bg-norbalt-400 rounded px-2
   text-offWhite focus:text-white focus:outline-1 focus:outline focus:outline-norbalt-100 transition {clazz}"
   size="0"
   on:keydown={handleKey}

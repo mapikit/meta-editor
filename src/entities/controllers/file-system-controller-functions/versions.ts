@@ -1,17 +1,13 @@
-import { ProjectVersionInfo } from "../../../common/types/serializables/project-config-type";
 import { Project } from "../../models/project";
 import { InjectedWindow } from "../../../common/types/injected-window";
 import { SystemConfiguration } from "../../models/system-configuration";
 import { MetaEditorInfoType } from "../../../common/types/meta-editor-info";
-import { ProjectsFileSystemController } from "./projects";
 
 export class ConfigurationFileSystemController {
   private static fileApi = (window as InjectedWindow).fileApi;
 
-  public static async archiveConfiguration (parentProject : Project, version : ProjectVersionInfo) : Promise<void> {
-    await this.fileApi.archiveVersion(parentProject.toJson(), version.identifier);
-    parentProject.removeVersionById(version.identifier);
-    await ProjectsFileSystemController.update(parentProject);
+  public static async archiveConfiguration (parentProject : Project, versionId : string) : Promise<void> {
+    await this.fileApi.archiveVersion(parentProject.toJson(), versionId);
   }
 
   public static async readConfigurationFile (parentProject : Project, version : string)

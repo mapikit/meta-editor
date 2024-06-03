@@ -6,37 +6,48 @@
   import { navigation } from "../../../frontend/lib/navigation/index.js";
   import { ProjectsController } from "../../../entities/controllers/projects-controller.js";
   import { SystemConfigurationController } from "../../../entities/controllers/system-configuration-controller.js";
+  import { onDestroy, onMount } from "svelte";
+  import { Unsubscriber } from "svelte/store";
 
   export let projectStore : ProjectStore;
   let { updatedAt, projectName, versions } = projectStore;
 
-  let project = projectStore.toEntity();
   let hovered = false;
   let mouseoutDelayTimeout;
   let timeoutMs = 200;
 
-  let quickEditButtonText = project.getLatestVersionIdentifier() === undefined ? "Create New Version" : "Edit Latest";
+  let quickEditButtonText = "";
   function getRelevantUpdateInfo () : string {
     const now = new Date();
     return formatDistance($updatedAt, now, { addSuffix: true });
   }
 
   const goToLatestVersion = async () : Promise<void> => {
+    const project = projectStore.toEntity();
     await ProjectsController.selectProject(project);
     let latestVersionId = project.getLatestVersionIdentifier();
     if (latestVersionId === undefined) {
-      latestVersionId = (await SystemConfigurationController.createNewEmptyConfiguration()).identifier;
+      latestVersionId = (await SystemConfigurationController.createNewEmptyConfiguration(project)).identifier;
     }
 
-
     SystemConfigurationController.loadConfigurationIntoView(latestVersionId);
-    navigation.navigateTo(`/projects/${projectStore.identifier}/versions/${latestVersionId}`);
+    navigation.navigateTo(project.getVersionNavigationPath(latestVersionId));
   };
+
+  let versionsUnsub : Unsubscriber;
+  onMount(() => {
+    versionsUnsub = versions.subscribe(() => {
+      quickEditButtonText = projectStore.toEntity()
+        .getLatestVersionIdentifier() === undefined ? "Create New Version" : "Edit Latest";
+    });
+  });
+
+  onDestroy(() => versionsUnsub());
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="relative flex flex-col rounded-lg
-  bg-card-gradient w-64 h-fit pb-4 pt-3 px-5 hover:brightness-125 transition-all duration-150
+  bg-card-gradient w-64 min-w-[16rem] h-fit pb-4 pt-3 px-5 hover:brightness-125 transition-all duration-150
   outline-2 outline-transparent outline hover:outline-norbalt-200 hover:delay-0 delay-200"
   on:mouseenter={() => {
     hovered = true;

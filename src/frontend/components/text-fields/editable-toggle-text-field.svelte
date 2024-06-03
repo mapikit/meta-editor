@@ -54,6 +54,8 @@
     p-1 inline-flex items-center ml-1 w-fit"
     on:click={() => {
       editing.set(!$editing);
+
+      if ($editing) { inputElement.focus(); }
     }}
   >
   {#if $editing}

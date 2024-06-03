@@ -3,7 +3,8 @@
 <script lang="ts">
    export let width : number = 1;
    export let color : string = undefined;
-   export let style : string = "";
+   let style : string = "";
+   export { style as class };
 </script>
 
 <svg
