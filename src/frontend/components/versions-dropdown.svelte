@@ -13,16 +13,16 @@
   import { Unsubscriber, Writable, writable } from "svelte/store";
 
   export let parentProject : ProjectStore;
-  let expanded = true;
+  let expanded = false;
   let { versions } = parentProject;
 
-  let project = parentProject.toEntity();
   let scrollCompensation : Writable<number> = (getContext("scroll-compensation") ?? writable(0)) as Writable<number>;
   let styleScrollCompensation = "transform: translateY(0)";
-  let latestVersion : ProjectVersionInfo;
+  let latestVersion : Writable<ProjectVersionInfo> = writable(null);
   let otherVersions : Writable<ProjectVersionInfo[]> = writable([]);
 
   const navigateToVersion = async (versionId : string) : Promise<void> => {
+    const project = parentProject.toEntity();
     await ProjectsController.selectProject(project);
     await SystemConfigurationController.loadConfiguration(project, versionId);
     SystemConfigurationController.loadConfigurationIntoView(versionId);
@@ -30,12 +30,17 @@
   };
 
   const cloneToNewVersion = async (version : ProjectVersionInfo) : Promise<void> => {
+    const project = parentProject.toEntity();
     await SystemConfigurationController.duplicateConfiguration(project, version.identifier);
+  };
+
+  const archiveVersion = async (version : ProjectVersionInfo) : Promise<void> => {
+    const project = parentProject.toEntity();
+    await SystemConfigurationController.archive(project, version.identifier);
   };
 
   $: {
     styleScrollCompensation = `transform: translateY(-${$scrollCompensation}px)`;
-    latestVersion = $versions.at($versions.length -1);
   }
 
   let scrollCompensationUnsub : Unsubscriber;
@@ -46,6 +51,7 @@
     scrollCompensationUnsub = scrollCompensation.subscribe(() =>  { expanded = false; });
     versionsUnsub = versions.subscribe((v) => {
       otherVersions.set(v.slice(0, -1).reverse());
+      latestVersion.set(v[v.length-1]);
     });
   });
   onDestroy(() => { scrollCompensationUnsub(); versionsUnsub(); });
@@ -78,39 +84,47 @@
           </CardButton>
         </div>
       {/if}
-      {#if latestVersion !== undefined}
+      {#if $latestVersion !== null && $latestVersion !== undefined} {#key $latestVersion.identifier}
         <div class="items-center p-1 flex w-fit">
           <EditableTextField class="w-40 h-7 rounded-none rounded-l"
-          bind:text={latestVersion.name}
+          bind:text={$latestVersion.name}
           onFinishEdit={async () => {
-            await SystemConfigurationController.updateFromVersionInfo(parentProject.toEntity(), latestVersion);
+            await SystemConfigurationController.updateFromVersionInfo(parentProject.toEntity(), $latestVersion);
             const now = new Date(Date.now());
             parentProject.updatedAt.set(now);
-            latestVersion.updatedAt = now.toISOString();
+            $latestVersion.updatedAt = now.toISOString();
             await ProjectsController.update(parentProject.toEntity());
           }}/>
           <span class="border-norbalt-400 w-24 text-center border-2 rounded-r
-            pl-1.5 pr-2 whitespace-nowrap select-none cursor-default"> @ {latestVersion.version} </span>
+            pl-1.5 pr-2 whitespace-nowrap select-none cursor-default"> @ {$latestVersion.version} </span>
           <div class="inline-flex h-7 space-x-1.5 ml-4">
             <CardButton class="w-7" hoverColor="green" noOutline
-            clickFunction={async () => { await navigateToVersion(latestVersion.identifier); }}>
+            clickFunction={async () => { await navigateToVersion($latestVersion.identifier); }}>
               <TreeStructure class="w-5 h-5" />
             </CardButton>
             <CardButton class="w-7" hoverColor="blue" noOutline
-            clickFunction={async () => { await cloneToNewVersion(latestVersion); }}>
+            clickFunction={async () => { await cloneToNewVersion($latestVersion); }}>
               <ArrowSquareUp class="w-6 h-6" /> </CardButton>
-            <CardButton class="w-7" hoverColor="red" noOutline> <Archive class="w-6 h-6" /> </CardButton>
+            <CardButton class="w-7" hoverColor="red" noOutline
+            clickFunction={async () => { await archiveVersion($latestVersion); }}>
+              <Archive class="w-6 h-6" /> </CardButton>
             </div>
         </div>
+      {/key}{/if}
+      {#if $otherVersions.length > 0}
+        <div class="border-t-2 border-norbalt-100 w-[calc(100%_-_0.5rem)]
+        h-0.5 my-2 mx-1 text-offWhite font-bold"> </div>
       {/if}
-      <div class="border-t-2 border-norbalt-100 w-[calc(100%_-_0.5rem)] h-0.5 my-2 mx-1 text-offWhite font-bold"> </div>
+      <div>
       {#each $otherVersions as version}
-        <div class="items-center mx-1 px-2 flex w-fit border-2 border-norbalt-400 rounded mb-2
-          last:mb-0 text-offWhite hover:text-white text-ellipsis cursor-default select-none">
-          <span class="w-36"> {version.name} </span>
+        <div class="items-center mx-1 px-2 flex w-fit border-2 border-norbalt-400 first:rounded-t
+          last:rounded-b border-b-0 last:border-b-2 border-t-2 first:border-t-2
+          text-offWhite hover:text-white select-none whitespace-nowrap">
+          <span class="w-36 overflow-ellipsis overflow-hidden cursor-default whitespace-nowrap"> {version.name} </span>
           <span class="border-l-2 border-norbalt-400 w-24 text-center"> @ {version.version} </span>
         </div>
       {/each}
+      </div>
     </div>
     </div>
   {/if}

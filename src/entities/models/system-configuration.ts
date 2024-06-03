@@ -5,8 +5,10 @@ import { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-t
 import { EnvironmentVariableEntity } from "meta-system/dist/src/entities/system-context";
 import { nanoid } from "nanoid";
 import { EditorEntityValue } from "./editor-entity-value";
-import { ProjectVersionInfo } from "src/common/types/serializables/project-config-type";
+import { ProjectVersionInfo } from "../../common/types/serializables/project-config-type";
 import { EntityValue } from "meta-system/dist/src/entities/meta-entity";
+import { getNextVersion } from "../../common/helpers/get-next-version";
+import { Project } from "./project";
 
 export class SystemConfiguration implements ConfigurationType, EditorEntityValue {
   constructor (configInfo : EntityValue<ConfigurationType>, projectId : string) {
@@ -17,10 +19,10 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
     this.businessOperations = configInfo.businessOperations ?? [];
     this.addons = configInfo.addons ?? [];
     this.projectId = projectId;
-    this.identifier = configInfo.identifier;
+    this.identifier = configInfo.identifier ?? nanoid ();
   }
 
-  public identifier : string = nanoid();
+  public readonly identifier : string = nanoid();
   public name : string;
   public version : string;
   public envs ?: EnvironmentVariableEntity[];
@@ -53,15 +55,13 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
     };
   }
 
-  public get duplicate () : ConfigurationType {
-    return {
-      name: this.name,
-      version: this.version,
-      businessOperations: this.businessOperations,
-      schemas: this.schemas,
-      envs: this.envs,
-      addons: this.addons,
-    };
+  public cloneToNewVersion (project : Project) : SystemConfiguration {
+    return new SystemConfiguration({
+      ...this,
+      name: `${this.name} (new)`,
+      version: getNextVersion(project.listVersions()),
+      identifier: nanoid(),
+    }, this.projectId);
   }
 
   public static newEmpty (projectId : string, version ?: string) : SystemConfiguration {

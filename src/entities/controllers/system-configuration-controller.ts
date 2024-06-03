@@ -68,20 +68,15 @@ export class SystemConfigurationController {
   }
 
   public static async archive (parentProject : Project, configurationId : string) : Promise<void> {
-    const versionInfo = parentProject.versions.find(version => version.identifier == configurationId);
-    return ConfigurationFileSystemController.archiveConfiguration(parentProject, versionInfo).then(() => {
-      SystemConfigurationMutations.removeConfiguration(configurationId);
-      ProjectsMutations.updateFromEntity(parentProject);
-    });
+    await ConfigurationFileSystemController.archiveConfiguration(parentProject, configurationId);
+    parentProject.removeVersionById(configurationId);
+    await ProjectsController.update(parentProject);
+    SystemConfigurationMutations.removeConfiguration(configurationId);
   }
 
   public static async duplicateConfiguration (parentProject : Project, configId : string) : Promise<void> {
-    const configInfo = await ConfigurationFileSystemController.readConfigurationFile(parentProject, configId);
-    const newConfigEntity = new SystemConfiguration({
-      ...configInfo,
-      version: getNextVersion(parentProject.versions.map(version => version.version)),
-      name: `${configInfo.name} (new)`,
-    }, parentProject.identifier);
+    const systemConfiguration = await ConfigurationFileSystemController.readConfigurationFile(parentProject, configId);
+    const newConfigEntity = systemConfiguration.cloneToNewVersion(parentProject);
 
     parentProject.addVersion(newConfigEntity.toVersionInfo());
     await ProjectsFileSystemController.update(parentProject);

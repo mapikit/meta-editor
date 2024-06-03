@@ -34,8 +34,7 @@ export class Project implements EditorEntityValue {
   }
 
   public removeVersionById (versionId : string) : void {
-    const index = this.versions.findIndex(_version => _version.identifier === versionId);
-    if(index !== -1) this.versions.splice(index, 1);
+    this.versions = this.versions.filter(v => v.identifier !== versionId);
   }
 
   public addVersion (version : ProjectVersionInfo) : void {

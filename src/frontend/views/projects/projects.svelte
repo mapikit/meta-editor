@@ -31,7 +31,8 @@
   </div>
   {#await ProjectsController.loadAllProjects()}
   Loading Projects...
-  {:then result}
+  <!--eslint-disable-next-line @typescript-eslint/no-unused-vars-->
+  {:then _result}
   <div class="overflow-y-scroll mt-6"
     on:scroll={compensateScroll}
     bind:this={scrollingListElement}
