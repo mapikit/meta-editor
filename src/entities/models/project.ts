@@ -47,7 +47,7 @@ export class Project implements EditorEntityValue {
 
   public getLatestVersionIdentifier () : string {
     const result = [...this.versions];
-    result.sort((a, b) => a.updatedAt > b.updatedAt ? 1 : -1);
+    result.sort((a, b) => a.updatedAt < b.updatedAt ? 1 : -1);
     return result[0]?.identifier;
   }
 
