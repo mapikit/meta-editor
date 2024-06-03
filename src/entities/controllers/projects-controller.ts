@@ -61,7 +61,7 @@ export class ProjectsController {
     await EditorMetadataController.saveCurrentMetadata();
   }
 
-  public static async update (project : Project) : Promise<void> {
+  public static async save (project : Project) : Promise<void> {
     project.updatedAt = new Date(Date.now());
     return ProjectsFileSystemController.update(project).then(() => {
       ProjectsMutations.updateFromEntity(project);
@@ -78,5 +78,21 @@ export class ProjectsController {
 
     await SystemConfigurationController.loadConfiguration(project, latestVersion);
     await SystemConfigurationController.loadConfigurationIntoView(latestVersion);
+  }
+
+  public static async cloneProject (project : Project) : Promise<void> {
+    const cloned = project.cloneToNew();
+    await ProjectsController.save(cloned);
+    await ProjectsController.loadProject(cloned.identifier);
+    await EditorMetadataController.appendProjectIdentifier(cloned.identifier);
+
+    const originalVersions = await ConfigurationFileSystemController.loadAllFromProject(project);
+    const newConfigurations = cloned.rerollVersionsIds(originalVersions);
+
+    const configSaveProcess = newConfigurations.map(async (configuration) => {
+      return SystemConfigurationController.save(cloned, configuration);
+    });
+
+    await Promise.all(configSaveProcess);
   }
 }

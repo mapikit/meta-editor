@@ -18,6 +18,7 @@ export class EditorMetadataController {
 
   public static async appendProjectIdentifier (identifier : string) : Promise<void> {
     editorMetadataStoreSingleton.data.update((v) => { v.availableProjectsIds.push(identifier); return v; });
+    await EditorMetadataController.saveCurrentMetadata();
   }
 
   public static async saveCurrentMetadata () : Promise<void> {

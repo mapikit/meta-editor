@@ -27,7 +27,7 @@
   bg-card-gradient w-72 h-fit pb-4 pt-3 px-5 ml-6 mt-6
   outline-2 outline-transparent outline pointer-events-auto">
   <EditableToggleTextField text={projectName}
-    onSubmit={async () => { await ProjectsController.update(project.toEntity()); }}
+    onSubmit={async () => { await ProjectsController.save(project.toEntity()); }}
     class="text-xl font-bold"
   />
   <VersionsDropdown bind:parentProject={project}/>

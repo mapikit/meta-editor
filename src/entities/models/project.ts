@@ -2,11 +2,13 @@ import { nanoid } from "nanoid";
 import { EditorEntityValue } from "./editor-entity-value";
 import { valid } from "semver";
 import { ProjectConfigType, ProjectVersionInfo } from "../../common/types/serializables/project-config-type.js";
+import { SystemConfiguration } from "./system-configuration";
+import clone from "just-clone";
 
 export class Project implements EditorEntityValue {
+  public readonly identifier : string = nanoid();
   public projectName : string;
   public description : string;
-  public identifier : string = nanoid();
   public versions : ProjectConfigType["versions"];
   public createdAt : Date;
   public updatedAt : Date;
@@ -57,6 +59,27 @@ export class Project implements EditorEntityValue {
 
   public static getFirstVersionNumber () : string {
     return "0.0.1";
+  }
+
+  /** Keeps the same version ID's - you should run .rerollVersionsIds afterwards */
+  public cloneToNew () : Project {
+    const versionsClone = clone(this.versions);
+    const result = new Project({ ...this.toJson(), identifier: nanoid(), versions: versionsClone });
+    result.projectName = `${this.projectName} (Clone)`;
+    return result;
+  }
+
+  /** Changes the versions ID's for the local versions */
+  public rerollVersionsIds (systemConfigurations : SystemConfiguration[]) : SystemConfiguration[] {
+    const clonedVersions = systemConfigurations.map(sc => {
+      const newConfig = new SystemConfiguration({ ...sc.toJson(), identifier: nanoid() }, this.identifier);
+      const localVersion = this.versions.find(versionInfo => versionInfo.identifier == sc.identifier);
+      localVersion.identifier = newConfig.identifier;
+
+      return newConfig;
+    });
+
+    return clonedVersions;
   }
 
   public toJson () : ProjectConfigType {

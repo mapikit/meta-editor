@@ -52,6 +52,10 @@
 
     notificationManager.notify(notification);
   };
+
+  const cloneProject = async () : Promise<void> => {
+    await ProjectsController.cloneProject(project.toEntity());
+  };
 </script>
 
 <div class="h-9 mt-4 mb-1 px-0.5 pb-0.5 w-full flex flex-row justify-between items-center">
@@ -60,7 +64,9 @@
       clickFunction={editLatestVersion}>
       <TreeStructure class="w-7 h-7"/>
     </CardButton>
-    <CardButton hoverColor={"yellow"} class="ml-4 w-9 h-9">
+    <CardButton hoverColor={"yellow"} class="ml-4 w-9 h-9"
+      clickFunction={cloneProject}
+    >
       <CopySimple class="w-7 h-7"/>
     </CardButton>
   </div>

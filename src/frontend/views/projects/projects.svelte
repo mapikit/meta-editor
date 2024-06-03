@@ -37,7 +37,7 @@
     on:scroll={compensateScroll}
     bind:this={scrollingListElement}
   >
-    <div class="flex flex-wrap py-5 -ml-6 -mt-11 pointer-events-none">
+    <div class="flex flex-wrap py-5 pb-24 -ml-6 -mt-11 pointer-events-none">
       {#each $projects as project (project.identifier)}
       <ProjectCard project={project}/>
       {/each}

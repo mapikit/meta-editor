@@ -89,11 +89,11 @@
           <EditableTextField class="w-40 h-7 rounded-none rounded-l"
           bind:text={$latestVersion.name}
           onFinishEdit={async () => {
-            await SystemConfigurationController.updateFromVersionInfo(parentProject.toEntity(), $latestVersion);
+            await SystemConfigurationController.saveFromVersionInfo(parentProject.toEntity(), $latestVersion);
             const now = new Date(Date.now());
             parentProject.updatedAt.set(now);
             $latestVersion.updatedAt = now.toISOString();
-            await ProjectsController.update(parentProject.toEntity());
+            await ProjectsController.save(parentProject.toEntity());
           }}/>
           <span class="border-norbalt-400 w-24 text-center border-2 rounded-r
             pl-1.5 pr-2 whitespace-nowrap select-none cursor-default"> @ {$latestVersion.version} </span>

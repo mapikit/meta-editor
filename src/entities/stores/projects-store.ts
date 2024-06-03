@@ -55,6 +55,8 @@ export class ProjectStore implements StoreEntityModel<Project> {
   toJson : never;
   getLatestVersionIdentifier : never;
   getVersionNavigationPath : never;
+  cloneToNew : never;
+  rerollVersionsIds : never;
 }
 
 export const projectsStore = new SelectedGenericStore<ProjectStore>();
