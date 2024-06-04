@@ -9,6 +9,8 @@
   function navigateToProjects () : void {
     navigation.navigateTo("/projects");
   }
+
+  let { items } = projectsStore;
 </script>
 
 <div class="w-full">
@@ -20,9 +22,16 @@
     {#await ProjectsController.loadAllProjects()}
     Loading Recent Projects...
     {:then}
-      {#each get(projectsStore.items).slice(0,5) as project}
-        <ProjectPreviewCard projectStore={project}/>
-      {/each}
+      {#if $items.length == 0}
+        <div class="text-offWhite inline-flex text-xl text-bold">
+          No projects yet.
+          <TextButton clickFunction={ProjectsController.createNewProject} text="Create your first" />
+        </div>
+      {:else}
+        {#each $items.slice(0,5) as project}
+          <ProjectPreviewCard projectStore={project}/>
+        {/each}
+      {/if}
     {/await}
   </div>
 </div>

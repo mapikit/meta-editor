@@ -38,18 +38,15 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
   }
 
   public toEntity () : SystemConfiguration {
-    const result = SystemConfiguration.newEmpty(get(this.projectId));
-
-    result.name = get(this.name);
-    result.version = get(this.version);
-    result.envs = get(this.envs);
-    result.schemas = get(this.schemas);
-    result.businessOperations = get(this.businessOperations);
-    result.addons = get(this.addons);
-    result.projectId = get(this.projectId);
-    result.createdAt = get(this.createdAt);
-    result.updatedAt = get(this.updatedAt);
-    result.identifier = this.identifier;
+    const result = new SystemConfiguration({
+      name: get(this.name),
+      version: get(this.version),
+      envs: get(this.envs),
+      schemas: get(this.schemas),
+      businessOperations: get(this.businessOperations),
+      addons: get(this.addons),
+      identifier: this.identifier,
+    } ,get(this.projectId));
 
     return result;
   }
@@ -58,6 +55,7 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
   public toJson : never;
   public duplicate : never;
   public toVersionInfo : never;
+  public cloneToNewVersion : never;
 }
 
 export const systemConfigurationsStore = new SelectedGenericStore<SystemConfigurationStore>();
