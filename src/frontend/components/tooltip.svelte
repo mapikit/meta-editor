@@ -83,9 +83,12 @@
 
 
 {#if showing}
-  <div class="absolute whitespace-pre-wrap text-left opacity-100 transition-all duration-200 delay-200 {hiddenClass}" transition:fade|global={{ duration: 120 }} style="{anchorPos}">
-    <div class="fixed z-50 px-3 py-1 rounded-lg bg-norbalt-100 w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
-      <div class="bg-norbalt-100 origin-center w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>
+  <div class="absolute whitespace-pre-wrap text-left opacity-100
+  transition-all duration-200 delay-200 {hiddenClass}" transition:fade|global={{ duration: 120 }} style="{anchorPos}">
+    <div class="fixed z-50 px-3 py-1 rounded-lg bg-norbalt-200
+    w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
+      <div class="bg-norbalt-200 origin-center
+      w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>
       {tooltipContent}
     </div>
   </div>

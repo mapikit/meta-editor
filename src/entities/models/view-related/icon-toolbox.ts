@@ -8,11 +8,11 @@ export class ToolboxAction {
 }
 
 export class IconToolboxData {
-  public icon : unknown /*Svelte Component*/ = null;
+  public icon : ConstructorOfATypedSvelteComponent /*Svelte Component*/ = null;
   public text : string;
   public actions : ToolboxAction[] = [];
 
-  public constructor (icon : unknown, text : string) {
+  public constructor (icon : ConstructorOfATypedSvelteComponent, text : string) {
     this.icon = icon;
     this.text = text;
   }

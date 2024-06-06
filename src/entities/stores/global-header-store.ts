@@ -5,6 +5,7 @@ import { IconToolboxData } from "../models/view-related/icon-toolbox";
 class GlobalHeaderDataStore {
   public readonly title : Writable<string> = writable("Meta-Editor");
   public readonly iconToolboxes : Writable<IconToolboxData[]> = writable([]);
+  public readonly openLocked : Writable<boolean> = writable(false);
 }
 
 export const globalHeaderStore = new GlobalHeaderDataStore();

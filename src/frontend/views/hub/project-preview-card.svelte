@@ -61,7 +61,7 @@
   }}>
 
   <div class="absolute -ml-5 {hovered ? "h-12 -mt-6" : "h-0 mt-0"}
-    w-full rounded transition-all -translate-y-[100%] bg-norbalt-300 flex
+    w-full rounded-lg transition-all -translate-y-[100%] bg-norbalt-300 flex
     justify-center items-center"> <!-- Project Card Toolbelt -->
     <button on:click={goToLatestVersion}
       class="inline-flex items-center rounded right-2 top-2
