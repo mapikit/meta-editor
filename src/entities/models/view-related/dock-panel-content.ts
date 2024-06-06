@@ -1,5 +1,5 @@
-import { TypedKeys } from "../../common/types/typed-keys";
-import { EditorEntityValue } from "./editor-entity-value";
+import { TypedKeys } from "../../../common/types/typed-keys";
+import { EditorEntityValue } from "../editor-entity-value";
 
 export type DockPanelType = "Addon Configure" | "Addons Browse" | "Addons Timeline"
 | "Addons" | "BOps Flow" | "Business Operations" | "Modules Store" | "Overview"

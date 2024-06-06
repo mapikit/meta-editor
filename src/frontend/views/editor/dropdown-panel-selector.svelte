@@ -2,7 +2,7 @@
 	import Selector from "../../components/selector/selector.svelte";
   import { PanelsStore, availablePanels } from "../../../entities/stores/panels-store";
 	import { PanelsMutations } from "../../../entities/mutations/panels-mutations";
-	import { DockPanelContent } from "../../../entities/models/dock-panel-content";
+	import { DockPanelContent } from "../../../entities/models/view-related/dock-panel-content";
 	import { SelectorOption } from "../../components/selector/select-options-type";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

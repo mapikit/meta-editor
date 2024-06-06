@@ -12,6 +12,7 @@
   import Projects from "./views/projects/projects.svelte";
   import Editor from "./views/editor/editor.svelte";
   import { EditorMetadataController } from "../entities/controllers/editor-metadata-controller";
+  import GlobalHeader from "./views/global-header.svelte";
 
   const spawn = () : void => {
     loading.set(true);
@@ -39,7 +40,8 @@
   <Loading />
 {:else}
   <Layout>
-    <Switch basePath="/">
+    <GlobalHeader slot="header"/>
+    <Switch basePath="/" slot="content">
       <Route path="/">
         <Hub />
       </Route>

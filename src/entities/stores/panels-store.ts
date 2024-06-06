@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { Writable, writable } from "svelte/store";
 import { EditorEntityValue } from "src/entities/models/editor-entity-value";
-import { DockPanelContent, DockPanelType } from "../models/dock-panel-content";
+import { DockPanelContent, DockPanelType } from "../models/view-related/dock-panel-content";
 
 export class PanelsStore<T extends EditorEntityValue> {
   public readonly panelType : Writable<DockPanelType> = writable(null);
