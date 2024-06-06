@@ -39,7 +39,7 @@
   $: arrowPos = getArrowPos(componentRect, showing);
   $: anchorPos = getParentAnchorPosition(component, showing);
 
-  const getPosition = (...comp) => {
+  const getPosition = (...comp) : string => {
     switch (position) {
       case "left": return "transform: translateX(calc(-100% - 16px)) translateY(-50%);";
       case "right": return "transform: translateX(14px) translateY(-50%);";
@@ -48,7 +48,7 @@
     }
   };
 
-  const getParentAnchorPosition = (...comp) => {
+  const getParentAnchorPosition = (...comp) : string => {
     switch(position) {
       case "left": return "left: 0";
       case "right": return "right: 0";
@@ -85,8 +85,8 @@
 {#if showing}
   <div class="absolute whitespace-pre-wrap text-left opacity-100
   transition-all duration-200 delay-200 {hiddenClass}" transition:fade|global={{ duration: 120 }} style="{anchorPos}">
-    <div class="fixed z-50 px-3 py-1 rounded-lg bg-norbalt-200
-    w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
+    <div class="fixed z-50 px-3 py-1 rounded bg-norbalt-200
+    w-max max-w-sm font-sans shadow" style="{xOffset}" bind:this={component}>
       <div class="bg-norbalt-200 origin-center
       w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>
       {tooltipContent}
