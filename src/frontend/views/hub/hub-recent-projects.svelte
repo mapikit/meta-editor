@@ -2,7 +2,6 @@
   import { ProjectsController } from "../../../entities/controllers/projects-controller";
   import { projectsStore } from "../../../entities/stores/projects-store";
   import TextButton from "../../components/buttons/text-button.svelte";
-  import { get } from "svelte/store";
   import ProjectPreviewCard from "./project-preview-card.svelte";
   import { navigation } from "../../lib/navigation";
 

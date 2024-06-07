@@ -1,4 +1,6 @@
 /* eslint-disable max-classes-per-file */
+import { ComponentType } from "svelte";
+
 export class ToolboxAction {
   public constructor (
     public actionText : string,
@@ -8,11 +10,11 @@ export class ToolboxAction {
 }
 
 export class IconToolboxData {
-  public icon : ConstructorOfATypedSvelteComponent /*Svelte Component*/ = null;
+  public icon : ComponentType /*Svelte Component*/ = null;
   public text : string;
   public actions : ToolboxAction[] = [];
 
-  public constructor (icon : ConstructorOfATypedSvelteComponent, text : string) {
+  public constructor (icon : ComponentType, text : string) {
     this.icon = icon;
     this.text = text;
   }

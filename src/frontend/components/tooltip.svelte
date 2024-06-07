@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { Writable, writable } from "svelte/store";
   import { fade } from "svelte/transition";
 
   export let position : "top" | "bottom" | "left" | "right" = "left";
   export let tooltipContent  = "%NOTOOLTIPTEXTPROVIDED%";
   export let visible  = false;
+  export let xCompensation : Writable<number> = writable(0);
+  export let yCompensation : Writable<number> = writable(0);
   let component : HTMLDivElement;
   let componentRect : DOMRect;
   let visibilityDelay : NodeJS.Timeout;
@@ -35,9 +38,9 @@
   }
 
 
-  $: xOffset = getPosition(componentRect, showing);
-  $: arrowPos = getArrowPos(componentRect, showing);
-  $: anchorPos = getParentAnchorPosition(component, showing);
+  $: xOffset = getPosition(componentRect, showing, $xCompensation);
+  $: arrowPos = getArrowPos(componentRect, showing, $xCompensation);
+  $: anchorPos = getParentAnchorPosition(component, showing, $xCompensation);
 
   const getPosition = (...comp) : string => {
     switch (position) {
@@ -49,11 +52,12 @@
   };
 
   const getParentAnchorPosition = (...comp) : string => {
+    console.log("UPDATED!", $xCompensation);
     switch(position) {
-      case "left": return "left: 0";
+      case "left": return `left: calc(0px + ${$xCompensation}px)`;
       case "right": return "right: 0";
       case "top": return "top: 0; right: 50%;";
-      case "bottom": return "bottom: 0; right: 50%;";
+      case "bottom": return `bottom: calc(0px + ${$yCompensation}px); right: calc(50% + ${$xCompensation}px);`;
     }
   };
 

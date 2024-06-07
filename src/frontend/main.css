@@ -57,6 +57,18 @@ body #svelte {
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: #454c7c;
+  visibility: visible;
   border-radius: 5px;
-  cursor: scroll;
+  transition: all 0.2s;
+}
+
+@layer components {
+  .scroll-fade::-webkit-scrollbar-thumb {
+    visibility: hidden;
+    transition: all 1s;
+  }
+
+  .scroll-fade:hover::-webkit-scrollbar-thumb {
+    visibility: visible;
+  }
 }
