@@ -30,7 +30,7 @@
   </div>
   <div class="relative h-full w-full flex-1 flex items-center
   justify-self-center justify-center max-w-[min(50%_,_24rem)]">
-    <h1 class="font-[Livvic] text-norbalt-200 font-bold delay-200 transition select-none
+    <h1 class="font-[Livvic] text-norbalt-100 font-bold delay-200 transition select-none
     overflow-ellipsis whitespace-nowrap overflow-clip mr-8"> {$title} </h1>
   </div>
   <div class="flex-1 w-full">

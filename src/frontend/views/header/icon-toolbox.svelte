@@ -27,7 +27,7 @@ on:click_outside={() => { if (!actionsOpen) {return;} actionsOpen = false; }}
 use:clickOutside
 >
   <svelte:component this={toolboxData.icon}
-    class="w-full h-full p-1.5 text-norbalt-200 group-hover/toolbox:text-white transition" />
+    class="w-full h-full p-1.5 text-norbalt-100 group-hover/toolbox:text-white transition" />
   <Tooltip tooltipContent="{toolboxData.text}" visible={tooltipVisible && !actionsOpen} position="bottom"
   xCompensation={scrollAmount}/>
 
