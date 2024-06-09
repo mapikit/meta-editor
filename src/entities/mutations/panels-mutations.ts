@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { SystemConfiguration } from "../models/system-configuration";
 import { PanelsStore, availablePanels } from "../stores/panels-store";
 import { EditorEntityValue } from "src/entities/models/editor-entity-value";
-import { DockPanelContent, DockPanelType } from "../models/dock-panel-content";
+import { DockPanelContent, DockPanelType } from "../models/view-related/dock-panel-content";
 import { BusinessOperationType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
 import { EnvironmentVariableEntity } from "meta-system/dist/src/entities/system-context";
 import { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-type";

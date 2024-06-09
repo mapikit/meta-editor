@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import DockingArea from "./views/editor/editor.svelte";
 	import { CursorMutations } from "../entities/mutations/cursor-mutations";
 	import { DockController } from "../entities/controllers/dock-controller";
   import { GenericLayoutStateMutations } from "../entities/mutations/layout-state-mutations";
@@ -12,6 +11,8 @@
   import Projects from "./views/projects/projects.svelte";
   import Editor from "./views/editor/editor.svelte";
   import { EditorMetadataController } from "../entities/controllers/editor-metadata-controller";
+  import GlobalHeader from "./views/header/global-header.svelte";
+  import { globalHeaderStore } from "../entities/stores/global-header-store";
 
   const spawn = () : void => {
     loading.set(true);
@@ -39,14 +40,12 @@
   <Loading />
 {:else}
   <Layout>
-    <Switch basePath="/">
-      <Route path="/">
+    <GlobalHeader slot="header"/>
+    <Switch basePath="/" slot="content">
+      <Route path="/" onEnter={() => { globalHeaderStore.title.set("Meta-Editor"); }}>
         <Hub />
       </Route>
-      <Route path="/editor">
-        <DockingArea />
-      </Route>
-      <Route path="/projects">
+      <Route path="/projects" onEnter={() => { globalHeaderStore.title.set("Projects"); }}>
         <Projects />
       </Route>
       <Route path="/projects/:identifier/versions/:version_identifier">

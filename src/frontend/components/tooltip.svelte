@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { Writable, writable } from "svelte/store";
   import { fade } from "svelte/transition";
 
   export let position : "top" | "bottom" | "left" | "right" = "left";
   export let tooltipContent  = "%NOTOOLTIPTEXTPROVIDED%";
   export let visible  = false;
+  export let xCompensation : Writable<number> = writable(0);
+  export let yCompensation : Writable<number> = writable(0);
   let component : HTMLDivElement;
   let componentRect : DOMRect;
   let visibilityDelay : NodeJS.Timeout;
@@ -35,11 +38,11 @@
   }
 
 
-  $: xOffset = getPosition(componentRect, showing);
-  $: arrowPos = getArrowPos(componentRect, showing);
-  $: anchorPos = getParentAnchorPosition(component, showing);
+  $: xOffset = getPosition(componentRect, showing, $xCompensation);
+  $: arrowPos = getArrowPos(componentRect, showing, $xCompensation);
+  $: anchorPos = getParentAnchorPosition(component, showing, $xCompensation);
 
-  const getPosition = (...comp) => {
+  const getPosition = (...comp) : string => {
     switch (position) {
       case "left": return "transform: translateX(calc(-100% - 16px)) translateY(-50%);";
       case "right": return "transform: translateX(14px) translateY(-50%);";
@@ -48,12 +51,13 @@
     }
   };
 
-  const getParentAnchorPosition = (...comp) => {
+  const getParentAnchorPosition = (...comp) : string => {
+    console.log("UPDATED!", $xCompensation);
     switch(position) {
-      case "left": return "left: 0";
+      case "left": return `left: calc(0px + ${$xCompensation}px)`;
       case "right": return "right: 0";
       case "top": return "top: 0; right: 50%;";
-      case "bottom": return "bottom: 0; right: 50%;";
+      case "bottom": return `bottom: calc(0px + ${$yCompensation}px); right: calc(50% + ${$xCompensation}px);`;
     }
   };
 
@@ -83,9 +87,12 @@
 
 
 {#if showing}
-  <div class="absolute whitespace-pre-wrap text-left opacity-100 transition-all duration-200 delay-200 {hiddenClass}" transition:fade|global={{ duration: 120 }} style="{anchorPos}">
-    <div class="fixed z-50 px-3 py-1 rounded-lg bg-norbalt-100 w-max max-w-sm font-sans text-l font-semibold shadow" style="{xOffset}" bind:this={component}>
-      <div class="bg-norbalt-100 origin-center w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>
+  <div class="absolute whitespace-pre-wrap text-left opacity-100
+  transition-all duration-200 delay-200 {hiddenClass}" transition:fade|global={{ duration: 120 }} style="{anchorPos}">
+    <div class="fixed z-50 px-3 py-1 rounded bg-norbalt-200
+    w-max max-w-sm font-sans shadow" style="{xOffset}" bind:this={component}>
+      <div class="bg-norbalt-200 origin-center
+      w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>
       {tooltipContent}
     </div>
   </div>
