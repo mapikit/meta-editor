@@ -80,7 +80,6 @@
 
     const windowInfo = { width: window.innerWidth, height: window.innerHeight };
     const rect = positionTesterComponent?.getBoundingClientRect();
-    // const parentRect = positionTesterComponent?.parentElement.parentElement.getBoundingClientRect();
     if (!rect) return;
 
     if (["left", "right"].includes(position)) {
