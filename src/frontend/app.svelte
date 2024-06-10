@@ -13,6 +13,8 @@
   import { EditorMetadataController } from "../entities/controllers/editor-metadata-controller";
   import GlobalHeader from "./views/header/global-header.svelte";
   import { globalHeaderStore } from "../entities/stores/global-header-store";
+  import cursorStore from "../entities/stores/cursor-store";
+  import Tooltip from "./components/tooltip.svelte";
 
   const spawn = () : void => {
     loading.set(true);
@@ -34,6 +36,13 @@
   });
 
   const { loading, ready } = genericLayoutStateStore;
+  const { position } = cursorStore;
+  let x = 0, y = 0;
+
+  $: x = $position.x;
+  $: y = $position.y;
+
+  let vis = false;
 </script>
 
 {#if !$ready || $loading}
@@ -55,7 +64,14 @@
   </Layout>
 {/if}
 
-<svelte:body on:mousemove={CursorMutations.positionEventHandler}/>
+<button class="absolute bg-roseRed-light w-10 h-10"
+  style={`top: 0; left: 0; transform: translate(calc(${x}px - 50%), calc(${y}px - 50%));`}
+  on:click={() => { vis = !vis; }}
+>
+  <Tooltip tooltipContent={"Teste notfication"} visible={vis} position="left"/>
+</button>
+
+<svelte:body on:mousemove={CursorMutations.positionEventHandler} class="overflow-hidden"/>
 <svelte:head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
@@ -65,3 +81,4 @@
   <link href="https://fonts.googleapis.com/css2?family=Livvic" rel="stylesheet">
   <title> Meta-Editor </title>
 </svelte:head>
+<svelte:document class="overflow-hidden"/>
