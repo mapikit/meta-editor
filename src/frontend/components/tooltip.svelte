@@ -19,8 +19,8 @@
   let offset = "";
   let arrowPos = "";
   let anchorPos = "";
-  let moveOutOfScreenAmount = 0;
-  let arrowAllowedMovementAmount = 0;
+  let movedOutOfScreenAmount = 0;
+  let arrowMoveAmount = 0;
   let maxWidth = 0;
 
 
@@ -49,14 +49,14 @@
   $: anchorPos = getParentAnchorPosition(component, showing, $xCompensation);
 
   const getPosition = (...comp) : string => {
-    const topOffscreenMove = ["top", "bottom"].includes(position) ? 0 : -moveOutOfScreenAmount;
-    const leftOffscreenMove = ["left", "right"].includes(position) ? 0 : -moveOutOfScreenAmount;
+    const topOffscreenMove = ["top", "bottom"].includes(position) ? 0 : -movedOutOfScreenAmount;
+    const leftOffscreenMove = ["left", "right"].includes(position) ? 0 : -movedOutOfScreenAmount;
 
     switch (finalPosition) {
-      case "left": return `transform: translateX(calc(-100% - 16px)) translateY(calc(-50% + ${topOffscreenMove}px));`;
-      case "right": return `transform: translateX(14px) translateY(calc(-50% + ${topOffscreenMove}px));`;
-      case "top": return `transform: translateX(calc(-50% + ${leftOffscreenMove}px)) translateY(calc(-100% - 16px))`;
-      case "bottom": return `transform: translateX(calc(-50% + ${leftOffscreenMove}px)) translateY(18px);`;
+      case "left": return `transform: translateX(calc(-100% - 8px)) translateY(calc(-50% + ${topOffscreenMove}px));`;
+      case "right": return `transform: translateX(8px) translateY(calc(-50% + ${topOffscreenMove}px));`;
+      case "top": return `transform: translateX(calc(-50% + ${leftOffscreenMove}px)) translateY(calc(-100% - 8px))`;
+      case "bottom": return `transform: translateX(calc(-50% + ${leftOffscreenMove}px)) translateY(8px);`;
     }
   };
 
@@ -73,8 +73,9 @@
   function setFinalPosition (...comp) : void {
     let shouldFlip = false;
     let moveAmount = 0;
-    moveOutOfScreenAmount = 0;
+    movedOutOfScreenAmount = 0;
     finalPosition = position;
+    arrowMoveAmount = 0;
     let securityMargin = 6;
 
     const windowInfo = { width: window.innerWidth, height: window.innerHeight };
@@ -90,6 +91,7 @@
       moveAmount = rect.y <= 0 ? rect.y - securityMargin
         : rect.bottom >= windowInfo.height
           ? rect.bottom - windowInfo.height + securityMargin : 0;
+
     } else {
       shouldFlip = position === "top"
         ? rect.y <= 0
@@ -109,34 +111,45 @@
       }
     }
 
-    moveOutOfScreenAmount = moveAmount;
+    movedOutOfScreenAmount = moveAmount;
+    arrowMoveAmount = Math.min(moveAmount, (["left", "right"].includes(position) ? rect.height : rect.width)/2);
   }
 
   $: arrowPos = getArrowPos(component);
 
   function getArrowPos (...comp) : string {
-    const topOffscreenMove = ["top", "bottom"].includes(position) ? 0 : -moveOutOfScreenAmount;
-    const leftOffscreenMove = ["left", "right"].includes(position) ? 0 : -moveOutOfScreenAmount;
+    const topOffscreenMove = ["top", "bottom"].includes(position) ? 0 : -arrowMoveAmount;
+    const leftOffscreenMove = ["left", "right"].includes(position) ? 0 : -arrowMoveAmount;
 
     switch (finalPosition) {
-      case "left": return `right: -8px; top: calc(50% - 8px - ${topOffscreenMove}px); transform: rotate(45deg);`;
-      case "right": return `left: -8px; top: calc(50% - 8px - ${topOffscreenMove}px); transform: rotate(45deg);`;
-      case "top": return `bottom: -8px; left: calc(50% - ${leftOffscreenMove}px); transform: translateX(-8px) rotate(45deg);`;
-      case "bottom": return `top: -8px; left: calc(50% - ${leftOffscreenMove}px); transform: translateX(-8px) rotate(45deg);`;
+      case "left": return `right: 6px; top: calc(50% - 8px - ${topOffscreenMove}px); transform: rotate(45deg);`;
+      case "right": return `left: 6px; top: calc(50% - 8px - ${topOffscreenMove}px); transform: rotate(45deg);`;
+      case "top": return `bottom: 6px; left: calc(50% - ${leftOffscreenMove}px); transform: translateX(-8px) rotate(45deg);`;
+      case "bottom": return `top: 6px; left: calc(50% - ${leftOffscreenMove}px); transform: translateX(-8px) rotate(45deg);`;
     }
   }
 
   let hiddenClass = "";
   $: hiddenClass = showing ? "" : "opacity-0";
 
+  let arrowPadding = "";
+
+  $: arrowPadding = finalPosition === "left"
+    ? "pr-3" : finalPosition === "right"
+      ? "pl-3" : finalPosition === "top"
+        ? "pb-3" : "pt-3";
 </script>
 
 {#if visible}
   <!-- Position tester - spawns before the visible one to see if it is out of the screen -->
   <div class="absolute whitespace-pre-wrap text-left" style="{anchorPos}">
-    <div class="fixed px-3 py-1 rounded
-    w-max max-w-sm font-sans" style="visibility: hidden; {offset}" bind:this={positionTesterComponent}>
-      {tooltipContent}
+    <div class="fixed z-50 {arrowPadding}
+    w-max max-w-sm font-sans overflow-hidden" style="visibility: hidden; {offset}" bind:this={positionTesterComponent}>
+      <div class="px-3 py-1">
+        {tooltipContent}
+        <div class="origin-center
+        w-4 h-4 absolute z-10" style="{arrowPos}"/>
+      </div>
     </div>
   </div>
 {/if}
@@ -144,11 +157,13 @@
 {#if showing}
   <div class="absolute whitespace-pre-wrap text-left opacity-100
   transition-all duration-200 delay-200 {hiddenClass}" transition:fade|global={{ duration: 120 }} style="{anchorPos}">
-    <div class="fixed z-50 px-3 py-1 rounded bg-norbalt-200
-    w-max max-w-sm font-sans shadow" style="{offset}" bind:this={component}>
-      <div class="bg-norbalt-200 origin-center
-      w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>
-      {tooltipContent}
+    <div class="fixed z-50 {arrowPadding} delay-500 transition-all
+    w-max max-w-sm font-sans shadow overflow-hidden" style="{offset}" bind:this={component}>
+      <div class="px-3 py-1 rounded bg-norbalt-200">
+        {tooltipContent}
+        <div class="bg-norbalt-200 origin-center
+        w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>
+      </div>
     </div>
   </div>
 {/if}
