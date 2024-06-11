@@ -19,7 +19,7 @@
   let direction = subdivision.direction;
   let { dragging, draggingElement } = dockContext;
 
-  let isView;
+  let isView : boolean;
   let parent = subdivision.parent;
   let { showBottomDropArea, showTopDropArea, showLeftDropArea, showRightDropArea } = subdivision.getDropAreaRules();
 

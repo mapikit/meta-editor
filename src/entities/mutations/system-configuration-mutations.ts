@@ -1,6 +1,7 @@
 import { get } from "svelte/store";
 import { SystemConfiguration } from "../models/system-configuration";
 import { SystemConfigurationStore, systemConfigurationsStore } from "../stores/system-configurations-store";
+import { Schema } from "../models/schema";
 
 export class SystemConfigurationMutations {
   public static openConfiguration (configurationId : string) : void {
@@ -52,5 +53,14 @@ export class SystemConfigurationMutations {
   public static setAvailableConfigurations (configurations : SystemConfiguration[]) : void {
     systemConfigurationsStore.items.set(configurations.map(cf => new SystemConfigurationStore(cf)));
     systemConfigurationsStore.currentlyOpenItemId.set(null);
+  }
+
+  // Editor Functions
+
+  public static addNewEmptySchema () : void {
+    const currentConfig = get(systemConfigurationsStore.currentlyOpenItems);
+    if (!currentConfig) { return; }
+
+    currentConfig.schemas.update(v => v.concat([Schema.newEmpty()]));
   }
 }

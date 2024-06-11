@@ -1,7 +1,6 @@
 import { ConfigurationType } from "meta-system";
 import { Addon } from "meta-system/dist/src/configuration/addon-type";
 import { BusinessOperationType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
-import { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-type";
 import { EnvironmentVariableEntity } from "meta-system/dist/src/entities/system-context";
 import { nanoid } from "nanoid";
 import { EditorEntityValue } from "./editor-entity-value";
@@ -9,6 +8,7 @@ import { ProjectVersionInfo } from "../../common/types/serializables/project-con
 import { EntityValue } from "meta-system/dist/src/entities/meta-entity";
 import { getNextVersion } from "../../common/helpers/get-next-version";
 import { Project } from "./project";
+import { Schema } from "./schema";
 
 export class SystemConfiguration implements ConfigurationType, EditorEntityValue {
   constructor (configInfo : EntityValue<ConfigurationType>, projectId : string) {
@@ -26,7 +26,7 @@ export class SystemConfiguration implements ConfigurationType, EditorEntityValue
   public name : string;
   public version : string;
   public envs ?: EnvironmentVariableEntity[];
-  public schemas : SchemaType[];
+  public schemas : Schema[];
   public businessOperations : BusinessOperationType[];
   public addons : Addon[];
   public projectId : string;

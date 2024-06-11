@@ -7,10 +7,13 @@ import { BusinessOperationType } from "meta-system/dist/src/configuration/busine
 import { EnvironmentVariableEntity } from "meta-system/dist/src/entities/system-context";
 import { SchemaType } from "meta-system/dist/src/configuration/schemas/schemas-type";
 import { TypedKeys } from "src/common/types/typed-keys";
+import { systemConfigurationsStore } from "../stores/system-configurations-store";
+import { get } from "svelte/store";
 
 export class PanelsMutations {
   // eslint-disable-next-line max-lines-per-function
   public static SetAvailableViewsByLoadingConfiguration (configuration : SystemConfiguration) : void {
+    const matchingConfigurationStore = systemConfigurationsStore.getItemById(configuration.identifier);
     const entityMapper = <T extends EditorEntityValue>(
       entityKey : TypedKeys<T, string>, type : DockPanelType,
     ) => (entity : T) : DockPanelContent<T> => {
@@ -21,21 +24,28 @@ export class PanelsMutations {
       return { identifier: nanoid(), value };
     };
 
+    // eslint-disable-next-line max-lines-per-function
     availablePanels.allAvailablePanels.update(() => {
       return [].concat(
-        configuration.addons.map(entityMapper("identifier", "Addon Configure")),
-        configuration.businessOperations.map(entityMapper<BusinessOperationType>("identifier", "Business Operations")),
-        ((configuration.envs) ?? []).map(entityMapper<EnvironmentVariableEntity>("key", "Environment Variables")),
-        configuration.schemas.map(entityMapper<SchemaType>("name", "Schema Details")),
-        configuration.schemas.map(entityMapper<SchemaType>("name", "Configure Schema")),
-        [new DockPanelContent("identifier", "Overview", configuration)],
-        [new DockPanelContent("identifier", "Addons", createIdentifierToValue(configuration.addons))],
-        [new DockPanelContent("identifier", "Addons Timeline", createIdentifierToValue(configuration.addons))],
-        [new DockPanelContent("identifier", "Schemas", createIdentifierToValue(configuration.schemas))],
+        get(matchingConfigurationStore.addons)
+          .map(entityMapper("identifier", "Addon Configure")),
+        get(matchingConfigurationStore.businessOperations)
+          .map(entityMapper<BusinessOperationType>("identifier", "Business Operations")),
+        (get(matchingConfigurationStore.envs) ?? [])
+          .map(entityMapper<EnvironmentVariableEntity>("key", "Environment Variables")),
+        get(matchingConfigurationStore.schemas)
+          .map(entityMapper<SchemaType>("name", "Schema Details")),
+        get(matchingConfigurationStore.schemas)
+          .map(entityMapper<SchemaType>("name", "Configure Schema")),
+        [new DockPanelContent("identifier", "Overview", matchingConfigurationStore)],
+        [new DockPanelContent("identifier", "Addons", createIdentifierToValue(matchingConfigurationStore.addons))],
+        [new DockPanelContent("identifier", "Addons Timeline",
+          createIdentifierToValue(matchingConfigurationStore.addons))],
+        [new DockPanelContent("identifier", "Schemas", createIdentifierToValue(matchingConfigurationStore.schemas))],
         [new DockPanelContent("identifier", "Business Operations",
-          createIdentifierToValue(configuration.businessOperations))],
+          createIdentifierToValue(matchingConfigurationStore.businessOperations))],
         [new DockPanelContent("identifier", "Environment Variables",
-          createIdentifierToValue(configuration.envs ?? []))],
+          createIdentifierToValue(matchingConfigurationStore.envs ?? []))],
       );
     });
   }

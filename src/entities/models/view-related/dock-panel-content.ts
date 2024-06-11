@@ -9,7 +9,7 @@ export class DockPanelContent<T extends EditorEntityValue> {
   public readonly panelType : DockPanelType;
   public readonly entityPanelData : T;
   public readonly type : DockPanelType;
-  private readonly key : TypedKeys<T, string>;
+  public readonly key : TypedKeys<T, string>;
   private ommitKeyInTitle : boolean;
 
   public constructor (key : TypedKeys<T, string>, type : DockPanelType, entityData ?: T) {

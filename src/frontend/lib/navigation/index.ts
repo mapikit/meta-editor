@@ -87,6 +87,7 @@ class Navigation {
         return; // Is goBack
       }
 
+      console.log(navigationPath);
       this.history.push(this._path);
       this._path = navigationPath;
     });
@@ -110,7 +111,7 @@ class Navigation {
   }
 
   public static getNavigator () : Navigation {
-    return new Navigation("/editor");
+    return new Navigation("/");
   }
 
   /** Only works if the path was registered */
