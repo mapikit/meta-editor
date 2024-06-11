@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PanelsStore } from "../../../../entities/stores/panels-store";
   import Overview from "./overview.svelte";
-  import Schemas from "./schemas.svelte";
+  import Schemas from "./schemas/schemas.svelte";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export let viewContent : PanelsStore<any>;

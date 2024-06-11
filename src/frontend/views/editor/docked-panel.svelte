@@ -15,7 +15,8 @@
 </script>
 
 <div class="relative rounded-lg overflow-hidden bg-gradient-to-tr
-from-norbalt-300 to-norbalt-400 w-full h-full select-none shadow-contrast"
+from-norbalt-300 to-norbalt-400 w-full h-full select-none shadow-contrast
+  flex flex-col"
   bind:this={draggedView}
 >
   <Draggable
@@ -28,7 +29,7 @@ from-norbalt-300 to-norbalt-400 w-full h-full select-none shadow-contrast"
   >
     <PanelHeader parent={parent} currentElement={currentElement}/>
   </Draggable>
-  <section class="flex-1 w-full p-2 h-full flex flex-col justify-center items-center">
+  <section class="flex-1 w-full p-2 pt-0 h-full flex flex-col justify-center items-center">
     <DockViewContent viewContent={$view}/>
   </section>
 </div>

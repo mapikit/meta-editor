@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Writable, writable } from "svelte/store";
   import { SubdivisionStore } from "../../../../entities/stores/dock-subdivision-store";
   import DropdownPanelSelector from "../dropdown-panel-selector.svelte";
   import PanelOptions from "./panel-options.svelte";
@@ -7,13 +8,14 @@
   export let currentElement : SubdivisionStore;
 
   let { view } = currentElement;
-  let title;
+  let title : Writable<string> = writable(undefined);
+  let finalTitle = $title ? $title : "Not selected";
 
   $: {
     title = $view.title;
+    finalTitle = $title ? $title : "Not selected";
   }
 
-  let finalTitle = $title ?? "Not selected";
 </script>
 
 <header class="w-full h-9 px-2 py-1 flex flex-row items-center">
