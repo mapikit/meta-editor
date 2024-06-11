@@ -1,29 +1,21 @@
 <script lang="ts">
 	import Draggable from "../../components/drag-n-drop/draggable.svelte";
-  import DropdownViewSelector from "./dropdown-panel-selector.svelte";
-  import { DockMutations } from "../../../entities/mutations/dock-mutations";
 	import { SubdivisionStore } from "../../../entities/stores/dock-subdivision-store";
 	import DockViewContent from "./dockable-panel-types/docked-panel-content.svelte";
   import PanelHeader from "./dockable-panel-types/panel-header.svelte";
 
   // This is the holder for views in dock.
-  // This contains the logic for changing the view type
 
   export let parent : SubdivisionStore;
   export let currentElement : SubdivisionStore;
   let draggedView : HTMLElement;
 
-  let id;
-  let { ratio, dimension, view } = currentElement;
-  let title;
+  let { view } = currentElement;
 
-  $: {
-    id = currentElement?._id;
-    title = $view.title;
-  }
 </script>
 
-<div class="relative rounded-lg overflow-hidden bg-gradient-to-tr from-norbalt-300 to-norbalt-400 w-full h-full select-none shadow-contrast"
+<div class="relative rounded-lg overflow-hidden bg-gradient-to-tr
+from-norbalt-300 to-norbalt-400 w-full h-full select-none shadow-contrast"
   bind:this={draggedView}
 >
   <Draggable

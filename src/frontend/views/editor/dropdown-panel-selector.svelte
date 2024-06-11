@@ -3,7 +3,7 @@
   import { PanelsStore, availablePanels } from "../../../entities/stores/panels-store";
 	import { PanelsMutations } from "../../../entities/mutations/panels-mutations";
 	import { DockPanelContent } from "../../../entities/models/view-related/dock-panel-content";
-	import { SelectorOption } from "../../components/selector/select-options-type";
+	import { SelectorOption } from "../../components/dropdown/select-options-type";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export let selectedView : PanelsStore<any>;
@@ -24,4 +24,4 @@
   };
 </script>
 
-<Selector options={selectorOptions} field="" styleClass="w-6 h-6" onChange={selectView}/>
+<Selector options={selectorOptions} field="" styleClass="ml-1.5 w-6 h-6" onChange={selectView}/>
