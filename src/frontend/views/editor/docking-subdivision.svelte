@@ -48,7 +48,7 @@
 </script>
 
 <div
-  class="relative z-0 w-full h-full flex bg-norbalt-500
+  class="relative z-0 w-full h-full flex
     rounded-xl transition-[padding] duration-100 min-h-0 min-w-0"
   style="flex: {$subdivisionRatio}; flex-direction:{$direction === "horizontal" ? "row" : "column"}"
   bind:this={refElement}>

@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { DockMutations } from "../../../../entities/mutations/dock-mutations";
+  import { DotsThree } from "phosphor-svelte";
+import { DockMutations } from "../../../../entities/mutations/dock-mutations";
   import { SubdivisionStore } from "../../../../entities/stores/dock-subdivision-store";
+  import { fly } from "svelte/transition";
 
   let open = false;
   let id;
@@ -15,11 +17,16 @@
   // This would allow plugins to create their panels and specify them.
 </script>
 
-<button class="w-4 h-4 bg-norbalt-200 rounded-sm"
+<button class="w-5 h-5 bg-transparent rounded-sm transition-all
+hover:bg-norbalt-200 text-offWhite hover:text-white text-bold"
   on:click={() => { open = !open; }}
-/>
+>
+  <DotsThree class="w-5 h-5"/>
+</button>
+
 {#if open}
-  <div class="bg-norbalt-300 absolute mt-6 rounded-sm shadow-md flex flex-col overflow-hidden">
+  <div class="bg-norbalt-300 absolute mt-6 rounded shadow-md flex flex-col overflow-hidden"
+  transition:fly={{ x: 0, y: -12, duration: 150 }}>
     <button class="w-full text-center text-offWhite
       hover:text-white transition-all px-3 pt-2 pb-1 hover:bg-norbalt-200"
       on:click={() => { DockMutations.divide(parent, id); open = false; }} > New Panel </button>
