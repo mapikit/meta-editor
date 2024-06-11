@@ -14,8 +14,7 @@
 
 </script>
 
-<div class="relative rounded-lg overflow-hidden bg-gradient-to-tr
-from-norbalt-300 to-norbalt-400 w-full h-full select-none shadow-contrast
+<div class="relative rounded-lg overflow-hidden bg-panel-gradient w-full h-full select-none shadow-contrast
   flex flex-col"
   bind:this={draggedView}
 >

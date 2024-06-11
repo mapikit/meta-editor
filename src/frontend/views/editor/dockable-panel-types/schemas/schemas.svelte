@@ -1,7 +1,7 @@
 <script lang="ts">
   import CardButton from "../../../../components/buttons/card-button.svelte";
   import { PanelsStore } from "../../../../../entities/stores/panels-store";
-  import { PlusSquare } from "phosphor-svelte";
+  import { CaretDown, PlusSquare } from "phosphor-svelte";
   import { SystemConfigurationMutations } from "../../../../../entities/mutations/system-configuration-mutations";
   import { SystemConfigurationStore } from "../../../../../entities/stores/system-configurations-store";
   import { Writable } from "svelte/store";
@@ -23,15 +23,23 @@
   {#if $currentData.length === 0}
   <CardButton hoverColor="green" class= "mt-2 px-2.5 py-1"
   clickFunction={() => { SystemConfigurationMutations.addNewEmptySchema(); }} >
-  Add New Schema <PlusSquare class="ml-2"/>
-</CardButton>
+    Add New Schema <PlusSquare class="ml-2"/>
+  </CardButton>
   {:else}
+  <div class="overflow-y-scroll w-full mb-16 pb-1 -mr-1 pr-1 h-[calc(100%_-_2rem)">
   {#each $currentData as schema }
-      <p> {schema.name} </p>
-      {/each}
-    <div class="w-full p-1">
-      Add +
+    <div class="bg-norbalt-400 w-full rounded py-1.5 px-2.5 mt-2 first:mt-0">
+      <div class="flex items-center">
+        <CaretDown class="mr-1.5 text-offWhite font-black hover:text-white" />
+        <p> {schema.name} </p>
+      </div>
     </div>
+  {/each}
+  <CardButton hoverColor="default" class= "mt-4 px-2.5 py-1 ml-0.5 w-[calc(100%_-_4px)]"
+  clickFunction={() => { SystemConfigurationMutations.addNewEmptySchema(); }} >
+    Add New Schema <PlusSquare class="ml-2"/>
+  </CardButton>
+  </div>
   {/if}
   <section class="absolute bottom-0 mb-2 w-[calc(100%_-_1rem)] mx-2 text-offWhite
   h-fit px-0.5 pt-1 text-xs whitespace-nowrap overflow-ellipsis
