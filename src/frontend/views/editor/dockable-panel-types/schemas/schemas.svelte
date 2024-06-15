@@ -1,11 +1,12 @@
 <script lang="ts">
   import CardButton from "../../../../components/buttons/card-button.svelte";
   import { PanelsStore } from "../../../../../entities/stores/panels-store";
-  import { CaretDown, PlusSquare } from "phosphor-svelte";
+  import { PlusSquare } from "phosphor-svelte";
   import { SystemConfigurationMutations } from "../../../../../entities/mutations/system-configuration-mutations";
   import { SystemConfigurationStore } from "../../../../../entities/stores/system-configurations-store";
   import { Writable } from "svelte/store";
   import { Schema } from "../../../../../entities/models/schema";
+  import SchemaItem from "./schema-item.svelte";
 
   export let content : PanelsStore<{identifier : string, value : SystemConfigurationStore["schemas"] }>;
 
@@ -28,12 +29,7 @@
   {:else}
   <div class="overflow-y-scroll w-full mb-16 pb-1 -mr-1 pr-1 h-[calc(100%_-_2rem)">
   {#each $currentData as schema }
-    <div class="bg-norbalt-400 w-full rounded py-1.5 px-2.5 mt-2 first:mt-0">
-      <div class="flex items-center">
-        <CaretDown class="mr-1.5 text-offWhite font-black hover:text-white" />
-        <p> {schema.name} </p>
-      </div>
-    </div>
+    <SchemaItem schema={schema}/>
   {/each}
   <CardButton hoverColor="default" class= "mt-4 px-2.5 py-1 ml-0.5 w-[calc(100%_-_4px)]"
   clickFunction={() => { SystemConfigurationMutations.addNewEmptySchema(); }} >

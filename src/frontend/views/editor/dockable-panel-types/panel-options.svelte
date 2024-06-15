@@ -1,6 +1,6 @@
 <script lang="ts">
   import { DotsThree } from "phosphor-svelte";
-import { DockMutations } from "../../../../entities/mutations/dock-mutations";
+  import { DockMutations } from "../../../../entities/mutations/dock-mutations";
   import { SubdivisionStore } from "../../../../entities/stores/dock-subdivision-store";
   import { fly } from "svelte/transition";
 

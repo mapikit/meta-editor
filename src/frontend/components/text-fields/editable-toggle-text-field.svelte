@@ -4,7 +4,7 @@
 
   export let text : Writable<string> = writable("");
   export let onSubmit = () : void => {};
-  let clazz : string = "";
+  let clazz : string = "w-full";
   export { clazz as class };
 
   let inputElement : HTMLElement;
@@ -41,7 +41,7 @@
 
 </script>
 
-<div class="flex items-center justify-between w-full {clazz}">
+<div class="flex items-center justify-between {clazz}">
   <input bind:value={$text} type="text"
     class="rounded px-2 py-1 -mt-1 -ml-2 flex-1 outline-none
     {$editing ? " bg-norbalt-400" : " bg-transparent"} w-fit"

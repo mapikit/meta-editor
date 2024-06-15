@@ -5,10 +5,10 @@ import fs from "fs";
 import type { MetaEditorInfoType } from "../common/types/meta-editor-info";
 import type { UserConfigType } from "../common/types/serializables/user-config";
 import type { ProjectConfigType } from "../common/types/serializables/project-config-type";
-import type { ConfigurationType } from "meta-system";
-import { Serializable } from "../common/types/serializable";
+import type { Serializable } from "../common/types/serializable";
 import type { SerializableEditorMetadata } from "../common/types/serializables/serialized-editor-metadata";
 import type { EntityValue } from "meta-system/dist/src/entities/meta-entity";
+import { EditorSystemConfiguration } from "src/common/types/serializables/system-configuration-type";
 
 /**
  * Exposes a method to the electron renderer. Will be available through window.fileApi
@@ -60,7 +60,7 @@ export class ElectronFileSystem {
   @exposeInWindow
   static async saveVersion (
     project : ProjectConfigType,
-    config : EntityValue<ConfigurationType>,
+    config : EntityValue<EditorSystemConfiguration>,
     editor : MetaEditorInfoType,
   ) : Promise<void> {
     const projectDir = this.getProjectDirPath(project.identifier);
@@ -137,7 +137,8 @@ export class ElectronFileSystem {
   }
 
   @exposeInWindow
-  static async getVersion (projectIdentifier : string, versionId : string) : Promise<EntityValue<ConfigurationType>> {
+  static async getVersion (projectIdentifier : string, versionId : string)
+    : Promise<EntityValue<EditorSystemConfiguration>> {
     this.decideVersionDir(versionId);
     const versionPath = this.getVersionConfigPath(projectIdentifier, versionId);
     if(!fs.existsSync(versionPath)) return undefined;

@@ -20,7 +20,8 @@ export class SubdivisionStore {
   public readonly _id = nanoid();
   public readonly ratio : Writable<number> = writable(1);
   public readonly children : Writable<SubdivisionStore[]> = writable([]);
-  public readonly view : Writable<PanelsStore<EditorEntityValue>> = writable(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public readonly view : Writable<PanelsStore<EditorEntityValue, any>> = writable(null);
   public readonly direction : Writable<"horizontal" | "vertical" | null> = writable(null);
   public readonly parent : Writable<SubdivisionStore | null> = writable(null);
   public readonly dimension : Writable<number> = writable(0);
@@ -37,7 +38,7 @@ export class SubdivisionStore {
   public constructor (opts : { parent ?: SubdivisionStore }) {
     if (opts.parent) DockMutations.setParent(this, opts.parent);
 
-    this.view.set(new PanelsStore("", { identifier: this._id }));
+    this.view.set(PanelsStore.newEmptyPanelStore());
   }
 
   public getFirstAndLastObservables () : { isFirst : Readable<boolean>, isLast : Readable<boolean> } {
