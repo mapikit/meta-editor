@@ -43,11 +43,11 @@ export class PanelsMutations {
       const configId = matchingConfigurationStore.identifier;
       return [].concat(
         get(matchingConfigurationStore.addons)
-          .map(entityMapper("identifier", "Addon Configure") as any), // TODO
+          .map(entityMapper("identifier", "Addon Configure")),
         get(matchingConfigurationStore.businessOperations)
-          .map(entityMapper<BusinessOperationType>("identifier", "Business Operations") as any), // TODO
+          .map(entityMapper<BusinessOperationType>("identifier", "Business Operations")),
         (get(matchingConfigurationStore.envs) ?? [])
-          .map(entityMapper<EnvironmentVariableEntity>("key", "Environment Variables") as any), // TODO
+          .map(entityMapper<EnvironmentVariableEntity>("key", "Environment Variables")),
         get(matchingConfigurationStore.schemas)
           .map(entityMapper<Schema>("name", "Configure Schema")),
         [new DockPanelContent("Overview", matchingConfigurationStore)],

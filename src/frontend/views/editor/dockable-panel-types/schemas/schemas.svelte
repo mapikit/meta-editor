@@ -3,15 +3,17 @@
   import { PanelsStore } from "../../../../../entities/stores/panels-store";
   import { PlusSquare } from "phosphor-svelte";
   import { SystemConfigurationMutations } from "../../../../../entities/mutations/system-configuration-mutations";
-  import { SystemConfigurationStore } from "../../../../../entities/stores/system-configurations-store";
   import { Writable } from "svelte/store";
-  import { Schema } from "../../../../../entities/models/schema";
   import SchemaItem from "./schema-item.svelte";
+  import { SchemaStore } from "../../../../../entities/stores/schema-store";
+  import { StoreEntityModel } from "../../../../../entities/models/store-model";
+  import { Schema } from "../../../../../entities/models/schema";
 
-  export let content : PanelsStore<{identifier : string, value : SystemConfigurationStore["schemas"] }>;
+  type SchemasViewPanelData = { identifier : string; value : Schema[] };
+  export let content : PanelsStore<SchemasViewPanelData, StoreEntityModel<SchemasViewPanelData>>;
 
   let systemData = content.entityPanelData;
-  let currentData : Writable<Schema[]>;
+  let currentData : Writable<SchemaStore[]>;
 
   $: {
     currentData = $systemData.value;

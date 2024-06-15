@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { Readable, Writable, get, readable, writable } from "svelte/store";
+import { Writable, get, writable } from "svelte/store";
 import { ProjectVersionInfo } from "../../common/types/serializables/project-config-type";
 import { Project } from "../models/project";
 import { StoreEntityModel } from "../models/store-model";
@@ -42,7 +42,7 @@ export class ProjectStore implements StoreEntityModel<Project> {
     this.description = writable(configuration.description);
     this.identifier = configuration.identifier;
     this.versions = writable(configuration.versions.map(v => new ProjectVersionInfoStore(v)));
-    this.createdAt = readable(configuration.createdAt);
+    this.createdAt = writable(configuration.createdAt);
     this.updatedAt = writable(configuration.updatedAt);
   }
 
@@ -50,7 +50,7 @@ export class ProjectStore implements StoreEntityModel<Project> {
   public description : Writable<string> = writable("");
   public identifier : string;
   public versions : Writable<ProjectVersionInfoStore[]>;
-  public createdAt : Readable<Date>;
+  public createdAt : Writable<Date>;
   public updatedAt : Writable<Date> = writable(new Date());
 
   public toEntity () : Project {

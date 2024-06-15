@@ -1,4 +1,4 @@
-import { Readable, Writable, get, readable, writable } from "svelte/store";
+import { Writable, get, writable } from "svelte/store";
 import { SystemConfiguration } from "../models/system-configuration";
 import { SelectedGenericStore } from "./selected-generic-store";
 import { SchemaStore } from "./schema-store";
@@ -17,7 +17,7 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
   public readonly businessOperations : Writable<BusinessOperationStore[]> = writable([]);
   public readonly addons : Writable<AddonStore[]> = writable([]);
   public readonly projectId : Writable<string> = writable("");
-  public readonly createdAt : Readable<Date>;
+  public readonly createdAt : Writable<Date>;
   public readonly updatedAt : Writable<Date> = writable(new Date());
 
   private readonly originalConfiguration : SystemConfiguration;
@@ -35,7 +35,7 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
     this.projectId.set(configuration.projectId);
     this.updatedAt.set(new Date(configuration.updatedAt));
 
-    this.createdAt = readable(new Date(configuration.createdAt));
+    this.createdAt = writable(new Date(configuration.createdAt));
   }
 
   public toEntity () : SystemConfiguration {
@@ -51,12 +51,6 @@ export class SystemConfigurationStore implements StoreEntityModel<SystemConfigur
 
     return result;
   }
-
-  // TODO verify this typing
-  public toJson : never;
-  public duplicate : never;
-  public toVersionInfo : never;
-  public cloneToNewVersion : never;
 }
 
 export const systemConfigurationsStore = new SelectedGenericStore<SystemConfigurationStore>();
