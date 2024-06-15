@@ -1,24 +1,25 @@
 /* eslint-disable max-classes-per-file */
 import { Writable, writable } from "svelte/store";
-import { EditorEntityValue } from "src/entities/models/editor-entity-value";
+import { DefaultEditorEntityValue, EditorEntityValue } from "src/entities/models/editor-entity-value";
 import { DockPanelContent, DockPanelType } from "../models/view-related/dock-panel-content";
-import { StoreEntityModel, newEmptyStoreEntityModel } from "../models/store-model";
+import { StoreEntityModel } from "../models/store-model";
 
-export class PanelsStore<T extends EditorEntityValue, P extends StoreEntityModel<T>> {
+export class PanelStore<T extends EditorEntityValue = DefaultEditorEntityValue,
+  P extends StoreEntityModel<T> = StoreEntityModel<T>> {
   public readonly panelType : Writable<DockPanelType> = writable(null);
-  public entityPanelData : Writable<P> = writable<P>(null);
+  public panelContent : Writable<DockPanelContent<T,P>> = writable<DockPanelContent<T,P>>(null);
   public readonly typeHistory : Writable<DockPanelContent<T,P>[]> = writable([]);
 
   public readonly title : Writable<string> = writable(null);
 
-  public constructor (panelTitle : string, entityData : P) {
-    this.entityPanelData.set(entityData);
+  public constructor (panelTitle : string, panelContent : DockPanelContent<T,P>) {
+    this.panelContent.set(panelContent);
 
     this.title.set(panelTitle);
   }
 
-  public static newEmptyPanelStore () : PanelsStore<EditorEntityValue, StoreEntityModel<EditorEntityValue>> {
-    return new PanelsStore("", newEmptyStoreEntityModel());
+  public static newEmptyPanelStore () : PanelStore<EditorEntityValue, StoreEntityModel<EditorEntityValue>> {
+    return new PanelStore("", DockPanelContent.newEmpty());
   }
 }
 

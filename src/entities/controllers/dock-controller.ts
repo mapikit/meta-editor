@@ -1,7 +1,15 @@
+import { DockPanelType } from "../models/view-related/dock-panel-content";
 import { DockMutations } from "../mutations/dock-mutations";
+import { PanelsMutations } from "../mutations/panels-mutations";
 import { SubdivisionStore, exported } from "../stores/dock-subdivision-store";
+import { PanelStore } from "../stores/panels-store";
 
 export class DockController {
+  public static changeView (panel : PanelStore, viewType : DockPanelType, entityId ?: string) : void {
+    const newDockPanelData = PanelsMutations.getPanelFromTypeAndIdentifier(viewType, entityId);
+    PanelsMutations.applyPanelChange(panel, newDockPanelData);
+  }
+
   // eslint-disable-next-line max-lines-per-function
   public static bootDefault () : void {
     if (exported.mainSubdivisionStore.booted) return;

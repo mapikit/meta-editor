@@ -4,6 +4,8 @@ import { nanoid } from "nanoid";
 
 export type EditorEntityValueConcrete<T extends EntityValue> = new (param : T) => EditorEntityValue<T> & T;
 
+export type DefaultEditorEntityValue = { identifier : string };
+
 export abstract class EditorEntityValue<T extends EntityValue = { identifier : string }> {
   public readonly identifier : string = nanoid();
 

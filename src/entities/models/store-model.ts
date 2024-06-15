@@ -12,7 +12,7 @@ export type StoreModel<T> = {
 export type StoreEntityModel<T extends EditorEntityValue> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [K in keyof T as T[K] extends (...args : any[]) => any ? never : K] :
-  K extends "identifier" ? T[K]
+  K extends "identifier" ? string
     : T[K] extends Array<EditorEntityValue> ? Writable<StoreEntityModel<T[K][0]>[]>
       : Writable<T[K]>;
 } & { toEntity : () => T; };

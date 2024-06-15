@@ -1,5 +1,5 @@
 import { SystemConfiguration } from "../models/system-configuration";
-import { PanelsStore, availablePanels } from "../stores/panels-store";
+import { PanelStore, availablePanels } from "../stores/panels-store";
 import { EditorEntityValue } from "src/entities/models/editor-entity-value";
 import { DockPanelContent, DockPanelType } from "../models/view-related/dock-panel-content";
 import { BusinessOperationType } from "meta-system/dist/src/configuration/business-operations/business-operations-type";
@@ -65,14 +65,36 @@ export class PanelsMutations {
     });
   }
 
-  public static applyPanelChange <T extends EditorEntityValue, P extends StoreEntityModel<T>>
-  (view : PanelsStore<T, P>, viewData : DockPanelContent<T, P>) : void {
-    view.entityPanelData.set(viewData.entityPanelData);
+  public static applyPanelChange (view : PanelStore, viewData : DockPanelContent) : void {
+    view.panelContent.set(viewData);
     view.title.set(viewData.title);
     view.panelType.set(viewData.type);
     view.typeHistory.update(history => {
       history.push(viewData);
       return history;
+    });
+  }
+
+  public static goBackPanel (view : PanelStore) : void {
+    let lastContent : DockPanelContent;
+    console.log();
+    view.typeHistory.update(current => {
+      const before = current.pop();
+      lastContent = current.pop();
+      if (!lastContent) lastContent = before;
+      return current;
+    });
+
+    if (!lastContent) return;
+
+    view.panelContent.set(lastContent);
+    view.title.set(lastContent.title);
+    view.panelType.set(lastContent.type);
+  }
+
+  public static getPanelFromTypeAndIdentifier (type : DockPanelType, id : string) : DockPanelContent {
+    return get(availablePanels.allAvailablePanels).find((dockContent) => {
+      return dockContent.identifier === id && dockContent.type === type;
     });
   }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import CardButton from "../../../../components/buttons/card-button.svelte";
-  import { PanelsStore } from "../../../../../entities/stores/panels-store";
+  import { PanelStore } from "../../../../../entities/stores/panels-store";
   import { PlusSquare } from "phosphor-svelte";
   import { SystemConfigurationMutations } from "../../../../../entities/mutations/system-configuration-mutations";
   import { Writable } from "svelte/store";
@@ -10,13 +10,13 @@
   import { Schema } from "../../../../../entities/models/schema";
 
   type SchemasViewPanelData = { identifier : string; value : Schema[] };
-  export let content : PanelsStore<SchemasViewPanelData, StoreEntityModel<SchemasViewPanelData>>;
+  export let content : PanelStore<SchemasViewPanelData, StoreEntityModel<SchemasViewPanelData>>;
 
-  let systemData = content.entityPanelData;
+  let systemData = content.panelContent;
   let currentData : Writable<SchemaStore[]>;
 
   $: {
-    currentData = $systemData.value;
+    currentData = $systemData.entityPanelData.value;
   }
 
 </script>
