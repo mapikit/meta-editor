@@ -1,6 +1,6 @@
 <script lang="ts">
   export let text : string;
-  export let onFinishEdit = () : void => {};
+  export let onFinishEdit : (value : string) => void = () : void => {};
 
   let previousText : string = text;
   let blockFlag = false;
@@ -30,7 +30,7 @@
       return;
     }
     previousText = text;
-    onFinishEdit();
+    onFinishEdit(text);
     field.blur();
   }
 
