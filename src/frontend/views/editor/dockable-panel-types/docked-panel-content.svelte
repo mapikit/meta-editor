@@ -3,6 +3,7 @@
 	import { PanelStore } from "../../../../entities/stores/panels-store";
   import Overview from "./overview.svelte";
   import Schemas from "./schemas/schemas.svelte";
+  import ConfigureSchema from "./schemas/configure-schema.svelte";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export let viewContent : PanelStore<any, any>;
@@ -12,7 +13,7 @@
 </script>
 
 {#if $viewType === "Configure Schema"}
-aa
+  <ConfigureSchema content={viewContent}/>
 {:else if $viewType === "Overview"}
   <Overview content={viewContent} />
 {:else if $viewType === "Schemas"}

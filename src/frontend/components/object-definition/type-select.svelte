@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { typeColors } from "../../common/styles/type-colors";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
   import ChevronIcon from "../../icons/chevron-icon.svelte";
   import ArrowIcon from "../../icons/arrow-icon.svelte";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
-import Tooltip from "../common/tooltip.svelte";
+  import { typeColors } from "src/frontend/lib/type-colors";
+  import Tooltip from "../tooltip.svelte";
 
   let collapsed = true;
   let subTypeCollapsed = true;
@@ -75,7 +75,7 @@ import Tooltip from "../common/tooltip.svelte";
   };
 
   $: cursorChangeType = level.canAddProperty() ? "cursor-pointer" : "";
-  
+
   // Size changes
   $: sizeWidth = size === "small" ? "w-8" : "w-11";
   $: sizeHeight = size === "small" ? "h-5" : "h-6";
@@ -89,7 +89,9 @@ import Tooltip from "../common/tooltip.svelte";
   let typeTooltipVisible = false;
 </script>
 
-<div class="{sizeWidth} {marginSize} rounded bg-norbalt-350 {sizeHeight} border border-norbalt-100 stroke-offWhite hover:stroke-white relative hover:border-offWhite transition-all" on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
+<div class="{sizeWidth} {marginSize} rounded bg-norbalt-350 {sizeHeight} border border-norbalt-100
+stroke-offWhite hover:stroke-white relative hover:border-offWhite transition-all"
+on:blur="{() => { collapsed = true; subTypeCollapsed = true; }}">
   <div class="flex flex-row items-center justify-center h-full {sizeWidth} {cursorChangeType}" 
     on:click="{toggleCollapse}"
     on:mouseenter={() => { typeTooltipVisible = true; }}
@@ -129,7 +131,10 @@ import Tooltip from "../common/tooltip.svelte";
     <div class="z-10 absolute {dropdownMarginSize}" transition:fly|global="{{ duration: 120, delay: 90, x: 20 }}">
       <div class="{dropdownWidthSize} rounded bg-norbalt-200 shadow">
         {#each availableSubTypeOptions as option }
-          <div class="transition-all duration-75 cursor-pointer grid flex-row grid-cols-[12px_calc(100%_-_16px)] items-center {dropdownItemSize} first:rounded-t last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white" on:click="{() => {changeSubType(option);}}">
+          <div class="transition-all duration-75 cursor-pointer grid flex-row
+          grid-cols-[12px_calc(100%_-_16px)] items-center {dropdownItemSize}
+          first:rounded-t last:rounded-b hover:bg-norbalt-100 stroke-offWhite hover:stroke-white"
+          on:click="{() => {changeSubType(option);}}">
             <div class="transition-all rounded-full {sizeBall} mt-0.5 " style="background-color: {typeColors[option]};"/>
             <p> {option} </p>
           </div>
