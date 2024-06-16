@@ -5,7 +5,7 @@ import { defaultTypesValues } from "./default-types-values";
 export type DefinitionData = {
   keyName : string;
   value : unknown;
-  type : TypeDefinition["type"];
+  type : TypeDefinition["type"] | TypeDefinition["type"][];
   required : boolean;
   subtype ?: unknown
 }
@@ -26,11 +26,19 @@ export const convertObjDefinitionToDefinitionData =
   const result : DefinitionData[] = [];
 
   keys.forEach((key) => {
+    const value = Array.isArray(objDef[key])
+      ? (objDef[key] as TypeDefinition[]).map((def) => objValue[key] ?? defaultTypesValues[def.type] ?? "")
+      : (objDef[key] ?? defaultTypesValues[(objDef[key] as TypeDefinition).type] ?? "");
+    const type = Array.isArray(objDef[key])
+      ? (objDef[key] as TypeDefinition[]).map((t) => t.type)
+      : (objDef[key] as TypeDefinition).type;
+
+    const required = Array.isArray(objDef[key]) ? false : (objDef[key] as TypeDefinition).required;
     const partialResult = {
       keyName: key,
-      value: objValue[key] ?? defaultTypesValues[objDef[key].type] ?? "",
-      type: objDef[key].type,
-      required: objDef[key].required ?? false,
+      value,
+      type,
+      required,
       subtype: objDef[key]["subtype"],
     };
 
@@ -185,12 +193,20 @@ export const convertDefinitionDataToObjectDefinition = (definitionData : Definit
     definitionData.value = Number(definitionData.value);
   }
 
+  if (Array.isArray(definitionData.type)) {
+    result.definition[definitionData.keyName] = definitionData.type.map((t) => {
+      return { type: t, required: definitionData.required };
+    });
+
+    return result;
+  }
+
   result.definition[definitionData.keyName] = {
     "type": definitionData.type,
     "required": definitionData.required,
   };
 
-  result.data[definitionData.keyName] = definitionData.value;
+  result.data[definitionData.keyName]= definitionData.value;
 
 
   return result;
