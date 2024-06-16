@@ -39,6 +39,10 @@
 
     notificationManager.notify(notification);
   };
+
+  const cloneSchemaFunction = () : void => {
+    SystemConfigurationMutations.cloneSchemaById(schema.identifier);
+  };
 </script>
 
 <div class="bg-norbalt-400 w-full rounded py-1.5 px-2.5 mt-2 first:mt-0">
@@ -49,7 +53,7 @@
     </button>
     <EditableToggleTextField text={name} />
     <div class="flex px-1 ml-2 py-1 bg-norbalt-300 rounded">
-      <SchemaActionButton tooltipText="Duplicate Schema" action={() => {}} class="hover:text-ochreYellow">
+      <SchemaActionButton tooltipText="Duplicate Schema" action={cloneSchemaFunction} class="hover:text-ochreYellow">
         <CopySimple />
       </SchemaActionButton>
       <SchemaActionButton tooltipText="Edit Schema" action={editSchemaFunction} class="hover:text-brightGreen">

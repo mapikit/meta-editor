@@ -3,6 +3,8 @@ import { SystemConfiguration } from "../models/system-configuration";
 import { SystemConfigurationStore, systemConfigurationsStore } from "../stores/system-configurations-store";
 import { Schema } from "../models/schema";
 import { SchemaStore } from "../stores/schema-store";
+import clone from "just-clone";
+import { nanoid } from "nanoid";
 
 export class SystemConfigurationMutations {
   public static openConfiguration (configurationId : string) : void {
@@ -70,5 +72,23 @@ export class SystemConfigurationMutations {
     if (!currentConfig) { return; }
 
     currentConfig.schemas.update(s => s.filter(sf => sf.identifier !== identifier));
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  public static cloneSchemaById (identifier : string) : void {
+    const currentConfig = get(systemConfigurationsStore.currentlyOpenItems);
+    if (!currentConfig) { return; }
+
+    currentConfig.schemas.update(s => {
+      const found = s.findIndex(sf => sf.identifier === identifier);
+      let result = s;
+      if (found >= 0) {
+        const newSchema = new SchemaStore({ ...clone(s[found].toEntity()), identifier: nanoid() });
+        newSchema.name.update(name => name + " (copy)");
+        result = [].concat(s.slice(0, found + 1), [newSchema], s.slice(found + 1, s.length));
+      }
+
+      return result;
+    });
   }
 }
