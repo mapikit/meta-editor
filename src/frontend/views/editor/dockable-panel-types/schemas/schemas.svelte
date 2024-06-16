@@ -30,7 +30,7 @@
   </CardButton>
   {:else}
   <div class="overflow-y-scroll w-full mb-16 pb-1 -mr-1 pr-1 h-[calc(100%_-_2rem)">
-  {#each $currentData as schema }
+  {#each $currentData as schema (schema.identifier) }
     <SchemaItem schema={schema}/>
   {/each}
   <CardButton hoverColor="default" class= "mt-4 px-2.5 py-1 ml-0.5 w-[calc(100%_-_4px)]"

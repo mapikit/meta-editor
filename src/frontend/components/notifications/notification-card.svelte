@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import { get } from "svelte/store";
   import { formatDistance } from "date-fns";
+  import CardButton from "../buttons/card-button.svelte";
 
   export let notification : NotificationData;
 
@@ -55,6 +56,17 @@
 
     notificationManager.dismissVisible(notification);
   };
+
+  const buttonTheme = (type : NotificationData["type"]) : CardButton["$$prop_def"]["hoverColor"] => {
+    const colorDict : Record<NotificationData["type"], CardButton["$$prop_def"]["hoverColor"]> = {
+      "debug": "blue",
+      "error": "red",
+      "info": "default",
+      "warn": "yellow",
+    };
+
+    return colorDict[type];
+  };
 </script>
 
 <!-- Just an effect, no aria role needed -->
@@ -74,17 +86,15 @@ py-3 px-4 mt-3 max-w-3xl {stackDisplay ? "w-[calc(100%-4px)] ml-0.5" : "w-fit"} 
     {formatDistance(notification.timestamp, new Date(Date.now()), { addSuffix: true })} </p>
   <h1 class="text-lg font-[Livvic] font-bold"> {notification.title} </h1>
   <p class="mt-1">{notification.description} </p>
+  {#if !stackDisplay}
   <div class="w-full flex flex-row-reverse mt-3 -mr-2">
     {#each notification.buttonActions as button }
-      <button class="bg-norbalt-400 outline outline-2 outline-transparent hover:outline-norbalt-200
-        transition-all duration-100 text-offWhite hover:text-white rounded px-2 py-0.5 ml-2
-      "
-        on:click={button.call}
-      >
+      <CardButton clickFunction={button.call} class="w-fit px-2" hoverColor={buttonTheme(button.type)}>
         {button.text}
-      </button>
+      </CardButton>
     {/each}
   </div>
+  {/if}
   {#if notification.durationMs && notification.durationMs > 0 && !stackDisplay}
     <div class="{notificationProgressColorMap[notification.type]}
     absolute bottom-0 w-full h-1 left-0 origin-left"

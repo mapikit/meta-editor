@@ -6,6 +6,9 @@
   import SchemaActionButton from "./schema-action-button.svelte";
   import { DockController } from "../../../../../entities/controllers/dock-controller";
   import { PanelStore } from "../../../../../entities/stores/panels-store";
+  import { NotificationAction, NotificationData, notificationManager }
+    from "src/frontend/components/notifications/notification-center";
+  import { SystemConfigurationMutations } from "src/entities/mutations/system-configuration-mutations";
 
   export let schema : SchemaStore;
 
@@ -16,6 +19,25 @@
 
   const editSchemaFunction = () : void => {
     DockController.changeView(currentPanel, "Configure Schema", schema.identifier);
+  };
+
+  const deleteSchemaFunction = () : void => {
+    const notification = new NotificationData(
+      "warn",
+      `Deleting Schema "${$name}"`,
+      "You're about to remove this Schema. Meta-Editor will not automatically remove any references"+
+      " you may have of it throughout your configuration. You will need to manually apply a fix in every location.",
+      false, 15000,
+    );
+
+    const confirmAction = new NotificationAction(() => {
+      SystemConfigurationMutations.removeSchemaById(schema.identifier);
+      notificationManager.dismissVisible(notification);
+    }, "Yes, delete the Schema", "error");
+
+    notification.buttonActions.push(confirmAction);
+
+    notificationManager.notify(notification);
   };
 </script>
 
@@ -33,7 +55,7 @@
       <SchemaActionButton tooltipText="Edit Schema" action={editSchemaFunction} class="hover:text-brightGreen">
         <ArrowSquareOut />
       </SchemaActionButton>
-      <SchemaActionButton tooltipText="Remove Schema" action={() => {}} class="hover:text-roseRed">
+      <SchemaActionButton tooltipText="Remove Schema" action={deleteSchemaFunction} class="hover:text-roseRed">
         <TrashSimple />
       </SchemaActionButton>
     </div>

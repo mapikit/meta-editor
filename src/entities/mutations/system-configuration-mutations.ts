@@ -64,4 +64,11 @@ export class SystemConfigurationMutations {
 
     currentConfig.schemas.update(v => v.concat([new SchemaStore(Schema.newEmpty())]));
   }
+
+  public static removeSchemaById (identifier : string) : void {
+    const currentConfig = get(systemConfigurationsStore.currentlyOpenItems);
+    if (!currentConfig) { return; }
+
+    currentConfig.schemas.update(s => s.filter(sf => sf.identifier !== identifier));
+  }
 }

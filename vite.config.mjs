@@ -1,9 +1,10 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import nodeResolve from "@rollup/plugin-node-resolve";
+import tsconfig from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [svelte(), tsconfig()],
   root: "./",
   publicDir: "./static",
   build: {

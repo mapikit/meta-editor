@@ -79,9 +79,8 @@ export class PanelsMutations {
     let lastContent : DockPanelContent;
     console.log();
     view.typeHistory.update(current => {
-      const before = current.pop();
-      lastContent = current.pop();
-      if (!lastContent) lastContent = before;
+      current.pop();
+      lastContent = current[current.length -1];
       return current;
     });
 
