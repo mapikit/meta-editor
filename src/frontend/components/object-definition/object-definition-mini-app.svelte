@@ -10,8 +10,8 @@
   import ObjectDefinitionEditor from "./object-definition-editor.svelte";
   import ArrowIcon from "../../icons/arrow-icon.svelte";
   import { writable, Writable } from "svelte/store";
-  import deepClone from "deep-clone";
   import ChevronIcon from "../../icons/chevron-icon.svelte";
+  import clone from "just-clone";
 
   // Default mode is Creating an Obj Definition
   export let editingLevel : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
@@ -23,7 +23,7 @@
 
   export let initialData : object;
 
-  let definitionData : DefinitionData[] = convertObjDefinitionToDefinitionData(deepClone($format), initialData);
+  let definitionData : DefinitionData[] = convertObjDefinitionToDefinitionData(clone($format), initialData);
   const rootDefinitionData : Writable<DefinitionData> = writable({
     subtype: definitionData,
     keyName: "root",
@@ -125,24 +125,26 @@
 
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="{rootStyle}"
   on:mousedown={(e) => {e.stopPropagation();}}
 >
   <div class="bg-norbalt-350 py-2 px-4 rounded-t h-9 flex flex-row items-center mb-3"> <!-- Header BreadCrumb -->
     {#if levelsNames.length >= 1}
-      <div class="h-5 w-2.5 mr-2 cursor-pointer" on:click="{() => { goBackOneLevel(); }}">
+      <button class="h-5 w-2.5 mr-2 cursor-pointer" on:click="{() => { goBackOneLevel(); }}">
         <ArrowIcon style="stroke-white rotate-180 h-5 w-2.5"/>
-      </div>
+      </button>
     {/if}
     {#each levelsNames as level, index}
-      <div class="flex flex-row ml-2 first:ml-0 items-center text-lg text-offWhite last:text-white hover:text-white transition-all cursor-pointer"
+      <button class="flex flex-row ml-2 first:ml-0 items-center text-lg text-offWhite
+      last:text-white hover:text-white transition-all cursor-pointer"
         on:click="{() => navigateBackToLevel(index + 1)}"
       >
         {#if index !== 0}
           <ChevronIcon style="stroke-white -rotate-90"/>
         {/if}
         <p class="ml-1"> {level} </p>
-      </div>
+      </button>
     {/each}
   </div>
   <ObjectDefinitionEditor

@@ -12,8 +12,8 @@ export class ConfigurationFileSystemController {
 
   public static async readConfigurationFile (parentProject : Project, version : string)
     : Promise<SystemConfiguration> {
-    const versionInfo = await this.fileApi.getVersion(parentProject.identifier, version);
-    return new SystemConfiguration(versionInfo, parentProject.identifier);
+    const configType = await this.fileApi.getVersion(parentProject.identifier, version);
+    return new SystemConfiguration(configType, parentProject.identifier);
   }
 
   // Update Functions

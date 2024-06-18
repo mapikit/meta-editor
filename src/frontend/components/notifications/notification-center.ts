@@ -13,6 +13,7 @@ export class NotificationAction {
   public constructor (
     public call : () => void,
     public text : string,
+    public type : NotificationTypes = "info",
   ) {}
 }
 

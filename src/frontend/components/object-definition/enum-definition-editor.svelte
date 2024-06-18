@@ -1,14 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { Writable } from "svelte/store";
-  import CancelIcon from "../common/icons/cancel-icon.svelte";
   import StringField from "./editing-fields/string-field.svelte";
   import type { DefinitionData } from "./obj-def-converter";
   import { EditorLevel, EditorLevels } from "./obj-def-editor-types-and-helpers";
+  import CancelIcon from "src/frontend/icons/cancel-icon.svelte";
 
   // Default mode is Creating an Obj Definition
   export let level : EditorLevel = new EditorLevel(EditorLevels.createAndSignDefinition);
-  export let definitionData : Writable<DefinitionData>;;
+  export let definitionData : Writable<DefinitionData>;
   let enumDefinitiondata;
 
   $: {

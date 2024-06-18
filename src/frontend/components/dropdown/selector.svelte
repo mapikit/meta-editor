@@ -23,7 +23,7 @@
 
 </script>
 
-<button class="bg-norbalt-350 relative rounded py-1 flex
+<button class="bg-norbalt-300 relative rounded py-1 flex
   flex-row flex-nowrap border border-norbalt-100 transition-all
   {hoveredClass} {focusClass} select-none {styleClass} cursor-pointer"
   on:click="{(e) => { focused = !focused; e.stopPropagation(); }}"

@@ -158,7 +158,7 @@
   transition-all duration-200 delay-200 {hiddenClass}" transition:fade|global={{ duration: 120 }} style="{anchorPos}">
     <div class="fixed z-50 {arrowPadding} delay-500 transition-all
     w-max max-w-sm font-sans shadow overflow-hidden" style="{offset}" bind:this={component}>
-      <div class="px-3 py-1 rounded bg-norbalt-200">
+      <div class="px-3 py-1 rounded bg-norbalt-200 text-white">
         {tooltipContent}
         <div class="bg-norbalt-200 origin-center
         w-4 h-4 rounded-sm absolute -z-10" style="{arrowPos}"/>

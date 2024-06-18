@@ -13,6 +13,12 @@
   import { EditorMetadataController } from "../entities/controllers/editor-metadata-controller";
   import GlobalHeader from "./views/header/global-header.svelte";
   import { globalHeaderStore } from "../entities/stores/global-header-store";
+  import { systemConfigurationsStore } from "../entities/stores/system-configurations-store";
+  import { get } from "svelte/store";
+  import { projectsStore } from "../entities/stores/projects-store";
+  import { IconToolboxData, ToolboxAction } from "../entities/models/view-related/icon-toolbox";
+  import { FloppyDisk } from "phosphor-svelte";
+  import { SystemConfigurationController } from "../entities/controllers/system-configuration-controller";
 
   const spawn = () : void => {
     loading.set(true);
@@ -34,6 +40,33 @@
   });
 
   const { loading, ready } = genericLayoutStateStore;
+
+  const getEditorName = () : string => {
+    let projectName = "";
+    let configurationName = "";
+
+    projectName = get(get(projectsStore.currentlyOpenItems).projectName);
+    configurationName = get(get(systemConfigurationsStore.currentlyOpenItems).name);
+
+    return `${projectName} / ${configurationName}`;
+  };
+
+  const getEditorToolbar = () : IconToolboxData[] => {
+    const result = [];
+    const fileButton = new IconToolboxData(FloppyDisk, "File");
+    const saveAction = new ToolboxAction(
+      "Save",
+      "Saves currently open version, overwriting it on disk",
+      async () => {
+        const project = get(projectsStore.currentlyOpenItems).toEntity();
+        const configuration = get(systemConfigurationsStore.currentlyOpenItems).toEntity();
+        await SystemConfigurationController.save(project, configuration);
+      },
+    );
+
+    fileButton.actions.push(saveAction);
+    return result.concat([fileButton]);
+  };
 </script>
 
 {#if !$ready || $loading}
@@ -48,7 +81,12 @@
       <Route path="/projects" onEnter={() => { globalHeaderStore.title.set("Projects"); }}>
         <Projects />
       </Route>
-      <Route path="/projects/:identifier/versions/:version_identifier">
+      <Route path="/projects/:identifier/versions/:version_identifier"
+        onEnter={async () => {
+          globalHeaderStore.title.set(getEditorName());
+          globalHeaderStore.iconToolboxes.set(getEditorToolbar());
+        }}
+      >
         <Editor />
       </Route>
     </Switch>

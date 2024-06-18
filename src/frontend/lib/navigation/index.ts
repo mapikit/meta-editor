@@ -87,6 +87,7 @@ class Navigation {
         return; // Is goBack
       }
 
+      console.log(navigationPath);
       this.history.push(this._path);
       this._path = navigationPath;
     });

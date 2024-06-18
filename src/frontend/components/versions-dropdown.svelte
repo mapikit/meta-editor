@@ -1,16 +1,15 @@
 <script lang="ts">
   import { clickOutside } from "../lib/click-outside-directive";
   import { CaretDown, Archive, TreeStructure, PlusSquare, ArrowSquareUp } from "phosphor-svelte";
-  import { ProjectStore } from "../../entities/stores/projects-store";
+  import { ProjectStore, ProjectVersionInfoStore } from "../../entities/stores/projects-store";
   import EditableTextField from "./text-fields/editable-text-field.svelte";
   import { fly } from "svelte/transition";
   import CardButton from "./buttons/card-button.svelte";
   import { ProjectsController } from "../../entities/controllers/projects-controller";
   import { SystemConfigurationController } from "../../entities/controllers/system-configuration-controller";
   import { navigation } from "../lib/navigation";
-  import { ProjectVersionInfo } from "../../common/types/serializables/project-config-type";
   import { getContext, onDestroy, onMount } from "svelte";
-  import { Unsubscriber, Writable, writable } from "svelte/store";
+  import { Unsubscriber, Writable, get, writable } from "svelte/store";
 
   export let parentProject : ProjectStore;
   let expanded = false;
@@ -18,8 +17,8 @@
 
   let scrollCompensation : Writable<number> = (getContext("scroll-compensation") ?? writable(0)) as Writable<number>;
   let styleScrollCompensation = "transform: translateY(0)";
-  let latestVersion : Writable<ProjectVersionInfo> = writable(null);
-  let otherVersions : Writable<ProjectVersionInfo[]> = writable([]);
+  let latestVersion : Writable<ProjectVersionInfoStore> = writable(null);
+  let otherVersions : Writable<ProjectVersionInfoStore[]> = writable([]);
 
   const navigateToVersion = async (versionId : string) : Promise<void> => {
     const project = parentProject.toEntity();
@@ -29,12 +28,12 @@
     navigation.navigateTo(project.getVersionNavigationPath(versionId));
   };
 
-  const cloneToNewVersion = async (version : ProjectVersionInfo) : Promise<void> => {
+  const cloneToNewVersion = async (version : ProjectVersionInfoStore) : Promise<void> => {
     const project = parentProject.toEntity();
     await SystemConfigurationController.duplicateConfiguration(project, version.identifier);
   };
 
-  const archiveVersion = async (version : ProjectVersionInfo) : Promise<void> => {
+  const archiveVersion = async (version : ProjectVersionInfoStore) : Promise<void> => {
     const project = parentProject.toEntity();
     await SystemConfigurationController.archive(project, version.identifier);
   };
@@ -87,16 +86,18 @@
       {#if $latestVersion !== null && $latestVersion !== undefined} {#key $latestVersion.identifier}
         <div class="items-center p-1 flex w-fit">
           <EditableTextField class="w-40 h-7 rounded-none rounded-l"
-          bind:text={$latestVersion.name}
-          onFinishEdit={async () => {
-            await SystemConfigurationController.saveFromVersionInfo(parentProject.toEntity(), $latestVersion);
+          text={get($latestVersion.name)}
+          onFinishEdit={async (value) => {
+            $latestVersion.name.set(value);
+            await SystemConfigurationController
+              .saveFromVersionInfo(parentProject.toEntity(), $latestVersion.toEntity());
             const now = new Date(Date.now());
             parentProject.updatedAt.set(now);
-            $latestVersion.updatedAt = now.toISOString();
+            $latestVersion.updatedAt.set(now.toISOString());
             await ProjectsController.save(parentProject.toEntity());
           }}/>
           <span class="border-norbalt-400 w-24 text-center border-2 rounded-r
-            pl-1.5 pr-2 whitespace-nowrap select-none cursor-default"> @ {$latestVersion.version} </span>
+            pl-1.5 pr-2 whitespace-nowrap select-none cursor-default"> @ {get($latestVersion.version)} </span>
           <div class="inline-flex h-7 space-x-1.5 ml-4">
             <CardButton class="w-7" hoverColor="green" noOutline
             clickFunction={async () => { await navigateToVersion($latestVersion.identifier); }}>
