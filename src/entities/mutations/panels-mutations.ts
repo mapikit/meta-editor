@@ -46,8 +46,6 @@ export class PanelsMutations {
           .map(entityMapper("identifier", "Addon Configure")),
         get(matchingConfigurationStore.businessOperations)
           .map(entityMapper<BusinessOperationType>("identifier", "Business Operations")),
-        (get(matchingConfigurationStore.envs) ?? [])
-          .map(entityMapper<EnvironmentVariableEntity>("key", "Environment Variables")),
         get(matchingConfigurationStore.schemas)
           .map(entityMapper<Schema>("name", "Configure Schema")),
         [new DockPanelContent("Overview", matchingConfigurationStore)],

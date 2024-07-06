@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Selector from "../../components/dropdown/selector.svelte";
   import { PanelStore, availablePanels } from "../../../entities/stores/panels-store";
 	import { PanelsMutations } from "../../../entities/mutations/panels-mutations";
 	import { DockPanelContent } from "../../../entities/models/view-related/dock-panel-content";
@@ -12,12 +11,24 @@
   let { allAvailablePanels: allAvailableViews } = availablePanels;
 
   let open = false;
-  let selectorOptions : SelectorOption<DockPanelContent>[] = [];
+  let rootLevelPanels : DockPanelContent[] = [];
+  let addonsPanels : DockPanelContent[] = [];
+  let schemasPanels : DockPanelContent[] = [];
+  let bopsPanels : DockPanelContent[] = [];
 
   $: {
-    selectorOptions = $allAvailableViews.map((view) => {
-      return { label: view.title, value: view };
+    addonsPanels = $allAvailableViews.filter((view) => {
+      return view.type === "Addon Configure";
     });
+    schemasPanels = $allAvailableViews.filter((view) => {
+      return view.type === "Configure Schema";
+    });
+    bopsPanels = $allAvailableViews.filter((view) => {
+      return view.type === "BOps Flow";
+    });
+    rootLevelPanels = $allAvailableViews.filter((view) => {
+      !([].concat(addonsPanels, schemasPanels, bopsPanels).includes(view));
+    })
   }
 
   const selectView = (selected : SelectorOption<DockPanelContent>) : void => {
@@ -36,9 +47,9 @@ on:click_outside={() => { open = false; }}
   </button>
 
   {#if open}
-  <div class="absolute top-full left-0" transition:fly={{ x:0, y: -20, duration: 160 }}>
-    <div class="fixed w-8 h-8 rounded bg-norbalt-300 outline outline-2 outline-norbalt-200 overflow-hidden">
-      aaaaa
+  <div class="absolute top-full left-0.5" transition:fly={{ x:0, y: -20, duration: 160 }}>
+    <div class="fixed w-fit h-8 rounded bg-norbalt-300 outline outline-2 outline-norbalt-200 overflow-hidden px-2 py-1">
+      inserir pickers + searchbar
     </div>
   </div>
   {/if}
