@@ -48,8 +48,16 @@ on:click_outside={() => { open = false; }}
 
   {#if open}
   <div class="absolute top-full left-0.5" transition:fly={{ x:0, y: -20, duration: 160 }}>
-    <div class="fixed w-fit h-8 rounded bg-norbalt-300 outline outline-2 outline-norbalt-200 overflow-hidden px-2 py-1">
-      inserir pickers + searchbar
+    <div class="fixed w-fit h-8 rounded bg-norbalt-300 outline outline-2 outline-norbalt-200 overflow-hidden px-2 py-1
+    flex flex-col justify-start items-center">
+      <div class="bg-norbalt-400 rounded-sm w-48 h-8">
+
+      </div>
+      <div class="w-full flex-1">
+        {#each schemasPanels as schema }
+          {schema.title}
+        {/each}
+      </div>
     </div>
   </div>
   {/if}
