@@ -7,6 +7,7 @@
   import EditableTextField from "src/frontend/components/text-fields/editable-text-field.svelte";
   import CardButton from "src/frontend/components/buttons/card-button.svelte";
   import DropdownPanelGroup from "./dropdown-panel-group.svelte";
+  import Fuse from "fuse.js";
 
   export let selectedView : PanelStore;
   let { allAvailablePanels: allAvailableViews } = availablePanels;
@@ -19,6 +20,9 @@
 
   let textSearch = "";
   let panelsGroup = [];
+  const defaultFuzzyOptions = { keys: ["title"] };
+  let fuzzySearch = new Fuse([], defaultFuzzyOptions);
+  let matchedViews : DockPanelContent[] = null; // Assumes null if not searching
 
   $: {
     addonsPanels = $allAvailableViews.filter((view) => {
@@ -42,8 +46,13 @@
     ];
   }
 
-  const dismiss = () : void => { open = false; };
+  const dismiss = () : void => { open = false; matchedViews = []; textSearch = ""; };
+  const search = () : void => {
+    if (textSearch === "") { matchedViews = null; return; }
 
+    fuzzySearch.setCollection($allAvailableViews);
+    matchedViews = fuzzySearch.search(textSearch).map(res => res.item);
+  };
 </script>
 
 <div class="relative h-full w-fit ml-2 flex justify-center items-center"
@@ -61,7 +70,8 @@ on:click_outside={() => { open = false; }}
     <div class="fixed rounded bg-norbalt-300 overflow-hidden px-2 py-1 pb-2 shadow-lg
     flex flex-col justify-start items-center z-10"transition:fly={{ x:0, y: -20, duration: 160 }}>
       <div class="flex w-full h-8 flex-row items-center">
-        <EditableTextField class="w-48" text={textSearch} onFinishEdit={(v) => { textSearch = v; }} />
+        <EditableTextField class="w-48" text={textSearch}
+          onChange={(v) => { textSearch = v; search(); }} /> <!-- strong candidate for debounce later on -->
         <CardButton clickFunction={() => { console.log(textSearch); } }
           class="w-8 bg-transparent" noOutline hoverColor="green">
           <MagnifyingGlass />
@@ -70,12 +80,13 @@ on:click_outside={() => { open = false; }}
       <div class="grid grid-cols-2 gap-2 mt-2 w-[32.5rem]">
         {#each panelsGroup as panelGroup }
           <DropdownPanelGroup
+          matchedViews={matchedViews}
           selectedView={selectedView}
           group={panelGroup.data}
           title={panelGroup.title}
           class="w-64"
           onSelect={dismiss}
-          textColor={panelGroup.color}/> <!-- TODO fix this typing -->
+          textColor={panelGroup.color}/>
         {/each}
       </div>
     </div>

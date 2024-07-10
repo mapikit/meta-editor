@@ -5,6 +5,7 @@
 
   export let selectedView : PanelStore;
   export let group : DockPanelContent[];
+  export let matchedViews : DockPanelContent[];
   export let title : string;
   export let textColor : "yellow" | "blue" | "green" | "red" | "default" = "default";
   let clazz : string = "";
@@ -20,12 +21,18 @@
   const selectView = (selected : DockPanelContent) : void => {
     PanelsMutations.applyPanelChange(selectedView, selected);
   };
+
+  let exibitionGroup = group;
+
+  $: {
+    exibitionGroup = matchedViews === null ? group : matchedViews.filter((item) => group.includes(item));
+  }
 </script>
 
 <div class="rounded bg-norbalt-350 px-2 py-1 {clazz}">
   <p class="font-bold {color}">{title}</p>
   <div class="w-full h-24 overflow-y-scroll scroll-pl-2"> <!-- Panels List-->
-    {#each group as item }
+    {#each exibitionGroup as item }
       <button class="overflow-hidden whitespace-nowrap text-offWhite overflow-ellipsis
       hover:text-white transition w-full max-w-full text-left"
       on:click={() => { selectView(item); onSelect(); }}> {item.title} </button>
