@@ -46,22 +46,27 @@
     ];
   }
 
-  const dismiss = () : void => { open = false; matchedViews = []; textSearch = ""; };
+  const dismiss = () : void => { open = false; resetSearch(); };
   const search = () : void => {
     if (textSearch === "") { matchedViews = null; return; }
 
     fuzzySearch.setCollection($allAvailableViews);
     matchedViews = fuzzySearch.search(textSearch).map(res => res.item);
   };
+
+  const resetSearch = () : void => {
+    textSearch = "";
+    matchedViews = null;
+  };
 </script>
 
 <div class="relative h-full w-fit ml-2 flex justify-center items-center"
 use:clickOutside
-on:click_outside={() => { open = false; }}
+on:click_outside={() => { open = false; resetSearch(); }}
 >
   <button class="w-5 h-5 rounded-sm text-offWhite hover:text-white bg-transparent
   hover:bg-norbalt-200 transition justify-center items-center flex"
-  on:click={() => { open = !open; }}>
+  on:click={() => { open = !open; if (!open) resetSearch(); }}>
     <CaretDown class="{open ? "rotate-180" : "rotate-0"} transition-transform"/>
   </button>
 
@@ -72,7 +77,7 @@ on:click_outside={() => { open = false; }}
       <div class="flex w-full h-8 flex-row items-center">
         <EditableTextField class="w-48" text={textSearch}
           onChange={(v) => { textSearch = v; search(); }} /> <!-- strong candidate for debounce later on -->
-        <CardButton clickFunction={() => { console.log(textSearch); } }
+        <CardButton clickFunction={() => { search(); } }
           class="w-8 bg-transparent" noOutline hoverColor="green">
           <MagnifyingGlass />
         </CardButton>
