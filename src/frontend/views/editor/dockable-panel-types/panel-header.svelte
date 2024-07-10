@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Writable, writable } from "svelte/store";
   import { SubdivisionStore } from "../../../../entities/stores/dock-subdivision-store";
-  import DropdownPanelSelector from "../dropdown-panel-selector.svelte";
+  import DropdownPanelSelector from "../dropdown-panel-selector/dropdown-panel-selector.svelte";
   import PanelOptions from "./panel-options.svelte";
   import { ArrowLeft } from "phosphor-svelte";
   import { PanelsMutations } from "../../../../entities/mutations/panels-mutations";
@@ -35,7 +35,6 @@
   text-md font-semibold whitespace-nowrap"> {finalTitle} </span>
   <DropdownPanelSelector selectedView={$view}/>
   <div class="flex flex-row justify-end flex-1">
-
     <PanelOptions parent={parent} currentElement={currentElement}/>
   </div>
 </header>
