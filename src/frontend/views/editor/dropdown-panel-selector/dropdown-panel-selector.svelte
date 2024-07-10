@@ -70,7 +70,10 @@ on:click_outside={() => { open = false; resetSearch(); }}
     <CaretDown class="{open ? "rotate-180" : "rotate-0"} transition-transform"/>
   </button>
 
-  <div class="absolute top-full left-0.5" >
+  <!-- svelte-ignore a11y-no-static-element-interactions --> <!-- Honestly this is just to stop propagations -->
+  <div class="absolute top-full left-0.5"
+    on:mousedown={(e) => e.stopPropagation()}
+  >
     {#if open}
     <div class="fixed rounded bg-norbalt-300 overflow-hidden px-2 py-1 pb-2 shadow-lg
     flex flex-col justify-start items-center z-10"transition:fly={{ x:0, y: -20, duration: 160 }}>
