@@ -44,7 +44,7 @@
 
 
 <div
-  class="relative z-10 overflow-visible bg-norbalt-500
+  class="relative overflow-visible
     {modeCursor} {size} transition-all duration-100 flex justify-center items-center select-none"
   role="separator"
   on:mousedown={(ev) => {

@@ -25,7 +25,7 @@ hover:bg-norbalt-200 text-offWhite hover:text-white text-bold"
 </button>
 
 {#if open}
-  <div class="bg-norbalt-300 absolute mt-6 rounded shadow-md flex flex-col overflow-hidden"
+  <div class="bg-norbalt-300 absolute mt-6 rounded shadow-md flex flex-col overflow-hidden z-10"
   transition:fly={{ x: 0, y: -12, duration: 150 }}>
     <button class="w-full text-center text-offWhite
       hover:text-white transition-all px-3 pt-2 pb-1 hover:bg-norbalt-200"

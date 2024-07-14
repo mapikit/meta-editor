@@ -1,6 +1,7 @@
 <script lang="ts">
   export let text : string;
   export let onFinishEdit : (value : string) => void = () : void => {};
+  export let onChange : (value : string) => void = () : void => {};
 
   let previousText : string = text;
   let blockFlag = false;
@@ -42,5 +43,6 @@
   size="0"
   on:keydown={handleKey}
   on:focusout={confirmEdition}
+  on:input={(e) => onChange(e.currentTarget.value)}
   bind:this={field}
   bind:value={text}/>
